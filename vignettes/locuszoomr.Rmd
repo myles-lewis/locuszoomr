@@ -50,6 +50,9 @@ for linkage disequilibrium (LD) across SNPs. In order to make use of this API
 function you will need a personal access token (see the `LDlinkR` vignette), 
 available from the LDlink website https://ldlink.nci.nih.gov/?tab=apiaccess.
 
+Requests to LDlink are cached using the `memoise` package, to reduce API 
+requests. This is helpful when modifying plots for aesthetic reasons.
+
 # Example locus plot
 
 ```{r eval = FALSE}
@@ -65,3 +68,4 @@ locusplot(SLE_gwas, gene = 'STAT4', flank = 1e5, LDtoken = "..")
 ```{r locus1, echo = FALSE, message=FALSE, fig.show='hold', out.width='80%', out.extra='style="border: 0;"'}
 knitr::include_graphics("locus1.png")
 ```
+
