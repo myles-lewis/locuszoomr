@@ -1,12 +1,25 @@
 Package: locuszoomr
-Title: What the Package Does (One Line, Title Case)
+Title: Gene locus plot with gene annotations
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    c(person(given = "Myles",family = "Lewis",
+    role = c("aut", "cre"),
+    email = "myles.lewis@qmul.ac.uk",
+    comment = c(ORCID = "0000-0001-9365-5345")))
+Description: Pure R version of locuszoom.
+Language: en-gb
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
+biocViews:
+Imports:
+    AnnotationFilter,
+    BiocGenerics,
+    ensembldb,
+    GenomeInfoDb,
+    LDlinkR
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr

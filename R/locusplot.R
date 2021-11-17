@@ -15,7 +15,7 @@
 #' @param flank Vector of how much flanking region left and right of the gene 
 #' to show. 
 #' @param ens_version Specifies which ensembl database to query for gene and 
-#' exon positions. See [ensembldb].
+#' exon positions. See `ensembldb` Bioconductor package.
 #' @param chrom Determines which column in `data` contains chromosome 
 #' information.
 #' @param pos Determines which column in `data` contains position information.
@@ -44,12 +44,15 @@
 #' which lack LD information. The next 5 colours are for r2 or D' LD results 
 #' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
 #' SNP.
+#' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value.
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom LDlinkR LDmatrix
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
 #' SeqNameFilter GeneIdFilter
+#' @importFrom GenomeInfoDb seqlengths
+#' @importFrom graphics axTicks axis layout lines par rect strwidth text
 #' @export
 
 locusplot <- function(data, xrange = NULL, seqname = NULL,
@@ -57,7 +60,6 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
                       ens_version = "EnsDb.Hsapiens.v75",
                       chrom = 'chrom', pos = 'pos', p = 'p',
                       labs = 'rsid',
-                      startLabels = NULL,
                       pcutoff = 5e-08,
                       chromCols = 'royalblue',
                       sigCol = 'red',
@@ -90,11 +92,12 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
   data <- as.data.frame(data)
   if (LD) {
-    require("LDlinkR")
     cat(paste("Requesting LD on", min(c(nrow(data), 1000)), "SNPs"))
     rslist <- data[, labs]
-    if (length(rslist) > 1000) rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
-    ldm <- LDmatrix(rslist, pop = "CEU", r2d = "r2", token = LDtoken)
+    if (length(rslist) > 1000) {
+      rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
+    }
+    ldm <- LDlinkR::LDmatrix(rslist, pop = "CEU", r2d = "r2", token = LDtoken)
     if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
     ld <- ldm[, index_snp]
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
