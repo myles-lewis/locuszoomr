@@ -26,6 +26,8 @@ locusplot(
   xticks = "bottom",
   index_snp = NULL,
   LD = TRUE,
+  pop = "CEU",
+  r2d = "r2",
   LDtoken = "",
   border = FALSE,
   LDcols = c("grey", "blue", "cyan", "green3", "orange", "red", "purple"),
@@ -83,6 +85,12 @@ selected.}
 \item{LD}{Logical whether LD is plotted. Queries 1000 genomes via LDlinkR
 package. See \link{LDlinkR}.}
 
+\item{pop}{A 1000 Genomes Project population, (e.g. YRI or CEU), multiple
+allowed, default = "CEU". Passed to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
+
+\item{r2d}{Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed
+to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
+
 \item{LDtoken}{Peronsal access token for accessing 1000 genomes LD data via
 LDlink API. See \link{LDlinkR}.}
 
@@ -97,7 +105,8 @@ SNP.}
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
 }
 \value{
-No return value.
+Returns a list containing the subset of data plotted, chromosome and
+genomic position range.
 }
 \description{
 Genomic locus plot similar to locuszoom.

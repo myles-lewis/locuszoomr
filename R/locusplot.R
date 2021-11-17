@@ -35,7 +35,13 @@
 #' disequilibrium (LD). If not specifiied, the SNP with the lowest P value is 
 #' selected.
 #' @param LD Logical whether LD is plotted. Queries 1000 genomes via LDlinkR 
-#' package. See [LDlinkR].
+#' package. See [LDlinkR]. Results are cached using the `memoise` package, so
+#' that if exactly the same locus is requested the system does not repeatedly 
+#' call the API.
+#' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
+#' allowed, default = "CEU". Passed to [LDlinkR::LDmatrix].
+#' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
+#' to [LDlinkR::LDmatrix].
 #' @param LDtoken Peronsal access token for accessing 1000 genomes LD data via 
 #' LDlink API. See [LDlinkR].
 #' @param border Logical whether a bounding box is plotted around upper and 
@@ -54,6 +60,7 @@
 #' SeqNameFilter GeneIdFilter
 #' @importFrom GenomeInfoDb seqlengths
 #' @importFrom graphics axTicks axis layout lines par rect strwidth text
+#' @importFrom memoise memoise
 #' @export
 
 locusplot <- function(data, xrange = NULL, seqname = NULL,
@@ -71,16 +78,15 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
                       xticks = 'bottom',
                       index_snp = NULL,
                       LD = TRUE,
+                      pop = "CEU",
+                      r2d = "r2",
                       LDtoken = "",
                       border = FALSE,
                       LDcols = c('grey', 'blue', 'cyan', 'green3', 'orange', 'red', 
                                  'purple'),
                       ...) {
   args <- list(...)
-  if (!inherits(data, 'data.frame') | inherits(data, 'tbl')) data <- as.data.frame(data)
-  data$logP <- -log10(data[, p])
   require(ens_version, character.only = TRUE)
-  
   edb <- get(ens_version)
   if (!is.null(gene)) {
     locus <- genes(edb, filter = GeneNameFilter(gene))
@@ -91,14 +97,15 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   if (is.null(xlab)) xlab <- paste("Chromosome", seqname, "(Mb)")
   data <- data[data[, chrom] == seqname &
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
+  data$logP <- -log10(data[, p])
   data <- as.data.frame(data)
   if (LD) {
-    cat(paste("Requesting LD on", min(c(nrow(data), 1000)), "SNPs"))
     rslist <- data[, labs]
     if (length(rslist) > 1000) {
       rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
     }
-    ldm <- LDlinkR::LDmatrix(rslist, pop = "CEU", r2d = "r2", token = LDtoken)
+    cat(paste("Obtaining LD on", length(rslist), "SNPs"))
+    ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken)
     if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
     ld <- ldm[, index_snp]
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
@@ -200,5 +207,5 @@ mapRow <- function(TX, gap = 2e3, cex.text = 0.7,
   TX
 }
 
-
-
+# use memoise to reduce calls to LDlink API
+mem_LDmatrix <- memoise(LDmatrix)

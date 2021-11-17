@@ -16,7 +16,8 @@ Imports:
     BiocGenerics,
     ensembldb,
     GenomeInfoDb,
-    LDlinkR
+    LDlinkR,
+    memoise
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Suggests:
