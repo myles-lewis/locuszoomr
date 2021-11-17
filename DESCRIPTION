@@ -19,7 +19,8 @@ Imports:
     LDlinkR
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Suggests: 
+Suggests:
+    data.table,
     rmarkdown,
     knitr
 VignetteBuilder: knitr

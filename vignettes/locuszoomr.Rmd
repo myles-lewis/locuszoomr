@@ -1,6 +1,13 @@
 ---
 title: "locuszoomr"
-output: rmarkdown::html_vignette
+author: "Myles Lewis"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    toc_depth: 3
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{locuszoomr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -9,11 +16,52 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  collapse = TRUE
 )
 ```
 
-```{r setup}
+# Introduction
+
+The `locuszoomr` package allows user to produce publication ready gene locus 
+plots very similar to those produced by the web interface locuszoom 
+(http://locuszoom.org) but running purely locally in R. It provides 
+customisation to the plots.
+
+# Installation
+
+Bioconductor packages ensembldb and an ensembl database package are required 
+before installation.
+
+```{r eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("ensembldb")
+BiocManager::install("EnsDb.Hsapiens.v75")
+```
+
+Install from Github
+```{r eval = FALSE}
+devtools::install_github("myles-lewis/locuszoomr")
 library(locuszoomr)
+```
+
+`locuszoomr` automatically leverages the `LDlinkR` package to query 1000 genomes 
+for linkage disequilibrium (LD) across SNPs. In order to make use of this API
+function you will need a personal access token (see the `LDlinkR` vignette), 
+available from the LDlink website https://ldlink.nci.nih.gov/?tab=apiaccess.
+
+# Example locus plot
+
+```{r eval = FALSE}
+# Manhattan plot using SLE GWAS data from Bentham et al 2015
+# FTP download full summary statistics from
+# https://www.ebi.ac.uk/gwas/studies/GCST003156
+library(data.table)
+SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
+
+locusplot(SLE_gwas, gene = 'STAT4', flank = 1e5, LDtoken = "..")
+```
+
+```{r locus1, echo = FALSE, message=FALSE, fig.show='hold', out.width='80%', out.extra='style="border: 0;"'}
+knitr::include_graphics("locus1.png")
 ```

@@ -45,7 +45,8 @@
 #' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
 #' SNP.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
-#' @return No return value.
+#' @return Returns a list containing the subset of data plotted, chromosome and
+#' genomic position range.
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom LDlinkR LDmatrix
@@ -171,6 +172,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
+  invisible(list(data = data, seqname = seqname, xrange = xrange))
 }
 
 # map genes into rows without overlap
