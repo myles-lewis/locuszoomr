@@ -83,7 +83,9 @@ disequilibrium (LD). If not specifiied, the SNP with the lowest P value is
 selected.}
 
 \item{LD}{Logical whether LD is plotted. Queries 1000 genomes via LDlinkR
-package. See \link{LDlinkR}.}
+package. See \link{LDlinkR}. Results are cached using the \code{memoise} package, so
+that if exactly the same locus is requested the system does not repeatedly
+call the API.}
 
 \item{pop}{A 1000 Genomes Project population, (e.g. YRI or CEU), multiple
 allowed, default = "CEU". Passed to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}

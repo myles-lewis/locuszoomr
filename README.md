@@ -1,6 +1,8 @@
 # locuszoomr
 
-This is a pure R implementation of locuszoom for plotting genetic data at a genomic locus accompanied by gene annotations. It uses the LDlink API to query linkage disequilibrium data from 1000 genomes.
+This is a pure R implementation of locuszoom for plotting genetic data at 
+genomic loci accompanied by gene annotations. It uses the LDlink API to query 
+linkage disequilibrium data from 1000 genomes.
 
 # Installation
 
@@ -31,7 +33,7 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 # Example locus plot
 
 ```
-# Manhattan plot using SLE GWAS data from Bentham et al 2015
+# Locus plot using SLE GWAS data from Bentham et al 2015
 # FTP download full summary statistics from
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
