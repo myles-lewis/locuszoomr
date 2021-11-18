@@ -1,6 +1,6 @@
-#' Locus plot
+#' Create locus object for plotting
 #' 
-#' Genomic locus plot similar to locuszoom.
+#' Creates object of class 'locus' for genomic locus plot similar to locuszoom.
 #' 
 #' @details 
 #' This is an R version of locuszoom for generating publication ready Manhattan 
@@ -21,16 +21,6 @@
 #' @param pos Determines which column in `data` contains position information.
 #' @param p Determines which column in `data` contains SNP p values.
 #' @param labs Determines which column in `data` contains SNP rs IDs.
-#' @param pcutoff Cut-off for p value significance. Defaults to 5e-08.
-#' @param chromCols Colour for normal points if `LD` is `FALSE`.
-#' @param sigCol Colour for significant points if `LD` is `FALSE`.
-#' @param xlab x axis title.
-#' @param ylab y axis title.
-#' @param cex.axis Specifies font size for axis numbering.
-#' @param heights Ratio of top to bottom plot. See [layout].
-#' @param maxrows Specifies maximum nunber of rows to display in gene 
-#' annotation panel.
-#' @param xticks Character value specifying whether x axis ticks and numbers.
 #' @param index_snp Specifies the index SNP for displaying linkage 
 #' disequilibrium (LD). If not specifiied, the SNP with the lowest P value is 
 #' selected.
@@ -44,48 +34,32 @@
 #' to [LDlinkR::LDmatrix].
 #' @param LDtoken Peronsal access token for accessing 1000 genomes LD data via 
 #' LDlink API. See [LDlinkR].
-#' @param border Logical whether a bounding box is plotted around upper and 
-#' lower plots.
-#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs 
-#' which lack LD information. The next 5 colours are for r2 or D' LD results 
-#' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
-#' SNP.
-#' @param ... Other arguments passed to [plot()] for the scatter plot.
-#' @return Returns a list containing the subset of data plotted, chromosome and
-#' genomic position range.
+#' @return Returns an object of class 'locus' ready for plotting, containing 
+#' the subset of GWAS data to be plotted, 
+#' chromosome and genomic position range, 
+#' ensembl database version number, 
+#' column names for chromosome, position, SNP ID, p value
+#' locus gene information from ensembl and
+#' locus exon information from ensembl.
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom LDlinkR LDmatrix
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
 #' SeqNameFilter GeneIdFilter
 #' @importFrom GenomeInfoDb seqlengths
-#' @importFrom graphics axTicks axis layout lines par rect strwidth text
 #' @importFrom memoise memoise
 #' @export
 
-locusplot <- function(data, xrange = NULL, seqname = NULL,
+locus <- function(data, xrange = NULL, seqname = NULL,
                       gene = NULL, flank = 5e4,
                       ens_version = "EnsDb.Hsapiens.v75",
                       chrom = 'chrom', pos = 'pos', p = 'p',
                       labs = 'rsid',
-                      pcutoff = 5e-08,
-                      chromCols = 'royalblue',
-                      sigCol = 'red',
-                      xlab = NULL, ylab = '-log10 P value',
-                      cex.axis = 0.8,
-                      heights = c(3, 2),
-                      maxrows = 7,
-                      xticks = 'bottom',
                       index_snp = NULL,
                       LD = TRUE,
                       pop = "CEU",
                       r2d = "r2",
-                      LDtoken = "",
-                      border = FALSE,
-                      LDcols = c('grey', 'blue', 'cyan', 'green3', 'orange', 'red', 
-                                 'purple'),
-                      ...) {
-  args <- list(...)
+                      LDtoken = "") {
   require(ens_version, character.only = TRUE)
   edb <- get(ens_version)
   if (!is.null(gene)) {
@@ -94,7 +68,6 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
     seqname <- names(seqlengths(locus))
   }
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  if (is.null(xlab)) xlab <- paste("Chromosome", seqname, "(Mb)")
   data <- data[data[, chrom] == seqname &
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
   data$logP <- -log10(data[, p])
@@ -110,12 +83,6 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
     if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
     ld <- ldm[, index_snp]
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
-    data$col <- LDcols[cut(data$ld, -1:6/5, labels = FALSE)]
-    data$col[is.na(data$col)] <- LDcols[1]
-    data$col[which.max(data$logP)] <- LDcols[7]
-  } else {
-    data$col <- chromCols
-    data$col[data[, p] < pcutoff] <- sigCol
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
@@ -126,9 +93,77 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   TX <- TX[TX$seqnames == seqname, ]
   TX <- TX[TX$end > xrange[1], ]
   TX <- TX[TX$start < xrange[2], ]
+  EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+  
+  loc <- list(seqname = seqname, xrange = xrange,
+              ens_version = ens_version,
+              chrom = chrom, pos = pos, p = p, labs = labs,
+              data = data, TX = TX, EX = EX)
+  class(loc) <- "locus"
+  loc
+}
+
+#' Locus plot
+#' 
+#' Genomic locus plot similar to locuszoom.
+#' 
+#' @details 
+#' This is an R version of locuszoom for generating publication ready Manhattan 
+#' plots of gene loci. It references ensembl databases for annotating genes 
+#' and exons. It queries LDlink to retrieve LD information on the index SNP.
+#' 
+#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param pcutoff Cut-off for p value significance. Defaults to 5e-08.
+#' @param chromCols Colour for normal points if `LD` is `FALSE`.
+#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param xlab x axis title.
+#' @param ylab y axis title.
+#' @param cex.axis Specifies font size for axis numbering.
+#' @param heights Ratio of top to bottom plot. See [layout].
+#' @param maxrows Specifies maximum nunber of rows to display in gene 
+#' annotation panel.
+#' @param xticks Character value of either 'top' or 'bottom' specifying 
+#' whether x axis ticks and numbers are plotted on top or bottom plot window.
+#' @param border Logical whether a bounding box is plotted around upper and 
+#' lower plots.
+#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs 
+#' which lack LD information. The next 5 colours are for r2 or D' LD results 
+#' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
+#' SNP.
+#' @param ... Other arguments passed to [plot()] for the scatter plot.
+#' @return No return value.
+#' @importFrom BiocGenerics start end
+#' @importFrom graphics axTicks axis layout lines par rect strwidth text
+#' @export
+
+plot.locus <- function(x, ...,
+                      pcutoff = 5e-08,
+                      chromCols = 'royalblue',
+                      sigCol = 'red',
+                      xlab = NULL, ylab = expression("-log"[10] ~ "P"),
+                      cex.axis = 0.8,
+                      heights = c(3, 2),
+                      maxrows = 7,
+                      xticks = 'bottom',
+                      border = FALSE,
+                      LDcols = c('grey', 'blue', 'cyan', 'green3', 'orange', 'red', 
+                                 'purple')) {
+  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
+  data <- x$data
+  TX <- x$TX
+  EX <- x$EX
+  if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if ("ld" %in% colnames(data)) {
+    data$col <- LDcols[cut(data$ld, -1:6/5, labels = FALSE)]
+    data$col[is.na(data$col)] <- LDcols[1]
+    data$col[which.max(data$logP)] <- LDcols[7]
+  } else {
+    data$col <- chromCols
+    data$col[data[, x$p] < pcutoff] <- sigCol
+  }
+  
   TX <- mapRow(TX)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar), add = TRUE)
@@ -136,8 +171,8 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
-          mgp = c(1.8, 0.5, 0), mar = c(4, 4, 1, 2))
-  plot(NA, xlim = xrange,
+      mgp = c(1.8, 0.5, 0), mar = c(4, 4, 1, 2))
+  plot(NA, xlim = x$xrange,
        ylim = c(-maxrows - 0.3, -0.3), 
        bty = if (border) 'o' else 'n',
        yaxt = 'n', xaxt = 'n',
@@ -156,7 +191,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
          col = 'black', border = NA)
   }
   
-  tfilter <- TX$tmin > xrange[1] & TX$tmax < xrange[2]
+  tfilter <- TX$tmin > x$xrange[1] & TX$tmax < x$xrange[2]
   for (i in which(tfilter)) {
     text(TX$mean[i], -TX[i, 'row'] + 0.4,
          labels = if (TX$strand[i] == "+") {
@@ -168,9 +203,9 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   
   # scatter plot
   par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
-  plot(data[, pos], data$logP,
+  plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
-       xlim = xrange,
+       xlim = x$xrange,
        xlab = if (xticks == 'top') xlab else "",
        ylab = ylab,
        bty = if (border) 'o' else 'l',
@@ -179,12 +214,6 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
-  loc <- list(seqname = seqname, xrange = xrange,
-              ens_version = ens_version,
-              chrom = chrom, pos = pos, p = p, labs = labs,
-              data = data, TX = TX, EX = EX)
-  class(loc) <- "locus"
-  invisible(loc)
 }
 
 # map genes into rows without overlap
