@@ -70,3 +70,9 @@ plot(loc)
 knitr::include_graphics("locus1.png")
 ```
 
+## Plot gene annotation only
+
+```{r eval = FALSE}
+genetrack(loc)
+```
+
