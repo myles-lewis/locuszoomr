@@ -133,6 +133,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
 #' SNP.
 #' @param genecol Colour for genes and exons.
+#' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide 
+#' legend.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value.
 #' @importFrom BiocGenerics start end
@@ -152,13 +154,15 @@ plot.locus <- function(x, ...,
                       border = FALSE,
                       LDcols = c('grey', 'blue', 'cyan2', 'green3', 'orange', 'red', 
                                  'purple'),
-                      genecol = 'blue4') {
+                      genecol = 'blue4',
+                      legend_pos = 'topleft') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   TX <- x$TX
   EX <- x$EX
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
-  if ("ld" %in% colnames(data)) {
+  LD <- "ld" %in% colnames(data)
+  if (LD) {
     data$col <- LDcols[cut(data$ld, -1:6/5, labels = FALSE)]
     data$col[is.na(data$col)] <- LDcols[1]
     data$col[which.max(data$logP)] <- LDcols[7]
@@ -217,6 +221,19 @@ plot.locus <- function(x, ...,
        xaxt = 'n', ...)
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+  }
+  if (!is.null(legend_pos)) {
+    if (LD) {
+      legend(legend_pos,
+             legend = c('Index SNP',
+                        expression({0.8 < r^2} <= "1.0"),
+                        expression({0.6 < r^2} <= 0.8),
+                        expression({0.4 < r^2} <= 0.6),
+                        expression({0.2 < r^2} <= 0.4),
+                        expression({"0.0" < r^2} <= 0.2),
+                        expression("No" ~ r^2 ~ "data")),
+             pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.7)
+    }
   }
 }
 

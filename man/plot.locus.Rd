@@ -19,7 +19,8 @@
   xticks = "bottom",
   border = FALSE,
   LDcols = c("grey", "blue", "cyan2", "green3", "orange", "red", "purple"),
-  genecol = "blue4"
+  genecol = "blue4",
+  legend_pos = "topleft"
 )
 }
 \arguments{
@@ -59,6 +60,9 @@ ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
 
 \item{genecol}{Colour for genes and exons.}
+
+\item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
+legend.}
 }
 \value{
 No return value.
