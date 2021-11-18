@@ -40,3 +40,8 @@ No return value.
 \description{
 Plot gene annotation tracks from ensembldb data.
 }
+\details{
+This function is called by plot.locus(). It can used to plot the
+gene annotation tracks on their own. It uses base graphics, so layout() can
+be used to position adjacent plots above or below.
+}
