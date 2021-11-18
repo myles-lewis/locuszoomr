@@ -221,10 +221,10 @@ plot.locus <- function(x, ...,
 # map genes into rows without overlap
 mapRow <- function(TX, gap = 2e3, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')])) {
-  gw <- strwidth(paste("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / 12
+  gw <- strwidth(paste("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
-  TX$tmin <- TX$mean - gw
-  TX$tmax <- TX$mean + gw
+  TX$tmin <- TX$mean - gw / 2
+  TX$tmax <- TX$mean + gw / 2
   TX$min <- apply(TX[, c('start', 'end', 'tmin')], 1, min) - gap / 2
   TX$max <- apply(TX[, c('start', 'end', 'tmax')], 1, max) + gap / 2
   TX$row <- 0
