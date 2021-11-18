@@ -100,6 +100,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   data$logP <- -log10(data[, p])
   data <- as.data.frame(data)
   if (LD) {
+    if (LDtoken == "") stop("LDtoken is missing")
     rslist <- data[, labs]
     if (length(rslist) > 1000) {
       rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
@@ -117,7 +118,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
     data$col[data[, p] < pcutoff] <- sigCol
   }
   
-  TX <- genes(edb, filter = AnnotationFilterList(
+  TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(c(1:22, "X", "Y")),
     GeneIdFilter("ENSG", "startsWith")))
   TX <- data.frame(TX)
@@ -127,6 +128,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   TX <- TX[TX$start < xrange[2], ]
   TX <- mapRow(TX)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+  EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar), add = TRUE)
@@ -147,7 +149,7 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   }
   for (i in 1:nrow(TX)) {
     lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 2)
-    e <- exons(edb, filter = GeneIdFilter(TX$gene_id[i]))
+    e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
     for (j in 1:length(e)) {
@@ -179,7 +181,12 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
-  invisible(list(data = data, seqname = seqname, xrange = xrange))
+  loc <- list(seqname = seqname, xrange = xrange,
+              ens_version = ens_version,
+              chrom = chrom, pos = pos, p = p, labs = labs,
+              data = data, TX = TX, EX = EX)
+  class(loc) <- "locus"
+  invisible(loc)
 }
 
 # map genes into rows without overlap
