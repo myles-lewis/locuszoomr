@@ -138,7 +138,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value.
 #' @importFrom BiocGenerics start end
-#' @importFrom graphics axTicks axis layout lines par rect strwidth text
+#' @importFrom graphics axTicks axis layout lines par rect strwidth text abline
 #' @export
 
 plot.locus <- function(x, ...,
@@ -152,7 +152,7 @@ plot.locus <- function(x, ...,
                       maxrows = 7,
                       xticks = 'bottom',
                       border = FALSE,
-                      LDcols = c('grey', 'blue', 'cyan2', 'green3', 'orange', 'red', 
+                      LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
                                  'purple'),
                       genecol = 'blue4',
                       legend_pos = 'topleft') {
@@ -180,34 +180,8 @@ plot.locus <- function(x, ...,
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
       mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 1, 2))
-  plot(NA, xlim = x$xrange,
-       ylim = c(-maxrows - 0.3, -0.3), 
-       bty = if (border) 'o' else 'n',
-       yaxt = 'n', xaxt = 'n',
-       xlab = if (xticks == 'bottom') xlab else "",
-       ylab = "",
-       xaxt = 'n')
-  if (xticks == 'bottom') {
-    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
-  }
-  for (i in 1:nrow(TX)) {
-    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 1, lend = 1)
-    e <- EX[EX$gene_id == TX$gene_id[i], ]
-    exstart <- start(e)
-    exend <- end(e)
-    rect(exstart, -TX[i, 'row'] - 0.15, exend, -TX[i, 'row'] + 0.15,
-         col = genecol, border = genecol, lwd = 0.5, lend = 2, ljoin = 1)
-  }
-  
-  tfilter <- TX$tmin > x$xrange[1] & TX$tmax < x$xrange[2]
-  for (i in which(tfilter)) {
-    text(TX$mean[i], -TX[i, 'row'] + 0.45,
-         labels = if (TX$strand[i] == "+") {
-           bquote(.(TX$gene_name[i]) ~ symbol("\256"))
-         } else {     
-           bquote(symbol("\254") ~ .(TX$gene_name[i]))
-         }, cex = cex.text)
-  }
+  genetracks(TX, EX, xrange = x$xrange, border, cex.axis, cex.text, genecol, 
+             maxrows, xticks = (xticks == 'bottom'))
   
   # scatter plot
   par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
@@ -218,7 +192,12 @@ plot.locus <- function(x, ...,
        ylab = ylab,
        bty = if (border) 'o' else 'l',
        cex.axis = cex.axis,
-       xaxt = 'n', ...)
+       xaxt = 'n',
+       panel.first = {
+         if (!is.null(pcutoff)) {
+           abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+         }
+       }, ...)
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
@@ -234,6 +213,38 @@ plot.locus <- function(x, ...,
                         expression("No" ~ r^2 ~ "data")),
              pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.7)
     }
+  }
+}
+
+# Plot gene tracks
+genetracks <- function(TX, EX, xrange, border, cex.axis, cex.text,
+                       genecol, maxrows, xticks) {
+  plot(NA, xlim = xrange,
+       ylim = c(-maxrows - 0.3, -0.3), 
+       bty = if (border) 'o' else 'n',
+       yaxt = 'n', xaxt = 'n',
+       xlab = if (xticks == 'bottom') xlab else "",
+       ylab = "",
+       xaxt = 'n')
+  if (xticks) {
+    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+  }
+  for (i in 1:nrow(TX)) {
+    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 1, lend = 1)
+    e <- EX[EX$gene_id == TX$gene_id[i], ]
+    exstart <- start(e)
+    exend <- end(e)
+    rect(exstart, -TX[i, 'row'] - 0.15, exend, -TX[i, 'row'] + 0.15,
+         col = genecol, border = genecol, lwd = 0.5, lend = 2, ljoin = 1)
+  }
+  tfilter <- TX$tmin > xrange[1] & TX$tmax < xrange[2]
+  for (i in which(tfilter)) {
+    text(TX$mean[i], -TX[i, 'row'] + 0.45,
+         labels = if (TX$strand[i] == "+") {
+           bquote(.(TX$gene_name[i]) ~ symbol("\256"))
+         } else {     
+           bquote(symbol("\254") ~ .(TX$gene_name[i]))
+         }, cex = cex.text)
   }
 }
 

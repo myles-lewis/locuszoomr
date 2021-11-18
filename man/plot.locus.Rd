@@ -18,7 +18,7 @@
   maxrows = 7,
   xticks = "bottom",
   border = FALSE,
-  LDcols = c("grey", "blue", "cyan2", "green3", "orange", "red", "purple"),
+  LDcols = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   genecol = "blue4",
   legend_pos = "topleft"
 )
