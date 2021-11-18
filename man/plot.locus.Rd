@@ -18,7 +18,8 @@
   maxrows = 7,
   xticks = "bottom",
   border = FALSE,
-  LDcols = c("grey", "blue", "cyan", "green3", "orange", "red", "purple")
+  LDcols = c("grey", "blue", "cyan2", "green3", "orange", "red", "purple"),
+  genecol = "blue4"
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ lower plots.}
 which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
+
+\item{genecol}{Colour for genes and exons.}
 }
 \value{
 No return value.

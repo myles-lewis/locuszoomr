@@ -132,6 +132,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' which lack LD information. The next 5 colours are for r2 or D' LD results 
 #' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
 #' SNP.
+#' @param genecol Colour for genes and exons.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value.
 #' @importFrom BiocGenerics start end
@@ -149,8 +150,9 @@ plot.locus <- function(x, ...,
                       maxrows = 7,
                       xticks = 'bottom',
                       border = FALSE,
-                      LDcols = c('grey', 'blue', 'cyan', 'green3', 'orange', 'red', 
-                                 'purple')) {
+                      LDcols = c('grey', 'blue', 'cyan2', 'green3', 'orange', 'red', 
+                                 'purple'),
+                      genecol = 'blue4') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   TX <- x$TX
@@ -173,7 +175,7 @@ plot.locus <- function(x, ...,
   
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.8, 0.5, 0), mar = c(4, 4, 1, 2))
+      mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 1, 2))
   plot(NA, xlim = x$xrange,
        ylim = c(-maxrows - 0.3, -0.3), 
        bty = if (border) 'o' else 'n',
@@ -185,17 +187,17 @@ plot.locus <- function(x, ...,
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
   for (i in 1:nrow(TX)) {
-    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 2)
+    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 1, lend = 1)
     e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
-    rect(exstart, -TX[i, 'row'] - 0.1, exend, -TX[i, 'row'] + 0.1,
-         col = 'black', border = NA)
+    rect(exstart, -TX[i, 'row'] - 0.15, exend, -TX[i, 'row'] + 0.15,
+         col = genecol, border = genecol, lwd = 0.5, lend = 2, ljoin = 1)
   }
   
   tfilter <- TX$tmin > x$xrange[1] & TX$tmax < x$xrange[2]
   for (i in which(tfilter)) {
-    text(TX$mean[i], -TX[i, 'row'] + 0.4,
+    text(TX$mean[i], -TX[i, 'row'] + 0.45,
          labels = if (TX$strand[i] == "+") {
            bquote(.(TX$gene_name[i]) ~ symbol("\256"))
          } else {     
