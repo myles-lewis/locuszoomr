@@ -114,7 +114,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' 
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param pcutoff Cut-off for p value significance. Defaults to 5e-08.
-#' @param chromCols Colour for normal points if `LD` is `FALSE`.
+#' @param chromCols Colour for normal points if `LD` is `FALSE` when the locus 
+#' object is made.
 #' @param sigCol Colour for significant points if `LD` is `FALSE`.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
@@ -142,6 +143,7 @@ plot.locus <- function(x, ...,
                       sigCol = 'red',
                       xlab = NULL, ylab = expression("-log"[10] ~ "P"),
                       cex.axis = 0.8,
+                      cex.text = 0.7,
                       heights = c(3, 2),
                       maxrows = 7,
                       xticks = 'bottom',
@@ -161,8 +163,7 @@ plot.locus <- function(x, ...,
     data$col <- chromCols
     data$col[data[, x$p] < pcutoff] <- sigCol
   }
-  
-  TX <- mapRow(TX)
+  TX <- mapRow(TX, xlim = x$xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   
   oldpar <- par(no.readonly = TRUE)
@@ -198,7 +199,7 @@ plot.locus <- function(x, ...,
            bquote(.(TX$gene_name[i]) ~ symbol("\256"))
          } else {     
            bquote(symbol("\254") ~ .(TX$gene_name[i]))
-         }, cex = 0.7)
+         }, cex = cex.text)
   }
   
   # scatter plot
@@ -219,7 +220,7 @@ plot.locus <- function(x, ...,
 # map genes into rows without overlap
 mapRow <- function(TX, gap = 2e3, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')])) {
-  gw <- strwidth(TX$gene_name, units = "inch", cex = cex.text) * diff(xlim) / 12
+  gw <- strwidth(paste("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / 12
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   TX$tmin <- TX$mean - gw
   TX$tmax <- TX$mean + gw

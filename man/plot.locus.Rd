@@ -13,6 +13,7 @@
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
   cex.axis = 0.8,
+  cex.text = 0.7,
   heights = c(3, 2),
   maxrows = 7,
   xticks = "bottom",
@@ -27,7 +28,8 @@
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to 5e-08.}
 
-\item{chromCols}{Colour for normal points if \code{LD} is \code{FALSE}.}
+\item{chromCols}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
+object is made.}
 
 \item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
 
