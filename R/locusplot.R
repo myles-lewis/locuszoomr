@@ -120,6 +120,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.text Font size for gene text.
 #' @param heights Ratio of top to bottom plot. See [layout].
 #' @param maxrows Specifies maximum nunber of rows to display in gene 
 #' annotation panel.

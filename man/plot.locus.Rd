@@ -39,6 +39,8 @@ object is made.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
 
+\item{cex.text}{Font size for gene text.}
+
 \item{heights}{Ratio of top to bottom plot. See \link{layout}.}
 
 \item{maxrows}{Specifies maximum nunber of rows to display in gene
