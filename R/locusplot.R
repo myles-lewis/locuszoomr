@@ -152,10 +152,8 @@ locusplot <- function(data, xrange = NULL, seqname = NULL,
     e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
-    for (j in 1:length(e)) {
-      rect(exstart[j], -TX[i, 'row'] - 0.1, exend[j], -TX[i, 'row'] + 0.1,
-           col = 'black', border = NA)
-    }
+    rect(exstart, -TX[i, 'row'] - 0.1, exend, -TX[i, 'row'] + 0.1,
+         col = 'black', border = NA)
   }
   
   tfilter <- TX$tmin > xrange[1] & TX$tmax < xrange[2]
