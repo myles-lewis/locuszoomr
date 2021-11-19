@@ -141,20 +141,22 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @export
 
 plot.locus <- function(x, ...,
-                      pcutoff = 5e-08,
-                      chromCols = 'royalblue',
-                      sigCol = 'red',
-                      xlab = NULL, ylab = expression("-log"[10] ~ "P"),
-                      cex.axis = 0.8,
-                      cex.text = 0.7,
-                      heights = c(3, 2),
-                      maxrows = 7,
-                      xticks = 'bottom',
-                      border = FALSE,
-                      LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
-                                 'purple'),
-                      genecol = 'blue4',
-                      legend_pos = 'topleft') {
+                       filter_gene_name = NULL,
+                       filter_gene_biotype = NULL,
+                       pcutoff = 5e-08,
+                       chromCols = 'royalblue',
+                       sigCol = 'red',
+                       xlab = NULL, ylab = expression("-log"[10] ~ "P"),
+                       cex.axis = 0.8,
+                       cex.text = 0.7,
+                       heights = c(3, 2),
+                       maxrows = 7,
+                       xticks = 'bottom',
+                       border = FALSE,
+                       LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
+                                  'purple'),
+                       genecol = 'blue4',
+                       legend_pos = 'topleft') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   TX <- x$TX
@@ -169,8 +171,6 @@ plot.locus <- function(x, ...,
     data$col <- chromCols
     data$col[data[, x$p] < pcutoff] <- sigCol
   }
-  # TX <- mapRow(TX, xlim = x$xrange, cex.text = cex.text)
-  # maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar), add = TRUE)
@@ -179,7 +179,8 @@ plot.locus <- function(x, ...,
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
       mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 1, 2))
-  genetracks(x, border, cex.axis, cex.text, genecol, 
+  genetracks(x, filter_gene_name, filter_gene_biotype,
+             border, cex.axis, cex.text, genecol, 
              maxrows, xticks = (xticks == 'bottom'))
   
   # scatter plot
@@ -238,17 +239,29 @@ plot.locus <- function(x, ...,
 #' @export
 
 genetracks <- function(locus,
+                       filter_gene_name = NULL,
+                       filter_gene_biotype = NULL,
                        border = FALSE,
                        cex.axis = 0.8,
                        cex.text = 0.7,
                        genecol = 'blue4', 
-                       maxrows = 7,
+                       maxrows = NULL,
                        xticks = TRUE,
                        xlab = NULL) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
   EX <- locus$EX
   xrange <- locus$xrange
+  if (!is.null(filter_gene_name)) {
+    TX <- TX[TX$gene_name %in% filter_gene_name, ]
+  }
+  if (!is.null(filter_gene_biotype)) {
+    TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
+  }
+  if (nrow(TX) == 0) {
+    message('No genes to plot')
+    return(plot.new())
+  }
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
@@ -264,7 +277,8 @@ genetracks <- function(locus,
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
   for (i in 1:nrow(TX)) {
-    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2), lwd = 1, lend = 1)
+    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
+          col = genecol, lwd = 1, lend = 1)
     e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
