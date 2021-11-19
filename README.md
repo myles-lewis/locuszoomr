@@ -39,5 +39,6 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 
-locusplot(SLE_gwas, gene = 'STAT4', flank = 1e5, LDtoken = "..")
+loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, LDtoken = "..")
+plot(loc)
 ```
