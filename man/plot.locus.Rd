@@ -7,6 +7,8 @@
 \method{plot}{locus}(
   x,
   ...,
+  filter_gene_name = NULL,
+  filter_gene_biotype = NULL,
   pcutoff = 5e-08,
   chromCols = "royalblue",
   sigCol = "red",
@@ -28,7 +30,14 @@
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
 
-\item{pcutoff}{Cut-off for p value significance. Defaults to 5e-08.}
+\item{filter_gene_name}{Vector of gene names to display.}
+
+\item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
+\code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
+\code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
+
+\item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
+to \code{NULL} to disable.}
 
 \item{chromCols}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
 object is made.}
