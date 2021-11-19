@@ -140,7 +140,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' which lack LD information. The next 5 colours are for r2 or D' LD results 
 #' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
 #' SNP.
-#' @param genecol Colour for genes and exons.
+#' @param gene_col Colour for genes and exons.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
+#' border.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide 
 #' legend.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
@@ -163,7 +166,7 @@ plot.locus <- function(x, ...,
                        border = FALSE,
                        LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
                                   'purple'),
-                       genecol = 'blue4',
+                       gene_col = 'blue4',
                        legend_pos = 'topleft') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
@@ -188,7 +191,7 @@ plot.locus <- function(x, ...,
   par(tcl = -0.3, las = 1, font.main = 1,
       mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 1, 2))
   genetracks(x, filter_gene_name, filter_gene_biotype,
-             border, cex.axis, cex.text, genecol, 
+             border, cex.axis, cex.text, gene_col, exon_col, exon_border,
              maxrows, xticks = (xticks == 'bottom'))
   
   # scatter plot
@@ -244,7 +247,10 @@ plot.locus <- function(x, ...,
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
 #' @param border Logical whether a bounding box is plotted.
-#' @param genecol Colour for genes and exons.
+#' @param gene_col Colour for gene lines.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
+#' border.
 #' @return No return value.
 #' @importFrom BiocGenerics start end
 #' @importFrom graphics axTicks axis lines rect text plot.new
@@ -256,7 +262,9 @@ genetracks <- function(locus,
                        border = FALSE,
                        cex.axis = 0.8,
                        cex.text = 0.7,
-                       genecol = 'blue4', 
+                       gene_col = 'blue4',
+                       exon_col = 'blue4',
+                       exon_border = 'blue4',
                        maxrows = NULL,
                        xticks = TRUE,
                        xlab = NULL) {
@@ -290,20 +298,20 @@ genetracks <- function(locus,
   }
   for (i in 1:nrow(TX)) {
     lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
-          col = genecol, lwd = 1, lend = 1)
+          col = gene_col, lwd = 1, lend = 1)
     e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
     rect(exstart, -TX[i, 'row'] - 0.15, exend, -TX[i, 'row'] + 0.15,
-         col = genecol, border = genecol, lwd = 0.5, lend = 2, ljoin = 1)
+         col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
   }
   tfilter <- TX$tmin > xrange[1] & TX$tmax < xrange[2]
   for (i in which(tfilter)) {
     text(TX$mean[i], -TX[i, 'row'] + 0.45,
          labels = if (TX$strand[i] == "+") {
-           bquote(.(TX$gene_name[i]) ~ symbol("\256"))
+           bquote(.(TX$gene_name[i]) * symbol("\256"))
          } else {     
-           bquote(symbol("\254") ~ .(TX$gene_name[i]))
+           bquote(symbol("\254") * .(TX$gene_name[i]))
          }, cex = cex.text)
   }
 }
@@ -311,7 +319,7 @@ genetracks <- function(locus,
 # map genes into rows without overlap
 mapRow <- function(TX, gap = 2e3, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')])) {
-  gw <- strwidth(paste("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / par("pin")[1]
+  gw <- strwidth(paste0("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   TX$tmin <- TX$mean - gw / 2
   TX$tmax <- TX$mean + gw / 2
