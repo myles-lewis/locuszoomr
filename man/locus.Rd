@@ -39,13 +39,16 @@ to show.}
 exon positions. See \code{ensembldb} Bioconductor package.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
-information.}
+information. Automatically looks for PLINK headings.}
 
-\item{pos}{Determines which column in \code{data} contains position information.}
+\item{pos}{Determines which column in \code{data} contains position information.
+Automatically looks for PLINK headings.}
 
-\item{p}{Determines which column in \code{data} contains SNP p values.}
+\item{p}{Determines which column in \code{data} contains SNP p values.
+Automatically looks for PLINK headings.}
 
-\item{labs}{Determines which column in \code{data} contains SNP rs IDs.}
+\item{labs}{Determines which column in \code{data} contains SNP rs IDs.
+Automatically looks for PLINK headings.}
 
 \item{index_snp}{Specifies the index SNP for displaying linkage
 disequilibrium (LD). If not specifiied, the SNP with the lowest P value is

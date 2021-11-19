@@ -11,7 +11,9 @@ genetracks(
   border = FALSE,
   cex.axis = 0.8,
   cex.text = 0.7,
-  genecol = "blue4",
+  gene_col = "blue4",
+  exon_col = "blue4",
+  exon_border = "blue4",
   maxrows = NULL,
   xticks = TRUE,
   xlab = NULL
@@ -32,7 +34,12 @@ genetracks(
 
 \item{cex.text}{Font size for gene text.}
 
-\item{genecol}{Colour for genes and exons.}
+\item{gene_col}{Colour for gene lines.}
+
+\item{exon_col}{Fill colour for exons.}
+
+\item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
+border.}
 
 \item{maxrows}{Specifies maximum nunber of rows to display in gene
 annotation panel.}

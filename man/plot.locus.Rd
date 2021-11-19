@@ -21,7 +21,7 @@
   xticks = "bottom",
   border = FALSE,
   LDcols = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
-  genecol = "blue4",
+  gene_col = "blue4",
   legend_pos = "topleft"
 )
 }
@@ -68,10 +68,15 @@ which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
 
-\item{genecol}{Colour for genes and exons.}
+\item{gene_col}{Colour for genes and exons.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
+
+\item{exon_col}{Fill colour for exons.}
+
+\item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
+border.}
 }
 \value{
 No return value.

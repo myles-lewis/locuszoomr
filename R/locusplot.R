@@ -19,10 +19,13 @@
 #' @param ens_version Specifies which ensembl database to query for gene and 
 #' exon positions. See `ensembldb` Bioconductor package.
 #' @param chrom Determines which column in `data` contains chromosome 
-#' information.
-#' @param pos Determines which column in `data` contains position information.
-#' @param p Determines which column in `data` contains SNP p values.
+#' information. Automatically looks for PLINK headings.
+#' @param pos Determines which column in `data` contains position information. 
+#' Automatically looks for PLINK headings.
+#' @param p Determines which column in `data` contains SNP p values. 
+#' Automatically looks for PLINK headings.
 #' @param labs Determines which column in `data` contains SNP rs IDs.
+#' Automatically looks for PLINK headings.
 #' @param index_snp Specifies the index SNP for displaying linkage 
 #' disequilibrium (LD). If not specifiied, the SNP with the lowest P value is 
 #' selected.
@@ -70,6 +73,23 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     seqname <- names(seqlengths(locus))
   }
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
+  # PLINK headings
+  if (!chrom %in% colnames(data)) {
+    if ("CHR" %in% colnames(data)) {chrom <- "CHR"
+    } else stop("Column specified by `chrom` not found in `data`")
+  }
+  if (!pos %in% colnames(data)) {
+    if ("BP" %in% colnames(data)) {pos <- "BP"
+    } else stop("Column specified by `pos` not found in `data`")
+  }
+  if (!p %in% colnames(data)) {
+    if ("P" %in% colnames(data)) {p <- "P"
+    } else stop("Column specified by `p` not found in `data`")
+  }
+  if (!labs %in% colnames(data)) {
+    if ("SNP" %in% colnames(data)) {labs <- "SNP"
+    } else stop("Column specified by `labs` not found in `data`")
+  }
   data <- data[data[, chrom] == seqname &
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
   data$logP <- -log10(data[, p])
