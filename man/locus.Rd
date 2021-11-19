@@ -79,6 +79,8 @@ Creates object of class 'locus' for genomic locus plot similar to locuszoom.
 }
 \details{
 This is an R version of locuszoom for generating publication ready Manhattan
-plots of gene loci. It references ensembl databases for annotating genes
-and exons. It queries LDlink to retrieve LD information on the index SNP.
+plots of gene loci. It references ensembl databases using the ensembldb
+Bioconductor package framework for annotating genes and exons. It queries
+LDlink (https://ldlink.nci.nih.gov/) via the \link{LDlinkR} package to retrieve
+LD information on a reference SNP.
 }

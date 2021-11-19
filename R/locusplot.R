@@ -4,8 +4,10 @@
 #' 
 #' @details 
 #' This is an R version of locuszoom for generating publication ready Manhattan 
-#' plots of gene loci. It references ensembl databases for annotating genes 
-#' and exons. It queries LDlink to retrieve LD information on the index SNP.
+#' plots of gene loci. It references ensembl databases using the ensembldb 
+#' Bioconductor package framework for annotating genes and exons. It queries 
+#' LDlink (https://ldlink.nci.nih.gov/) via the [LDlinkR] package to retrieve 
+#' LD information on a reference SNP.
 #' 
 #' @param data Dataset (data.frame or data.table) to use for plot.
 #' @param xrange Vector of genomic position range for the x axis.
@@ -110,7 +112,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @details 
 #' This is an R version of locuszoom for generating publication ready Manhattan 
 #' plots of gene loci. It references ensembl databases for annotating genes 
-#' and exons. It queries LDlink to retrieve LD information on the index SNP.
+#' and exons. It queries LDlink to retrieve LD information on the index SNP. 
+#' Use [locus()] first to generate an object of class 'locus' for plotting.
 #' 
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param filter_gene_name Vector of gene names to display.
