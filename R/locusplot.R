@@ -386,7 +386,7 @@ genetracks <- function(locus,
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
 #' border.
 #' @return No return value.
-#' @importFrom plotly plot_ly add_segments add_text %>%
+#' @importFrom plotly plot_ly plotly_empty add_segments add_text %>%
 #' @export
 
 genetrack_ly <- function(locus,
@@ -413,7 +413,7 @@ genetrack_ly <- function(locus,
   }
   if (nrow(TX) == 0) {
     message('No genes to plot')
-    return(plot.new())
+    return(plot_empty())
   }
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
