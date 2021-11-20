@@ -22,6 +22,8 @@
   border = FALSE,
   LDcols = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   gene_col = "blue4",
+  exon_col = "blue4",
+  exon_border = "blue4",
   legend_pos = "topleft"
 )
 }
@@ -70,13 +72,13 @@ SNP.}
 
 \item{gene_col}{Colour for genes and exons.}
 
-\item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
-legend.}
-
 \item{exon_col}{Fill colour for exons.}
 
 \item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
 border.}
+
+\item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
+legend.}
 }
 \value{
 No return value.

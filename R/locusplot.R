@@ -164,6 +164,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
 #' border.
+#' @param text_pos Character value of either 'top' or 'left' specifying 
+#' placement of gene name labels.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide 
 #' legend.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
@@ -187,6 +189,9 @@ plot.locus <- function(x, ...,
                        LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
                                   'purple'),
                        gene_col = 'blue4',
+                       exon_col = 'blue4',
+                       exon_border = 'blue4',
+                       text_pos = 'top',
                        legend_pos = 'topleft') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
@@ -205,14 +210,15 @@ plot.locus <- function(x, ...,
   
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar), add = TRUE)
-  layout(matrix(2:1, nrow = 2), heights = heights)
+  graphics::layout(matrix(2:1, nrow = 2), heights = heights)
   
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 1, 2))
+      mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
-             maxrows, xticks = (xticks == 'bottom'))
+             maxrows, text_pos, xticks = (xticks == 'bottom'),
+             xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
   par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
@@ -271,6 +277,8 @@ plot.locus <- function(x, ...,
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
 #' border.
+#' @param text_pos Character value of either 'top' or 'left' specifying 
+#' placement of gene name labels.
 #' @return No return value.
 #' @importFrom BiocGenerics start end
 #' @importFrom graphics axTicks axis lines rect text plot.new
@@ -286,6 +294,7 @@ genetracks <- function(locus,
                        exon_col = 'blue4',
                        exon_border = 'blue4',
                        maxrows = NULL,
+                       text_pos = 'top',
                        xticks = TRUE,
                        xlab = NULL) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
@@ -302,8 +311,9 @@ genetracks <- function(locus,
     message('No genes to plot')
     return(plot.new())
   }
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+  TX <- TX[TX$row <= maxrows, ]
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
   plot(NA, xlim = xrange,
@@ -316,33 +326,138 @@ genetracks <- function(locus,
   if (xticks) {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
+  exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   for (i in 1:nrow(TX)) {
     lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
           col = gene_col, lwd = 1, lend = 1)
     e <- EX[EX$gene_id == TX$gene_id[i], ]
     exstart <- start(e)
     exend <- end(e)
-    rect(exstart, -TX[i, 'row'] - 0.15, exend, -TX[i, 'row'] + 0.15,
+    rect(exstart, -TX[i, 'row'] - exheight, exend, -TX[i, 'row'] + exheight,
          col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
   }
-  tfilter <- TX$tmin > xrange[1] & TX$tmax < xrange[2]
-  for (i in which(tfilter)) {
-    text(TX$mean[i], -TX[i, 'row'] + 0.45,
-         labels = if (TX$strand[i] == "+") {
-           bquote(.(TX$gene_name[i]) * symbol("\256"))
-         } else {     
-           bquote(symbol("\254") * .(TX$gene_name[i]))
-         }, cex = cex.text)
+  if (text_pos == "top") {
+    tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
+              (TX$tmax < xrange[2] + diff(xrange) * 0.04))
+    for (i in tfilter) {
+      text(TX$mean[i], -TX[i, 'row'] + 0.45,
+           labels = if (TX$strand[i] == "+") {
+             bquote(.(TX$gene_name[i]) * symbol("\256"))
+           } else {     
+             bquote(symbol("\254") * .(TX$gene_name[i]))
+           }, cex = cex.text, xpd = NA)
+    }
+  } else if (text_pos == "left") {
+    tfilter <- if (border) {
+      which(TX$tmin > xrange[1])
+    } else 1:nrow(TX)
+    for (i in tfilter) {
+      text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],
+           labels = if (TX$strand[i] == "+") {
+             bquote(.(TX$gene_name[i]) * symbol("\256"))
+           } else {     
+             bquote(symbol("\254") * .(TX$gene_name[i]))
+           }, cex = cex.text, pos = 2, xpd = NA)
+    }
   }
+  
+}
+
+#' Gene tracks using plotly
+#' 
+#' Plot gene annotation tracks from ensembldb data using plotly.
+#' 
+#' @details This function can used to plot gene annotation tracks on their own.
+#' @param locus Object of class 'locus' generated by [locus()].
+#' @param filter_gene_name Vector of gene names to display.
+#' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
+#' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
+#' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
+#' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.text Font size for gene text.
+#' @param maxrows Specifies maximum nunber of rows to display in gene 
+#' annotation panel.
+#' @param xticks Logical whether x axis ticks and numbers are plotted.
+#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
+#' in `locus`.
+#' @param border Logical whether a bounding box is plotted.
+#' @param gene_col Colour for gene lines.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
+#' border.
+#' @return No return value.
+#' @importFrom plotly plot_ly add_segments add_text %>%
+#' @export
+
+genetrack_ly <- function(locus,
+                       filter_gene_name = NULL,
+                       filter_gene_biotype = NULL,
+                       border = FALSE,
+                       cex.axis = 0.8,
+                       cex.text = 0.7,
+                       gene_col = 'blue4',
+                       exon_col = 'blue4',
+                       exon_border = 'blue4',
+                       maxrows = NULL,
+                       xticks = TRUE,
+                       xlab = NULL) {
+  if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
+  TX <- locus$TX
+  EX <- as.data.frame(locus$EX)
+  xrange <- locus$xrange
+  if (!is.null(filter_gene_name)) {
+    TX <- TX[TX$gene_name %in% filter_gene_name, ]
+  }
+  if (!is.null(filter_gene_biotype)) {
+    TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
+  }
+  if (nrow(TX) == 0) {
+    message('No genes to plot')
+    return(plot.new())
+  }
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
+  maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+  if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
+  
+  gene_col <- col2hex(gene_col)
+  exon_col <- col2hex(exon_col)
+  exon_border <- col2hex(exon_border)
+  EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
+  shapes <- lapply(1:nrow(EX), function(i) {
+    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border),
+         x0 = EX$start[i], x1 = EX$end[i], xref = "x",
+         y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
+  })
+  TX$tx <- rowMeans(TX[, c('start', 'end')])
+  TX$ty <- -TX$row + 0.4
+  
+  plot_ly(TX) %>%
+    add_segments(x = ~start, y = ~-row,
+                 xend = ~end, yend = ~-row,
+                 color = I(gene_col),
+                 text = ~gene_name, hoverinfo = 'text') %>%
+    add_text(x = ~tx, y = ~ty, text = ~gene_name,
+             showlegend = FALSE, hoverinfo = 'none') %>%
+    plotly::layout(shapes = shapes,
+                   xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
+                                color = 'black', ticklen = 5),
+                   yaxis = list(title = "", showgrid = FALSE, 
+                                showticklabels = FALSE))
 }
 
 # map genes into rows without overlap
-mapRow <- function(TX, gap = 2e3, cex.text = 0.7, 
-                   xlim = range(TX[, c('start', 'end')])) {
+mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
+                   xlim = range(TX[, c('start', 'end')]),
+                   text_pos = 'top') {
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
-  TX$tmin <- TX$mean - gw / 2
-  TX$tmax <- TX$mean + gw / 2
+  if (text_pos == 'top') {
+    TX$tmin <- TX$mean - gw / 2
+    TX$tmax <- TX$mean + gw / 2
+  } else if (text_pos == 'left') {
+    TX$tmin <- TX$start - gw - gap
+    TX$tmax <- TX$end
+  }
   TX$min <- apply(TX[, c('start', 'end', 'tmin')], 1, min) - gap / 2
   TX$max <- apply(TX[, c('start', 'end', 'tmax')], 1, max) + gap / 2
   TX$row <- 0
@@ -363,3 +478,11 @@ mapRow <- function(TX, gap = 2e3, cex.text = 0.7,
 
 # use memoise to reduce calls to LDlink API
 mem_LDmatrix <- memoise(LDmatrix)
+
+#' @importFrom grDevices col2rgb rgb
+
+col2hex <- function(cname) {
+  colMat <- col2rgb(cname)
+  rgb(red = colMat[1, ]/255, green = colMat[2, ]/255, blue = colMat[3, ]/255)
+}
+
