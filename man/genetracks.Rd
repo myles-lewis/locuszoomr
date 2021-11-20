@@ -15,6 +15,7 @@ genetracks(
   exon_col = "blue4",
   exon_border = "blue4",
   maxrows = NULL,
+  text_pos = "top",
   xticks = TRUE,
   xlab = NULL
 )
@@ -43,6 +44,9 @@ border.}
 
 \item{maxrows}{Specifies maximum nunber of rows to display in gene
 annotation panel.}
+
+\item{text_pos}{Character value of either 'top' or 'left' specifying
+placement of gene name labels.}
 
 \item{xticks}{Logical whether x axis ticks and numbers are plotted.}
 

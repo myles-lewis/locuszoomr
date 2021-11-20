@@ -24,6 +24,7 @@
   gene_col = "blue4",
   exon_col = "blue4",
   exon_border = "blue4",
+  text_pos = "top",
   legend_pos = "topleft"
 )
 }
@@ -76,6 +77,9 @@ SNP.}
 
 \item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
 border.}
+
+\item{text_pos}{Character value of either 'top' or 'left' specifying
+placement of gene name labels.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
