@@ -106,3 +106,6 @@ genetracks(loc, filter_gene_biotype = 'protein_coding')
 genetracks(loc, gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```
 
+These gene annotations are outputted via R base graphics system. For users who 
+prefer the grid system we recommend looking at Bioconductor packages Gviz or 
+ggbio.
