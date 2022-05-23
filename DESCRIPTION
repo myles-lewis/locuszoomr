@@ -7,7 +7,7 @@ Authors@R:
     email = "myles.lewis@qmul.ac.uk",
     comment = c(ORCID = "0000-0001-9365-5345")))
 Description: Pure R version of locuszoom. Plots genetic data with locus 
-annotation.
+    annotation.
 Language: en-gb
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
@@ -21,7 +21,7 @@ Imports:
     memoise,
     plotly
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests:
     data.table,
     rmarkdown,

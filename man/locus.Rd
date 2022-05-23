@@ -54,7 +54,7 @@ Automatically looks for PLINK headings.}
 disequilibrium (LD). If not specifiied, the SNP with the lowest P value is
 selected.}
 
-\item{LD}{Logical whether LD is plotted. Queries 1000 genomes via LDlinkR
+\item{LD}{Logical whether LD is plotted. Queries 1000 Genomes via LDlinkR
 package. See \link{LDlinkR}. Results are cached using the \code{memoise} package, so
 that if exactly the same locus is requested the system does not repeatedly
 call the API.}
