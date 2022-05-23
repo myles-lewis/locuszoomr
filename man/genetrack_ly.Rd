@@ -41,7 +41,7 @@ genetrack_ly(
 \item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
 border.}
 
-\item{maxrows}{Specifies maximum nunber of rows to display in gene
+\item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
 
 \item{xticks}{Logical whether x axis ticks and numbers are plotted.}
@@ -53,7 +53,7 @@ in \code{locus}.}
 No return value.
 }
 \description{
-Plot gene annotation tracks from ensembldb data using \code{plotly}.
+Plot gene annotation tracks from \code{ensembldb} data using \code{plotly}.
 }
 \details{
 This function can used to plot gene annotation tracks on their own.

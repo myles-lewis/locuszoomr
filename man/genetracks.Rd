@@ -42,7 +42,7 @@ genetracks(
 \item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
 border.}
 
-\item{maxrows}{Specifies maximum nunber of rows to display in gene
+\item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
@@ -57,7 +57,7 @@ in \code{locus}.}
 No return value.
 }
 \description{
-Plot gene annotation tracks from ensembldb data.
+Plot gene annotation tracks from \code{ensembldb} data.
 }
 \details{
 This function is called by plot.locus(). It can used to plot the

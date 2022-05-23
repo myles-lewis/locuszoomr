@@ -35,7 +35,7 @@ locus(
 \item{flank}{Vector of how much flanking region left and right of the gene
 to show.}
 
-\item{ens_version}{Specifies which ensembl database to query for gene and
+\item{ens_version}{Specifies which Ensembl database to query for gene and
 exon positions. See \code{ensembldb} Bioconductor package.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
@@ -51,7 +51,7 @@ Automatically looks for PLINK headings.}
 Automatically looks for PLINK headings.}
 
 \item{index_snp}{Specifies the index SNP for displaying linkage
-disequilibrium (LD). If not specifiied, the SNP with the lowest P value is
+disequilibrium (LD). If not specified, the SNP with the lowest P value is
 selected.}
 
 \item{LD}{Logical whether LD is plotted. Queries 1000 Genomes via LDlinkR

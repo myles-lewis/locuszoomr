@@ -92,7 +92,7 @@ Genomic locus plot similar to locuszoom.
 }
 \details{
 This is an R version of locuszoom for generating publication ready Manhattan
-plots of gene loci. It references ensembl databases for annotating genes
+plots of gene loci. It references Ensembl databases for annotating genes
 and exons. It queries LDlink to retrieve linkage disequilibrium (LD)
 information on the index SNP. Use \code{\link[=locus]{locus()}} first to generate an object of
 class 'locus' for plotting.

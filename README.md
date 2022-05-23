@@ -6,7 +6,7 @@ linkage disequilibrium data from 1000 Genomes.
 
 # Installation
 
-Bioconductor packages ensembldb and an ensembl database package are required 
+Bioconductor packages `ensembldb` and an Ensembl database package are required 
 before installation.
 
 ```

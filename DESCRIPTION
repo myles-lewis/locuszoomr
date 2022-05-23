@@ -8,8 +8,7 @@ Authors@R:
     comment = c(ORCID = "0000-0001-9365-5345")))
 Description: Pure R implementation of 'LocusZoom' for plotting genetic data at 
     genomic loci accompanied by gene annotations. It uses the LDlink API to query 
-    linkage disequilibrium data from 1000 G
-    enomes.
+    linkage disequilibrium data from the 1000 Genomes Project.
 Language: en-gb
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
