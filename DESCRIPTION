@@ -6,7 +6,8 @@ Authors@R:
     role = c("aut", "cre"),
     email = "myles.lewis@qmul.ac.uk",
     comment = c(ORCID = "0000-0001-9365-5345")))
-Description: Pure R version of locuszoom.
+Description: Pure R version of locuszoom. Plots genetic data with locus 
+annotation.
 Language: en-gb
 License: GPL-3 + file LICENSE
 Encoding: UTF-8

@@ -29,7 +29,7 @@
 #' @param index_snp Specifies the index SNP for displaying linkage 
 #' disequilibrium (LD). If not specifiied, the SNP with the lowest P value is 
 #' selected.
-#' @param LD Logical whether LD is plotted. Queries 1000 genomes via LDlinkR 
+#' @param LD Logical whether LD is plotted. Queries 1000 Genomes via LDlinkR 
 #' package. See [LDlinkR]. Results are cached using the `memoise` package, so
 #' that if exactly the same locus is requested the system does not repeatedly 
 #' call the API.
