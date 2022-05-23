@@ -65,25 +65,25 @@ allowed, default = "CEU". Passed to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
 \item{r2d}{Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed
 to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
 
-\item{LDtoken}{Peronsal access token for accessing 1000 genomes LD data via
+\item{LDtoken}{Personal access token for accessing 1000 Genomes LD data via
 LDlink API. See \link{LDlinkR}.}
 }
 \value{
 Returns an object of class 'locus' ready for plotting, containing
 the subset of GWAS data to be plotted,
 chromosome and genomic position range,
-ensembl database version number,
+Ensembl database version number,
 column names for chromosome, position, SNP ID, p value
-locus gene information from ensembl and
-locus exon information from ensembl.
+locus gene information from Ensembl and
+locus exon information from Ensembl.
 }
 \description{
-Creates object of class 'locus' for genomic locus plot similar to locuszoom.
+Creates object of class 'locus' for genomic locus plot similar to \code{locuszoom}.
 }
 \details{
-This is an R version of locuszoom for generating publication ready Manhattan
-plots of gene loci. It references ensembl databases using the ensembldb
+This is an R version of \code{locuszoom} for generating publication ready Manhattan
+plots of gene loci. It references Ensembl databases using the \code{ensembldb}
 Bioconductor package framework for annotating genes and exons. It queries
 LDlink (https://ldlink.nci.nih.gov/) via the \link{LDlinkR} package to retrieve
-LD information on a reference SNP.
+linkage disequilibrium (LD) information on a reference SNP.
 }

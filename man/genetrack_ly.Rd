@@ -2,7 +2,7 @@
 % Please edit documentation in R/locusplot.R
 \name{genetrack_ly}
 \alias{genetrack_ly}
-\title{Gene tracks using plotly}
+\title{Gene tracks using 'plotly'}
 \usage{
 genetrack_ly(
   locus,
@@ -53,7 +53,7 @@ in \code{locus}.}
 No return value.
 }
 \description{
-Plot gene annotation tracks from ensembldb data using plotly.
+Plot gene annotation tracks from ensembldb data using \code{plotly}.
 }
 \details{
 This function can used to plot gene annotation tracks on their own.

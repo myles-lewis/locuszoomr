@@ -57,7 +57,7 @@ object is made.}
 
 \item{heights}{Ratio of top to bottom plot. See \link{layout}.}
 
-\item{maxrows}{Specifies maximum nunber of rows to display in gene
+\item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
 
 \item{xticks}{Character value of either 'top' or 'bottom' specifying
@@ -93,6 +93,7 @@ Genomic locus plot similar to locuszoom.
 \details{
 This is an R version of locuszoom for generating publication ready Manhattan
 plots of gene loci. It references ensembl databases for annotating genes
-and exons. It queries LDlink to retrieve LD information on the index SNP.
-Use \code{\link[=locus]{locus()}} first to generate an object of class 'locus' for plotting.
+and exons. It queries LDlink to retrieve linkage disequilibrium (LD)
+information on the index SNP. Use \code{\link[=locus]{locus()}} first to generate an object of
+class 'locus' for plotting.
 }

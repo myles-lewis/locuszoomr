@@ -2,7 +2,7 @@
 
 This is a pure R implementation of locuszoom for plotting genetic data at 
 genomic loci accompanied by gene annotations. It uses the LDlink API to query 
-linkage disequilibrium data from 1000 genomes.
+linkage disequilibrium data from 1000 Genomes.
 
 # Installation
 
