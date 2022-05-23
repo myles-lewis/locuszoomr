@@ -413,7 +413,7 @@ genetrack_ly <- function(locus,
   }
   if (nrow(TX) == 0) {
     message('No genes to plot')
-    return(plot_empty())
+    return(plotly_empty())
   }
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
