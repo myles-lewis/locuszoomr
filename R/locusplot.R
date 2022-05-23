@@ -522,7 +522,7 @@ LDplot <- function(loc,
                    scheme, ...) {
   data <- loc$data
   labs <- loc$labs
-  if (LDtoken == "") stop("LDtoken is missing")
+  if (token == "") stop("LDtoken is missing")
   rslist <- data[, labs]
   if (length(rslist) > 1000) {
     rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
