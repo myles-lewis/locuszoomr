@@ -7,10 +7,10 @@ Authors@R:
     email = "myles.lewis@qmul.ac.uk",
     comment = c(ORCID = "0000-0001-9365-5345")))
 Description: Pure R implementation of 'LocusZoom' for plotting genetic data at 
-    genomic loci accompanied by gene annotations. It uses the 'LDlink' API to query 
-    linkage disequilibrium data from the 1000 Genomes Project.
+    genomic loci accompanied by gene annotations. It uses the 'LDlink' API to 
+    query linkage disequilibrium data from the 1000 Genomes Project.
 Language: en-gb
-License: GPL-3
+License: Artistic-2.0
 Encoding: UTF-8
 biocViews:
 Imports:

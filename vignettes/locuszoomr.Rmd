@@ -83,7 +83,7 @@ plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
                                      'PI4KAP2', 'MIR301B'))
 ```
 
-# Arrange multiple locus plots
+# Arrange multiple plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus plots side by side, specify layout manually and set the argument `use_layout = FALSE` when plotting locus objects.
 
