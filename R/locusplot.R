@@ -66,15 +66,16 @@
 #' @export
 
 locus <- function(data, xrange = NULL, seqname = NULL,
-                      gene = NULL, flank = 5e4,
-                      ens_version = "EnsDb.Hsapiens.v75",
-                      chrom = 'chrom', pos = 'pos', p = 'p',
-                      labs = 'rsid',
-                      index_snp = NULL,
-                      LD = TRUE,
-                      pop = "CEU",
-                      r2d = "r2",
-                      LDtoken = "") {
+                  gene = NULL, flank = 5e4,
+                  ens_version = "EnsDb.Hsapiens.v75",
+                  chrom = 'chrom', pos = 'pos', p = 'p',
+                  labs = 'rsid',
+                  index_snp = NULL,
+                  LD = TRUE,
+                  eQTL = FALSE,
+                  pop = "CEU",
+                  r2d = "r2",
+                  LDtoken = "") {
   if (!ens_version %in% (.packages())) {
     stop("Ensembl database not loaded. Try: library(", ens_version, ")",
          call. = FALSE)
@@ -114,11 +115,15 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     if (length(rslist) > 1000) {
       rslist <- rslist[order(data$logP, decreasing = TRUE)[seq_len(1000)]]
     }
-    cat(paste("Obtaining LD on", length(rslist), "SNPs"))
+    message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
     ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken)
     if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
     ld <- ldm[, index_snp]
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
+  }
+  if (eQTL) {
+    if (LDtoken == "") stop("LDtoken is missing")
+    
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
