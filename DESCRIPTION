@@ -17,6 +17,7 @@ Description:
 Language: en-gb
 License: Artistic-2.0
 Encoding: UTF-8
+Depends: R (>= 3.5)
 biocViews:
     DataRepresentation,
     Sequencing,
@@ -25,6 +26,7 @@ biocViews:
 Imports:
     AnnotationFilter,
     BiocGenerics,
+    EnsDb.Hsapiens.v75,
     ensembldb,
     GenomeInfoDb,
     graphics,

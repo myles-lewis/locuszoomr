@@ -16,6 +16,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE
 )
+library(locuszoomr)
 ```
 
 # Introduction
@@ -58,20 +59,37 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 
 # Example locus plot
 
+The quick example below uses a small subset of a GWAS dataset incorporated into
+the package as a demo. The dataset is from a genetic study on Systemic Lupus
+Erythematosus (SLE) by Bentham et al (2015). `LD = FALSE` is set to avoid the
+LDlink API since it requires a personal API token.
+
+```{r fig.dim=c(8, 7)}
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+plot(loc)
+```
+
+Once an API personal access token has been obtained, the LDlink API can be
+called to retrieve LD information at the locus which is overlaid on the locus
+plot.
+
 ```{r eval = FALSE}
 # Locus plot using SLE GWAS data from Bentham et al 2015
 # FTP download full summary statistics from
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
-
-loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, LDtoken = "..")
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LDtoken = "your_token")
 plot(loc)
 ```
 
 ```{r locus1, echo = FALSE, message=FALSE, fig.show='hold', out.width='80%', out.extra='style="border: 0;"'}
 knitr::include_graphics("locus1.png")
 ```
+
+The gene tracks can be customised.
 
 ```{r eval = FALSE}
 # Filter by gene biotype
@@ -84,25 +102,23 @@ plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
 
 # Arrange multiple plots
 
-`locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus plots side by side, specify layout manually and set the argument `use_layout = FALSE` when plotting locus objects.
+`locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
+plots side by side, specify layout manually and set the argument `use_layout =
+FALSE` when plotting locus objects.
 
-```{r eval = FALSE}
+```{r, fig.dim = c(10,5)}
 
-loc2 <- locus(SLE_gwas, gene = 'STAT4', flank = 1e5, LDtoken = "..")
-loc3 <- locus(SLE_gwas, gene = 'IRF5', flank = c(7e4, 2e5), LDtoken = "..")
+loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
+loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = FALSE)
 
 # multiplot
 oldpar <- par(no.readonly = TRUE)
+on.exit(par(oldpar))
 mat <- matrix(c(2:1, 4:3, 6:5), nrow = 2)
 graphics::layout(mat, heights = c(3, 2))
 plot(loc, use_layout = FALSE, legend_pos = 'topleft')
 plot(loc2, use_layout = FALSE, legend_pos = NULL)
 plot(loc3, use_layout = FALSE, legend_pos = NULL)
-par(oldpar)
-```
-
-```{r mukti, echo = FALSE, message=FALSE, fig.show='hold', out.width='100%', out.extra='style="border: 0;"'}
-knitr::include_graphics("multi.png")
 ```
 
 # Plot gene annotation only
@@ -111,23 +127,16 @@ The gene track can be plotted from a `locus` class object using the function
 `genetrack()`. This uses base graphics, so `layout()` can be used to stack 
 custom-made plots above or below the gene tracks.
 
-```{r eval = FALSE}
+```{r}
 genetracks(loc)
-```
-
-```{r locus2, echo = FALSE, message=FALSE, fig.show='hold', out.width='80%', out.extra='style="border: 0;"'}
-knitr::include_graphics("locus2.png")
 ```
 
 The function allows control over plotting of the gene tracks.
 
-```{r eval = FALSE}
+```{r}
 # Limit the number of tracks
-genetracks(loc, maxrows = 4)
-
 # Filter by gene biotype
-genetracks(loc, filter_gene_biotype = 'protein_coding')
-
 # Customise colours
-genetracks(loc, gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
+genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
+           gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```

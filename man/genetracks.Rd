@@ -64,3 +64,20 @@ This function is called by plot.locus(). It can used to plot the
 gene annotation tracks on their own. It uses base graphics, so layout() can
 be used to position adjacent plots above or below.
 }
+\examples{
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+genetracks(loc)
+
+## Limit the number of tracks
+genetracks(loc, maxrows = 4)
+
+## Filter by gene biotype
+genetracks(loc, filter_gene_biotype = 'protein_coding')
+
+## Customise colours
+genetracks(loc, gene_col = 'grey', exon_col = 'orange',
+           exon_border = 'darkgrey')
+
+}

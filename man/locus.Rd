@@ -89,3 +89,9 @@ genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
 \link{LDlinkR} package to retrieve linkage disequilibrium (LD) information on a
 reference SNP.
 }
+\examples{
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+plot(loc)
+}
