@@ -67,9 +67,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                       pop = "CEU",
                       r2d = "r2",
                       LDtoken = "") {
-  require(ens_version, character.only = TRUE)
-  if (!requireNamespace(ens_version, quietly = TRUE)) {
-    stop(paste("Ensembl database", ens_version, "not installed"),
+  if (!ens_version %in% (.packages())) {
+    stop("Ensembl database not loaded. Try: library(", ens_version, ")",
          call. = FALSE)
   }
   edb <- get(ens_version)

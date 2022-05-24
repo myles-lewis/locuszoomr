@@ -20,6 +20,7 @@ Install from Github
 ```
 devtools::install_github("myles-lewis/locuszoomr")
 library(locuszoomr)
+library(EnsDb.Hsapiens.v75)
 ```
 
 `locuszoomr` automatically leverages the `LDlinkR` package to query 1000 genomes 

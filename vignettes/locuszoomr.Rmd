@@ -4,9 +4,7 @@ author: "Myles Lewis"
 output:
   html_document:
     toc: true
-    toc_float:
-      collapsed: false
-    toc_depth: 3
+    toc_depth: 2
     number_sections: true
 vignette: >
   %\VignetteIndexEntry{locuszoomr}
@@ -47,6 +45,7 @@ Install from Github
 ```{r eval = FALSE}
 devtools::install_github("myles-lewis/locuszoomr")
 library(locuszoomr)
+library(EnsDb.Hsapiens.v75)
 ```
 
 `locuszoomr` automatically leverages the `LDlinkR` package to query 1000 Genomes 
