@@ -58,7 +58,7 @@
 #' @import EnsDb.Hsapiens.v75
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
-#' @importFrom LDlinkR LDmatrix
+#' @importFrom LDlinkR LDmatrix LDexpress
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
 #' SeqNameFilter GeneIdFilter
 #' @importFrom GenomeInfoDb seqlengths
@@ -109,6 +109,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
   data$logP <- -log10(data[, p])
   data <- as.data.frame(data)
+  if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
   if (LD) {
     if (LDtoken == "") stop("LDtoken is missing")
     rslist <- data[, labs]
@@ -117,13 +118,17 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     }
     message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
     ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken)
-    if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
     ld <- ldm[, index_snp]
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
   }
   if (eQTL) {
     if (LDtoken == "") stop("LDtoken is missing")
-    
+    LDexp <- mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
+                           token = LDtoken)
+    for (i in c("R2", "D'", "Effect_Size", "P_value")) {
+      LDexp[, i] <- as.numeric(LDexp[, i])
+    }
+    LDexp$Effect_Allele <- gsub("=.*", "", LDexp$Effect_Allele_Freq)
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
@@ -136,10 +141,11 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   TX <- TX[TX$start < xrange[2], ]
   EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   
-  loc <- list(seqname = seqname, xrange = xrange,
+  loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_version = ens_version,
               chrom = chrom, pos = pos, p = p, labs = labs,
               data = data, TX = TX, EX = EX)
+  if (eQTL) loc$LDexp <- LDexp
   class(loc) <- "locus"
   loc
 }
@@ -448,6 +454,7 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
 
 # use memoise to reduce calls to LDlink API
 mem_LDmatrix <- memoise(LDmatrix)
+mem_LDexpress <- memoise(LDexpress)
 
 #' @importFrom grDevices col2rgb rgb
 
