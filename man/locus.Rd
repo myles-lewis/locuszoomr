@@ -78,7 +78,8 @@ locus gene information from Ensembl and
 locus exon information from Ensembl.
 }
 \description{
-Creates object of class 'locus' for genomic locus plot similar to \code{locuszoom}.
+Creates object of class 'locus' for genomic locus plot similar to
+\code{locuszoom}.
 }
 \details{
 This is an R version of \code{locuszoom} (http://locuszoom.org) for generating

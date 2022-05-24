@@ -57,8 +57,8 @@ object is made.}
 \item{cex.text}{Font size for gene text.}
 
 \item{use_layout}{Logical whether \code{graphics::layout} is called. Default
-\code{TRUE} is for a standard single plot. Set to \code{FALSE} if a more complex layout
-with multiple plots is required.}
+\code{TRUE} is for a standard single plot. Set to \code{FALSE} if a more complex
+layout with multiple plots is required.}
 
 \item{heights}{Ratio of top to bottom plot. See \link{layout}.}
 

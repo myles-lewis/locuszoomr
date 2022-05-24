@@ -1,6 +1,7 @@
 #' Create locus object for plotting
 #' 
-#' Creates object of class 'locus' for genomic locus plot similar to `locuszoom`.
+#' Creates object of class 'locus' for genomic locus plot similar to 
+#' `locuszoom`.
 #' 
 #' @details 
 #' This is an R version of `locuszoom` (http://locuszoom.org) for generating
@@ -67,6 +68,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                       r2d = "r2",
                       LDtoken = "") {
   require(ens_version, character.only = TRUE)
+  if (!requireNamespace(ens_version, quietly = TRUE)) {
+    stop(paste("Ensembl database", ens_version, "not installed"),
+         call. = FALSE)
+  }
   edb <- get(ens_version)
   flank <- rep_len(flank, 2)
   if (!is.null(gene)) {
@@ -100,7 +105,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     if (LDtoken == "") stop("LDtoken is missing")
     rslist <- data[, labs]
     if (length(rslist) > 1000) {
-      rslist <- rslist[order(data$logP, decreasing = TRUE)[1:1000]]
+      rslist <- rslist[order(data$logP, decreasing = TRUE)[seq_len(1000)]]
     }
     cat(paste("Obtaining LD on", length(rslist), "SNPs"))
     ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken)
@@ -110,7 +115,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(c(1:22, "X", "Y")),
+    SeqNameFilter(c(seq_len(22), "X", "Y")),
     GeneIdFilter("ENSG", "startsWith")))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
@@ -152,9 +157,9 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.text Font size for gene text.
-#' @param use_layout Logical whether `graphics::layout` is called. Default 
-#' `TRUE` is for a standard single plot. Set to `FALSE` if a more complex layout 
-#' with multiple plots is required.
+#' @param use_layout Logical whether `graphics::layout` is called. Default
+#'   `TRUE` is for a standard single plot. Set to `FALSE` if a more complex
+#'   layout with multiple plots is required.
 #' @param heights Ratio of top to bottom plot. See [layout].
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
@@ -162,10 +167,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' whether x axis ticks and numbers are plotted on top or bottom plot window.
 #' @param border Logical whether a bounding box is plotted around upper and 
 #' lower plots.
-#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs 
-#' which lack LD information. The next 5 colours are for r2 or D' LD results 
-#' ranging from 0 to 1 in intervals of 0.2. The final colour is for the index 
-#' SNP.
+#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs
+#'   which lack LD information. The next 5 colours are for r2 or D' LD results
+#'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
+#'   SNP.
 #' @param gene_col Colour for genes and exons.
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
@@ -193,8 +198,8 @@ plot.locus <- function(x, ...,
                        maxrows = 7,
                        xticks = 'bottom',
                        border = FALSE,
-                       LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 'orange', 'red', 
-                                  'purple'),
+                       LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 
+                                  'orange', 'red', 'purple'),
                        gene_col = 'blue4',
                        exon_col = 'blue4',
                        exon_border = 'blue4',
@@ -221,7 +226,8 @@ plot.locus <- function(x, ...,
   }
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
+      mgp = c(1.8, 0.5, 0), 
+      mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
              maxrows, text_pos, xticks = (xticks == 'bottom'),
@@ -334,7 +340,7 @@ genetracks <- function(locus,
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
-  for (i in 1:nrow(TX)) {
+  for (i in seq_len(nrow(TX))) {
     lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
           col = gene_col, lwd = 1, lend = 1)
     e <- EX[EX$gene_id == TX$gene_id[i], ]
@@ -357,7 +363,7 @@ genetracks <- function(locus,
   } else if (text_pos == "left") {
     tfilter <- if (border) {
       which(TX$tmin > xrange[1])
-    } else 1:nrow(TX)
+    } else seq_len(nrow(TX))
     for (i in tfilter) {
       text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],
            labels = if (TX$strand[i] == "+") {
@@ -430,7 +436,7 @@ genetrack_ly <- function(locus,
   exon_col <- col2hex(exon_col)
   exon_border <- col2hex(exon_border)
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
-  shapes <- lapply(1:nrow(EX), function(i) {
+  shapes <- lapply(seq_len(nrow(EX)), function(i) {
     list(type = "rect", fillcolor = exon_col, line = list(color = exon_border),
          x0 = EX$start[i], x1 = EX$end[i], xref = "x",
          y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
@@ -456,7 +462,8 @@ genetrack_ly <- function(locus,
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
                    text_pos = 'top') {
-  gw <- strwidth(paste0("--", TX$gene_name), units = "inch", cex = cex.text) * diff(xlim) / par("pin")[1]
+  gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
+                 cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
     TX$tmin <- TX$mean - gw / 2

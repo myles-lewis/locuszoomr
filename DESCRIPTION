@@ -6,18 +6,29 @@ Authors@R:
     role = c("aut", "cre"),
     email = "myles.lewis@qmul.ac.uk",
     comment = c(ORCID = "0000-0001-9365-5345")))
-Description: Pure R implementation of 'LocusZoom' for plotting genetic data at 
-    genomic loci accompanied by gene annotations. It uses the 'LDlink' API to 
-    query linkage disequilibrium data from the 1000 Genomes Project.
+Description:
+    This package allows users to produce publication-ready gene locus 
+    plots similar to those produced by the web interface LocusZoom 
+    (http://locuszoom.org), but running locally in R. Genetic or genomic data 
+    with gene annotation tracks are plotted via R base graphics system, allowing 
+    flexibility and easy customisation including laying out multiple locus plots 
+    on the same page. It uses the 'LDlink' API to query linkage disequilibrium 
+    data from the 1000 Genomes Project and overlay this on plots.
 Language: en-gb
 License: Artistic-2.0
 Encoding: UTF-8
 biocViews:
+    DataRepresentation,
+    Sequencing,
+    Software,
+    Visualization
 Imports:
     AnnotationFilter,
     BiocGenerics,
     ensembldb,
     GenomeInfoDb,
+    graphics,
+    grDevices,
     LDlinkR,
     memoise,
     plotly
