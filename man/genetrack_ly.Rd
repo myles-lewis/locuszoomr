@@ -58,3 +58,10 @@ Plot gene annotation tracks from \code{ensembldb} data using \code{plotly}.
 \details{
 This function can used to plot gene annotation tracks on their own.
 }
+\examples{
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+genetrack_ly(loc)
+
+}
