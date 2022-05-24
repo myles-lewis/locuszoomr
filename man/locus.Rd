@@ -32,8 +32,8 @@ locus(
 \item{gene}{Optional specifies which gene to view. Either \code{xrange} with
 \code{seqname}, or \code{gene} must be specified.}
 
-\item{flank}{Vector of how much flanking region left and right of the gene
-to show.}
+\item{flank}{Single value or vector with 2 values for how much flanking
+region left and right of the gene to show.}
 
 \item{ens_version}{Specifies which Ensembl database to query for gene and
 exon positions. See \code{ensembldb} Bioconductor package.}
@@ -81,9 +81,10 @@ locus exon information from Ensembl.
 Creates object of class 'locus' for genomic locus plot similar to \code{locuszoom}.
 }
 \details{
-This is an R version of \code{locuszoom} for generating publication ready Manhattan
-plots of gene loci. It references Ensembl databases using the \code{ensembldb}
-Bioconductor package framework for annotating genes and exons. It queries
-LDlink (https://ldlink.nci.nih.gov/) via the \link{LDlinkR} package to retrieve
-linkage disequilibrium (LD) information on a reference SNP.
+This is an R version of \code{locuszoom} (http://locuszoom.org) for generating
+publication ready Manhattan plots of gene loci. It references Ensembl
+databases using the \code{ensembldb} Bioconductor package framework for annotating
+genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
+\link{LDlinkR} package to retrieve linkage disequilibrium (LD) information on a
+reference SNP.
 }

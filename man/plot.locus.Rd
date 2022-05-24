@@ -16,6 +16,7 @@
   ylab = expression("-log"[10] ~ "P"),
   cex.axis = 0.8,
   cex.text = 0.7,
+  use_layout = TRUE,
   heights = c(3, 2),
   maxrows = 7,
   xticks = "bottom",
@@ -54,6 +55,10 @@ object is made.}
 \item{cex.axis}{Specifies font size for axis numbering.}
 
 \item{cex.text}{Font size for gene text.}
+
+\item{use_layout}{Logical whether \code{graphics::layout} is called. Default
+\code{TRUE} is for a standard single plot. Set to \code{FALSE} if a more complex layout
+with multiple plots is required.}
 
 \item{heights}{Ratio of top to bottom plot. See \link{layout}.}
 

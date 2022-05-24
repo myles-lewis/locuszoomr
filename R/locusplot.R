@@ -3,19 +3,20 @@
 #' Creates object of class 'locus' for genomic locus plot similar to `locuszoom`.
 #' 
 #' @details 
-#' This is an R version of `locuszoom` for generating publication ready Manhattan 
-#' plots of gene loci. It references Ensembl databases using the `ensembldb` 
-#' Bioconductor package framework for annotating genes and exons. It queries 
-#' LDlink (https://ldlink.nci.nih.gov/) via the [LDlinkR] package to retrieve 
-#' linkage disequilibrium (LD) information on a reference SNP.
+#' This is an R version of `locuszoom` (http://locuszoom.org) for generating
+#' publication ready Manhattan plots of gene loci. It references Ensembl
+#' databases using the `ensembldb` Bioconductor package framework for annotating
+#' genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
+#' [LDlinkR] package to retrieve linkage disequilibrium (LD) information on a
+#' reference SNP.
 #' 
 #' @param data Dataset (data.frame or data.table) to use for plot.
 #' @param xrange Vector of genomic position range for the x axis.
 #' @param seqname Specifies which chromosome to plot.
 #' @param gene Optional specifies which gene to view. Either `xrange` with 
 #' `seqname`, or `gene` must be specified.
-#' @param flank Vector of how much flanking region left and right of the gene 
-#' to show. 
+#' @param flank Single value or vector with 2 values for how much flanking 
+#' region left and right of the gene to show.
 #' @param ens_version Specifies which Ensembl database to query for gene and 
 #' exon positions. See `ensembldb` Bioconductor package.
 #' @param chrom Determines which column in `data` contains chromosome 
@@ -67,9 +68,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                       LDtoken = "") {
   require(ens_version, character.only = TRUE)
   edb <- get(ens_version)
+  flank <- rep_len(flank, 2)
   if (!is.null(gene)) {
     locus <- genes(edb, filter = GeneNameFilter(gene))
-    xrange <- c(start(locus) - flank, end(locus) + flank)
+    xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
     seqname <- names(seqlengths(locus))
   }
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
@@ -150,6 +152,9 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.text Font size for gene text.
+#' @param use_layout Logical whether `graphics::layout` is called. Default 
+#' `TRUE` is for a standard single plot. Set to `FALSE` if a more complex layout 
+#' with multiple plots is required.
 #' @param heights Ratio of top to bottom plot. See [layout].
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
@@ -183,6 +188,7 @@ plot.locus <- function(x, ...,
                        xlab = NULL, ylab = expression("-log"[10] ~ "P"),
                        cex.axis = 0.8,
                        cex.text = 0.7,
+                       use_layout = TRUE,
                        heights = c(3, 2),
                        maxrows = 7,
                        xticks = 'bottom',
@@ -208,11 +214,11 @@ plot.locus <- function(x, ...,
     data$col <- chromCols
     data$col[data[, x$p] < pcutoff] <- sigCol
   }
-  
-  oldpar <- par(no.readonly = TRUE)
-  on.exit(par(oldpar), add = TRUE)
-  graphics::layout(matrix(2:1, nrow = 2), heights = heights)
-  
+  if (use_layout) {
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar), add = TRUE)
+    graphics::layout(matrix(2:1, nrow = 2), heights = heights)
+  }
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
       mgp = c(1.8, 0.5, 0), mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
