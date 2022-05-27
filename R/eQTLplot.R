@@ -1,5 +1,5 @@
 
-
+#' @param outline_col Colour of symbol outlines. Default is `NA` for no outlines.
 #' @import EnsDb.Hsapiens.v75
 #' @importFrom graphics axTicks axis layout par strwidth abline legend
 #' @importFrom grDevices adjustcolor hcl.colors
