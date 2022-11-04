@@ -1,5 +1,39 @@
 
+#' eQTL plot
+#'
+#' Experimental plotting function for plotting eQTL data from GTex
+#' 
+#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param filter_gene_name Vector of gene names to display.
+#' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
+#' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
+#' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
+#' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set 
+#' to `NULL` to disable.
+#' @param col Colour of points for SNPs which do not have eQTLs.
 #' @param outline_col Colour of symbol outlines. Default is `NA` for no outlines.
+#' #' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.text Font size for gene text.
+#' @param use_layout Logical whether `graphics::layout` is called. Default
+#'   `TRUE` is for a standard single plot. Set to `FALSE` if a more complex
+#'   layout with multiple plots is required.
+#' @param heights Ratio of top to bottom plot. See [layout].
+#' @param maxrows Specifies maximum number of rows to display in gene 
+#' annotation panel.
+#' @param xticks Character value of either 'top' or 'bottom' specifying 
+#' whether x axis ticks and numbers are plotted on top or bottom plot window.
+#' @param border Logical whether a bounding box is plotted around upper and 
+#' lower plots.
+#' @param gene_col Colour for genes and exons.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
+#' border.
+#' @param text_pos Character value of either 'top' or 'left' specifying 
+#' placement of gene name labels.
+#' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide 
+#' legend.
+#' @param ... Other arguments passed to [plot()] for the scatter plot.
+#' @return No return value. Produces a plot using base graphics.
 #' @import EnsDb.Hsapiens.v75
 #' @importFrom graphics axTicks axis layout par strwidth abline legend
 #' @importFrom grDevices adjustcolor hcl.colors

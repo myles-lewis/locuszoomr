@@ -17,6 +17,7 @@ locus(
   labs = "rsid",
   index_snp = NULL,
   LD = TRUE,
+  eQTL = FALSE,
   pop = "CEU",
   r2d = "r2",
   LDtoken = ""
