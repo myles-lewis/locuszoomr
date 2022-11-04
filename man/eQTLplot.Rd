@@ -49,8 +49,25 @@ to \code{NULL} to disable.}
 
 \item{col}{Colour of points for SNPs which do not have eQTLs.}
 
-\item{outline_col}{Colour of symbol outlines. Default is \code{NA} for no outlines.
-#' @param cex.axis Specifies font size for axis numbering.}
+\item{outline_col}{Colour of symbol outlines. Default is \code{NA} for no outlines.}
+
+\item{up_palette}{Character string specifying palette for upregulation eQTL
+using \link[grDevices:palettes]{grDevices::hcl.colors}}
+
+\item{down_palette}{Character string specifying palette for downregulation
+eQTL using \link[grDevices:palettes]{grDevices::hcl.colors}}
+
+\item{alpha}{Alpha opacity for points}
+
+\item{tissue}{GTex tissue in which eQTL has been measured}
+
+\item{eqtl_gene}{Gene showing eQTL effect}
+
+\item{xlab}{x axis title}
+
+\item{ylab}{y axis title}
+
+\item{cex.axis}{Specifies font size for axis numbering.}
 
 \item{cex.text}{Font size for gene text.}
 

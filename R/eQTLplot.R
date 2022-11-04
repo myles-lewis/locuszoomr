@@ -12,7 +12,16 @@
 #' to `NULL` to disable.
 #' @param col Colour of points for SNPs which do not have eQTLs.
 #' @param outline_col Colour of symbol outlines. Default is `NA` for no outlines.
-#' #' @param cex.axis Specifies font size for axis numbering.
+#' @param up_palette Character string specifying palette for upregulation eQTL
+#'   using [grDevices::hcl.colors]
+#' @param down_palette Character string specifying palette for downregulation
+#'   eQTL using [grDevices::hcl.colors]
+#' @param alpha Alpha opacity for points
+#' @param tissue GTex tissue in which eQTL has been measured
+#' @param eqtl_gene Gene showing eQTL effect
+#' @param xlab x axis title
+#' @param ylab y axis title
+#' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.text Font size for gene text.
 #' @param use_layout Logical whether `graphics::layout` is called. Default
 #'   `TRUE` is for a standard single plot. Set to `FALSE` if a more complex
