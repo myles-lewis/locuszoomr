@@ -1,7 +1,10 @@
 
 #' eQTL plot
 #'
-#' Experimental plotting function for plotting eQTL data from GTex
+#' Experimental plotting function for overlaying eQTL data from GTex on top of
+#' GWAS results. y axis shows the -log10 p-value for the GWAS result.
+#' Significant eQTL for the specified gene are overlaid using colours and
+#' symbols.
 #' 
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param filter_gene_name Vector of gene names to display.
@@ -43,6 +46,7 @@
 #' legend.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a plot using base graphics.
+#' 
 #' @import EnsDb.Hsapiens.v75
 #' @importFrom graphics axTicks axis layout par strwidth abline legend
 #' @importFrom grDevices adjustcolor hcl.colors
@@ -81,29 +85,33 @@ eQTLplot <- function(x, ...,
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   LDX <- x$LDexp[x$LDexp$Tissue == tissue & x$LDexp$Gene_Symbol == eqtl_gene, ]
   ind <- match(data[, x$labs], LDX$RS_ID)
-  data$eqtl_effect <- NA
-  data$eqtl_effect <- LDX$Effect_Size[ind]
-  data$eqtl_p <- LDX$P_value[ind]
-  data$eqtl_effect_allele <- LDX$Effect_Allele[ind]
-  # gwas allele and eqtl effect allele are the same
-  mismatch <- which(data$eqtl_effect_allele != data$effect_allele)
-  which_rev <- data$other_allele[mismatch] == data$eqtl_effect_allele[mismatch]
-  rev_effect <- mismatch[which_rev]
-  mismatch <- mismatch[!which_rev]
-  data$eqtl_effect[rev_effect] <- -data$eqtl_effect[rev_effect]
-  data$eqtl_effect[mismatch] <- NA
-  up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
-  down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
-  ecol <- cut(abs(data$eqtl_effect), breaks=6)
   data$col <- 'black'
   data$col <- adjustcolor(data$col, alpha.f = alpha)
-  eqind <- !is.na(data$eqtl_effect)
-  equp <- eqind & sign(data$eqtl_effect) == -1
-  eqdown <- eqind & sign(data$eqtl_effect) == 1
-  data$col[equp] <- down_cols[ecol[equp]]
-  data$col[eqdown] <- up_cols[ecol[eqdown]]
   data$pch <- 21
-  data$pch[eqind] <- 24.5 - sign(data$eqtl_effect[eqind]) / 2
+  if (all(is.na(ind))) {
+    message("No significant eQTL")
+  } else {
+    data$eqtl_effect <- NA
+    data$eqtl_effect <- LDX$Effect_Size[ind]
+    data$eqtl_p <- LDX$P_value[ind]
+    data$eqtl_effect_allele <- LDX$Effect_Allele[ind]
+    # gwas allele and eqtl effect allele are the same
+    mismatch <- which(data$eqtl_effect_allele != data$effect_allele)
+    which_rev <- data$other_allele[mismatch] == data$eqtl_effect_allele[mismatch]
+    rev_effect <- mismatch[which_rev]
+    mismatch <- mismatch[!which_rev]
+    data$eqtl_effect[rev_effect] <- -data$eqtl_effect[rev_effect]
+    data$eqtl_effect[mismatch] <- NA
+    up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
+    down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
+    ecol <- cut(abs(data$eqtl_effect), breaks=6)
+    eqind <- !is.na(data$eqtl_effect)
+    equp <- eqind & sign(data$eqtl_effect) == -1
+    eqdown <- eqind & sign(data$eqtl_effect) == 1
+    data$col[equp] <- down_cols[ecol[equp]]
+    data$col[eqdown] <- up_cols[ecol[eqdown]]
+    data$pch[eqind] <- 24.5 - sign(data$eqtl_effect[eqind]) / 2
+  }
   
   if (use_layout) {
     oldpar <- par(no.readonly = TRUE)
