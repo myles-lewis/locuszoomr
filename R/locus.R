@@ -37,7 +37,7 @@
 #'   package, so that if exactly the same locus is requested the system does not
 #'   repeatedly call the API.
 #' @param eQTL Logical whether to obtain eQTL data. Queries GTEx eQTL data via
-#'   [LDlinkR::LDexpress]
+#'   [LDlinkR::LDexpress] using the SNP specified by `index_snp`
 #' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
 #' allowed, default = "CEU". Passed to [LDlinkR::LDmatrix].
 #' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
