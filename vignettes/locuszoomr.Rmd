@@ -153,3 +153,11 @@ The function allows control over plotting of the gene tracks.
 genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
            gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```
+
+# Convert plots to grid objects
+
+The `gridGraphics` package can be used to convert locus plots which are produced
+in base graphics to `grid` objects (grobs), which can then be laid out on the
+same page as `ggplot2` plots etc. The `gridBase` package allows `grid` and base
+graphics outputs to be mixed.
+
