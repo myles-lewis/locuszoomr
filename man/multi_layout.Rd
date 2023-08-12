@@ -14,9 +14,12 @@ multi_layout(nrow = 1, ncol = 1, heights = c(3, 2))
 \item{heights}{Vector of length 2 specifying height for plot and gene tracks}
 }
 \value{
-Sets \code{\link[=layout]{layout()}} to enable multiple plots per page. Returns \code{par()} so
-that layout can be reset to default at the end of plotting.
+Sets \code{\link[=layout]{layout()}} to enable multiple plots per page. Returns \code{par()}
+invisibly so that layout can be reset to default at the end of plotting.
 }
 \description{
 Uses \code{\link[=layout]{layout()}} to set up a pages of multiple locus plots.
+}
+\seealso{
+\code{\link[=layout]{layout()}}
 }

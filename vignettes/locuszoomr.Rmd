@@ -103,22 +103,35 @@ plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
 # Arrange multiple plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
-plots side by side, specify layout manually and set the argument `use_layout =
-FALSE` when plotting locus objects.
+plots side by side, use the function `multi_layout()` to set the number of locus
+plots per row and column. Then set the argument `use_layout = FALSE` when
+plotting locus objects. `multi_layout()` returns a list of original `par()`
+parameters so they can be reset after plotting has finished.
 
-```{r, fig.dim = c(10,5)}
-
+```{r eval = FALSE}
 loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
 loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = FALSE)
 
 # multiplot
-oldpar <- par(no.readonly = TRUE)
-on.exit(par(oldpar))
-mat <- matrix(c(2:1, 4:3, 6:5), nrow = 2)
-graphics::layout(mat, heights = c(3, 2))
+pdf("myplot.pdf", height = 7, width = 10)
+oldpar <- multi_layout(nrow = 1, ncol = 3)
 plot(loc, use_layout = FALSE, legend_pos = 'topleft')
 plot(loc2, use_layout = FALSE, legend_pos = NULL)
 plot(loc3, use_layout = FALSE, legend_pos = NULL)
+par(oldpar)  # reset to default
+dev.off()
+```
+
+```{r, echo=FALSE, fig.dim = c(10,5)}
+loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
+loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = FALSE)
+
+# multiplot
+oldpar <- multi_layout(nrow = 1, ncol = 3)
+plot(loc, use_layout = FALSE, legend_pos = 'topleft')
+plot(loc2, use_layout = FALSE, legend_pos = NULL)
+plot(loc3, use_layout = FALSE, legend_pos = NULL)
+par(oldpar)  # reset to default
 ```
 
 # Plot gene annotation only
