@@ -102,14 +102,14 @@ plot.locus <- function(x, ...,
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
       mgp = c(1.8, 0.5, 0), 
-      mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
+      mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 1.5))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
              maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
+  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 1.5))
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
        xlim = x$xrange,
