@@ -61,7 +61,7 @@ package, so that if exactly the same locus is requested the system does not
 repeatedly call the API.}
 
 \item{eQTL}{Logical whether to obtain eQTL data. Queries GTEx eQTL data via
-\link[LDlinkR:LDexpress]{LDlinkR::LDexpress}}
+\link[LDlinkR:LDexpress]{LDlinkR::LDexpress} using the SNP specified by \code{index_snp}}
 
 \item{pop}{A 1000 Genomes Project population, (e.g. YRI or CEU), multiple
 allowed, default = "CEU". Passed to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}

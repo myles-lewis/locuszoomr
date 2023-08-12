@@ -103,8 +103,9 @@ legend.}
 No return value. Produces a plot using base graphics.
 }
 \description{
-Experimental plotting function for overlaying eQTL data from GTex on top of
+Experimental plotting function for overlaying eQTL data from GTEx on top of
 GWAS results. y axis shows the -log10 p-value for the GWAS result.
 Significant eQTL for the specified gene are overlaid using colours and
-symbols.
+symbols. GTEx data is obtained using \link[LDlinkR:LDexpress]{LDlinkR::LDexpress} using the index
+SNP.
 }
