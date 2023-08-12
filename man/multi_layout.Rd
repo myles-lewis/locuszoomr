@@ -18,7 +18,7 @@ Sets \code{\link[=layout]{layout()}} to enable multiple plots per page. Returns 
 invisibly so that layout can be reset to default at the end of plotting.
 }
 \description{
-Uses \code{\link[=layout]{layout()}} to set up a pages of multiple locus plots.
+Uses \code{\link[=layout]{layout()}} to set up pages of multiple locus plots.
 }
 \seealso{
 \code{\link[=layout]{layout()}}

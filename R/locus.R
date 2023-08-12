@@ -32,10 +32,12 @@
 #' @param index_snp Specifies the index SNP for displaying linkage 
 #' disequilibrium (LD). If not specified, the SNP with the lowest P value is 
 #' selected.
-#' @param LD Logical whether LD is plotted. Queries 1000 Genomes via LDlinkR
-#'   package. See [LDlinkR::LDmatrix]. Results are cached using the `memoise`
-#'   package, so that if exactly the same locus is requested the system does not
-#'   repeatedly call the API.
+#' @param LD Logical or character. If logical specifies whether LD is plotted by
+#'   querying 1000 Genomes via `LDlinkR` package. See [LDlinkR::LDmatrix].
+#'   Results are cached using the `memoise` package, so that if exactly the same
+#'   locus is requested the system does not repeatedly call the API. If
+#'   set to a character value, this determines which column in `data` contains
+#'   LD information.
 #' @param eQTL Logical whether to obtain eQTL data. Queries GTEx eQTL data via
 #'   [LDlinkR::LDexpress] using the SNP specified by `index_snp`
 #' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
@@ -74,7 +76,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                   chrom = 'chrom', pos = 'pos', p = 'p',
                   labs = 'rsid',
                   index_snp = NULL,
-                  LD = TRUE,
+                  LD = FALSE,
                   eQTL = FALSE,
                   pop = "CEU",
                   r2d = "r2",
@@ -113,7 +115,9 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   data$logP <- -log10(data[, p])
   data <- as.data.frame(data)
   if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
-  if (LD) {
+  if (is.character(LD)) {
+    colnames(data)[which(colnames(data) == LD)] <- "ld"
+  } else if (LD) {
     if (LDtoken == "") stop("LDtoken is missing")
     rslist <- data[, labs]
     if (length(rslist) > 1000) {

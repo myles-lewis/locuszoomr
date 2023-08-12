@@ -16,7 +16,7 @@ locus(
   p = "p",
   labs = "rsid",
   index_snp = NULL,
-  LD = TRUE,
+  LD = FALSE,
   eQTL = FALSE,
   pop = "CEU",
   r2d = "r2",
@@ -55,10 +55,12 @@ Automatically looks for PLINK headings.}
 disequilibrium (LD). If not specified, the SNP with the lowest P value is
 selected.}
 
-\item{LD}{Logical whether LD is plotted. Queries 1000 Genomes via LDlinkR
-package. See \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}. Results are cached using the \code{memoise}
-package, so that if exactly the same locus is requested the system does not
-repeatedly call the API.}
+\item{LD}{Logical or character. If logical specifies whether LD is plotted by
+querying 1000 Genomes via \code{LDlinkR} package. See \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.
+Results are cached using the \code{memoise} package, so that if exactly the same
+locus is requested the system does not repeatedly call the API. If
+set to a character value, this determines which column in \code{data} contains
+LD information.}
 
 \item{eQTL}{Logical whether to obtain eQTL data. Queries GTEx eQTL data via
 \link[LDlinkR:LDexpress]{LDlinkR::LDexpress} using the SNP specified by \code{index_snp}}

@@ -81,7 +81,7 @@ plot.
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LDtoken = "your_token")
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = TRUE, LDtoken = "your_token")
 plot(loc)
 ```
 

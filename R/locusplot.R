@@ -87,9 +87,11 @@ plot.locus <- function(x, ...,
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   LD <- "ld" %in% colnames(data)
   if (LD) {
-    data$col <- LDcols[cut(data$ld, -1:6/5, labels = FALSE)]
-    data$col[is.na(data$col)] <- LDcols[1]
-    data$col[which.max(data$logP)] <- LDcols[7]
+    data$col <- cut(data$ld, -1:6/5, labels = FALSE)
+    data$col[is.na(data$col)] <- 1L
+    data$col[which.max(data$logP)] <- 7L
+    data <- data[order(data$col), ]
+    data$col <- LDcols[data$col]
   } else {
     data$col <- chromCols
     data$col[data[, x$p] < pcutoff] <- sigCol
