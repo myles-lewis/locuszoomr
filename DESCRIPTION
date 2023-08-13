@@ -31,13 +31,13 @@ Imports:
     GenomeInfoDb,
     graphics,
     grDevices,
-    LDlinkR,
     memoise,
     plotly
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
     data.table,
+    LDlinkR,
     rmarkdown,
     knitr
 VignetteBuilder: knitr

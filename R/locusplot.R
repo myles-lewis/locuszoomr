@@ -303,9 +303,6 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   TX
 }
 
-# use memoise to reduce calls to LDlink API
-mem_LDmatrix <- memoise(LDmatrix)
-mem_LDexpress <- memoise(LDexpress)
 
 #' @importFrom grDevices col2rgb rgb
 

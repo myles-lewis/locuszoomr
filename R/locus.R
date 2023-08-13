@@ -9,7 +9,7 @@
 #' publication ready Manhattan plots of gene loci. It references Ensembl
 #' databases using the `ensembldb` Bioconductor package framework for annotating
 #' genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
-#' [LDlinkR] package to retrieve linkage disequilibrium (LD) information on a
+#' `LDlinkR` package to retrieve linkage disequilibrium (LD) information on a
 #' reference SNP.
 #' 
 #' @param data Dataset (data.frame or data.table) to use for plot.
@@ -33,19 +33,19 @@
 #' disequilibrium (LD). If not specified, the SNP with the lowest P value is 
 #' selected.
 #' @param LD Logical or character. If logical specifies whether LD is plotted by
-#'   querying 1000 Genomes via `LDlinkR` package. See [LDlinkR::LDmatrix].
+#'   querying 1000 Genomes via `LDlinkR` package. See [LDlinkR::LDmatrix()].
 #'   Results are cached using the `memoise` package, so that if exactly the same
 #'   locus is requested the system does not repeatedly call the API. If
 #'   set to a character value, this determines which column in `data` contains
 #'   LD information.
 #' @param eQTL Logical whether to obtain eQTL data. Queries GTEx eQTL data via
-#'   [LDlinkR::LDexpress] using the SNP specified by `index_snp`
+#'   [LDlinkR::LDexpress()] using the SNP specified by `index_snp`
 #' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
-#' allowed, default = "CEU". Passed to [LDlinkR::LDmatrix].
+#' allowed, default = "CEU". Passed to [LDlinkR::LDmatrix()].
 #' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
-#' to [LDlinkR::LDmatrix].
+#' to [LDlinkR::LDmatrix()].
 #' @param LDtoken Personal access token for accessing 1000 Genomes LD data via 
-#' LDlink API. See [LDlinkR].
+#' LDlink API. See `LDlinkR` package documentation.
 #' @return Returns an object of class 'locus' ready for plotting, containing 
 #' the subset of GWAS data to be plotted, 
 #' chromosome and genomic position range, 
@@ -63,7 +63,6 @@
 #' @import EnsDb.Hsapiens.v75
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
-#' @importFrom LDlinkR LDmatrix LDexpress
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
 #' SeqNameFilter GeneIdFilter
 #' @importFrom GenomeInfoDb seqlengths
@@ -118,6 +117,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   if (is.character(LD)) {
     colnames(data)[which(colnames(data) == LD)] <- "ld"
   } else if (LD) {
+    if (!requireNamespace("LDlinkR", quietly = TRUE)) {
+      stop("Package 'LDlinkR' must be installed to use this feature",
+           call. = FALSE)
+    }
     if (LDtoken == "") stop("LDtoken is missing")
     rslist <- data[, labs]
     if (length(rslist) > 1000) {
@@ -129,6 +132,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     data$ld <- ld[match(data[, labs], ldm$RS_number)]
   }
   if (eQTL) {
+    if (!requireNamespace("LDlinkR", quietly = TRUE)) {
+      stop("Package 'LDlinkR' must be installed to use this feature",
+           call. = FALSE)
+    }
     if (LDtoken == "") stop("LDtoken is missing")
     LDexp <- mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
                            token = LDtoken)
@@ -156,3 +163,8 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   class(loc) <- "locus"
   loc
 }
+
+
+# use memoise to reduce calls to LDlink API
+mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
+mem_LDexpress <- memoise(LDlinkR::LDexpress)

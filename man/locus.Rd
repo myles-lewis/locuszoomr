@@ -56,23 +56,23 @@ disequilibrium (LD). If not specified, the SNP with the lowest P value is
 selected.}
 
 \item{LD}{Logical or character. If logical specifies whether LD is plotted by
-querying 1000 Genomes via \code{LDlinkR} package. See \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.
+querying 1000 Genomes via \code{LDlinkR} package. See \code{\link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix()}}.
 Results are cached using the \code{memoise} package, so that if exactly the same
 locus is requested the system does not repeatedly call the API. If
 set to a character value, this determines which column in \code{data} contains
 LD information.}
 
 \item{eQTL}{Logical whether to obtain eQTL data. Queries GTEx eQTL data via
-\link[LDlinkR:LDexpress]{LDlinkR::LDexpress} using the SNP specified by \code{index_snp}}
+\code{\link[LDlinkR:LDexpress]{LDlinkR::LDexpress()}} using the SNP specified by \code{index_snp}}
 
 \item{pop}{A 1000 Genomes Project population, (e.g. YRI or CEU), multiple
-allowed, default = "CEU". Passed to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
+allowed, default = "CEU". Passed to \code{\link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix()}}.}
 
 \item{r2d}{Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed
-to \link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix}.}
+to \code{\link[LDlinkR:LDmatrix]{LDlinkR::LDmatrix()}}.}
 
 \item{LDtoken}{Personal access token for accessing 1000 Genomes LD data via
-LDlink API. See \link{LDlinkR}.}
+LDlink API. See \code{LDlinkR} package documentation.}
 }
 \value{
 Returns an object of class 'locus' ready for plotting, containing
@@ -92,7 +92,7 @@ This is an R version of \code{locuszoom} (http://locuszoom.org) for generating
 publication ready Manhattan plots of gene loci. It references Ensembl
 databases using the \code{ensembldb} Bioconductor package framework for annotating
 genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
-\link{LDlinkR} package to retrieve linkage disequilibrium (LD) information on a
+\code{LDlinkR} package to retrieve linkage disequilibrium (LD) information on a
 reference SNP.
 }
 \examples{
