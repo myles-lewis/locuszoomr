@@ -21,7 +21,7 @@ library(locuszoomr)
 
 # Introduction
 
-The `locuszoomr` package allows user to produce publication ready gene locus 
+The `locuszoomr` package allows users to produce publication ready gene locus 
 plots very similar to those produced by the web interface locuszoom 
 (http://locuszoom.org), but running purely locally in R. It provides 
 customisation to the plots.
