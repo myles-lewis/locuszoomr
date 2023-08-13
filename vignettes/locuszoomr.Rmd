@@ -78,9 +78,13 @@ loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
 plot(loc)
 ```
 
+# Obtaining LD information
+
 Once an API personal access token has been obtained, the LDlink API can be
-called to retrieve LD information at the locus which is overlaid on the locus
-plot.
+called to retrieve LD (linkage disequilibium) information at the locus which is
+overlaid on the locus plot. This is shown as a colour overlay showing the level
+of $r^2$ between SNPs and the index SNP which defaults to the SNP with the
+lowest p-value (or the SNP can be specified manually).
 
 ```{r eval = FALSE}
 # Locus plot using SLE GWAS data from Bentham et al 2015
@@ -93,8 +97,8 @@ plot(loc)
 ```
 
 The subset of GWAS data included in the `locuszoomr` package has LD data already
-acquired from LDlink and included in the `r2` column. This can be plotted by
-setting `LD = "r2"`. This allows users to add their own LD information from
+acquired from LDlink which is included in the `r2` column. This can be plotted
+by setting `LD = "r2"`. This allows users to add their own LD information from
 their own datasets to loci.
 
 ```{r fig.dim=c(8, 7)}
@@ -102,8 +106,19 @@ loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2")
 plot(loc)
 ```
 
-The gene tracks can be customised. See the help page at `?plot.locus` for more
-details.
+# Plot customisation
+
+Various plotting options can be customised through arguments via the call to
+`plot()`. Plot borders can be set using `border = TRUE`. The chromosome position
+$x$ axis labels can be placed under the top or bottom plots using 
+`xtick = "top"` or `"bottom"`.
+
+See the help page at `?plot.locus` for more details.
+
+# Customising gene tracks
+
+The gene tracks can be also customised with colours and gene label text
+position. See the help page at `?plot.locus` for more details.
 
 ```{r eval = FALSE}
 # Filter by gene biotype
@@ -158,7 +173,8 @@ custom-made plots above or below the gene tracks.
 genetracks(loc)
 ```
 
-The function allows control over plotting of the gene tracks.
+The function allows control over plotting of the gene tracks such as changing
+the number of gene annotation tracks.
 
 ```{r}
 # Limit the number of tracks
