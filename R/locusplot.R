@@ -103,7 +103,7 @@ plot.locus <- function(x, ...,
   }
   # lower locus plot
   par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.8, 0.5, 0), 
+      mgp = c(1.5, 0.3, 0), 
       mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 1.5))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
@@ -111,7 +111,8 @@ plot.locus <- function(x, ...,
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 1.5))
+  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 1.5),
+      mgp = c(1.7, 0.5, 0))
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
        xlim = x$xrange,
@@ -228,10 +229,12 @@ genetracks <- function(locus,
        bty = if (border) 'o' else 'n',
        yaxt = 'n', xaxt = 'n',
        xlab = if (xticks) xlab else "",
-       ylab = "",
-       xaxt = 'n')
+       ylab = "")
   if (xticks) {
-    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+    xd <- diff(xrange) * 0.04
+    axis(1, at = xrange + c(-xd, xd), labels = FALSE, lwd.ticks = 0)
+    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
+         lwd = 0, lwd.ticks = 1)
   }
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   for (i in seq_len(nrow(TX))) {
