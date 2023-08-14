@@ -75,6 +75,7 @@ LDlink API since it requires a personal API token.
 ```{r warning=FALSE, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+summary(loc)
 plot(loc)
 ```
 
@@ -98,8 +99,8 @@ plot(loc)
 
 The subset of GWAS data included in the `locuszoomr` package has LD data already
 acquired from LDlink which is included in the `r2` column. This can be plotted
-by setting `LD = "r2"`. This allows users to add their own LD information from
-their own datasets to loci.
+by setting `LD = "r2"`. This method allows users to add their own LD information
+from their own datasets to loci.
 
 ```{r fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2")

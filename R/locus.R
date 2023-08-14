@@ -57,6 +57,7 @@
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+#' summary(loc)
 #' plot(loc)
 #' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
 #' plot(loc2)
@@ -168,3 +169,17 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 # use memoise to reduce calls to LDlink API
 mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
 mem_LDexpress <- memoise(LDlinkR::LDexpress)
+
+
+#' @export
+summary.locus <- function(object, ...) {
+  cat("Chromosome", object$seqname, "\n")
+  cat("Position", format(object$xrange[1], big.mark=","), "to",
+      format(object$xrange[2], big.mark=","), "\n")
+  cat("Gene", object$gene, "\n")
+  cat(nrow(object$data), "SNPs/datapoints\n")
+  cat(nrow(object$TX), "gene transcripts\n")
+  tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
+  cat(paste(tb, names(tb), collapse = ", "))
+}
+
