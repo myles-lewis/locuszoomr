@@ -99,6 +99,7 @@ reference SNP.
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+summary(loc)
 plot(loc)
 loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
 plot(loc2)
