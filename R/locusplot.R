@@ -98,8 +98,8 @@ plot.locus <- function(x, ...,
   }
   
   if (use_layout) {
-    oldpar <- par(no.readonly = TRUE)
-    on.exit(par(oldpar), add = TRUE)
+    op0 <- par(no.readonly = TRUE)
+    on.exit(par(op0), add = TRUE)
     graphics::layout(matrix(2:1, nrow = 2), heights = heights)
   }
   # lower locus plot
@@ -109,8 +109,9 @@ plot.locus <- function(x, ...,
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  par(mar = c(ifelse(xticks == 'top', 3, 0.1), 4, 2, 1.5),
+  op <- par(mar = c(ifelse(xticks == 'top', 3, 0.1), 4, 2, 1.5),
       mgp = c(1.7, 0.5, 0))
+  on.exit(par(op), add = TRUE)
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
        xlim = x$xrange,
