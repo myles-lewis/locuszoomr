@@ -1,17 +1,57 @@
 
-
-
-
-
+#' Set up a column of multiple plots
+#'
+#' Uses [layout()] to set up multiple locus plots aligned in a column.
+#'
+#' @param nrow Number of rows of locus plots
+#' @param heights Vector of length `nrow + 1` specifying height for plots with
+#'   a gene track on the bottom
+#' @return Sets [layout()] to enable multiple plots aligned in a column. The
+#'   gene track is assumed to be positioned on the bottom. Returns `par()`
+#'   invisibly so that layout can be reset to default at the end of plotting.
+#' @seealso [layout()]
+#' @export
 
 set_layers <- function(nrow = 1,
-                       heights = c(rep(3, nrow), 2)) {
+                       heights = c(rep(3, nrow-1), 2)) {
   op <- par(no.readonly = TRUE)
   mat <- matrix(seq_len(nrow +1))
   graphics::layout(mat, heights = heights)
   invisible(op)
 }
 
+
+#' Scatter locus plot
+#'
+#' Produces a scatter plot from a 'locus' class object. Intended for use with
+#' [set_layers()].
+#'
+#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
+#'   to `NULL` to disable.
+#' @param chromCols Colour for normal points if `LD` is `FALSE` when the locus
+#'   object is made.
+#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param xlab x axis title.
+#' @param ylab y axis title.
+#' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.text Font size for gene text.
+#' @param xticks Character value of either 'top' or 'bottom' specifying whether
+#'   x axis ticks and numbers are plotted on top or bottom plot window.
+#' @param border Logical whether a bounding box is plotted around upper and
+#'   lower plots.
+#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs
+#'   which lack LD information. The next 5 colours are for r2 or D' LD results
+#'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
+#'   SNP.
+#' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
+#'   legend.
+#' @param align Logical whether set [par()] to align the plot.
+#' @param ... Other arguments passed to [plot()] for the scatter plot.
+#' @return No return value. Produces a scatter plot using base graphics.
+#' @seealso [locus()] [set_layers()]
+#' @export
+#' 
 scatter_plot <- function(x,
                          pcutoff = 5e-08,
                          chromCols = 'royalblue',
