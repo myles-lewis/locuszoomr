@@ -53,7 +53,7 @@ SNP.}
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
 
-\item{align}{Logical whether set \code{\link[=par]{par()}} to align the plot.}
+\item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
 }

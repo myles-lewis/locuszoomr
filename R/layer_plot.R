@@ -45,7 +45,7 @@ set_layers <- function(nrow = 1,
 #'   SNP.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
-#' @param align Logical whether set [par()] to align the plot.
+#' @param align Logical whether to set [par()] to align the plot.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()]

@@ -25,6 +25,7 @@
 #' border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
+#' @param align Logical whether to set [par()] to align the plot.
 #' @return No return value.
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
