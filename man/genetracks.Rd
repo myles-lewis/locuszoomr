@@ -17,7 +17,8 @@ genetracks(
   maxrows = NULL,
   text_pos = "top",
   xticks = TRUE,
-  xlab = NULL
+  xlab = NULL,
+  align = TRUE
 )
 }
 \arguments{
