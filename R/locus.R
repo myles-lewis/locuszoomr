@@ -8,9 +8,7 @@
 #' This is an R version of `locuszoom` (http://locuszoom.org) for generating
 #' publication ready Manhattan plots of gene loci. It references Ensembl
 #' databases using the `ensembldb` Bioconductor package framework for annotating
-#' genes and exons. It queries LDlink (https://ldlink.nci.nih.gov/) via the
-#' `LDlinkR` package to retrieve linkage disequilibrium (LD) information on a
-#' reference SNP.
+#' genes and exons in the locus.
 #' 
 #' @param data Dataset (data.frame or data.table) to use for plot.
 #' @param xrange Vector of genomic position range for the x axis.
@@ -29,23 +27,10 @@
 #' Automatically looks for PLINK headings.
 #' @param labs Determines which column in `data` contains SNP rs IDs.
 #' Automatically looks for PLINK headings.
-#' @param index_snp Specifies the index SNP for displaying linkage 
-#' disequilibrium (LD). If not specified, the SNP with the lowest P value is 
-#' selected.
-#' @param LD Logical or character. If logical specifies whether LD is plotted by
-#'   querying 1000 Genomes via `LDlinkR` package. See [LDlinkR::LDmatrix()].
-#'   Results are cached using the `memoise` package, so that if exactly the same
-#'   locus is requested the system does not repeatedly call the API. If
-#'   set to a character value, this determines which column in `data` contains
+#' @param index_snp Specifies the index SNP. If not specified, the SNP with the
+#'   lowest P value is selected.
+#' @param LD Optional character value to specify which column in `data` contains
 #'   LD information.
-#' @param eQTL Logical whether to obtain eQTL data. Queries GTEx eQTL data via
-#'   [LDlinkR::LDexpress()] using the SNP specified by `index_snp`
-#' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
-#' allowed, default = "CEU". Passed to [LDlinkR::LDmatrix()].
-#' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
-#' to [LDlinkR::LDmatrix()].
-#' @param LDtoken Personal access token for accessing 1000 Genomes LD data via 
-#' LDlink API. See `LDlinkR` package documentation.
 #' @return Returns an object of class 'locus' ready for plotting, containing 
 #' the subset of GWAS data to be plotted, 
 #' chromosome and genomic position range, 
@@ -76,11 +61,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
                   chrom = 'chrom', pos = 'pos', p = 'p',
                   labs = 'rsid',
                   index_snp = NULL,
-                  LD = FALSE,
-                  eQTL = FALSE,
-                  pop = "CEU",
-                  r2d = "r2",
-                  LDtoken = "") {
+                  LD = NULL) {
   if (!ens_version %in% (.packages())) {
     stop("Ensembl database not loaded. Try: library(", ens_version, ")",
          call. = FALSE)
@@ -117,33 +98,6 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
   if (is.character(LD)) {
     colnames(data)[which(colnames(data) == LD)] <- "ld"
-  } else if (LD) {
-    if (!requireNamespace("LDlinkR", quietly = TRUE)) {
-      stop("Package 'LDlinkR' must be installed to use this feature",
-           call. = FALSE)
-    }
-    if (LDtoken == "") stop("LDtoken is missing")
-    rslist <- data[, labs]
-    if (length(rslist) > 1000) {
-      rslist <- rslist[order(data$logP, decreasing = TRUE)[seq_len(1000)]]
-    }
-    message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
-    ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken)
-    ld <- ldm[, index_snp]
-    data$ld <- ld[match(data[, labs], ldm$RS_number)]
-  }
-  if (eQTL) {
-    if (!requireNamespace("LDlinkR", quietly = TRUE)) {
-      stop("Package 'LDlinkR' must be installed to use this feature",
-           call. = FALSE)
-    }
-    if (LDtoken == "") stop("LDtoken is missing")
-    LDexp <- mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
-                           token = LDtoken)
-    for (i in c("R2", "D'", "Effect_Size", "P_value")) {
-      LDexp[, i] <- as.numeric(LDexp[, i])
-    }
-    LDexp$Effect_Allele <- gsub("=.*", "", LDexp$Effect_Allele_Freq)
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
@@ -159,16 +113,11 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_version = ens_version,
               chrom = chrom, pos = pos, p = p, labs = labs,
+              index_snp = index_snp,
               data = data, TX = TX, EX = EX)
-  if (eQTL) loc$LDexp <- LDexp
   class(loc) <- "locus"
   loc
 }
-
-
-# use memoise to reduce calls to LDlink API
-mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
-mem_LDexpress <- memoise(LDlinkR::LDexpress)
 
 
 #' @export
