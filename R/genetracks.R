@@ -59,7 +59,8 @@ genetracks <- function(locus,
                        maxrows = NULL,
                        text_pos = 'top',
                        xticks = TRUE,
-                       xlab = NULL) {
+                       xlab = NULL,
+                       align = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
   EX <- locus$EX
@@ -78,6 +79,13 @@ genetracks <- function(locus,
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   TX <- TX[TX$row <= maxrows, ]
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
+  
+  if (align) {
+    op <- par(tcl = -0.25, las = 1, font.main = 1,
+              mgp = c(1.6, 0.3, 0), 
+              mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
+    on.exit(par(op))
+  }
   
   plot(NA, xlim = xrange,
        ylim = c(-maxrows - 0.3, -0.3), 

@@ -96,22 +96,20 @@ plot.locus <- function(x, ...,
     data$col <- chromCols
     data$col[data[, x$p] < pcutoff] <- sigCol
   }
+  
   if (use_layout) {
     oldpar <- par(no.readonly = TRUE)
     on.exit(par(oldpar), add = TRUE)
     graphics::layout(matrix(2:1, nrow = 2), heights = heights)
   }
   # lower locus plot
-  par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.6, 0.3, 0), 
-      mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 1.5))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
              maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 1.5),
+  par(mar = c(ifelse(xticks == 'top', 3, 0.1), 4, 2, 1.5),
       mgp = c(1.7, 0.5, 0))
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
@@ -127,7 +125,10 @@ plot.locus <- function(x, ...,
          }
        }, ...)
   if (xticks == 'top') {
+    par(mgp = c(1.6, 0.3, 0))
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+  } else {
+    axis(1, at = axTicks(1), labels = FALSE)
   }
   if (!is.null(legend_pos)) {
     if (LD) {
