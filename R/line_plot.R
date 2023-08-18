@@ -1,4 +1,25 @@
 
+#' Locus line plot
+#'
+#' Produces a line plot from a 'locus' class object. Intended for use with
+#' [set_layers()].
+#'
+#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
+#'   to `NULL` to disable.
+#' @param xlab x axis title.
+#' @param ylab y axis title.
+#' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.text Font size for gene text.
+#' @param xticks Logical whether x axis numbers and axis title are plotted.
+#' @param border Logical whether a bounding box is plotted around upper and
+#'   lower plots.
+#' @param align Logical whether set [par()] to align the plot.
+#' @param ... Other arguments passed to [plot()] for the scatter plot.
+#' @return No return value. Produces a scatter plot using base graphics.
+#' @seealso [locus()] [set_layers()] [scatter_plot()]
+#' @export
+#' 
 line_plot <- function(x,
                       pcutoff = 5e-08,
                       xlab = NULL,
@@ -8,6 +29,7 @@ line_plot <- function(x,
                       xticks = FALSE,
                       border = FALSE,
                       align = TRUE, ...) {
+  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   TX <- x$TX
   EX <- x$EX

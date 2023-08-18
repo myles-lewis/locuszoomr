@@ -21,7 +21,7 @@ set_layers <- function(nrow = 1,
 }
 
 
-#' Scatter locus plot
+#' Locus scatter plot
 #'
 #' Produces a scatter plot from a 'locus' class object. Intended for use with
 #' [set_layers()].
@@ -36,8 +36,7 @@ set_layers <- function(nrow = 1,
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.text Font size for gene text.
-#' @param xticks Character value of either 'top' or 'bottom' specifying whether
-#'   x axis ticks and numbers are plotted on top or bottom plot window.
+#' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
 #' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs
@@ -66,6 +65,7 @@ scatter_plot <- function(x,
                                     'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
                          align = TRUE, ...) {
+  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   TX <- x$TX
   EX <- x$EX
