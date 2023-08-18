@@ -69,12 +69,11 @@ head(SLE_gwas_sub)
 ```
 
 We plot a locus from this dataset by extracting a subset of the data using the
-`locus()` function. In this first example `LD = FALSE` is set to avoid the
-LDlink API since it requires a personal API token.
+`locus()` function.
 
 ```{r warning=FALSE, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
 summary(loc)
 plot(loc)
 ```
@@ -93,7 +92,8 @@ lowest p-value (or the SNP can be specified manually).
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
-loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, LD = TRUE, LDtoken = "your_token")
+loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5)
+loc <- link_LD(loc, LDtoken = "your_token")
 plot(loc)
 ```
 
