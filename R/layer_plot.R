@@ -61,6 +61,7 @@ scatter_plot <- function(x,
                          cex.text = 0.7,
                          xticks = FALSE,
                          border = FALSE,
+                         showLD = TRUE,
                          LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 
                                     'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
@@ -70,12 +71,13 @@ scatter_plot <- function(x,
   TX <- x$TX
   EX <- x$EX
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
-  LD <- "ld" %in% colnames(data)
-  if (LD) {
+  hasLD <- "ld" %in% colnames(data)
+  if (showLD & hasLD) {
     data$col <- cut(data$ld, -1:6/5, labels = FALSE)
     data$col[is.na(data$col)] <- 1L
     data$col[which.max(data$logP)] <- 7L
     data <- data[order(data$col), ]
+    LDcols <- rep_len(LDcols, 7)
     data$col <- LDcols[data$col]
   } else {
     data$col <- chromCols
@@ -110,7 +112,7 @@ scatter_plot <- function(x,
     axis(1, at = axTicks(1), labels = FALSE)
   }
   if (!is.null(legend_pos)) {
-    if (LD) {
+    if (showLD & hasLD) {
       legend(legend_pos,
              legend = c('Index SNP',
                         expression({0.8 < r^2} <= "1.0"),
