@@ -60,8 +60,8 @@ line_plot <- function(x,
   do.call("plot", plot.args)
   
   if (xticks) {
-    par(mgp = c(1.6, 0.3, 0))
-    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
+         mgp = c(1.6, 0.3, 0))
   } else {
     axis(1, at = axTicks(1), labels = FALSE)
   }
