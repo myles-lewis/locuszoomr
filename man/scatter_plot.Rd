@@ -11,10 +11,10 @@ scatter_plot(
   sigCol = "red",
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  cex.axis = 0.8,
-  cex.text = 0.7,
+  cex.axis = 1,
   xticks = FALSE,
   border = FALSE,
+  showLD = TRUE,
   LDcols = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   legend_pos = "topleft",
   align = TRUE,
@@ -37,8 +37,6 @@ object is made.}
 \item{ylab}{y axis title.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
-
-\item{cex.text}{Font size for gene text.}
 
 \item{xticks}{Logical whether x axis numbers and axis title are plotted.}
 

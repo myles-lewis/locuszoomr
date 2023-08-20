@@ -35,7 +35,6 @@ set_layers <- function(nrow = 1,
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
-#' @param cex.text Font size for gene text.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
@@ -57,8 +56,7 @@ scatter_plot <- function(x,
                          sigCol = 'red',
                          xlab = NULL,
                          ylab = expression("-log"[10] ~ "P"),
-                         cex.axis = 0.8,
-                         cex.text = 0.7,
+                         cex.axis = 1,
                          xticks = FALSE,
                          border = FALSE,
                          showLD = TRUE,
