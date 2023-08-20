@@ -9,8 +9,7 @@ line_plot(
   pcutoff = 5e-08,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  cex.axis = 0.8,
-  cex.text = 0.7,
+  cex.axis = 1,
   xticks = FALSE,
   border = FALSE,
   align = TRUE,
@@ -28,8 +27,6 @@ to \code{NULL} to disable.}
 \item{ylab}{y axis title.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
-
-\item{cex.text}{Font size for gene text.}
 
 \item{xticks}{Logical whether x axis numbers and axis title are plotted.}
 

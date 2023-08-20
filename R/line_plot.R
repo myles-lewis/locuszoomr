@@ -10,7 +10,6 @@
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param cex.axis Specifies font size for axis numbering.
-#' @param cex.text Font size for gene text.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
@@ -24,8 +23,7 @@ line_plot <- function(x,
                       pcutoff = 5e-08,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
-                      cex.axis = 0.8,
-                      cex.text = 0.7,
+                      cex.axis = 1,
                       xticks = FALSE,
                       border = FALSE,
                       align = TRUE, ...) {
@@ -37,25 +35,30 @@ line_plot <- function(x,
   
   # line plot
   if (align) {
-    op <- par(tcl = -0.25, las = 1, font.main = 1,
+    op <- par(tcl = -0.25, 
               mar = c(ifelse(xticks, 3, 0.1), 4, 2, 1.5),
               mgp = c(1.7, 0.5, 0))
     on.exit(par(op))
   }
   
-  plot(data[, x$pos], data$logP,
-       type = "l",
-       xlim = x$xrange,
-       xlab = if (xticks == 'top') xlab else "",
-       ylab = ylab,
-       bty = if (border) 'o' else 'l',
-       cex.axis = cex.axis,
-       xaxt = 'n',
-       panel.first = {
-         if (!is.null(pcutoff)) {
-           abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
-         }
-       }, ...)
+  new.args <- list(...)
+  plot.args <- list(x = data[, x$pos], y = data$logP,
+                    type = "l",
+                    las = 1, font.main = 1,
+                    xlim = x$xrange,
+                    xlab = if (xticks) xlab else "",
+                    ylab = ylab,
+                    bty = if (border) 'o' else 'l',
+                    cex.axis = cex.axis,
+                    xaxt = 'n',
+                    panel.first = {
+                      if (!is.null(pcutoff)) {
+                        abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+                      }
+                    })
+  if (length(new.args)) plot.args[names(new.args)] <- new.args
+  do.call("plot", plot.args)
+  
   if (xticks) {
     par(mgp = c(1.6, 0.3, 0))
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
