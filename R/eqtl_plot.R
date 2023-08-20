@@ -7,6 +7,8 @@
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param tissue GTex tissue in which eQTL has been measured
 #' @param eqtl_gene Gene showing eQTL effect
+#' @param bg Fill colour for point symbols
+#' @param col Outline point colour. `NA` for no outlines.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param xlab x axis title.
@@ -21,13 +23,14 @@
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()] [scatter_plot()]
+#' @importFrom graphics points
 #' @export
 #' 
 eqtl_plot <- function(x,
                       tissue = "Whole Blood",
                       eqtl_gene = x$gene,
                       bg = "royalblue",
-                      outline_col = NA,
+                      col = NA,
                       pcutoff = NULL,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
@@ -38,7 +41,7 @@ eqtl_plot <- function(x,
                       align = TRUE, ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   
-  if (!"LDexp" %in% names(loc)) stop("Contains no eQTL data")
+  if (!"LDexp" %in% names(x)) stop("Contains no eQTL data")
   data <- x$LDexp
   data <- data[data$Tissue == tissue & data$Gene_Symbol == eqtl_gene, ]
   if (nrow(data) == 0) stop("No data")
@@ -74,7 +77,7 @@ eqtl_plot <- function(x,
   
   new.args <- list(...)
   plot.args <- list(x = data$pos, y = data$logP,
-                    pch = data$pch, bg = bg, col = outline_col,
+                    pch = data$pch, bg = bg, col = col,
                     las = 1, font.main = 1,
                     xlim = x$xrange,
                     xlab = if (xticks) xlab else "",

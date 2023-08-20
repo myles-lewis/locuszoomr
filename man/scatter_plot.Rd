@@ -43,6 +43,8 @@ object is made.}
 \item{border}{Logical whether a bounding box is plotted around upper and
 lower plots.}
 
+\item{showLD}{Logical whether to show LD with colours}
+
 \item{LDcols}{Vector of colours for plotting LD. The first colour is for SNPs
 which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index

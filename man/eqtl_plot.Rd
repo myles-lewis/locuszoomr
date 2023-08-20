@@ -9,7 +9,7 @@ eqtl_plot(
   tissue = "Whole Blood",
   eqtl_gene = x$gene,
   bg = "royalblue",
-  outline_col = NA,
+  col = NA,
   pcutoff = NULL,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
@@ -27,6 +27,10 @@ eqtl_plot(
 \item{tissue}{GTex tissue in which eQTL has been measured}
 
 \item{eqtl_gene}{Gene showing eQTL effect}
+
+\item{bg}{Fill colour for point symbols}
+
+\item{col}{Outline point colour. \code{NA} for no outlines.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
