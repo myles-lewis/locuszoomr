@@ -102,7 +102,7 @@ scatter_plot <- function(x,
                bty = if (border) 'o' else 'l',
                cex.axis = cex.axis,
                xaxt = 'n',
-               tcl = -0.25, 
+               tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
                panel.first = abl)
   if (length(new.args)) plot.args[names(new.args)] <- new.args
@@ -110,9 +110,9 @@ scatter_plot <- function(x,
   
   if (xticks) {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
-         mgp = c(1.6, 0.3, 0), tcl = -0.25)
+         mgp = c(1.7, 0.4, 0), tcl = -0.3)
   } else {
-    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.25)
+    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
     if (showLD & hasLD) {

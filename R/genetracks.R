@@ -82,9 +82,7 @@ genetracks <- function(locus,
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
   if (align) {
-    op <- par(tcl = -0.25, las = 1, font.main = 1,
-              mgp = c(1.6, 0.3, 0), 
-              mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
+    op <- par(mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
     on.exit(par(op))
   }
   
@@ -93,12 +91,15 @@ genetracks <- function(locus,
        bty = if (border) 'o' else 'n',
        yaxt = 'n', xaxt = 'n',
        xlab = if (xticks) xlab else "",
-       ylab = "")
+       ylab = "",
+       las = 1, font.main = 1,
+       tcl = -0.3, mgp = c(1.6, 0.3, 0))
   if (xticks) {
     xd <- diff(xrange) * 0.04
-    axis(1, at = xrange + c(-xd, xd), labels = FALSE, lwd.ticks = 0)
+    axis(1, at = xrange + c(-xd, xd), labels = FALSE, lwd.ticks = 0)  # extend line
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
-         lwd = 0, lwd.ticks = 1)
+         lwd = 0, lwd.ticks = 1,
+         tcl = -0.3, mgp = c(1.7, 0.4, 0))
   }
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   for (i in seq_len(nrow(TX))) {
