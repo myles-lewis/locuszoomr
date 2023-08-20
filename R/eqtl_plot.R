@@ -71,7 +71,7 @@ eqtl_plot <- function(x,
   
   if (add) {
     points(x = data$pos, y = data$logP,
-           pch = data$pch, bg = bg, col = outline_col, ...)
+           pch = data$pch, bg = bg, col = col, ...)
     return()
   }
   
