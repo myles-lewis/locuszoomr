@@ -4,10 +4,10 @@
 \alias{set_layers}
 \title{Set up a column of multiple plots}
 \usage{
-set_layers(nrow = 1, heights = c(rep(3, nrow - 1), 2))
+set_layers(n = 1, heights = c(rep(3, n), 2))
 }
 \arguments{
-\item{nrow}{Number of rows of locus plots}
+\item{n}{Number of plots (not including gene tracks on bottom)}
 
 \item{heights}{Vector of length \code{nrow + 1} specifying height for plots with
 a gene track on the bottom}

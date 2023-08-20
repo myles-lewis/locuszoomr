@@ -9,7 +9,7 @@ genetracks(
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   border = FALSE,
-  cex.axis = 0.8,
+  cex.axis = 1,
   cex.text = 0.7,
   gene_col = "blue4",
   exon_col = "blue4",
