@@ -41,6 +41,10 @@ line_plot <- function(x,
     on.exit(par(op))
   }
   
+  if (!is.null(pcutoff)) {
+    abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
+  } else abl <- NULL
+  
   new.args <- list(...)
   plot.args <- list(x = data[, x$pos], y = data$logP,
                     type = "l",
@@ -50,12 +54,10 @@ line_plot <- function(x,
                     ylab = ylab,
                     bty = if (border) 'o' else 'l',
                     cex.axis = cex.axis,
-                    xaxt = 'n')
+                    xaxt = 'n',
+                    panel.first = abl)
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
-  if (!is.null(pcutoff)) {
-    abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
-  }
   
   if (xticks) {
     par(mgp = c(1.6, 0.3, 0))
