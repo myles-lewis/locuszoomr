@@ -48,13 +48,10 @@ eqtl_plot <- function(x,
   data$logP <- -log10(data$P_value)
   
   # fix effect allele not being minor allele
-  data$Non_effect_Allele_Freq <- gsub(".?=", "", data$Non_effect_Allele_Freq)
-  data$Effect_Allele_Freq <- gsub(".?=", "", data$Effect_Allele_Freq)
-  data$Non_effect_Allele_Freq <- as.numeric(data$Non_effect_Allele_Freq)
+  data$Effect_Allele_Freq <- gsub(".*=", "", data$Effect_Allele_Freq)
   data$Effect_Allele_Freq <- as.numeric(data$Effect_Allele_Freq)
-  swap <- !is.na(data$Effect_Allele_Freq) & data$Effect_Allele_Freq > 0.5 
+  swap <- !is.na(data$Effect_Allele_Freq) & data$Effect_Allele_Freq > 0.5
   data$Effect_Size[swap] <- -data$Effect_Size[swap]
-  
   data$pch <- sign(data$Effect_Size) / 2 + 24.5
   
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
