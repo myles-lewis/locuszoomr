@@ -92,8 +92,7 @@ genetracks <- function(locus,
        yaxt = 'n', xaxt = 'n',
        xlab = if (xticks) xlab else "",
        ylab = "",
-       las = 1, font.main = 1,
-       tcl = -0.3, mgp = c(1.6, 0.3, 0))
+       font.main = 1)
   if (xticks) {
     xd <- diff(xrange) * 0.04
     axis(1, at = xrange + c(-xd, xd), labels = FALSE, lwd.ticks = 0)  # extend line
