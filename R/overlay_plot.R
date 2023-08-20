@@ -80,8 +80,6 @@ overlay_plot <- function(x, ...,
   if (!"LDexp" %in% names(x)) stop("Missing eQTL data")
   if (is.null(eqtl_gene)) stop("eqtl_gene not specified")
   data <- x$data
-  TX <- x$TX
-  EX <- x$EX
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   LDX <- x$LDexp[x$LDexp$Tissue == tissue & x$LDexp$Gene_Symbol == eqtl_gene, ]
   ind <- match(data[, x$labs], LDX$RS_ID)
@@ -145,15 +143,4 @@ overlay_plot <- function(x, ...,
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
   }
-  # if (!is.null(legend_pos)) {
-  #     legend(legend_pos,
-  #            legend = c('Index SNP',
-  #                       expression({0.8 < r^2} <= "1.0"),
-  #                       expression({0.6 < r^2} <= 0.8),
-  #                       expression({0.4 < r^2} <= 0.6),
-  #                       expression({0.2 < r^2} <= 0.4),
-  #                       expression({"0.0" < r^2} <= 0.2),
-  #                       expression("No" ~ r^2 ~ "data")),
-  #            pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.7)
-  # }
 }

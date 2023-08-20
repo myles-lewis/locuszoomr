@@ -66,8 +66,6 @@ scatter_plot <- function(x,
                          align = TRUE, ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
-  TX <- x$TX
-  EX <- x$EX
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   hasLD <- "ld" %in% colnames(data)
   if (showLD & hasLD) {

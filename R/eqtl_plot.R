@@ -1,10 +1,12 @@
 
-#' Locus line plot
+#' Locus eQTL plot
 #'
-#' Produces a line plot from a 'locus' class object. Intended for use with
-#' [set_layers()].
+#' Produces a plot of eQTL data embedded in a 'locus' class object. Intended for
+#' use with [set_layers()].
 #'
 #' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param tissue GTex tissue in which eQTL has been measured
+#' @param eqtl_gene Gene showing eQTL effect
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param xlab x axis title.
@@ -13,22 +15,48 @@
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
+#' @param add Logical whether to add points to an existing plot or generate a
+#'   new plot.
 #' @param align Logical whether set [par()] to align the plot.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()] [scatter_plot()]
 #' @export
 #' 
-line_plot <- function(x,
-                      pcutoff = 5e-08,
+eqtl_plot <- function(x,
+                      tissue = "Whole Blood",
+                      eqtl_gene = x$gene,
+                      bg = "royalblue",
+                      outline_col = NA,
+                      pcutoff = NULL,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
                       cex.axis = 1,
                       xticks = FALSE,
                       border = FALSE,
+                      add = FALSE,
                       align = TRUE, ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
-  data <- x$data
+  
+  if (!"LDexp" %in% names(loc)) stop("Contains no eQTL data")
+  data <- x$LDexp
+  data <- data[data$Tissue == tissue & data$Gene_Symbol == eqtl_gene, ]
+  if (nrow(data) == 0) stop("No data")
+  
+  data$pos <- gsub(".*:", "", data$Position_grch37)  # remove up to ':'
+  data$pos <- as.numeric(data$pos)
+  data$logP <- -log10(data$P_value)
+  
+  # fix effect allele not being minor allele
+  data$Non_effect_Allele_Freq <- gsub(".?=", "", data$Non_effect_Allele_Freq)
+  data$Effect_Allele_Freq <- gsub(".?=", "", data$Effect_Allele_Freq)
+  data$Non_effect_Allele_Freq <- as.numeric(data$Non_effect_Allele_Freq)
+  data$Effect_Allele_Freq <- as.numeric(data$Effect_Allele_Freq)
+  swap <- !is.na(data$Effect_Allele_Freq) & data$Effect_Allele_Freq > 0.5 
+  data$Effect_Size[swap] <- -data$Effect_Size[swap]
+  
+  data$pch <- sign(data$Effect_Size) / 2 + 24.5
+  
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   
   # line plot
@@ -41,9 +69,15 @@ line_plot <- function(x,
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
+  if (add) {
+    points(x = data$pos, y = data$logP,
+           pch = data$pch, bg = bg, col = outline_col, ...)
+    return()
+  }
+  
   new.args <- list(...)
-  plot.args <- list(x = data[, x$pos], y = data$logP,
-                    type = "l",
+  plot.args <- list(x = data$pos, y = data$logP,
+                    pch = data$pch, bg = bg, col = outline_col,
                     las = 1, font.main = 1,
                     xlim = x$xrange,
                     xlab = if (xticks) xlab else "",
