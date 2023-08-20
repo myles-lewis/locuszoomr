@@ -66,7 +66,7 @@ plot.locus <- function(x, ...,
                        chromCols = 'royalblue',
                        sigCol = 'red',
                        xlab = NULL, ylab = expression("-log"[10] ~ "P"),
-                       cex.axis = 0.8,
+                       cex.axis = 1,
                        cex.text = 0.7,
                        use_layout = TRUE,
                        heights = c(3, 2),
@@ -114,6 +114,7 @@ plot.locus <- function(x, ...,
   on.exit(par(op), add = TRUE)
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
+       las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
        xlim = x$xrange,
        xlab = if (xticks == 'top') xlab else "",
        ylab = ylab,
@@ -126,10 +127,10 @@ plot.locus <- function(x, ...,
          }
        }, ...)
   if (xticks == 'top') {
-    par(mgp = c(1.6, 0.3, 0))
-    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
+         tcl = -0.3, mgp = c(1.6, 0.3, 0))
   } else {
-    axis(1, at = axTicks(1), labels = FALSE)
+    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3, mgp = c(1.6, 0.3, 0))
   }
   if (!is.null(legend_pos)) {
     if (LD) {
@@ -141,7 +142,7 @@ plot.locus <- function(x, ...,
                         expression({0.2 < r^2} <= 0.4),
                         expression({"0.0" < r^2} <= 0.2),
                         expression("No" ~ r^2 ~ "data")),
-             pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.7)
+             pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.8)
     }
   }
 }
