@@ -50,14 +50,12 @@ line_plot <- function(x,
                     ylab = ylab,
                     bty = if (border) 'o' else 'l',
                     cex.axis = cex.axis,
-                    xaxt = 'n',
-                    panel.first = {
-                      if (!is.null(pcutoff)) {
-                        abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
-                      }
-                    })
+                    xaxt = 'n')
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
+  if (!is.null(pcutoff)) {
+    abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+  }
   
   if (xticks) {
     par(mgp = c(1.6, 0.3, 0))

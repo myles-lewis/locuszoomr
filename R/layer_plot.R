@@ -3,7 +3,7 @@
 #'
 #' Uses [layout()] to set up multiple locus plots aligned in a column.
 #'
-#' @param nrow Number of rows of locus plots
+#' @param n Number of plots (not including gene tracks on bottom)
 #' @param heights Vector of length `nrow + 1` specifying height for plots with
 #'   a gene track on the bottom
 #' @return Sets [layout()] to enable multiple plots aligned in a column. The
@@ -12,10 +12,10 @@
 #' @seealso [layout()]
 #' @export
 
-set_layers <- function(nrow = 1,
-                       heights = c(rep(3, nrow-1), 2)) {
+set_layers <- function(n = 1,
+                       heights = c(rep(3, n), 2)) {
   op <- par(no.readonly = TRUE)
-  mat <- matrix(seq_len(nrow +1))
+  mat <- matrix(seq_len(n +1))
   graphics::layout(mat, heights = heights)
   invisible(op)
 }
@@ -99,15 +99,12 @@ scatter_plot <- function(x,
                ylab = ylab,
                bty = if (border) 'o' else 'l',
                cex.axis = cex.axis,
-               xaxt = 'n',
-               panel.first = {
-                 if (!is.null(pcutoff)) {
-                   abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
-                 }
-               })
+               xaxt = 'n')
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
-  
+  if (!is.null(pcutoff)) {
+    abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+  }
   # plot(data[, x$pos], data$logP,
   #      pch = 21, bg = data$col,
   #      xlim = x$xrange,
