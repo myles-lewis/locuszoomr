@@ -109,8 +109,7 @@ plot.locus <- function(x, ...,
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  op <- par(mar = c(ifelse(xticks == 'top', 3, 0.1), 4, 2, 1.5),
-      mgp = c(1.7, 0.5, 0))
+  op <- par(mar = c(ifelse(xticks == 'top', 3, 0.1), 4, 2, 1.5))
   on.exit(par(op), add = TRUE)
   plot(data[, x$pos], data$logP,
        pch = 21, bg = data$col,
@@ -128,9 +127,9 @@ plot.locus <- function(x, ...,
        }, ...)
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
-         tcl = -0.3, mgp = c(1.6, 0.3, 0))
+         tcl = -0.3, mgp = c(1.7, 0.4, 0))
   } else {
-    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3, mgp = c(1.6, 0.3, 0))
+    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
     if (LD) {

@@ -117,18 +117,18 @@ overlay_plot <- function(x, ...,
     graphics::layout(matrix(2:1, nrow = 2), heights = heights)
   }
   # lower locus plot
-  par(tcl = -0.3, las = 1, font.main = 1,
-      mgp = c(1.8, 0.5, 0), 
-      mar = c(ifelse(xticks == 'bottom', 4, 2), 4, 0.25, 2))
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.text, gene_col, exon_col, exon_border,
              maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # scatter plot
-  par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
+  op <- par(mar = c(ifelse(xticks == 'top', 3, 0), 4, 2, 2))
+  on.exit(par(op), add = TRUE)
   plot(data[, x$pos], data$logP,
        pch = data$pch, col = outline_col, bg = data$col,
+       tcl = -0.3, las = 1, font.main = 1,
+       mgp = c(1.7, 0.5, 0),
        xlim = x$xrange,
        xlab = if (xticks == 'top') xlab else "",
        ylab = ylab,
@@ -141,6 +141,9 @@ overlay_plot <- function(x, ...,
          }
        }, ...)
   if (xticks == 'top') {
-    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis)
+    axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
+         tcl = -0.3, mgp = c(1.7, 0.4, 0))
+  } else {
+    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
 }

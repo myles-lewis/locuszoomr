@@ -76,15 +76,15 @@ genetracks <- function(locus,
     message('No genes to plot')
     return(plot.new())
   }
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
-  maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  TX <- TX[TX$row <= maxrows, ]
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
   if (align) {
     op <- par(mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
     on.exit(par(op))
   }
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
+  maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+  TX <- TX[TX$row <= maxrows, ]
   
   plot(NA, xlim = xrange,
        ylim = c(-maxrows - 0.3, -0.3), 
