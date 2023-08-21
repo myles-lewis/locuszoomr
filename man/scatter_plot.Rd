@@ -17,6 +17,7 @@ scatter_plot(
   showLD = TRUE,
   LDcols = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   legend_pos = "topleft",
+  add = FALSE,
   align = TRUE,
   ...
 )
@@ -52,6 +53,9 @@ SNP.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
+
+\item{add}{Logical whether to add points to an existing plot or generate a
+new plot.}
 
 \item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 

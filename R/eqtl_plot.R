@@ -59,7 +59,7 @@ eqtl_plot <- function(x,
   
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   
-  # line plot
+  # scatter plot
   if (align) {
     op <- par(mar = c(ifelse(xticks, 3, 0.1), 4, 2, 1.5))
     on.exit(par(op))
@@ -69,13 +69,14 @@ eqtl_plot <- function(x,
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
+  new.args <- list(...)
   if (add) {
-    points(x = data$pos, y = data$logP,
-           pch = data$pch, bg = bg, col = col, ...)
+    plot.args <- list(x = data$pos, y = data$logP,
+           pch = data$pch, bg = bg, col = col)
+    if (length(new.args)) plot.args[names(new.args)] <- new.args
+    do.call("points", plot.args)
     return()
   }
-  
-  new.args <- list(...)
   plot.args <- list(x = data$pos, y = data$logP,
                     pch = data$pch, bg = bg, col = col,
                     las = 1, font.main = 1,

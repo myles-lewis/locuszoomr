@@ -45,6 +45,8 @@ set_layers <- function(n = 1,
 #'   SNP.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
+#' @param add Logical whether to add points to an existing plot or generate a
+#'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
@@ -64,6 +66,7 @@ scatter_plot <- function(x,
                          LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 
                                     'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
+                         add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
@@ -92,6 +95,13 @@ scatter_plot <- function(x,
   } else abl <- NULL
   
   new.args <- list(...)
+  if (add) {
+    plot.args <- list(x = data[, x$pos], y = data$logP,
+                      pch = 21, bg = data$col)
+    if (length(new.args)) plot.args[names(new.args)] <- new.args
+    do.call("points", plot.args)
+    return()
+  }
   plot.args <- list(x = data[, x$pos], y = data$logP,
                pch = 21, bg = data$col,
                las = 1, font.main = 1,

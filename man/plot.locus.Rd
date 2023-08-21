@@ -14,7 +14,7 @@
   sigCol = "red",
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  cex.axis = 0.8,
+  cex.axis = 1,
   cex.text = 0.7,
   use_layout = TRUE,
   heights = c(3, 2),

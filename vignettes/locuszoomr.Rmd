@@ -81,10 +81,11 @@ plot(loc)
 # Obtaining LD information
 
 Once an API personal access token has been obtained, the LDlink API can be
-called to retrieve LD (linkage disequilibium) information at the locus which is
-overlaid on the locus plot. This is shown as a colour overlay showing the level
-of $r^2$ between SNPs and the index SNP which defaults to the SNP with the
-lowest p-value (or the SNP can be specified manually).
+called using the function `link_LD()` to retrieve LD (linkage disequilibium)
+information at the locus which is overlaid on the locus plot. This is shown as a
+colour overlay showing the level of $r^2$ between SNPs and the index SNP which
+defaults to the SNP with the lowest p-value (or the SNP can be specified
+manually).
 
 ```{r eval = FALSE}
 # Locus plot using SLE GWAS data from Bentham et al 2015
