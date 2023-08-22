@@ -20,13 +20,13 @@
 #' @param ens_version Specifies which Ensembl database to query for gene and 
 #' exon positions. See `ensembldb` Bioconductor package.
 #' @param chrom Determines which column in `data` contains chromosome 
-#' information. Automatically looks for PLINK headings.
+#' information. If `NULL` tries to autodetect the column.
 #' @param pos Determines which column in `data` contains position information. 
-#' Automatically looks for PLINK headings.
+#' If `NULL` tries to autodetect the column.
 #' @param p Determines which column in `data` contains SNP p values. 
-#' Automatically looks for PLINK headings.
+#' If `NULL` tries to autodetect the column.
 #' @param labs Determines which column in `data` contains SNP rs IDs.
-#' Automatically looks for PLINK headings.
+#' If `NULL` tries to autodetect the column.
 #' @param index_snp Specifies the index SNP. If not specified, the SNP with the
 #'   lowest P value is selected.
 #' @param LD Optional character value to specify which column in `data` contains
@@ -57,8 +57,8 @@
 locus <- function(data, xrange = NULL, seqname = NULL,
                   gene = NULL, flank = 5e4,
                   ens_version = "EnsDb.Hsapiens.v75",
-                  chrom = 'chrom', pos = 'pos', p = 'p',
-                  labs = 'rsid',
+                  chrom = NULL, pos = NULL, p = NULL,
+                  labs = NULL,
                   index_snp = NULL,
                   LD = NULL) {
   if (!ens_version %in% (.packages())) {
@@ -73,23 +73,39 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     seqname <- names(seqlengths(locus))
   }
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  # PLINK headings
+  
+  # autodetect headings
+  if (is.null(chrom)) {
+    w <- grep("chr", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {chrom <- colnames(data)[w]
+    } else stop("cannot autodetect chromosome column")
+  }
+  if (is.null(pos)) {
+    w <- grep("pos", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {pos <- colnames(data)[w]
+    } else stop("cannot autodetect SNP position column")
+  }
+  if (is.null(p)) {
+    w <- grep("^p", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {p <- colnames(data)[w]
+    } else stop("cannot autodetect p-value column")
+  }
+  if (is.null(labs)) {
+    w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {labs <- colnames(data)[w]
+    } else stop("cannot autodetect SNP id column")
+  }
+  
+  # check headings
   if (!chrom %in% colnames(data)) {
-    if ("CHR" %in% colnames(data)) {chrom <- "CHR"
-    } else stop("Column specified by `chrom` not found in `data`")
-  }
+    stop("Column specified by `chrom` not found in `data`")}
   if (!pos %in% colnames(data)) {
-    if ("BP" %in% colnames(data)) {pos <- "BP"
-    } else stop("Column specified by `pos` not found in `data`")
-  }
+    stop("Column specified by `pos` not found in `data`")}
   if (!p %in% colnames(data)) {
-    if ("P" %in% colnames(data)) {p <- "P"
-    } else stop("Column specified by `p` not found in `data`")
-  }
+    stop("Column specified by `p` not found in `data`")}
   if (!labs %in% colnames(data)) {
-    if ("SNP" %in% colnames(data)) {labs <- "SNP"
-    } else stop("Column specified by `labs` not found in `data`")
-  }
+    stop("Column specified by `labs` not found in `data`")}
+  
   data <- data[data[, chrom] == seqname &
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
   data$logP <- -log10(data[, p])

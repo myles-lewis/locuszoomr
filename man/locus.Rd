@@ -11,10 +11,10 @@ locus(
   gene = NULL,
   flank = 50000,
   ens_version = "EnsDb.Hsapiens.v75",
-  chrom = "chrom",
-  pos = "pos",
-  p = "p",
-  labs = "rsid",
+  chrom = NULL,
+  pos = NULL,
+  p = NULL,
+  labs = NULL,
   index_snp = NULL,
   LD = NULL
 )
@@ -36,16 +36,16 @@ region left and right of the gene to show.}
 exon positions. See \code{ensembldb} Bioconductor package.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
-information. Automatically looks for PLINK headings.}
+information. If \code{NULL} tries to autodetect the column.}
 
 \item{pos}{Determines which column in \code{data} contains position information.
-Automatically looks for PLINK headings.}
+If \code{NULL} tries to autodetect the column.}
 
 \item{p}{Determines which column in \code{data} contains SNP p values.
-Automatically looks for PLINK headings.}
+If \code{NULL} tries to autodetect the column.}
 
 \item{labs}{Determines which column in \code{data} contains SNP rs IDs.
-Automatically looks for PLINK headings.}
+If \code{NULL} tries to autodetect the column.}
 
 \item{index_snp}{Specifies the index SNP. If not specified, the SNP with the
 lowest P value is selected.}
