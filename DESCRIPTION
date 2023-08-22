@@ -26,7 +26,6 @@ biocViews:
 Imports:
     AnnotationFilter,
     BiocGenerics,
-    EnsDb.Hsapiens.v75,
     ensembldb,
     GenomeInfoDb,
     graphics,
@@ -37,6 +36,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
     data.table,
+    EnsDb.Hsapiens.v75,
     LDlinkR,
     rmarkdown,
     knitr

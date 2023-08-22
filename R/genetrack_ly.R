@@ -27,7 +27,6 @@
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
 #' genetrack_ly(loc)
 #' 
-#' @import EnsDb.Hsapiens.v75
 #' @importFrom plotly plot_ly plotly_empty add_segments add_text %>%
 #' @export
 

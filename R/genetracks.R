@@ -43,7 +43,6 @@
 #' genetracks(loc, gene_col = 'grey', exon_col = 'orange',
 #'            exon_border = 'darkgrey')
 #' 
-#' @import EnsDb.Hsapiens.v75
 #' @importFrom BiocGenerics start end
 #' @importFrom graphics axTicks axis lines rect text plot.new
 #' @export

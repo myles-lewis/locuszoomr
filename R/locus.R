@@ -46,7 +46,6 @@
 #' plot(loc)
 #' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
 #' plot(loc2)
-#' @import EnsDb.Hsapiens.v75
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 

@@ -47,7 +47,6 @@
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a plot using base graphics.
 #' 
-#' @import EnsDb.Hsapiens.v75
 #' @importFrom graphics axTicks axis layout par strwidth abline legend
 #' @importFrom grDevices adjustcolor hcl.colors
 #' @export
