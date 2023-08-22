@@ -77,22 +77,30 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   # autodetect headings
   if (is.null(chrom)) {
     w <- grep("chr", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {chrom <- colnames(data)[w]
+    if (length(w) == 1) {
+      chrom <- colnames(data)[w]
     } else stop("cannot autodetect chromosome column")
   }
   if (is.null(pos)) {
     w <- grep("pos", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {pos <- colnames(data)[w]
+    if (length(w) == 1) {
+      pos <- colnames(data)[w]
     } else stop("cannot autodetect SNP position column")
   }
   if (is.null(p)) {
-    w <- grep("^p", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {p <- colnames(data)[w]
-    } else stop("cannot autodetect p-value column")
+    if ("p" %in% colnames(data)) {
+      p <- "p"
+    } else {
+      w <- grep("^p?val", colnames(data), ignore.case = TRUE)
+      if (length(w) == 1) {
+        p <- colnames(data)[w]
+      } else stop("cannot autodetect p-value column")
+    }
   }
   if (is.null(labs)) {
     w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {labs <- colnames(data)[w]
+    if (length(w) == 1) {
+      labs <- colnames(data)[w]
     } else stop("cannot autodetect SNP id column")
   }
   
