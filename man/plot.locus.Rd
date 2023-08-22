@@ -10,7 +10,7 @@
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   pcutoff = 5e-08,
-  chromCols = "royalblue",
+  chromCol = "royalblue",
   sigCol = "red",
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
@@ -43,7 +43,7 @@
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{chromCols}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
+\item{chromCol}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
 object is made.}
 
 \item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}

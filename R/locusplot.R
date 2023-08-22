@@ -17,7 +17,7 @@
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set 
 #' to `NULL` to disable.
-#' @param chromCols Colour for normal points if `LD` is `FALSE` when the locus 
+#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus 
 #' object is made.
 #' @param sigCol Colour for significant points if `LD` is `FALSE`.
 #' @param xlab x axis title.
@@ -62,7 +62,7 @@ plot.locus <- function(x, ...,
                        filter_gene_name = NULL,
                        filter_gene_biotype = NULL,
                        pcutoff = 5e-08,
-                       chromCols = 'royalblue',
+                       chromCol = 'royalblue',
                        sigCol = 'red',
                        xlab = NULL, ylab = expression("-log"[10] ~ "P"),
                        cex.axis = 1,
@@ -92,7 +92,7 @@ plot.locus <- function(x, ...,
     data <- data[order(data$col), ]
     data$col <- LDcols[data$col]
   } else {
-    data$col <- chromCols
+    data$col <- chromCol
     data$col[data[, x$p] < pcutoff] <- sigCol
   }
   

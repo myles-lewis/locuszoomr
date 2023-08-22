@@ -1,30 +1,4 @@
 
-#' Set up a column of multiple plots
-#'
-#' Uses [layout()] to set up multiple locus plots aligned in a column.
-#'
-#' @param n Number of plots (not including gene tracks on bottom)
-#' @param heights Vector of length `nrow + 1` specifying height for plots with
-#'   a gene track on the bottom
-#' @param rev Logical whether to reverse plotting order and plot from bottom to 
-#'   top
-#' @return Sets [layout()] to enable multiple plots aligned in a column. The
-#'   gene track is assumed to be positioned on the bottom. Returns `par()`
-#'   invisibly so that layout can be reset to default at the end of plotting.
-#' @seealso [layout()]
-#' @export
-
-set_layers <- function(n = 1,
-                       heights = c(rep(3, n), 2),
-                       rev = FALSE) {
-  op <- par(no.readonly = TRUE)
-  s <- if (rev) rev(seq_len(n +1)) else seq_len(n +1)
-  mat <- matrix(s)
-  graphics::layout(mat, heights = heights)
-  invisible(op)
-}
-
-
 #' Locus scatter plot
 #'
 #' Produces a scatter plot from a 'locus' class object. Intended for use with
@@ -33,7 +7,7 @@ set_layers <- function(n = 1,
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param chromCols Colour for normal points if `LD` is `FALSE` when the locus
+#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
 #'   object is made.
 #' @param sigCol Colour for significant points if `LD` is `FALSE`.
 #' @param xlab x axis title.
@@ -43,7 +17,7 @@ set_layers <- function(n = 1,
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
 #' @param showLD Logical whether to show LD with colours
-#' @param LDcols Vector of colours for plotting LD. The first colour is for SNPs
+#' @param LD_scheme Vector of colours for plotting LD. The first colour is for SNPs
 #'   which lack LD information. The next 5 colours are for r2 or D' LD results
 #'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 #'   SNP.
@@ -59,7 +33,7 @@ set_layers <- function(n = 1,
 #' 
 scatter_plot <- function(x,
                          pcutoff = 5e-08,
-                         chromCols = 'royalblue',
+                         chromCol = 'royalblue',
                          sigCol = 'red',
                          xlab = NULL,
                          ylab = expression("-log"[10] ~ "P"),
@@ -67,8 +41,8 @@ scatter_plot <- function(x,
                          xticks = FALSE,
                          border = FALSE,
                          showLD = TRUE,
-                         LDcols = c('grey', 'royalblue', 'cyan2', 'green3', 
-                                    'orange', 'red', 'purple'),
+                         LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
+                                       'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
                          add = FALSE,
                          align = TRUE, ...) {
@@ -76,16 +50,18 @@ scatter_plot <- function(x,
   data <- x$data
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   hasLD <- "ld" %in% colnames(data)
-  if (showLD & hasLD) {
-    data$col <- cut(data$ld, -1:6/5, labels = FALSE)
-    data$col[is.na(data$col)] <- 1L
-    data$col[which.max(data$logP)] <- 7L
-    data <- data[order(data$col), ]
-    LDcols <- rep_len(LDcols, 7)
-    data$col <- LDcols[data$col]
-  } else {
-    data$col <- chromCols
-    data$col[data[, x$p] < pcutoff] <- sigCol
+  if (!"bg" %in% colnames(data)) {
+    if (showLD & hasLD) {
+      data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
+      data$bg[is.na(data$bg)] <- 1L
+      data$bg[which.max(data$logP)] <- 7L
+      data <- data[order(data$bg), ]
+      LD_scheme <- rep_len(LD_scheme, 7)
+      data$bg <- LD_scheme[data$bg]
+    } else {
+      data$bg <- chromCol
+      data$bg[data[, x$p] < pcutoff] <- sigCol
+    }
   }
   
   # scatter plot
@@ -98,16 +74,19 @@ scatter_plot <- function(x,
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
+  pch <- 21
+  if ("pch" %in% colnames(data)) pch <- data$pch
+  
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, x$pos], y = data$logP,
-                      pch = 21, bg = data$col)
+                      pch = pch, bg = data$bg)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     do.call("points", plot.args)
     return()
   }
   plot.args <- list(x = data[, x$pos], y = data$logP,
-               pch = 21, bg = data$col,
+               pch = pch, bg = data$bg,
                las = 1, font.main = 1,
                xlim = x$xrange,
                xlab = if (xticks) xlab else "",
@@ -137,7 +116,7 @@ scatter_plot <- function(x,
                         expression({0.2 < r^2} <= 0.4),
                         expression({"0.0" < r^2} <= 0.2),
                         expression("No" ~ r^2 ~ "data")),
-             pch = 21, col = 'black', pt.bg = rev(LDcols), bty = 'n', cex = 0.8)
+             pch = 21, col = 'black', pt.bg = rev(LD_scheme), bty = 'n', cex = 0.8)
     }
   }
 }
