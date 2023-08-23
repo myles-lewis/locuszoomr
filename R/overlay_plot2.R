@@ -37,7 +37,10 @@ overlay_plot2 <- function(x,
   x$data$pch <- 21
   
   LDX <- x$LDexp[x$LDexp$Tissue == tissue & x$LDexp$Gene_Symbol == eqtl_gene, ]
+  # match by rsid
   ind <- match(x$data[, x$labs], LDX$RS_ID)
+  message(sum(!is.na(ind)), "/", nrow(LDX), " matched eQTL SNPs (total ", 
+          nrow(x$data), ")")
   
   if (all(is.na(ind))) {
     message("No significant eQTL")
