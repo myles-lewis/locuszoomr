@@ -7,6 +7,7 @@ locus_plot2 <- function(x,
                         cex.axis = 1,
                         cex.text = 0.7,
                         use_layout = TRUE,
+                        heights = c(3, 2),
                         maxrows = 7,
                         xticks = 'bottom',
                         border = FALSE,
@@ -17,7 +18,7 @@ locus_plot2 <- function(x,
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   
   if (use_layout) {
-    op0 <- set_layers(rev = TRUE)
+    op0 <- set_layers(1, heights, rev = TRUE)
     on.exit(par(op0), add = TRUE)
   }
   # lower locus plot
