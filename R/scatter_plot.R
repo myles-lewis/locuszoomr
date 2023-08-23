@@ -103,7 +103,7 @@ scatter_plot <- function(x,
   if (xticks) {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
          mgp = c(1.7, 0.4, 0), tcl = -0.3)
-  } else {
+  } else if (!border) {
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
