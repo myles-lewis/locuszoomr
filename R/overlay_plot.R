@@ -142,7 +142,7 @@ overlay_plot <- function(x, ...,
   if (xticks == 'top') {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
          tcl = -0.3, mgp = c(1.7, 0.4, 0))
-  } else {
+  } else if (!border) {
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
 }
