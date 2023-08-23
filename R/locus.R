@@ -73,8 +73,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     seqname <- names(seqlengths(locus))
   }
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  message("Chromosome ", seqname)
-  message("Position ", xrange[1], " to ", xrange[2])
+  message("Chromosome ", seqname, ": position ", xrange[1], " to ", xrange[2])
   
   # autodetect headings
   if (is.null(chrom)) {
@@ -148,10 +147,10 @@ locus <- function(data, xrange = NULL, seqname = NULL,
 
 #' @export
 summary.locus <- function(object, ...) {
-  cat("Chromosome", object$seqname, "\n")
-  cat("Position", format(object$xrange[1], big.mark=","), "to",
-      format(object$xrange[2], big.mark=","), "\n")
   cat("Gene", object$gene, "\n")
+  cat(paste0("Chromosome ", object$seqname, ": position ",
+             format(object$xrange[1], big.mark=","), " to ",
+             format(object$xrange[2], big.mark=","), "\n"))
   cat(nrow(object$data), "SNPs/datapoints\n")
   cat(nrow(object$TX), "gene transcripts\n")
   tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
