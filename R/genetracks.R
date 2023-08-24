@@ -14,6 +14,8 @@
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
 #' @param cex.text Font size for gene text.
+#' @param showExons Logical whether to show exons or simply show whole gene as a
+#'   rectangle
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param xticks Logical whether x axis ticks and numbers are plotted.

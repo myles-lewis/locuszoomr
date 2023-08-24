@@ -47,6 +47,9 @@ genetracks(
 \item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
 border.}
 
+\item{showExons}{Logical whether to show exons or simply show whole gene as a
+rectangle}
+
 \item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
 
