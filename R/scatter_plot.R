@@ -75,8 +75,12 @@ scatter_plot <- function(x,
   } else abl <- NULL
   
   pch <- 21
-  if ("pch" %in% colnames(data)) pch <- data$pch
-  
+  if ("pch" %in% colnames(data)) {
+    # print(str(data$pch))
+    if (length(unique(data$pch)) > 1) data <- data[order(data$pch), ]
+    pch <- data$pch
+  }
+    
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, x$pos], y = data$logP,
@@ -89,6 +93,7 @@ scatter_plot <- function(x,
                pch = pch, bg = data$bg,
                las = 1, font.main = 1,
                xlim = x$xrange,
+               ylim = c(0, max(data$logP, na.rm = TRUE)),
                xlab = if (xticks) xlab else "",
                ylab = ylab,
                bty = if (border) 'o' else 'l',

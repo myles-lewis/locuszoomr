@@ -22,13 +22,13 @@
 #' @export
 
 overlay_plot <- function(x,
-                          base_col = 'black',
-                          up_palette = "OrRd",
-                          down_palette = "Blues 3",
-                          alpha = 0.5,
-                          tissue = "Whole Blood",
-                          eqtl_gene = x$gene,
-                          ...) {
+                         base_col = 'black',
+                         up_palette = "OrRd",
+                         down_palette = "Blues 3",
+                         alpha = 0.5,
+                         tissue = "Whole Blood",
+                         eqtl_gene = x$gene,
+                         ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   if (!"LDexp" %in% names(x)) stop("Missing eQTL data")
   if (is.null(eqtl_gene)) stop("eqtl_gene not specified")
