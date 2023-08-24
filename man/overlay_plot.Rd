@@ -16,7 +16,7 @@ overlay_plot(
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \link{locus}.}
+\item{x}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
 \item{base_col}{Colour of points for SNPs which do not have eQTLs.}
 

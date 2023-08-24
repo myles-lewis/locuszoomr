@@ -11,7 +11,6 @@ scatter_plot(
   sigCol = "red",
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  cex.axis = 1,
   xticks = FALSE,
   border = FALSE,
   showLD = TRUE,
@@ -37,8 +36,6 @@ object is made.}
 
 \item{ylab}{y axis title.}
 
-\item{cex.axis}{Specifies font size for axis numbering.}
-
 \item{xticks}{Logical whether x axis numbers and axis title are plotted.}
 
 \item{border}{Logical whether a bounding box is plotted around upper and
@@ -60,6 +57,8 @@ new plot.}
 \item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
+
+\item{cex.axis}{Specifies font size for axis numbering.}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.

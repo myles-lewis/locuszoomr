@@ -37,7 +37,6 @@ scatter_plot <- function(x,
                          sigCol = 'red',
                          xlab = NULL,
                          ylab = expression("-log"[10] ~ "P"),
-                         cex.axis = 1,
                          xticks = FALSE,
                          border = FALSE,
                          showLD = TRUE,
@@ -75,12 +74,10 @@ scatter_plot <- function(x,
   } else abl <- NULL
   
   pch <- 21
-  if ("pch" %in% colnames(data)) {
-    # print(str(data$pch))
-    if (length(unique(data$pch)) > 1) data <- data[order(data$pch), ]
-    pch <- data$pch
-  }
-    
+  if ("pch" %in% colnames(data)) pch <- data$pch
+  col <- "black"
+  if ("col" %in% colnames(data)) col <- data$col
+  
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, x$pos], y = data$logP,
@@ -90,14 +87,13 @@ scatter_plot <- function(x,
     return()
   }
   plot.args <- list(x = data[, x$pos], y = data$logP,
-               pch = pch, bg = data$bg,
+               pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
                xlim = x$xrange,
                ylim = c(0, max(data$logP, na.rm = TRUE)),
                xlab = if (xticks) xlab else "",
                ylab = ylab,
                bty = if (border) 'o' else 'l',
-               cex.axis = cex.axis,
                xaxt = 'n',
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),

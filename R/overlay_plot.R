@@ -6,7 +6,7 @@
 #' Significant eQTL for the specified gene are overlaid using colours and
 #' symbols.
 #' 
-#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param x Object of class 'locus' to use for plot. See [locus()].
 #' @param base_col Colour of points for SNPs which do not have eQTLs.
 #' @param up_palette Character string specifying palette for upregulation eQTL
 #'   using [grDevices::hcl.colors]
@@ -35,6 +35,7 @@ overlay_plot <- function(x,
   
   x$data$bg <- adjustcolor(base_col, alpha.f = alpha)
   x$data$pch <- 21
+  # x$data$col <- NA
   
   LDX <- x$LDexp[x$LDexp$Tissue == tissue & x$LDexp$Gene_Symbol == eqtl_gene, ]
   # match by rsid
@@ -65,6 +66,8 @@ overlay_plot <- function(x,
     x$data$bg[equp] <- down_cols[ecol[equp]]
     x$data$bg[eqdown] <- up_cols[ecol[eqdown]]
     x$data$pch[eqind] <- 24.5 - sign(x$data$eqtl_effect[eqind]) / 2
+    # x$data$col[eqind] <- "black"
+    x$data <- x$data[order(x$data$pch), ]
   }
   
   locus_plot(x, col = NA, showLD = FALSE, ...)

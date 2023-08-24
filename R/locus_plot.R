@@ -51,8 +51,7 @@ locus_plot <- function(x,
                         filter_gene_name = NULL,
                         filter_gene_biotype = NULL,
                         xlab = NULL,
-                        cex.axis = 1,
-                        cex.text = 0.7,
+                        text.cex = 0.7,
                         use_layout = TRUE,
                         heights = c(3, 2),
                         maxrows = 7,
@@ -68,13 +67,19 @@ locus_plot <- function(x,
     op0 <- set_layers(1, heights, rev = TRUE)
     on.exit(par(op0), add = TRUE)
   }
+  
+  dots <- list(...)
+  cex.axis <- if ("cex.axis" %in% names(dots)) dots$cex.axis else 1
+  cex.lab <- if ("cex.lab" %in% names(dots)) dots$cex.lab else 1
+  
   # lower panel gene tracks at locus
   genetracks(x, filter_gene_name, filter_gene_biotype,
-             border, cex.axis, cex.text, gene_col, exon_col, exon_border,
+             border, cex.axis, cex.lab, text.cex, gene_col, exon_col, exon_border,
              maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # upper panel plot points
   scatter_plot(x, xticks = (xticks == 'top'),
-               border = border, cex.axis = cex.axis, xlab = xlab, ...)
+               border = border, # cex.axis = cex.axis,
+               xlab = xlab, ...)
 }
