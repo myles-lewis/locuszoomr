@@ -11,7 +11,7 @@ genetracks(
   border = FALSE,
   cex.axis = 1,
   cex.lab = 1,
-  text.cex = 0.7,
+  cex.text = 0.7,
   gene_col = "blue4",
   exon_col = "blue4",
   exon_border = "blue4",
@@ -35,7 +35,9 @@ genetracks(
 
 \item{cex.axis}{Specifies font size for axis numbering.}
 
-\item{text.cex}{Font size for gene text.}
+\item{cex.lab}{Specifies font size for axis titles.}
+
+\item{cex.text}{Font size for gene text.}
 
 \item{gene_col}{Colour for gene lines.}
 

@@ -75,7 +75,7 @@ We plot a locus from this dataset by extracting a subset of the data using the
 library(EnsDb.Hsapiens.v75)
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
 summary(loc)
-plot(loc)
+locus_plot(loc)
 ```
 
 # Obtaining LD information
@@ -95,7 +95,7 @@ library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5)
 loc <- link_LD(loc, LDtoken = "your_token")
-plot(loc)
+locus_plot(loc)
 ```
 
 The subset of GWAS data included in the `locuszoomr` package has LD data already
@@ -105,13 +105,13 @@ from their own datasets to loci.
 
 ```{r fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2")
-plot(loc)
+locus_plot(loc)
 ```
 
 # Plot customisation
 
 Various plotting options can be customised through arguments via the call to
-`plot()`. Plot borders can be set using `border = TRUE`. The chromosome position
+`locus_plot()`. Plot borders can be set using `border = TRUE`. The chromosome position
 $x$ axis labels can be placed under the top or bottom plots using 
 `xtick = "top"` or `"bottom"`.
 
@@ -124,10 +124,10 @@ position. See the help page at `?plot.locus` for more details.
 
 ```{r eval = FALSE}
 # Filter by gene biotype
-plot(loc, filter_gene_biotype = "protein_coding")
+locus_plot(loc, filter_gene_biotype = "protein_coding")
 
 # Custom selection of genes using gene names
-plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
+locus_plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
                                      'PI4KAP2', 'MIR301B'))
 ```
 
@@ -146,9 +146,9 @@ loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 # multiplot
 pdf("myplot.pdf", height = 7, width = 10)
 oldpar <- multi_layout(nrow = 1, ncol = 3)
-plot(loc, use_layout = FALSE, legend_pos = 'topleft')
-plot(loc2, use_layout = FALSE, legend_pos = NULL)
-plot(loc3, use_layout = FALSE, legend_pos = NULL)
+locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
+locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
+locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
 par(oldpar)  # reset to default
 dev.off()
 ```
@@ -159,9 +159,9 @@ loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 
 # multiplot
 oldpar <- multi_layout(nrow = 1, ncol = 3)
-plot(loc, use_layout = FALSE, legend_pos = 'topleft')
-plot(loc2, use_layout = FALSE, legend_pos = NULL)
-plot(loc3, use_layout = FALSE, legend_pos = NULL)
+locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
+locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
+locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
 par(oldpar)  # reset to default
 ```
 

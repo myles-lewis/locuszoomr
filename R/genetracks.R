@@ -12,7 +12,8 @@
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param cex.axis Specifies font size for axis numbering.
-#' @param text.cex Font size for gene text.
+#' @param cex.lab Specifies font size for axis titles.
+#' @param cex.text Font size for gene text.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
@@ -44,7 +45,7 @@
 #'            exon_border = 'darkgrey')
 #' 
 #' @importFrom BiocGenerics start end
-#' @importFrom graphics axTicks axis lines rect text plot.new
+#' @importFrom graphics axTicks axis lines rect text plot.new strwidth
 #' @export
 
 genetracks <- function(locus,
@@ -53,7 +54,7 @@ genetracks <- function(locus,
                        border = FALSE,
                        cex.axis = 1,
                        cex.lab = 1,
-                       text.cex = 0.7,
+                       cex.text = 0.7,
                        gene_col = 'blue4',
                        exon_col = 'blue4',
                        exon_border = 'blue4',
@@ -82,7 +83,7 @@ genetracks <- function(locus,
     op <- par(mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
     on.exit(par(op))
   }
-  TX <- mapRow(TX, xlim = xrange, text.cex = text.cex, text_pos = text_pos)
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   TX <- TX[TX$row <= maxrows, ]
   
@@ -121,7 +122,7 @@ genetracks <- function(locus,
              bquote(.(TX$gene_name[i]) * symbol("\256"))
            } else {     
              bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = text.cex, xpd = NA)
+           }, cex = cex.text, xpd = NA)
     }
   } else if (text_pos == "left") {
     tfilter <- if (border) {
@@ -133,7 +134,7 @@ genetracks <- function(locus,
              bquote(.(TX$gene_name[i]) * symbol("\256"))
            } else {     
              bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = text.cex, pos = 2, xpd = NA)
+           }, cex = cex.text, pos = 2, xpd = NA)
     }
   }
   
@@ -141,11 +142,11 @@ genetracks <- function(locus,
 
 
 # map genes into rows without overlap
-mapRow <- function(TX, gap = diff(xlim) * 0.02, text.cex = 0.7, 
+mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
                    text_pos = 'top') {
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
-                 cex = text.cex) * diff(xlim) / par("pin")[1]
+                 cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
     TX$tmin <- TX$mean - gw / 2

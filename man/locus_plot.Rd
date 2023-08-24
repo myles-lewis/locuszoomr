@@ -9,7 +9,10 @@ locus_plot(
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   xlab = NULL,
-  text.cex = 0.7,
+  cex = 1,
+  cex.axis = 1,
+  cex.lab = 1,
+  cex.text = 0.7,
   use_layout = TRUE,
   heights = c(3, 2),
   maxrows = 7,
@@ -32,6 +35,14 @@ locus_plot(
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
 
 \item{xlab}{x axis title.}
+
+\item{cex}{Specifies size for points.}
+
+\item{cex.axis}{Specifies font size for axis numbering.}
+
+\item{cex.lab}{Specifies font size for axis titles.}
+
+\item{cex.text}{Font size for gene text.}
 
 \item{use_layout}{Logical whether \code{graphics::layout} is called. Default
 \code{TRUE} is for a standard single plot. Set to \code{FALSE} if a more complex
@@ -60,10 +71,6 @@ placement of gene name labels.}
 
 \item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} to control the scatter
 plot.}
-
-\item{cex.axis}{Specifies font size for axis numbering.}
-
-\item{cex.text}{Font size for gene text.}
 }
 \value{
 No return value.

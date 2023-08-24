@@ -9,6 +9,9 @@ scatter_plot(
   pcutoff = 5e-08,
   chromCol = "royalblue",
   sigCol = "red",
+  cex = 1,
+  cex.axis = 1,
+  cex.lab = 1,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
   xticks = FALSE,
@@ -31,6 +34,12 @@ to \code{NULL} to disable.}
 object is made.}
 
 \item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
+
+\item{cex}{Specifies size for points.}
+
+\item{cex.axis}{Specifies font size for axis numbering.}
+
+\item{cex.lab}{Specifies font size for axis titles.}
 
 \item{xlab}{x axis title.}
 
@@ -57,8 +66,6 @@ new plot.}
 \item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
-
-\item{cex.axis}{Specifies font size for axis numbering.}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.

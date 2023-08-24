@@ -10,9 +10,11 @@
 #' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
 #'   object is made.
 #' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param cex Specifies size for points.
+#' @param cex.axis Specifies font size for axis numbering.
+#' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
-#' @param cex.axis Specifies font size for axis numbering.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
@@ -29,12 +31,16 @@
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()]
+#' @importFrom graphics par legend
 #' @export
 #' 
 scatter_plot <- function(x,
                          pcutoff = 5e-08,
                          chromCol = 'royalblue',
                          sigCol = 'red',
+                         cex = 1,
+                         cex.axis = 1,
+                         cex.lab = 1,
                          xlab = NULL,
                          ylab = expression("-log"[10] ~ "P"),
                          xticks = FALSE,
@@ -81,7 +87,7 @@ scatter_plot <- function(x,
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, x$pos], y = data$logP,
-                      pch = pch, bg = data$bg)
+                      pch = pch, bg = data$bg, cex = cex)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     do.call("points", plot.args)
     return()
@@ -89,6 +95,7 @@ scatter_plot <- function(x,
   plot.args <- list(x = data[, x$pos], y = data$logP,
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
+               cex = cex, cex.axis = cex.axis, cex.lab = cex.lab,
                xlim = x$xrange,
                ylim = c(0, max(data$logP, na.rm = TRUE)),
                xlab = if (xticks) xlab else "",
