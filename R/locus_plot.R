@@ -24,6 +24,8 @@
 #'   `TRUE` is for a standard single plot. Set to `FALSE` if a more complex
 #'   layout with multiple plots is required e.g. using [multi_layout()].
 #' @param heights Ratio of top to bottom plot. See [layout].
+#' @param showExons Logical whether to show exons or simply show whole gene as a
+#'   rectangle
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param xticks Character value of either 'top' or 'bottom' specifying 
@@ -59,6 +61,7 @@ locus_plot <- function(x,
                        cex.text = 0.7,
                        use_layout = TRUE,
                        heights = c(3, 2),
+                       showExons = TRUE,
                        maxrows = 7,
                        xticks = 'bottom',
                        border = FALSE,
@@ -80,7 +83,7 @@ locus_plot <- function(x,
   # lower panel gene tracks at locus
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.lab, cex.text, gene_col, exon_col, exon_border,
-             maxrows, text_pos, xticks = (xticks == 'bottom'),
+             showExons, maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # upper panel plot points

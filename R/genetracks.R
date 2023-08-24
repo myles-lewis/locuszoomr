@@ -58,6 +58,7 @@ genetracks <- function(locus,
                        gene_col = 'blue4',
                        exon_col = 'blue4',
                        exon_border = 'blue4',
+                       showExons = TRUE,
                        maxrows = NULL,
                        text_pos = 'top',
                        xticks = TRUE,
@@ -105,13 +106,19 @@ genetracks <- function(locus,
   }
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   for (i in seq_len(nrow(TX))) {
-    lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
-          col = gene_col, lwd = 1, lend = 1)
-    e <- EX[EX$gene_id == TX$gene_id[i], ]
-    exstart <- start(e)
-    exend <- end(e)
-    rect(exstart, -TX[i, 'row'] - exheight, exend, -TX[i, 'row'] + exheight,
-         col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
+    if (showExons) {
+      lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
+            col = gene_col, lwd = 1, lend = 1)
+      e <- EX[EX$gene_id == TX$gene_id[i], ]
+      exstart <- start(e)
+      exend <- end(e)
+      rect(exstart, -TX[i, 'row'] - exheight, exend, -TX[i, 'row'] + exheight,
+           col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
+    } else {
+      rect(TX[i, 'start'], -TX[i, 'row'] - exheight,
+           TX[i, 'end'], -TX[i, 'row'] + exheight,
+           col = gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
+    }
   }
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 

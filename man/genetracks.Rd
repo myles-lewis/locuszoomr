@@ -15,6 +15,7 @@ genetracks(
   gene_col = "blue4",
   exon_col = "blue4",
   exon_border = "blue4",
+  showExons = TRUE,
   maxrows = NULL,
   text_pos = "top",
   xticks = TRUE,

@@ -15,6 +15,7 @@ locus_plot(
   cex.text = 0.7,
   use_layout = TRUE,
   heights = c(3, 2),
+  showExons = TRUE,
   maxrows = 7,
   xticks = "bottom",
   border = FALSE,
@@ -49,6 +50,9 @@ locus_plot(
 layout with multiple plots is required e.g. using \code{\link[=multi_layout]{multi_layout()}}.}
 
 \item{heights}{Ratio of top to bottom plot. See \link{layout}.}
+
+\item{showExons}{Logical whether to show exons or simply show whole gene as a
+rectangle}
 
 \item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
