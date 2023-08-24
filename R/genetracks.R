@@ -15,7 +15,8 @@
 #' @param cex.lab Specifies font size for axis titles.
 #' @param cex.text Font size for gene text.
 #' @param showExons Logical whether to show exons or simply show whole gene as a
-#'   rectangle
+#'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
+#'   for rectangle border and `gene_col` for the fill colour.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
@@ -24,8 +25,8 @@
 #' @param border Logical whether a bounding box is plotted.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
-#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
-#' border.
+#' @param exon_border Border line colour outlining exons (or genes if
+#'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
 #' @param align Logical whether to set [par()] to align the plot.

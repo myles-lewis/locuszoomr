@@ -63,12 +63,12 @@ whether x axis ticks and numbers are plotted on top or bottom plot window.}
 \item{border}{Logical whether a bounding box is plotted around upper and
 lower plots.}
 
-\item{gene_col}{Colour for genes and exons.}
+\item{gene_col}{Colour for gene lines.}
 
 \item{exon_col}{Fill colour for exons.}
 
-\item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
-border.}
+\item{exon_border}{Border line colour outlining exons (or genes if
+\code{showExons} is \code{FALSE}). Set to \code{NA} for no border.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}

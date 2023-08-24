@@ -32,10 +32,10 @@
 #' whether x axis ticks and numbers are plotted on top or bottom plot window.
 #' @param border Logical whether a bounding box is plotted around upper and 
 #' lower plots.
-#' @param gene_col Colour for genes and exons.
+#' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
-#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
-#' border.
+#' @param exon_border Border line colour outlining exons (or genes if
+#'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
 #' @param ... Other arguments passed to [scatter_plot()] to control the scatter

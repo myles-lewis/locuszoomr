@@ -44,11 +44,12 @@ genetracks(
 
 \item{exon_col}{Fill colour for exons.}
 
-\item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
-border.}
+\item{exon_border}{Border line colour outlining exons (or genes if
+\code{showExons} is \code{FALSE}). Set to \code{NA} for no border.}
 
 \item{showExons}{Logical whether to show exons or simply show whole gene as a
-rectangle}
+rectangle. If \code{showExons = FALSE} colours are specified by \code{exon_border}
+for rectangle border and \code{gene_col} for the fill colour.}
 
 \item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
