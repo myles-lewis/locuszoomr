@@ -89,6 +89,7 @@ genetracks <- function(locus,
   }
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+  if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]
   
   plot(NA, xlim = xrange,
