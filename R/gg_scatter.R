@@ -28,8 +28,8 @@
 #' @return Returns a ggplot2 plot.
 #' @seealso [locus()] [set_layers()]
 #' @importFrom ggplot2 ggplot geom_point xlab ylab theme_classic theme
-#'  scale_fill_manual scale_color_manual scale_x_continuous aes guide_legend
-#'  element_text element_blank element_rect unit
+#'  scale_fill_manual scale_color_manual aes guide_legend element_text
+#'  element_blank element_rect unit
 #' @importFrom rlang .data
 #' @export
 #' 
@@ -68,6 +68,7 @@ gg_scatter <- function(x,
   }
   
   # scatter plot
+  data[, x$pos] <- data[, x$pos] / 1e6
   if (!"col" %in% colnames(data)) data$col <- "black"
   data$col <- as.factor(data$col)
   # if (!"pch" %in% colnames(data)) data$pch <- 21
@@ -104,8 +105,7 @@ gg_scatter <- function(x,
                       labels = legend_labels) +
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
-    #scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    scale_x_continuous(labels = function(x) x/1e6) +
+    # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
     xlab(xlab) + ylab(ylab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10),
