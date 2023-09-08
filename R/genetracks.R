@@ -58,7 +58,7 @@ genetracks <- function(locus,
                        cex.axis = 1,
                        cex.lab = 1,
                        cex.text = 0.7,
-                       gene_col = 'blue4',
+                       gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                        exon_col = 'blue4',
                        exon_border = 'blue4',
                        showExons = TRUE,
@@ -87,6 +87,10 @@ genetracks <- function(locus,
     op <- par(mar = c(ifelse(xticks, 4, 2), 4, 0.25, 1.5))
     on.exit(par(op))
   }
+  
+  pos <- TX$strand == "+"
+  TX$gene_name[pos] <- paste0(TX$gene_name[pos], sprintf("\u2192"))
+  TX$gene_name[!pos] <- paste0(sprintf("\u2190"), TX$gene_name[!pos])
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
@@ -109,44 +113,34 @@ genetracks <- function(locus,
          tcl = -0.3, mgp = c(1.7, 0.4, 0))
   }
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
-  for (i in seq_len(nrow(TX))) {
-    if (showExons) {
+  
+  if (showExons) {
+    for (i in seq_len(nrow(TX))) {
       lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
-            col = gene_col, lwd = 1, lend = 1)
+            col = gene_col, lwd = 1.5, lend = 1)
       e <- EX[EX$gene_id == TX$gene_id[i], ]
       exstart <- start(e)
       exend <- end(e)
       rect(exstart, -TX[i, 'row'] - exheight, exend, -TX[i, 'row'] + exheight,
            col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
-    } else {
-      rect(TX[i, 'start'], -TX[i, 'row'] - exheight,
-           TX[i, 'end'], -TX[i, 'row'] + exheight,
-           col = gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
     }
+  } else {
+    rect(TX[, 'start'], -TX[, 'row'] - exheight,
+         TX[, 'end'], -TX[, 'row'] + exheight,
+         col = gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
   }
+  
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
-    for (i in tfilter) {
-      text(TX$mean[i], -TX[i, 'row'] + 0.45,
-           labels = if (TX$strand[i] == "+") {
-             bquote(.(TX$gene_name[i]) * symbol("\256"))
-           } else {     
-             bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = cex.text, xpd = NA)
-    }
+    text(TX$mean[tfilter], -TX$row[tfilter] + 0.45,
+         labels = TX$gene_name[tfilter], cex = cex.text, xpd = NA)
   } else if (text_pos == "left") {
     tfilter <- if (border) {
       which(TX$tmin > xrange[1])
     } else seq_len(nrow(TX))
-    for (i in tfilter) {
-      text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],
-           labels = if (TX$strand[i] == "+") {
-             bquote(.(TX$gene_name[i]) * symbol("\256"))
-           } else {     
-             bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = cex.text, pos = 2, xpd = NA)
-    }
+    text(pmax(TX$start[tfilter], xrange[1] - diff(xrange) * 0.04), -TX$row[tfilter],
+         labels = TX$gene_name[tfilter], cex = cex.text, pos = 2, xpd = NA)
   }
   
 }
@@ -156,7 +150,7 @@ genetracks <- function(locus,
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
                    text_pos = 'top') {
-  gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
+  gw <- strwidth(TX$gene_name, units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
@@ -166,8 +160,8 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
     TX$tmin <- TX$start - gw - gap
     TX$tmax <- TX$end
   }
-  TX$min <- apply(TX[, c('start', 'end', 'tmin')], 1, min) - gap / 2
-  TX$max <- apply(TX[, c('start', 'end', 'tmax')], 1, max) + gap / 2
+  TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
+  TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
   TX$row <- 0
   j <- 1
   while (any(TX$row == 0)) {
