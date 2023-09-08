@@ -6,7 +6,7 @@
 gg_genetracks <- function(locus,
                           filter_gene_name = NULL,
                           filter_gene_biotype = NULL,
-                          border = FALSE,
+                          # border = FALSE,
                           cex.axis = 1,
                           cex.lab = 1,
                           cex.text = 0.7,
@@ -17,7 +17,8 @@ gg_genetracks <- function(locus,
                           maxrows = NULL,
                           text_pos = 'top',
                           xticks = TRUE,
-                          xlab = NULL) {
+                          xlab = NULL, 
+                          draw = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
   EX <- locus$EX
@@ -48,70 +49,107 @@ gg_genetracks <- function(locus,
   TX$start <- TX$start / 1e6
   TX$end <- TX$end / 1e6
   TX[, c("mean", "tmin", "tmax", "min", "max")] <- TX[, c("mean", "tmin", "tmax", "min", "max")] / 1e6
-  
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   
-  vp <- viewport(x = 0,
-                 y = if (xticks) unit(4, "lines") else 0,
-                 width = unit(1, "npc"),
-                 height = unit(1, "npc") - unit(5, "lines"),
-                 just = c("left", "bottom"),
-                 xscale = xrange + c(-0.04, 0.04) * diff(xrange),
-                 yscale = ylim
-                 )
+  gt <- gTree(
+    childrenvp = genetrack.vp(xrange, ylim, xticks),
+    children = gList(
+      exonGrob(TX, EX, showExons, gene_col, exon_col, exon_border, exheight),
+      genetextGrob(text_pos, TX, xrange, cex.text),
+      axGrob(xticks, xlab)),
+    gp = gpar()
+  )
   
-  pushViewport(vp)
+  if (draw) grid.draw(gt)
+  gt
+}
+
+
+genetrack.vp <- function(xrange, ylim, xticks) {
+  viewport(name = "genetrack",
+           x = unit(0, "lines"),
+           y = unit(ifelse(xticks, 4, 0), "lines"),
+           width = unit(1, "npc"),
+           height = unit(1, "npc") - unit(ifelse(xticks, 4, 0), "lines"),
+           just = c("left", "bottom"),
+           xscale = xrange + c(-0.04, 0.04) * diff(xrange),
+           yscale = ylim)
+}
+
+
+exonGrob <- function(TX, EX, showExons, gene_col, exon_col, exon_border,
+                     exheight) {
   if (showExons) {
-    for (i in seq_len(nrow(TX))) {
-      grid.lines(unit(TX[i, c('start', 'end')], "native"),
-                 unit(rep(-TX[i, 'row'], 2), "native"),
-                 gp = gpar(col = gene_col, lwd = 1.5, lineend = "butt"))
+    LX <- cbind(TX[, c('start', 'end')], rep(NA, nrow(TX)))
+    LX <- unlist(t(LX))
+    LY <- cbind(-TX[, 'row'], -TX[, 'row'], rep(NA, nrow(TX)))
+    LY <- unlist(t(LY))
+    
+    EXset <- lapply(seq_len(nrow(TX)), function(i) {
       e <- EX[EX$gene_id == TX$gene_id[i], ]
       exstart <- start(e) / 1e6
       exwidth <- end(e) / 1e6 - exstart
-      grid.rect(x = unit(exstart, "native"),
-                y = unit(-TX[i, 'row'] - exheight, "native"),
-                width = unit(exwidth, "native"),
-                height = unit(2 * exheight, "native"),
-                just = c("left", "bottom"),
-                gp = gpar(fill = exon_col, col = exon_border,
-                          lwd = 0.5, lineend = "square", linejoin = "mitre"))
-    }
+      cbind(x = exstart,
+            y = -TX[i, 'row'] - exheight,
+            width = exwidth,
+            height = 2 * exheight)
+    })
+    EXset <- do.call("rbind", EXset)
+    
+    gList(
+      linesGrob(unit(LX, "native"),
+                unit(LY, "native"),
+                gp = gpar(col = gene_col, lwd = 1.5, lineend = "butt"),
+                vp = "genetrack"),
+      rectGrob(x = unit(EXset[, "x"], "native"),
+               y = unit(EXset[, "y"], "native"),
+               width = unit(EXset[, "width"], "native"),
+               height = unit(EXset[, "height"], "native"),
+               just = c("left", "bottom"),
+               gp = gpar(fill = exon_col, col = exon_border,
+                         lwd = 0.5, lineend = "square", linejoin = "mitre"),
+               vp = "genetrack")
+    )
   } else {
-    grid.rect(x = unit(TX$start, "native"),
-              y = unit(-TX[, 'row'] - exheight, "native"),
-              width = unit(TX$end - TX$start, "native"),
-              height = unit(exheight*2, "native"),
-              just = c("left", "bottom"),
-              gp = gpar(fill = gene_col, col = exon_border,
-                        lineend = "square", linejoin = "mitre"))
+    rectGrob(x = unit(TX$start, "native"),
+             y = unit(-TX[, 'row'] - exheight, "native"),
+             width = unit(TX$end - TX$start, "native"),
+             height = unit(exheight*2, "native"),
+             just = c("left", "bottom"),
+             gp = gpar(fill = gene_col, col = exon_border,
+                       lineend = "square", linejoin = "mitre"),
+             vp = "genetrack")
   }
-  
+}
+
+
+genetextGrob <- function(text_pos, TX, xrange, cex.text) {
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
-    grid.text(TX$gene_name[tfilter],
-              x = unit(TX$mean[tfilter], "native"),
-              y = unit(-TX$row[tfilter] + 0.45, "native"),
-              gp = gpar(cex = cex.text))
+    textGrob(TX$gene_name[tfilter],
+             x = unit(TX$mean[tfilter], "native"),
+             y = unit(-TX$row[tfilter] + 0.45, "native"),
+             gp = gpar(cex = cex.text), vp = "genetrack")
   } else if (text_pos == "left") {
-    tfilter <- if (border) {
-      which(TX$tmin > xrange[1])
-    } else seq_len(nrow(TX))
-    grid.text(TX$gene_name[tfilter],
-              x = unit(pmax(TX$start[tfilter],
-                            xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
-                       "native"),
-              y = unit(-TX$row[tfilter], "native"),
-              just = "right",
-              gp = gpar(cex = cex.text))
+    tfilter <- which(TX$tmin > xrange[1])
+    textGrob(TX$gene_name[tfilter],
+             x = unit(pmax(TX$start[tfilter],
+                           xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
+                      "native"),
+             y = unit(-TX$row[tfilter], "native"),
+             just = "right",
+             gp = gpar(cex = cex.text), vp = "genetrack")
   }
-  
-  if (border) grid.rect()
-  if (xticks) {
-    grid.text(xlab, y = unit(-3, "lines"), gp = gpar(fontsize = 12))
-    grid.xaxis()
-  }
-  
-  popViewport()
 }
+
+
+axGrob <- function(xticks, xlab) {
+  if (xticks) {
+    gList(
+      textGrob(xlab, y = unit(-3, "lines"), gp = gpar(fontsize = 12), vp = "genetrack"),
+      xaxisGrob(vp = "genetrack")
+    )
+  }
+}
+
