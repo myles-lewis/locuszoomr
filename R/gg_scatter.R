@@ -105,9 +105,10 @@ gg_scatter <- function(x,
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    xlab(xlab) + ylab(ylab) +
+    labs(x = xlab, y = ylab) +
     theme_classic() +
-    theme(axis.text = element_text(colour = "black", size = 10),
+    theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
+          axis.title = element_text(size = 10 * cex.lab),
           legend.title = element_blank(),
           legend.justification = legend.justification,
           legend.position = legend.position,
