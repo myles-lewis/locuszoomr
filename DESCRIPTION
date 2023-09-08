@@ -28,10 +28,14 @@ Imports:
     BiocGenerics,
     ensembldb,
     GenomeInfoDb,
+    ggplot2,
     graphics,
     grDevices,
+    grid,
+    gtable,
     memoise,
-    plotly
+    plotly,
+    rlang
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
