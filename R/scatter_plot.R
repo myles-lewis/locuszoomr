@@ -71,7 +71,7 @@ scatter_plot <- function(x,
   
   # scatter plot
   if (align) {
-    op <- par(mar = c(ifelse(xticks, 3, 0.1), 4, 2, 1.5))
+    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2, 1.5))
     on.exit(par(op))
   }
   
