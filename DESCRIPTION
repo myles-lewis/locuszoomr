@@ -31,6 +31,7 @@ Imports:
     ggplot2,
     graphics,
     grDevices,
+    grid,
     memoise,
     plotly,
     rlang

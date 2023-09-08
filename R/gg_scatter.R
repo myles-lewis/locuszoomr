@@ -50,7 +50,7 @@ gg_scatter <- function(x,
                        legend_pos = 'topleft') {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
-  if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (is.null(xlab) & xticks) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
@@ -97,7 +97,7 @@ gg_scatter <- function(x,
     } else legend.position = "none"
   } else legend.position = "none"
   
-  ggplot(data, aes(x = .data[[x$pos]], y = .data$logP, color = .data$col,
+  p <- ggplot(data, aes(x = .data[[x$pos]], y = .data$logP, color = .data$col,
                    fill = .data$bg)) +
     geom_point(shape = 21, size = 2) +
     scale_fill_manual(breaks = levels(data$bg), values = scheme,
@@ -115,6 +115,9 @@ gg_scatter <- function(x,
           legend.text.align = 0,
           legend.key.size = unit(1, 'lines'),
           legend.spacing.y = unit(0, 'lines')) +
-    if (border) theme(panel.border = element_rect(colour = "black", fill = NA))
+    if (!xticks) theme(axis.text.x=element_blank(),
+                       axis.ticks.x=element_blank())
+  if (border) p <- p + theme(panel.border = element_rect(colour = "black", fill = NA))
+  p
 }
 
