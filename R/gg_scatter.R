@@ -29,7 +29,7 @@
 #' @seealso [locus()] [set_layers()]
 #' @importFrom ggplot2 ggplot geom_point xlab ylab theme_classic theme
 #'  scale_fill_manual scale_color_manual scale_x_continuous aes guide_legend
-#'  element_text element_blank unit
+#'  element_text element_blank element_rect unit
 #' @importFrom rlang .data
 #' @export
 #' 
@@ -78,10 +78,10 @@ gg_scatter <- function(x,
   if (!is.null(legend_pos)) {
     if (legend_pos == "topleft") {
       legend.justification <- c(0, 1)
-      legend.position <- c(0.01, 1)
+      legend.position <- c(0.01, 0.99)
     } else if (legend_pos == "topright") {
       legend.justification <- c(1, 1)
-      legend.position <- c(1, 1)
+      legend.position <- c(1, 0.99)
     } else {
       legend.position <- legend_pos
     }
@@ -113,6 +113,8 @@ gg_scatter <- function(x,
           legend.justification = legend.justification,
           legend.position = legend.position,
           legend.text.align = 0,
-          legend.key.size = unit(1, 'lines'))
+          legend.key.size = unit(1, 'lines'),
+          legend.spacing.y = unit(0, 'lines')) +
+    if (border) theme(panel.border = element_rect(colour = "black", fill = NA))
 }
 
