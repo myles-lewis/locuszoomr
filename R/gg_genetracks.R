@@ -34,6 +34,10 @@ gg_genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
+  pos <- TX$strand == "+"
+  TX$gene_name[pos] <- paste0(TX$gene_name[pos], sprintf("\u2192"))
+  TX$gene_name[!pos] <- paste0(sprintf("\u2190"), TX$gene_name[!pos])
+  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
@@ -43,6 +47,8 @@ gg_genetracks <- function(locus,
   xrange <- xrange / 1e6
   TX$start <- TX$start / 1e6
   TX$end <- TX$end / 1e6
+  TX[, c("mean", "tmin", "tmax", "min", "max")] <- TX[, c("mean", "tmin", "tmax", "min", "max")] / 1e6
+  
   exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   
   vp <- viewport(x = 0,
@@ -80,8 +86,28 @@ gg_genetracks <- function(locus,
               gp = gpar(fill = gene_col, col = exon_border,
                         lineend = "square", linejoin = "mitre"))
   }
-  if (border) grid.rect()
   
+  if (text_pos == "top") {
+    tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
+                       (TX$tmax < xrange[2] + diff(xrange) * 0.04))
+    grid.text(TX$gene_name[tfilter],
+              x = unit(TX$mean[tfilter], "native"),
+              y = unit(-TX$row[tfilter] + 0.45, "native"),
+              gp = gpar(cex = cex.text))
+  } else if (text_pos == "left") {
+    tfilter <- if (border) {
+      which(TX$tmin > xrange[1])
+    } else seq_len(nrow(TX))
+    grid.text(TX$gene_name[tfilter],
+              x = unit(pmax(TX$start[tfilter],
+                            xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
+                       "native"),
+              y = unit(-TX$row[tfilter], "native"),
+              just = "right",
+              gp = gpar(cex = cex.text))
+  }
+  
+  if (border) grid.rect()
   if (xticks) {
     grid.text(xlab, y = unit(-3, "lines"), gp = gpar(fontsize = 12))
     grid.xaxis()

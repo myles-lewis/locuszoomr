@@ -91,6 +91,7 @@ genetracks <- function(locus,
   pos <- TX$strand == "+"
   TX$gene_name[pos] <- paste0(TX$gene_name[pos], sprintf("\u2192"))
   TX$gene_name[!pos] <- paste0(sprintf("\u2190"), TX$gene_name[!pos])
+  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
