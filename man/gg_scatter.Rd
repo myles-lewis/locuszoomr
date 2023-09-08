@@ -9,7 +9,7 @@ gg_scatter(
   pcutoff = 5e-08,
   chromCol = "royalblue",
   sigCol = "red",
-  cex = 1,
+  size = 2,
   cex.axis = 1,
   cex.lab = 1,
   xlab = NULL,
@@ -32,7 +32,7 @@ object is made.}
 
 \item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
 
-\item{cex}{Specifies size for points.}
+\item{size}{Specifies size for points.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
 
@@ -44,8 +44,7 @@ object is made.}
 
 \item{xticks}{Logical whether x axis numbers and axis title are plotted.}
 
-\item{border}{Logical whether a bounding box is plotted around upper and
-lower plots.}
+\item{border}{Logical whether a bounding box is plotted around the plot.}
 
 \item{showLD}{Logical whether to show LD with colours}
 

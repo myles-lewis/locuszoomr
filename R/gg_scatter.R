@@ -10,14 +10,13 @@
 #' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
 #'   object is made.
 #' @param sigCol Colour for significant points if `LD` is `FALSE`.
-#' @param cex Specifies size for points.
+#' @param size Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
-#' @param border Logical whether a bounding box is plotted around upper and
-#'   lower plots.
+#' @param border Logical whether a bounding box is plotted around the plot.
 #' @param showLD Logical whether to show LD with colours
 #' @param LD_scheme Vector of colours for plotting LD. The first colour is for SNPs
 #'   which lack LD information. The next 5 colours are for r2 or D' LD results
@@ -37,7 +36,7 @@ gg_scatter <- function(x,
                        pcutoff = 5e-08,
                        chromCol = 'royalblue',
                        sigCol = 'red',
-                       cex = 1,
+                       size = 2,
                        cex.axis = 1,
                        cex.lab = 1,
                        xlab = NULL,
@@ -99,7 +98,7 @@ gg_scatter <- function(x,
   
   p <- ggplot(data, aes(x = .data[[x$pos]], y = .data$logP, color = .data$col,
                    fill = .data$bg)) +
-    geom_point(shape = 21, size = 2) +
+    geom_point(shape = 21, size = size) +
     scale_fill_manual(breaks = levels(data$bg), values = scheme,
                       guide = guide_legend(reverse = TRUE),
                       labels = legend_labels) +

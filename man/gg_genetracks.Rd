@@ -8,6 +8,7 @@ gg_genetracks(
   locus,
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
+  border = FALSE,
   cex.axis = 1,
   cex.lab = 1,
   cex.text = 0.7,
@@ -30,6 +31,8 @@ gg_genetracks(
 \item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
 \code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
+
+\item{border}{Logical whether a bounding box is plotted.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
 
@@ -60,8 +63,6 @@ placement of gene name labels.}
 in \code{locus}.}
 
 \item{draw}{Logical whether to draw the plot in the current viewport.}
-
-\item{border}{Logical whether a bounding box is plotted.}
 }
 \value{
 A grob object.

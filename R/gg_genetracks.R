@@ -31,13 +31,13 @@
 #' @param draw Logical whether to draw the plot in the current viewport.
 #' @return A grob object.
 #' @importFrom grid viewport linesGrob rectGrob textGrob xaxisGrob gList gTree
-#'   grid.draw
+#'   grid.draw gpar
 #' @export
 
 gg_genetracks <- function(locus,
                           filter_gene_name = NULL,
                           filter_gene_biotype = NULL,
-                          # border = FALSE,
+                          border = FALSE,
                           cex.axis = 1,
                           cex.lab = 1,
                           cex.text = 0.7,
@@ -85,6 +85,7 @@ gg_genetracks <- function(locus,
   gt <- gTree(
     childrenvp = genetrack.vp(xrange, ylim, xticks),
     children = gList(
+      if (border) rectGrob(gp = gpar(lwd = 1), vp = "genetrack"),
       exonGrob(TX, EX, showExons, gene_col, exon_col, exon_border, exheight),
       genetextGrob(text_pos, TX, xrange, cex.text),
       axGrob(xticks, xlab)),
@@ -99,9 +100,9 @@ gg_genetracks <- function(locus,
 genetrack.vp <- function(xrange, ylim, xticks) {
   viewport(name = "genetrack",
            x = unit(0, "lines"),
-           y = unit(ifelse(xticks, 4, 0), "lines"),
+           y = unit(ifelse(xticks, 4, 0.5), "lines"),
            width = unit(1, "npc"),
-           height = unit(1, "npc") - unit(ifelse(xticks, 4, 0), "lines"),
+           height = unit(1, "npc") - unit(ifelse(xticks, 4, 0.5), "lines"),
            just = c("left", "bottom"),
            xscale = xrange + c(-0.04, 0.04) * diff(xrange),
            yscale = ylim)

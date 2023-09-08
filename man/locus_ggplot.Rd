@@ -4,15 +4,65 @@
 \alias{locus_ggplot}
 \title{Locus plot using ggplot2}
 \usage{
-locus_ggplot(loc, height = unit(5, "cm"), xticks = "top")
+locus_ggplot(
+  loc,
+  height = unit(5, "cm"),
+  pcutoff = 5e-08,
+  chromCol = "royalblue",
+  sigCol = "red",
+  size = 2,
+  cex.axis = 1,
+  cex.lab = 1,
+  xlab = NULL,
+  ylab = expression("-log"[10] ~ "P"),
+  xticks = "top",
+  border = FALSE,
+  showLD = TRUE,
+  LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
+  legend_pos = "topleft",
+  ...
+)
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
 \item{height}{A unit object specifying height of the lower gene track.}
 
-\item{xticks}{Character value of either 'top' or 'bottom' specifying whether
-x axis ticks and numbers are plotted on top or bottom plot window.}
+\item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
+to \code{NULL} to disable.}
+
+\item{chromCol}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
+object is made.}
+
+\item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
+
+\item{size}{Specifies size for points.}
+
+\item{cex.axis}{Specifies font size for axis numbering.}
+
+\item{cex.lab}{Specifies font size for axis titles.}
+
+\item{xlab}{x axis title.}
+
+\item{ylab}{y axis title.}
+
+\item{xticks}{Logical whether x axis numbers and axis title are plotted.}
+
+\item{border}{Logical whether a bounding box is plotted around top and bottom
+plots.}
+
+\item{showLD}{Logical whether to show LD with colours}
+
+\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for SNPs
+which lack LD information. The next 5 colours are for r2 or D' LD results
+ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
+SNP.}
+
+\item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
+settings. Set to \code{NULL} to hide legend.}
+
+\item{...}{Additional arguments passed to \code{\link[=gg_genetracks]{gg_genetracks()}} to control
+colours of gene tracks etc.}
 }
 \description{
 Genomic locus plot similar to locuszoom.
