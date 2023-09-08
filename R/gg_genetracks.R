@@ -88,7 +88,7 @@ gg_genetracks <- function(locus,
       if (border) rectGrob(gp = gpar(lwd = 1.5), vp = "genetrack"),
       exonGrob(TX, EX, showExons, gene_col, exon_col, exon_border, exheight),
       genetextGrob(text_pos, TX, xrange, cex.text),
-      axGrob(xticks, xlab)),
+      axGrob(xticks, xlab, cex.lab, cex.axis)),
     gp = gpar()
   )
   
@@ -176,11 +176,12 @@ genetextGrob <- function(text_pos, TX, xrange, cex.text) {
 }
 
 
-axGrob <- function(xticks, xlab) {
+axGrob <- function(xticks, xlab, cex.lab, cex.axis) {
   if (xticks) {
     gList(
-      textGrob(xlab, y = unit(-3, "lines"), gp = gpar(fontsize = 12), vp = "genetrack"),
-      xaxisGrob(vp = "genetrack")
+      textGrob(xlab, y = unit(-0.3, "npc"), just = "bottom",
+               gp = gpar(cex = cex.lab, fontsize = 12), vp = "genetrack"),
+      xaxisGrob(name = "geneaxis", gp = gpar(cex = cex.axis), vp = "genetrack")
     )
   }
 }
