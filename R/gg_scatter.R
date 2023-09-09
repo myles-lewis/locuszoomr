@@ -1,8 +1,7 @@
 
 #' Locus scatter plot using ggplot2
 #'
-#' Produces a scatter plot from a 'locus' class object. Intended for use with
-#' [set_layers()].
+#' Produces a scatter plot from a 'locus' class object (without gene tracks).
 #'
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
@@ -22,10 +21,9 @@
 #'   which lack LD information. The next 5 colours are for r2 or D' LD results
 #'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 #'   SNP.
-#' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
-#'   legend.
+#' @param legend_pos Position of legend. Set to `NULL` to hide legend.
 #' @return Returns a ggplot2 plot.
-#' @seealso [locus()] [set_layers()]
+#' @seealso [locus()] [gg_addgenes()]
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)

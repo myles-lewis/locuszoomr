@@ -53,15 +53,13 @@ which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
 
-\item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
-legend.}
+\item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
 }
 \value{
 Returns a ggplot2 plot.
 }
 \description{
-Produces a scatter plot from a 'locus' class object. Intended for use with
-\code{\link[=set_layers]{set_layers()}}.
+Produces a scatter plot from a 'locus' class object (without gene tracks).
 }
 \examples{
 library(EnsDb.Hsapiens.v75)
@@ -70,5 +68,5 @@ loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 gg_scatter(loc)
 }
 \seealso{
-\code{\link[=locus]{locus()}} \code{\link[=set_layers]{set_layers()}}
+\code{\link[=locus]{locus()}} \code{\link[=gg_addgenes]{gg_addgenes()}}
 }
