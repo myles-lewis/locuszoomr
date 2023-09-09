@@ -13,7 +13,7 @@ eqtl_plot(
   pcutoff = NULL,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  cex.axis = 1,
+  cex.axis = 0.9,
   xticks = FALSE,
   border = FALSE,
   add = FALSE,
