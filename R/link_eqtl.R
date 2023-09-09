@@ -14,8 +14,14 @@
 #' @param LDtoken Personal access token for accessing 1000 Genomes LD data via 
 #' LDlink API. See `LDlinkR` package documentation.
 #' @return Returns an object of class 'locus' with an extra list element 'LDexp'
-#'   containing a dataframe of information obtained via `LDexpress()`
-#' @seealso [locus()]
+#'   containing a dataframe of information obtained via `LDexpress()`.
+#' @details
+#' The additional eQTL information obtained from LDlink web server can be
+#' displayed using [eqtl_plot()] which generates a scatter plot with gene tracks
+#' similar to a locus plot, or with [overlay_plot()] which tries to overlay the
+#' EQTL analysis over the original locus results (e.g. GWAS).
+#' 
+#' @seealso [locus()] [eqtl_plot()] [overlay_plot()]
 #' @export
 
 link_eqtl <- function(loc,

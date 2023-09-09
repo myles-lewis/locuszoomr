@@ -20,7 +20,7 @@ LDlink API. See \code{LDlinkR} package documentation.}
 }
 \value{
 Returns an object of class 'locus' with an extra list element 'LDexp'
-containing a dataframe of information obtained via \code{LDexpress()}
+containing a dataframe of information obtained via \code{LDexpress()}.
 }
 \description{
 Adds eQTL (expression quantitative trait loci) information from GTEx
@@ -28,6 +28,12 @@ Adds eQTL (expression quantitative trait loci) information from GTEx
 (https://ldlink.nci.nih.gov/) via the \code{LDlinkR} package to retrieve GTEx eQTL
 information on a reference SNP.
 }
+\details{
+The additional eQTL information obtained from LDlink web server can be
+displayed using \code{\link[=eqtl_plot]{eqtl_plot()}} which generates a scatter plot with gene tracks
+similar to a locus plot, or with \code{\link[=overlay_plot]{overlay_plot()}} which tries to overlay the
+EQTL analysis over the original locus results (e.g. GWAS).
+}
 \seealso{
-\code{\link[=locus]{locus()}}
+\code{\link[=locus]{locus()}} \code{\link[=eqtl_plot]{eqtl_plot()}} \code{\link[=overlay_plot]{overlay_plot()}}
 }
