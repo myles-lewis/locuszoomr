@@ -63,10 +63,12 @@ Returns a ggplot2 plot.
 Produces a scatter plot from a 'locus' class object. Intended for use with
 \code{\link[=set_layers]{set_layers()}}.
 }
-\seealso{
-\code{\link[=locus]{locus()}} \code{\link[=set_layers]{set_layers()}}
+\examples{
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
 loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 gg_scatter(loc)
+}
+\seealso{
+\code{\link[=locus]{locus()}} \code{\link[=set_layers]{set_layers()}}
 }

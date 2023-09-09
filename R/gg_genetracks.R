@@ -30,6 +30,7 @@
 #' placement of gene name labels.
 #' @param draw Logical whether to draw the plot in the current viewport.
 #' @return A grob object.
+#' @examples
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
