@@ -13,7 +13,7 @@
 #' The combined plot is outputted to the current device. A gtable plotting object is
 #' returned invisibly. This can be plotted using [grid.draw()].
 #' @seealso [gg_scatter()] [gg_genetracks()]
-#' @importFrom ggplot2 ggplotGrob find_panel
+#' @importFrom ggplot2 ggplotGrob find_panel layer_scales
 #' @importFrom gtable gtable_add_rows gtable_add_grob
 #' @importFrom grid grid.newpage grid.draw
 #' @export
