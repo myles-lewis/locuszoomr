@@ -19,8 +19,6 @@ BiocManager::install("EnsDb.Hsapiens.v75")
 Install from Github
 ```
 devtools::install_github("myles-lewis/locuszoomr")
-library(locuszoomr)
-library(EnsDb.Hsapiens.v75)
 ```
 
 `locuszoomr` automatically leverages the `LDlinkR` package to query 1000 genomes 
@@ -35,7 +33,16 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 
 ```
 # Locus plot using SLE GWAS data from Bentham et al 2015
-# FTP download full summary statistics from
+# Using subset of data embedded in the package
+library(locuszoomr)
+data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
+
+library(EnsDb.Hsapiens.v75)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
+summary(loc)
+locus_plot(loc)
+
+# Or FTP download the full summary statistics from
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')

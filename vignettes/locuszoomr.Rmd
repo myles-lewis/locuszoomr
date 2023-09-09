@@ -26,9 +26,8 @@ plots very similar to those produced by the web interface locuszoom
 (http://locuszoom.org), but running purely locally in R. It provides 
 customisation to the plots.
 
-These gene annotation plots are produced via R base graphics system. For users
-who prefer the grid system we recommend looking at Bioconductor packages `Gviz`
-or `ggbio`.
+These gene annotation plots are produced via R base graphics system. A ggplot2
+version is also available.
 
 # Installation
 
@@ -59,9 +58,13 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 
 # Example locus plot
 
-The quick example below uses a small subset of a GWAS dataset incorporated into
-the package as a demo. The dataset is from a genetic study on Systemic Lupus
-Erythematosus (SLE) by Bentham et al (2015). The data format is shown below.
+The quick example below uses a small subset (3 loci) of a GWAS dataset
+incorporated into the package as a demo. The dataset is from a genetic study on
+Systemic Lupus Erythematosus (SLE) by Bentham et al (2015). The full GWAS
+summary statistics can be downloaded from
+https://www.ebi.ac.uk/gwas/studies/GCST003156.
+
+The data format is shown below.
 
 ```{r}
 data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
@@ -244,3 +247,5 @@ plot that has been previously created and customised.
 gg_addgenes(p, loc)
 ```
 
+For users who prefer the grid system we recommend also looking at Bioconductor
+packages `Gviz` or `ggbio` as possible alternatives.
