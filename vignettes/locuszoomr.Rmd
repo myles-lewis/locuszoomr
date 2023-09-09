@@ -171,14 +171,14 @@ The gene track can be plotted from a `locus` class object using the function
 `genetrack()`. This uses base graphics, so `layout()` can be used to stack 
 custom-made plots above or below the gene tracks.
 
-```{r}
+```{r fig.dim=c(7, 3.5)}
 genetracks(loc)
 ```
 
 The function allows control over plotting of the gene tracks such as changing
 the number of gene annotation tracks.
 
-```{r}
+```{r fig.dim=c(7, 2.5)}
 # Limit the number of tracks
 # Filter by gene biotype
 # Customise colours
