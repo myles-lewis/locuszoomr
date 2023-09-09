@@ -44,8 +44,6 @@ BiocManager::install("EnsDb.Hsapiens.v75")
 Install from Github
 ```{r eval = FALSE}
 devtools::install_github("myles-lewis/locuszoomr")
-library(locuszoomr)
-library(EnsDb.Hsapiens.v75)
 ```
 
 `locuszoomr` automatically leverages the `LDlinkR` package to query 1000 Genomes 
@@ -62,17 +60,16 @@ The quick example below uses a small subset (3 loci) of a GWAS dataset
 incorporated into the package as a demo. The dataset is from a genetic study on
 Systemic Lupus Erythematosus (SLE) by Bentham et al (2015). The full GWAS
 summary statistics can be downloaded from
-https://www.ebi.ac.uk/gwas/studies/GCST003156.
-
-The data format is shown below.
+https://www.ebi.ac.uk/gwas/studies/GCST003156. The data format is shown below.
 
 ```{r}
+library(locuszoomr)
 data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
 head(SLE_gwas_sub)
 ```
 
 We plot a locus from this dataset by extracting a subset of the data using the
-`locus()` function.
+`locus()` function. Make sure you load the correct Ensembl database.
 
 ```{r warning=FALSE, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
@@ -103,8 +100,8 @@ locus_plot(loc)
 
 The subset of GWAS data included in the `locuszoomr` package has LD data already
 acquired from LDlink which is included in the `r2` column. This can be plotted
-by setting `LD = "r2"`. This method allows users to add their own LD information
-from their own datasets to loci.
+by setting `LD = "r2"`. This method also allows users to add their own LD
+information from their own datasets to loci.
 
 ```{r fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2")
@@ -229,7 +226,7 @@ The gene tracks can be produced on their own as a grid package grob using
 `gg_genetracks()`.
 
 ```{r, eval=FALSE}
-grid.newpage()
+grid::grid.newpage()
 gg_genetracks(loc)
 ```
 

@@ -34,7 +34,7 @@
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
-#' grid.newpage()
+#' grid::grid.newpage()
 #' gg_genetracks(loc)
 #' @importFrom grid viewport linesGrob rectGrob textGrob xaxisGrob gList gTree
 #'   grid.draw gpar
