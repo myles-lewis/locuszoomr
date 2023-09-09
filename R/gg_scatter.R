@@ -26,7 +26,7 @@
 #'   legend.
 #' @return Returns a ggplot2 plot.
 #' @seealso [locus()] [set_layers()]
-#' @importFrom ggplot2 ggplot geom_point xlab ylab theme_classic theme
+#' @importFrom ggplot2 ggplot geom_point labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
 #'  element_blank element_rect unit
 #' @importFrom rlang .data
