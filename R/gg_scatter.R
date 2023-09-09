@@ -26,7 +26,7 @@
 #'   legend.
 #' @return Returns a ggplot2 plot.
 #' @seealso [locus()] [set_layers()]
-#' @importFrom ggplot2 ggplot geom_point labs theme_classic theme
+#' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
 #'  element_blank element_rect unit
 #' @importFrom rlang .data
@@ -105,6 +105,7 @@ gg_scatter <- function(x,
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
+    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(0, NA) +
     labs(x = xlab, y = ylab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),

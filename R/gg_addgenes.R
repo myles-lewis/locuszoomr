@@ -21,6 +21,11 @@
 gg_addgenes <- function(p, loc,
                         height = unit(5, "cm"),
                         ...) {
+  # check x axis range
+  xl <- layer_scales(p)$x$get_limits() * 1e6
+  if (!identical(loc$xrange, xl)) {
+    message("Plot x axis limits and locus range differ: check correct locus?")}
+  
   g <- ggplotGrob(p)
   panels_extent <- g %>% find_panel()
   pg <- g %>%
