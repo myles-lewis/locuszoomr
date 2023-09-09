@@ -18,7 +18,7 @@ gg_genetracks(
   showExons = TRUE,
   maxrows = NULL,
   text_pos = "top",
-  xticks = TRUE,
+  xticks = FALSE,
   xlab = NULL,
   draw = TRUE
 )

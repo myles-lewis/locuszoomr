@@ -47,7 +47,7 @@ gg_genetracks <- function(locus,
                           showExons = TRUE,
                           maxrows = NULL,
                           text_pos = 'top',
-                          xticks = TRUE,
+                          xticks = FALSE,
                           xlab = NULL, 
                           draw = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
@@ -179,9 +179,9 @@ genetextGrob <- function(text_pos, TX, xrange, cex.text) {
 axGrob <- function(xticks, xlab, cex.lab, cex.axis) {
   if (xticks) {
     gList(
-      textGrob(xlab, y = unit(-0.3, "npc"), just = "bottom",
-               gp = gpar(cex = cex.lab, fontsize = 12), vp = "genetrack"),
-      xaxisGrob(name = "geneaxis", gp = gpar(cex = cex.axis), vp = "genetrack")
+      textGrob(xlab, y = unit(-2.5 / cex.lab, "lines"), just = "top",
+               gp = gpar(cex = cex.lab, fontsize = 10.5), vp = "genetrack"),
+      xaxisGrob(name = "geneaxis", gp = gpar(cex = cex.axis, fontsize = 10.5), vp = "genetrack")
     )
   }
 }
