@@ -13,6 +13,12 @@
 #' The combined plot is outputted to the current device. A gtable plotting object is
 #' returned invisibly. This can be plotted using [grid.draw()].
 #' @seealso [gg_scatter()] [gg_genetracks()]
+#' @examples
+#' library(EnsDb.Hsapiens.v75)
+#' data(SLE_gwas_sub)
+#' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+#' p <- gg_scatter(loc)
+#' gg_addgenes(p, loc)
 #' @importFrom ggplot2 ggplotGrob find_panel layer_scales
 #' @importFrom gtable gtable_add_rows gtable_add_grob
 #' @importFrom grid grid.newpage grid.draw

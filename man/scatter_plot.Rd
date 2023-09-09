@@ -10,7 +10,7 @@ scatter_plot(
   chromCol = "royalblue",
   sigCol = "red",
   cex = 1,
-  cex.axis = 1,
+  cex.axis = 0.9,
   cex.lab = 1,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),

@@ -47,7 +47,9 @@
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
 #' locus_plot(loc)
-#' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5)
+#' 
+#' ## Use embedded LD information in column `r2`
+#' loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 #' locus_plot(loc2)
 #' @export
 

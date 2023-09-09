@@ -144,7 +144,7 @@ loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
 loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
 
 # multiplot
-pdf("myplot.pdf", height = 7, width = 10)
+pdf("myplot.pdf", width = 10, height = 7)
 oldpar <- multi_layout(nrow = 1, ncol = 3)
 locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
 locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
@@ -186,10 +186,61 @@ genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
            gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```
 
-# Convert plots to grid objects
+# Layering plots
 
-The `gridGraphics` package can be used to convert locus plots which are produced
-in base graphics to `grid` objects (grobs), which can then be laid out on the
-same page as `ggplot2` plots etc. The `gridBase` package allows `grid` and base
-graphics outputs to be mixed.
+`locuszoomr` has been designed with modular functions to enable layering of
+plots on top of each other in a column with gene tracks on the bottom.
+`scatter_plot()` is used to generate the locus plot. `line_plot()` is used as an
+example of an additional plot. Also see `eqtl_plot()` for plotting eQTL
+information retrieved via LDlinkR.
+
+```{r eval=FALSE}
+pdf("myplot2.pdf", width = 6, height = 8)
+# set up layered plot with 2 plots & a gene track; store old par() settings
+oldpar <- set_layers(2)
+scatter_plot(loc)
+line_plot(loc, col = "orange")
+genetracks(loc)
+par(oldpar)  # revert par() settings
+dev.off()
+```
+
+```{r, echo=FALSE, fig.dim = c(6,8)}
+oldpar <- set_layers(2)
+scatter_plot(loc)
+line_plot(loc, col = "orange")
+genetracks(loc)
+par(oldpar)
+```
+
+# ggplot2 version
+
+`ggplot2` versions of several of the above functions are available. For a whole
+locus plot use `locus_ggplot()`.
+
+```{r, eval=FALSE}
+locus_ggplot(loc)
+```
+
+The gene tracks can be produced on their own as a grid package grob using
+`gg_genetracks()`.
+
+```{r, eval=FALSE}
+grid.newpage()
+gg_genetracks(loc)
+```
+
+The scatter plot alone can be produced as a ggplot2 object.
+
+```{r, eval=FALSE}
+p <- gg_scatter(loc)
+p
+```
+
+Finally, `gg_addgenes()` can be used to add gene tracks to an existing ggplot2
+plot that has been previously created and customised.
+
+```{r, eval=FALSE}
+gg_addgenes(p, loc)
+```
 

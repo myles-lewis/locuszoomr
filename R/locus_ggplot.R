@@ -32,6 +32,11 @@
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
 #'   colours of gene tracks etc.
 #' @seealso [gg_scatter()] [gg_genetracks()]
+#' @examples
+#' library(EnsDb.Hsapiens.v75)
+#' data(SLE_gwas_sub)
+#' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+#' locus_ggplot(loc)
 #' @importFrom ggplot2 ggplotGrob find_panel
 #' @importFrom gtable gtable_add_rows gtable_add_grob
 #' @importFrom grid grid.newpage grid.draw

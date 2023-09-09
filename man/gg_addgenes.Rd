@@ -26,6 +26,13 @@ Adds gene tracks to an existing ggplot2 plot.
 The combined plot is outputted to the current device. A gtable plotting object is
 returned invisibly. This can be plotted using \code{\link[=grid.draw]{grid.draw()}}.
 }
+\examples{
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)
+loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+p <- gg_scatter(loc)
+gg_addgenes(p, loc)
+}
 \seealso{
 \code{\link[=gg_scatter]{gg_scatter()}} \code{\link[=gg_genetracks]{gg_genetracks()}}
 }

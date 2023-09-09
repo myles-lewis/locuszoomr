@@ -26,6 +26,10 @@
 #'   legend.
 #' @return Returns a ggplot2 plot.
 #' @seealso [locus()] [set_layers()]
+#' library(EnsDb.Hsapiens.v75)
+#' data(SLE_gwas_sub)
+#' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+#' gg_scatter(loc)
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
 #'  element_blank element_rect unit
