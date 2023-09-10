@@ -35,7 +35,7 @@ eqtl_plot <- function(x,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
                       cex.axis = 0.9,
-                      xticks = FALSE,
+                      xticks = TRUE,
                       border = FALSE,
                       add = FALSE,
                       align = TRUE, ...) {

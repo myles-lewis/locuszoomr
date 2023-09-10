@@ -131,6 +131,72 @@ locus_plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
                                      'PI4KAP2', 'MIR301B'))
 ```
 
+# Plot gene annotation only
+
+The gene track can be plotted from a `locus` class object using the function 
+`genetrack()`. This uses base graphics, so `layout()` can be used to stack 
+custom-made plots above or below the gene tracks.
+
+```{r fig.dim=c(7, 3.5)}
+genetracks(loc)
+```
+
+The function allows control over plotting of the gene tracks such as changing
+the number of gene annotation tracks and the colour scheme. Set
+`showExons=FALSE` to show only genes and hide the exons.
+
+```{r fig.dim=c(7, 2.5)}
+# Limit the number of tracks
+# Filter by gene biotype
+# Customise colours
+genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
+           gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
+```
+
+# Obtaining eQTL data at a locus via LDlink server
+
+GTEx eQTL data can be accessed via the LDlinkR package which queries the LDlink
+API to download data and add it to a 'locus' object. The eQTL data is stored in
+`LDexp` slot in the locus object.
+
+```{r eval=FALSE}
+# obtain GTEx eQTL data from LDlinkR
+# needs personal access token for LDlink
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc2 <- link_eqtl(loc2, LDtoken = "..")
+head(loc2$LDexp)  # show eQTL data
+```
+
+Often at a locus eQTL data may be available on a range of genes and tissues. The
+following code shows how to see which genes and tissues are available and how
+eQTL SNPs they each have.
+
+```{r eval=FALSE}
+table(loc2$LDexp$Gene_Symbol)
+##      AHCYL2           IRF5            KCP        METTL2B           NRF1   RP11-212P7.2 
+##           5           1618              1              2              9              3 
+## ...
+
+table(loc2$LDexp$Tissue)
+##             Adipose - Subcutaneous          Adipose - Visceral (Omentum) 
+##                                 78                                    69 
+##                      Adrenal Gland                        Artery - Aorta 
+##                                 38                                   109
+## ...
+```
+
+Embedded eQTL data can be plotted using `eqtl_plot()` or shown as an overlay
+plot using `overlay_plot()` which shows GWAS or association data on the *y* axis
+and overlays eQTL results using symbols and colours.
+
+```{r eval=FALSE}
+# just plot eQTL results
+eqtl_plot(loc2, tissue = "Whole Blood", eqtl_gene = "IRF5")
+
+# overlay eqtl plot
+overlay_plot(loc2, eqtl_gene = "IRF5")
+```
+
 # Arrange multiple plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
@@ -140,8 +206,8 @@ plotting locus objects. `multi_layout()` returns a list of original `par()`
 parameters so they can be reset after plotting has finished.
 
 ```{r eval = FALSE}
-loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
-loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
 
 # multiplot
 pdf("myplot.pdf", width = 10, height = 7)
@@ -154,8 +220,8 @@ dev.off()
 ```
 
 ```{r, echo=FALSE, fig.dim = c(10,5)}
-loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
-loc3 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
 
 # multiplot
 oldpar <- multi_layout(nrow = 1, ncol = 3)
@@ -163,27 +229,6 @@ locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
 locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
 locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
 par(oldpar)  # reset to default
-```
-
-# Plot gene annotation only
-
-The gene track can be plotted from a `locus` class object using the function 
-`genetrack()`. This uses base graphics, so `layout()` can be used to stack 
-custom-made plots above or below the gene tracks.
-
-```{r fig.dim=c(7, 3.5)}
-genetracks(loc)
-```
-
-The function allows control over plotting of the gene tracks such as changing
-the number of gene annotation tracks.
-
-```{r fig.dim=c(7, 2.5)}
-# Limit the number of tracks
-# Filter by gene biotype
-# Customise colours
-genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
-           gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```
 
 # Layering plots
@@ -198,8 +243,8 @@ information retrieved via LDlinkR.
 pdf("myplot2.pdf", width = 6, height = 8)
 # set up layered plot with 2 plots & a gene track; store old par() settings
 oldpar <- set_layers(2)
-scatter_plot(loc)
-line_plot(loc, col = "orange")
+scatter_plot(loc, xticks = FALSE)
+line_plot(loc, col = "orange", xticks = FALSE)
 genetracks(loc)
 par(oldpar)  # revert par() settings
 dev.off()
@@ -207,8 +252,8 @@ dev.off()
 
 ```{r, echo=FALSE, fig.dim = c(6,8)}
 oldpar <- set_layers(2)
-scatter_plot(loc)
-line_plot(loc, col = "orange")
+scatter_plot(loc, xticks = FALSE)
+line_plot(loc, col = "orange", xticks = FALSE)
 genetracks(loc)
 par(oldpar)
 ```
@@ -246,3 +291,9 @@ gg_addgenes(p, loc)
 
 For users who prefer the grid system we recommend also looking at Bioconductor
 packages `Gviz` or `ggbio` as possible alternatives.
+
+# References
+
+Pruim RJ, Welch RP, Sanna S, Teslovich TM, Chines PS, Gliedt TP, Boehnke M,
+Abecasis GR, Willer CJ. (2010) LocusZoom: Regional visualization of genome-wide
+association scan results. *Bioinformatics* 2010; 26(18): 2336-7.
