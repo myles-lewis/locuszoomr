@@ -108,7 +108,7 @@ eqtl_plot <- function(x,
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
-    legend(legend_pos, legend = c("Up", "Down"), pch = c(24, 25),
+    legend(legend_pos, legend = c("up eQTL", "down eQTL"), pch = c(24, 25),
            col = col, pt.bg = c(up_cols[6], down_cols[6]),
            bty = "n", cex = 0.9, pt.cex = 1)
   }
