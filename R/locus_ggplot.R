@@ -79,7 +79,7 @@ locus_ggplot <- function(loc, height = unit(5, "cm"),
     gtable_add_grob(gg_genetracks(loc, xticks = (xticks != "top"),
                                   border = border, xlab = xlab,
                                   cex.axis = cex.axis,
-                                  cex.lab = cex.lab, ...),
+                                  cex.lab = cex.lab, draw = FALSE, ...),
                     t = -1, b = -1,
                     l = panels_extent$l, r = panels_extent$l +1)
   grid.newpage()

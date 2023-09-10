@@ -29,8 +29,9 @@
 eqtl_plot <- function(x,
                       tissue = "Whole Blood",
                       eqtl_gene = x$gene,
-                      bg = "royalblue",
-                      col = NA,
+                      up_palette = "Peach",
+                      down_palette = "Blues 2",
+                      col = "black",
                       pcutoff = NULL,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
@@ -55,7 +56,13 @@ eqtl_plot <- function(x,
   data$Effect_Allele_Freq <- as.numeric(data$Effect_Allele_Freq)
   swap <- !is.na(data$Effect_Allele_Freq) & data$Effect_Allele_Freq > 0.5
   data$Effect_Size[swap] <- -data$Effect_Size[swap]
-  data$pch <- sign(data$Effect_Size) / 2 + 24.5
+  data$pch <- -sign(data$Effect_Size) / 2 + 24.5
+  equp <- sign(data$Effect_Size) == 1
+  up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
+  down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
+  ecol <- cut(abs(data$Effect_Size), breaks=6)
+  data$bg[equp] <- up_cols[ecol[equp]]
+  data$bg[!equp] <- down_cols[ecol[!equp]]
   
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   
@@ -72,13 +79,13 @@ eqtl_plot <- function(x,
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data$pos, y = data$logP,
-           pch = data$pch, bg = bg, col = col)
+           pch = data$pch, bg = data$bg, col = col)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     do.call("points", plot.args)
     return()
   }
   plot.args <- list(x = data$pos, y = data$logP,
-                    pch = data$pch, bg = bg, col = col,
+                    pch = data$pch, bg = data$bg, col = col,
                     las = 1, font.main = 1,
                     xlim = x$xrange,
                     ylim = c(0, max(data$logP, na.rm = TRUE)),

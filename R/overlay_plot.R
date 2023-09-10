@@ -28,6 +28,7 @@ overlay_plot <- function(x,
                          alpha = 0.5,
                          tissue = "Whole Blood",
                          eqtl_gene = x$gene,
+                         legend_pos = "topright",
                          ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   if (!"LDexp" %in% names(x)) stop("Missing eQTL data")
@@ -61,14 +62,17 @@ overlay_plot <- function(x,
     down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
     ecol <- cut(abs(x$data$eqtl_effect), breaks=6)
     eqind <- !is.na(x$data$eqtl_effect)
-    equp <- eqind & sign(x$data$eqtl_effect) == -1
-    eqdown <- eqind & sign(x$data$eqtl_effect) == 1
-    x$data$bg[equp] <- down_cols[ecol[equp]]
-    x$data$bg[eqdown] <- up_cols[ecol[eqdown]]
+    eqdown <- eqind & sign(x$data$eqtl_effect) == -1
+    equp <- eqind & sign(x$data$eqtl_effect) == 1
+    x$data$bg[equp] <- up_cols[ecol[equp]]
+    x$data$bg[eqdown] <- down_cols[ecol[eqdown]]
     x$data$pch[eqind] <- 24.5 - sign(x$data$eqtl_effect[eqind]) / 2
     # x$data$col[eqind] <- "black"
     x$data <- x$data[order(x$data$pch), ]
   }
   
   locus_plot(x, col = NA, showLD = FALSE, ...)
+  # if (!is.null(legend_pos)) {
+  #   legend(legend_pos, legend = )
+  # }
 }

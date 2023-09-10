@@ -72,15 +72,11 @@ gg_genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
-  pos <- TX$strand == "+"
-  TX$gene_name[pos] <- paste0(TX$gene_name[pos], sprintf("\u2192"))
-  TX$gene_name[!pos] <- paste0(sprintf("\u2190"), TX$gene_name[!pos])
-  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]
-  
+    
   ylim <- c(-maxrows - 0.3, -0.3)
   xrange <- xrange / 1e6
   TX$start <- TX$start / 1e6
@@ -165,20 +161,33 @@ genetextGrob <- function(text_pos, TX, xrange, cex.text) {
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
-    textGrob(TX$gene_name[tfilter],
-             x = unit(TX$mean[tfilter], "native"),
-             y = unit(-TX$row[tfilter] + 0.45, "native"),
-             gp = gpar(cex = cex.text), vp = "genetrack")
+    tg <- lapply(tfilter, function(i) {
+      textGrob(label = if (TX$strand[i] == "+") {
+        bquote(.(TX$gene_name[i]) * symbol("\256"))
+      } else {     
+        bquote(symbol("\254") * .(TX$gene_name[i]))
+      },
+      x = unit(TX$mean[i], "native"),
+      y = unit(-TX$row[i] + 0.45, "native"),
+      gp = gpar(cex = cex.text), vp = "genetrack")
+    })
   } else if (text_pos == "left") {
     tfilter <- which(TX$tmin > xrange[1])
-    textGrob(TX$gene_name[tfilter],
-             x = unit(pmax(TX$start[tfilter],
-                           xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
-                      "native"),
-             y = unit(-TX$row[tfilter], "native"),
-             just = "right",
-             gp = gpar(cex = cex.text), vp = "genetrack")
+    tg <- lapply(tfilter, function(i) {
+      textGrob(label = if (TX$strand[i] == "+") {
+        bquote(.(TX$gene_name[i]) * symbol("\256"))
+      } else {     
+        bquote(symbol("\254") * .(TX$gene_name[i]))
+      },
+      x = unit(pmax(TX$start[i],
+                    xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
+               "native"),
+      y = unit(-TX$row[i], "native"),
+      just = "right",
+      gp = gpar(cex = cex.text), vp = "genetrack")
+    })
   }
+  do.call(gList, tg)
 }
 
 
