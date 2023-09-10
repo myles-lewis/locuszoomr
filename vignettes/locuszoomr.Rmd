@@ -197,6 +197,10 @@ eqtl_plot(loc2, tissue = "Whole Blood", eqtl_gene = "IRF5")
 overlay_plot(loc2, eqtl_gene = "IRF5")
 ```
 
+```{r, out.width='60%', fig.align="center", echo=FALSE}
+knitr::include_graphics("eqtl_overlay.png")
+```
+
 # Arrange multiple plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
