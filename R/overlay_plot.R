@@ -23,8 +23,8 @@
 
 overlay_plot <- function(x,
                          base_col = 'black',
-                         up_palette = "OrRd",
-                         down_palette = "Blues 3",
+                         up_palette = "Peach",
+                         down_palette = "Blues 2",
                          alpha = 0.5,
                          tissue = "Whole Blood",
                          eqtl_gene = x$gene,
@@ -71,8 +71,13 @@ overlay_plot <- function(x,
     x$data <- x$data[order(x$data$pch), ]
   }
   
-  locus_plot(x, col = NA, showLD = FALSE, ...)
-  # if (!is.null(legend_pos)) {
-  #   legend(legend_pos, legend = )
-  # }
+  if (!is.null(legend_pos)) {
+    legendFUN <- substitute(legend(lpos,
+                                   legend = c("Up", "Down"), pch = c(24, 25),
+                                   pt.bg = cols,
+                                   bty = "n", cex = 0.85, pt.cex = 1, y.intersp = 0.95),
+                            list(lpos = legend_pos, cols = c(up_cols[6], down_cols[6])))
+  } else legendFUN <- NULL
+  
+  locus_plot(x, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
 }

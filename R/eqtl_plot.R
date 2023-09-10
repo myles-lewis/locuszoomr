@@ -31,7 +31,7 @@ eqtl_plot <- function(x,
                       eqtl_gene = x$gene,
                       up_palette = "Peach",
                       down_palette = "Blues 2",
-                      col = "black",
+                      col = NA,
                       pcutoff = NULL,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
@@ -39,7 +39,8 @@ eqtl_plot <- function(x,
                       xticks = TRUE,
                       border = FALSE,
                       add = FALSE,
-                      align = TRUE, ...) {
+                      align = TRUE, 
+                      legend_pos = "topright", ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   
   if (!"LDexp" %in% names(x)) stop("Contains no eQTL data")
@@ -60,7 +61,7 @@ eqtl_plot <- function(x,
   equp <- sign(data$Effect_Size) == 1
   up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
   down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
-  ecol <- cut(abs(data$Effect_Size), breaks=6)
+  ecol <- cut(abs(data$Effect_Size), breaks = 6)
   data$bg[equp] <- up_cols[ecol[equp]]
   data$bg[!equp] <- down_cols[ecol[!equp]]
   
@@ -105,5 +106,10 @@ eqtl_plot <- function(x,
          mgp = c(1.7, 0.4, 0), tcl = -0.3)
   } else if (!border) {
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
+  }
+  if (!is.null(legend_pos)) {
+    legend(legend_pos, legend = c("Up", "Down"), pch = c(24, 25),
+           col = col, pt.bg = c(up_cols[6], down_cols[6]),
+           bty = "n", cex = 0.9, pt.cex = 1)
   }
 }
