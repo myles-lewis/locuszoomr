@@ -14,7 +14,7 @@ scatter_plot(
   cex.lab = 1,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
-  xticks = FALSE,
+  xticks = TRUE,
   border = FALSE,
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
