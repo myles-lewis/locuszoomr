@@ -88,10 +88,6 @@ genetracks <- function(locus,
     on.exit(par(op))
   }
   
-  pos <- TX$strand == "+"
-  TX$gene_name[pos] <- paste0(TX$gene_name[pos], sprintf("\u2192"))
-  TX$gene_name[!pos] <- paste0(sprintf("\u2190"), TX$gene_name[!pos])
-  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
@@ -134,14 +130,26 @@ genetracks <- function(locus,
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
-    text(TX$mean[tfilter], -TX$row[tfilter] + 0.45,
-         labels = TX$gene_name[tfilter], cex = cex.text, xpd = NA)
+    for (i in tfilter) {
+      text(TX$mean[i], -TX[i, 'row'] + 0.45,
+           labels = if (TX$strand[i] == "+") {
+             bquote(.(TX$gene_name[i]) * symbol("\256"))
+           } else {     
+             bquote(symbol("\254") * .(TX$gene_name[i]))
+           }, cex = cex.text, xpd = NA)
+    }
   } else if (text_pos == "left") {
     tfilter <- if (border) {
       which(TX$tmin > xrange[1])
     } else seq_len(nrow(TX))
-    text(pmax(TX$start[tfilter], xrange[1] - diff(xrange) * 0.04), -TX$row[tfilter],
-         labels = TX$gene_name[tfilter], cex = cex.text, pos = 2, xpd = NA)
+    for (i in tfilter) {
+      text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],
+           labels = if (TX$strand[i] == "+") {
+             bquote(.(TX$gene_name[i]) * symbol("\256"))
+           } else {     
+             bquote(symbol("\254") * .(TX$gene_name[i]))
+           }, cex = cex.text, pos = 2, xpd = NA)
+    }
   }
   
 }
@@ -151,7 +159,7 @@ genetracks <- function(locus,
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
                    text_pos = 'top') {
-  gw <- strwidth(TX$gene_name, units = "inch", 
+  gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
