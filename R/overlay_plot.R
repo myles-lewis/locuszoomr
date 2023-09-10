@@ -74,7 +74,7 @@ overlay_plot <- function(x,
   if (!is.null(legend_pos)) {
     legendFUN <- substitute(legend(lpos,
                                    legend = c("Up", "Down"), pch = c(24, 25),
-                                   pt.bg = cols,
+                                   pt.bg = cols, col = NA,
                                    bty = "n", cex = 0.85, pt.cex = 1, y.intersp = 0.95),
                             list(lpos = legend_pos, cols = c(up_cols[6], down_cols[6])))
   } else legendFUN <- NULL
