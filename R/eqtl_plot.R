@@ -7,7 +7,9 @@
 #' @param x Object of class 'locus' to use for plot. See [locus].
 #' @param tissue GTex tissue in which eQTL has been measured
 #' @param eqtl_gene Gene showing eQTL effect
-#' @param bg Fill colour for point symbols
+#' @param scheme Character string specifying palette for effect size showing
+#'   up/downregulation eQTL using [grDevices::hcl.colors]. Alternatively a
+#'   vector of 6 colours.
 #' @param col Outline point colour. `NA` for no outlines.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
@@ -20,6 +22,7 @@
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether set [par()] to align the plot.
+#' @param legend_pos Character value specifying legend position. See [legend()].
 #' @param ... Other arguments passed to [plot()] for the scatter plot.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()] [scatter_plot()]

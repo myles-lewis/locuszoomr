@@ -8,13 +8,13 @@
 #' 
 #' @param x Object of class 'locus' to use for plot. See [locus()].
 #' @param base_col Colour of points for SNPs which do not have eQTLs.
-#' @param up_palette Character string specifying palette for upregulation eQTL
-#'   using [grDevices::hcl.colors]
-#' @param down_palette Character string specifying palette for downregulation
-#'   eQTL using [grDevices::hcl.colors]
-#' @param alpha Alpha opacity for points
+#' @param alpha Alpha opacity for non-eQTL points
+#' @param scheme Character string specifying palette for effect size showing
+#'   up/downregulation eQTL using [grDevices::hcl.colors]. Alternatively a
+#'   vector of 6 colours.
 #' @param tissue GTex tissue in which eQTL has been measured
 #' @param eqtl_gene Gene showing eQTL effect
+#' @param legend_pos Character value specifying legend position. See [legend()].
 #' @param ... Other arguments passed to [locus_plot()] for the locus plot.
 #' @return No return value. Produces a plot using base graphics.
 #' 
@@ -23,9 +23,8 @@
 
 overlay_plot <- function(x,
                          base_col = 'black',
-                         up_palette = "Peach",
-                         down_palette = "Blues 2",
                          alpha = 0.5,
+                         scheme = "RdYlBu",
                          tissue = "Whole Blood",
                          eqtl_gene = x$gene,
                          legend_pos = "topright",
@@ -58,9 +57,12 @@ overlay_plot <- function(x,
     mismatch <- mismatch[!which_rev]
     x$data$eqtl_effect[rev_effect] <- -x$data$eqtl_effect[rev_effect]
     x$data$eqtl_effect[mismatch] <- NA
-    up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
-    down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
-    ecol <- cut(abs(x$data$eqtl_effect), breaks=6)
+    if (length(scheme) == 1) {
+      scheme <- hcl.colors(9, scheme)[-c(4:6)]
+    }
+    up_cols <- rev(scheme[1:3])
+    down_cols <- scheme[4:6]
+    ecol <- cut(abs(x$data$eqtl_effect), breaks = 3)
     eqind <- !is.na(x$data$eqtl_effect)
     eqdown <- eqind & sign(x$data$eqtl_effect) == -1
     equp <- eqind & sign(x$data$eqtl_effect) == 1
@@ -69,15 +71,27 @@ overlay_plot <- function(x,
     x$data$pch[eqind] <- 24.5 - sign(x$data$eqtl_effect[eqind]) / 2
     # x$data$col[eqind] <- "black"
     x$data <- x$data[order(x$data$pch), ]
+    pcex <- rep_len(0.9, nrow(x$data))
+    pcex[x$data$pch != 21] <- 1.1
+    labs <- levels(ecol)
+    cutlev <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
+                    upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
+    cutlev <- signif(cutlev, 2)
   }
   
   if (!is.null(legend_pos)) {
+    legtext <- c(rev(paste(cutlev[,1], cutlev[,2], sep=" : ")),
+                 paste(-cutlev[,2], -cutlev[,1], sep=" : "))
     legendFUN <- substitute(legend(lpos,
-                                   legend = c("up eQTL", "down eQTL"), pch = c(24, 25),
+                                   legend = legtext,
+                                   pch = rep(c(24, 25), each=3),
                                    pt.bg = cols, col = NA,
-                                   bty = "n", cex = 0.85, pt.cex = 1, y.intersp = 0.95),
-                            list(lpos = legend_pos, cols = c(up_cols[6], down_cols[6])))
+                                   title = "eQTL effect",
+                                   bty = "n", cex = 0.85, pt.cex = 1,
+                                   y.intersp = 0.95),
+                            list(lpos = legend_pos, legtext = legtext,
+                                 cols = c(rev(up_cols), down_cols)))
   } else legendFUN <- NULL
   
-  locus_plot(x, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
+  locus_plot(x, cex = pcex, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
 }

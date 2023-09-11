@@ -7,9 +7,8 @@
 overlay_plot(
   x,
   base_col = "black",
-  up_palette = "Peach",
-  down_palette = "Blues 2",
   alpha = 0.5,
+  scheme = "RdYlBu",
   tissue = "Whole Blood",
   eqtl_gene = x$gene,
   legend_pos = "topright",
@@ -21,17 +20,17 @@ overlay_plot(
 
 \item{base_col}{Colour of points for SNPs which do not have eQTLs.}
 
-\item{up_palette}{Character string specifying palette for upregulation eQTL
-using \link[grDevices:palettes]{grDevices::hcl.colors}}
+\item{alpha}{Alpha opacity for non-eQTL points}
 
-\item{down_palette}{Character string specifying palette for downregulation
-eQTL using \link[grDevices:palettes]{grDevices::hcl.colors}}
-
-\item{alpha}{Alpha opacity for points}
+\item{scheme}{Character string specifying palette for effect size showing
+up/downregulation eQTL using \link[grDevices:palettes]{grDevices::hcl.colors}. Alternatively a
+vector of 6 colours.}
 
 \item{tissue}{GTex tissue in which eQTL has been measured}
 
 \item{eqtl_gene}{Gene showing eQTL effect}
+
+\item{legend_pos}{Character value specifying legend position. See \code{\link[=legend]{legend()}}.}
 
 \item{...}{Other arguments passed to \code{\link[=locus_plot]{locus_plot()}} for the locus plot.}
 }

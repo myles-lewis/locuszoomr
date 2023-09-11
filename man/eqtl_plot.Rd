@@ -29,6 +29,10 @@ eqtl_plot(
 
 \item{eqtl_gene}{Gene showing eQTL effect}
 
+\item{scheme}{Character string specifying palette for effect size showing
+up/downregulation eQTL using \link[grDevices:palettes]{grDevices::hcl.colors}. Alternatively a
+vector of 6 colours.}
+
 \item{col}{Outline point colour. \code{NA} for no outlines.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
@@ -50,9 +54,9 @@ new plot.}
 
 \item{align}{Logical whether set \code{\link[=par]{par()}} to align the plot.}
 
-\item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
+\item{legend_pos}{Character value specifying legend position. See \code{\link[=legend]{legend()}}.}
 
-\item{bg}{Fill colour for point symbols}
+\item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.
