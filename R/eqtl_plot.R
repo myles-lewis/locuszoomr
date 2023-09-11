@@ -29,8 +29,7 @@
 eqtl_plot <- function(x,
                       tissue = "Whole Blood",
                       eqtl_gene = x$gene,
-                      up_palette = "Peach",
-                      down_palette = "Blues 2",
+                      scheme = "RdYlBu",
                       col = NA,
                       pcutoff = NULL,
                       xlab = NULL,
@@ -59,11 +58,18 @@ eqtl_plot <- function(x,
   data$Effect_Size[swap] <- -data$Effect_Size[swap]
   data$pch <- -sign(data$Effect_Size) / 2 + 24.5
   equp <- sign(data$Effect_Size) == 1
-  up_cols <- hcl.colors(8, up_palette, rev = TRUE)[-c(1,2)]
-  down_cols <- hcl.colors(8, down_palette, rev = TRUE)[-c(1,2)]
-  ecol <- cut(abs(data$Effect_Size), breaks = 6)
+  if (is.character(scheme)) {
+    scheme <- hcl.colors(9, scheme)[-c(4:6)]
+  }
+  up_cols <- rev(scheme[1:3])
+  down_cols <- scheme[4:6]
+  ecol <- cut(abs(data$Effect_Size), breaks = 3)
   data$bg[equp] <- up_cols[ecol[equp]]
   data$bg[!equp] <- down_cols[ecol[!equp]]
+  labs <- levels(ecol)
+  cutlev <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
+                  upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
+  cutlev <- signif(cutlev, 2)
   
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
   
@@ -108,8 +114,11 @@ eqtl_plot <- function(x,
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
-    legend(legend_pos, legend = c("up eQTL", "down eQTL"), pch = c(24, 25),
-           col = col, pt.bg = c(up_cols[6], down_cols[6]),
+    legtext <- c(rev(paste(cutlev[,1], cutlev[,2], sep=" : ")),
+                 paste(-cutlev[,2], -cutlev[,1], sep=" : "))
+    legend(legend_pos, legend = legtext, pch = rep(c(24, 25), each=3),
+           col = col, pt.bg = c(rev(up_cols), down_cols),
+           title = "eQTL effect",
            bty = "n", cex = 0.9, pt.cex = 1)
   }
 }

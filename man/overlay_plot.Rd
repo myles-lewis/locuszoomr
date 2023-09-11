@@ -7,11 +7,12 @@
 overlay_plot(
   x,
   base_col = "black",
-  up_palette = "OrRd",
-  down_palette = "Blues 3",
+  up_palette = "Peach",
+  down_palette = "Blues 2",
   alpha = 0.5,
   tissue = "Whole Blood",
   eqtl_gene = x$gene,
+  legend_pos = "topright",
   ...
 )
 }

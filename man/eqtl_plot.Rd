@@ -8,7 +8,7 @@ eqtl_plot(
   x,
   tissue = "Whole Blood",
   eqtl_gene = x$gene,
-  bg = "royalblue",
+  scheme = "RdYlBu",
   col = NA,
   pcutoff = NULL,
   xlab = NULL,
@@ -18,6 +18,7 @@ eqtl_plot(
   border = FALSE,
   add = FALSE,
   align = TRUE,
+  legend_pos = "topright",
   ...
 )
 }
@@ -27,8 +28,6 @@ eqtl_plot(
 \item{tissue}{GTex tissue in which eQTL has been measured}
 
 \item{eqtl_gene}{Gene showing eQTL effect}
-
-\item{bg}{Fill colour for point symbols}
 
 \item{col}{Outline point colour. \code{NA} for no outlines.}
 
@@ -52,6 +51,8 @@ new plot.}
 \item{align}{Logical whether set \code{\link[=par]{par()}} to align the plot.}
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
+
+\item{bg}{Fill colour for point symbols}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.
