@@ -122,6 +122,6 @@ eqtl_plot <- function(x,
     legend(legend_pos, legend = legtext, pch = rep(c(24, 25), each=3),
            col = col, pt.bg = c(rev(up_cols), down_cols),
            title = "eQTL effect",
-           bty = "n", cex = 0.9, pt.cex = 1)
+           bty = "n", cex = 0.85, pt.cex = 1, y.intersp = 0.96)
   }
 }

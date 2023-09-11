@@ -88,7 +88,7 @@ overlay_plot <- function(x,
                                    pt.bg = cols, col = NA,
                                    title = "eQTL effect",
                                    bty = "n", cex = 0.85, pt.cex = 1,
-                                   y.intersp = 0.95),
+                                   y.intersp = 0.96),
                             list(lpos = legend_pos, legtext = legtext,
                                  cols = c(rev(up_cols), down_cols)))
   } else legendFUN <- NULL
