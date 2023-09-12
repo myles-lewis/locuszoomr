@@ -6,9 +6,9 @@
 \usage{
 gg_scatter(
   x,
+  index_snp = x$index_snp,
   pcutoff = 5e-08,
-  chromCol = "royalblue",
-  sigCol = "red",
+  scheme = c("royalblue", "red", "purple"),
   size = 2,
   cex.axis = 1,
   cex.lab = 1,
@@ -24,13 +24,15 @@ gg_scatter(
 \arguments{
 \item{x}{Object of class 'locus' to use for plot. See \link{locus}.}
 
+\item{index_snp}{Specifies index SNP to be shown in a different colour and
+symbol. Defaults to the SNP with the lowest p-value. Set to \code{NULL} to not
+show this.}
+
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{chromCol}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
-object is made.}
-
-\item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
+\item{scheme}{Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
+= colour for significant points, 3rd = index SNP.}
 
 \item{size}{Specifies size for points.}
 

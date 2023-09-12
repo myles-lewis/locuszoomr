@@ -5,15 +5,17 @@
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param height A unit object specifying height of the lower gene track.
+#' @param index_snp Specifies index SNP to be shown in a different colour and
+#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
+#'   show this.
 #' @param xticks Character value of either 'top' or 'bottom' specifying whether
 #'   x axis ticks and numbers are plotted on top or bottom plot window.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
-#'   object is made.
-#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param scheme Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
+#'   = colour for significant points, 3rd = index SNP.
 #' @param size Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
@@ -43,9 +45,9 @@
 #' @export
 
 locus_ggplot <- function(loc, height = unit(5, "cm"),
+                         index_snp = loc$index_snp,
                          pcutoff = 5e-08,
-                         chromCol = 'royalblue',
-                         sigCol = 'red',
+                         scheme = c('royalblue', 'red', 'purple'),
                          size = 2,
                          cex.axis = 1,
                          cex.lab = 1,
@@ -59,9 +61,9 @@ locus_ggplot <- function(loc, height = unit(5, "cm"),
                          legend_pos = 'topleft',
                          ...) {
   p <- gg_scatter(loc,
+                  index_snp = index_snp,
                   pcutoff = pcutoff,
-                  chromCol = chromCol,
-                  sigCol = sigCol,
+                  scheme = scheme,
                   size = size,
                   cex.axis = cex.axis,
                   cex.lab = cex.lab,

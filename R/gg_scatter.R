@@ -4,11 +4,13 @@
 #' Produces a scatter plot from a 'locus' class object (without gene tracks).
 #'
 #' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param index_snp Specifies index SNP to be shown in a different colour and
+#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
+#'   show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
-#'   object is made.
-#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param scheme Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
+#'   = colour for significant points, 3rd = index SNP.
 #' @param size Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
@@ -36,9 +38,9 @@
 #' @export
 #' 
 gg_scatter <- function(x,
+                       index_snp = x$index_snp,
                        pcutoff = 5e-08,
-                       chromCol = 'royalblue',
-                       sigCol = 'red',
+                       scheme = c('royalblue', 'red', 'purple'),
                        size = 2,
                        cex.axis = 1,
                        cex.lab = 1,
@@ -58,14 +60,15 @@ gg_scatter <- function(x,
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[which.max(data$logP)] <- 7L
+      data$bg[data[, x$labs] == index_snp] <- 7L
       data$bg <- factor(data$bg)
       data <- data[order(data$bg), ]
       scheme <- rep_len(LD_scheme, 7)
+      if (is.null(index_snp)) scheme <- scheme[1:6]
     } else {
-      data$bg <- chromCol
-      data$bg[data[, x$p] < pcutoff] <- sigCol
-      scheme <- c(chromCol, sigCol)
+      data$bg <- scheme[1]
+      data$bg[data[, x$p] < pcutoff] <- scheme[2]
+      data$bg[data[, x$labs] == index_snp] <- scheme[3]
     }
   }
   
@@ -89,13 +92,9 @@ gg_scatter <- function(x,
       legend.position <- legend_pos
     }
     if (showLD & hasLD) {
-      legend_labels <- rev(c('Index SNP',
-                             expression({0.8 < r^2} <= "1.0"),
-                             expression({0.6 < r^2} <= 0.8),
-                             expression({0.4 < r^2} <= 0.6),
-                             expression({0.2 < r^2} <= 0.4),
-                             expression({"0.0" < r^2} <= 0.2),
-                             expression("No" ~ r^2 ~ "data")))
+      legend_labels <- rev(c("Index SNP", "0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
+                             "0.0 - 0.2", "NA"))
+      if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else legend.position = "none"
   } else legend.position = "none"
   
@@ -104,7 +103,7 @@ gg_scatter <- function(x,
     geom_point(shape = 21, size = size) +
     scale_fill_manual(breaks = levels(data$bg), values = scheme,
                       guide = guide_legend(reverse = TRUE),
-                      labels = legend_labels) +
+                      labels = legend_labels, name = expression({r^2})) +
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
@@ -113,9 +112,9 @@ gg_scatter <- function(x,
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
           axis.title = element_text(size = 10 * cex.lab),
-          legend.title = element_blank(),
           legend.justification = legend.justification,
           legend.position = legend.position,
+          legend.title.align = 0.5,
           legend.text.align = 0,
           legend.key.size = unit(1, 'lines'),
           legend.spacing.y = unit(0, 'lines')) +
