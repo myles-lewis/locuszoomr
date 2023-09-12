@@ -4,6 +4,8 @@ author: "Myles Lewis"
 output:
   html_document:
     toc: true
+    toc_float:
+      collapsed: false
     toc_depth: 2
     number_sections: true
 vignette: >
@@ -49,7 +51,7 @@ devtools::install_github("myles-lewis/locuszoomr")
 `locuszoomr` automatically leverages the `LDlinkR` package to query 1000 Genomes 
 for linkage disequilibrium (LD) across SNPs. In order to make use of this API
 function you will need a personal access token (see the `LDlinkR` vignette), 
-available from the LDlink website https://ldlink.nci.nih.gov/?tab=apiaccess.
+available from the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
 
 Requests to LDlink are cached using the `memoise` package, to reduce API 
 requests. This is helpful when modifying plots for aesthetic reasons.
@@ -80,12 +82,12 @@ locus_plot(loc)
 
 # Obtaining LD information
 
-Once an API personal access token has been obtained, the LDlink API can be
-called using the function `link_LD()` to retrieve LD (linkage disequilibium)
-information at the locus which is overlaid on the locus plot. This is shown as a
-colour overlay showing the level of $r^2$ between SNPs and the index SNP which
-defaults to the SNP with the lowest p-value (or the SNP can be specified
-manually).
+Once an API personal access token has been obtained, the
+[LDlink](https://ldlink.nih.gov/?tab=home) API can be called using the function
+`link_LD()` to retrieve LD (linkage disequilibium) information at the locus
+which is overlaid on the locus plot. This is shown as a colour overlay showing
+the level of $r^2$ between SNPs and the index SNP which defaults to the SNP with
+the lowest p-value (or the SNP can be specified manually).
 
 ```{r eval = FALSE}
 # Locus plot using SLE GWAS data from Bentham et al 2015
@@ -153,11 +155,12 @@ genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
            gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
 ```
 
-# Obtaining eQTL data at a locus via LDlink server
+# Add eQTL data via LDlink
 
-GTEx eQTL data can be accessed via the LDlinkR package which queries the LDlink
-API to download data and add it to a 'locus' object. The eQTL data is stored in
-`LDexp` slot in the locus object.
+GTEx eQTL data can be accessed via the LDlinkR package which queries the
+[LDlink](https://ldlink.nih.gov/?tab=home) server API to download data and add
+it to a 'locus' object. The eQTL data is stored in `LDexp` slot in the locus
+object.
 
 ```{r eval=FALSE}
 # obtain GTEx eQTL data from LDlinkR
