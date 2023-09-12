@@ -5,6 +5,9 @@
 #' [set_layers()].
 #'
 #' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param index_snp Specifies index SNP to be shown in a different colour and
+#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
+#'   show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
@@ -35,6 +38,7 @@
 #' @export
 #' 
 scatter_plot <- function(x,
+                         index_snp = x$index_snp,
                          pcutoff = 5e-08,
                          chromCol = 'royalblue',
                          sigCol = 'red',
@@ -59,13 +63,14 @@ scatter_plot <- function(x,
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[which.max(data$logP)] <- 7L
+      data$bg[data[, x$labs] == index_snp] <- 7L
       data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
     } else {
       data$bg <- chromCol
       data$bg[data[, x$p] < pcutoff] <- sigCol
+      data$bg[data[, x$labs] == index_snp] <- "purple"
     }
   }
   
@@ -79,7 +84,8 @@ scatter_plot <- function(x,
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
-  pch <- 21
+  pch <- rep(21L, nrow(data))
+  pch[data[, x$labs] == index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
@@ -117,14 +123,10 @@ scatter_plot <- function(x,
   if (!is.null(legend_pos)) {
     if (showLD & hasLD) {
       legend(legend_pos,
-             legend = c('Index SNP',
-                        expression({0.8 < r^2} <= "1.0"),
-                        expression({0.6 < r^2} <= 0.8),
-                        expression({0.4 < r^2} <= 0.6),
-                        expression({0.2 < r^2} <= 0.4),
-                        expression({"0.0" < r^2} <= 0.2),
-                        expression("No" ~ r^2 ~ "data")),
-             pch = 21, col = 'black', pt.bg = rev(LD_scheme), bty = 'n', cex = 0.8)
+             legend = c("0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
+                        "0.0 - 0.2"),
+             title = expression({r^2}), y.intersp = 0.96,
+             pch = 21, col = 'black', pt.bg = rev(LD_scheme[-c(1, 7)]), bty = 'n', cex = 0.8)
     }
   }
 }
