@@ -33,7 +33,7 @@
 #' gg_scatter(loc)
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
-#'  element_blank element_rect unit
+#'  element_blank element_rect unit geom_hline
 #' @importFrom rlang .data
 #' @export
 #' 
@@ -69,6 +69,7 @@ gg_scatter <- function(x,
       data$bg <- scheme[1]
       data$bg[data[, x$p] < pcutoff] <- scheme[2]
       data$bg[data[, x$labs] == index_snp] <- scheme[3]
+      data$bg <- factor(data$bg, levels = scheme)
     }
   }
   
@@ -100,6 +101,8 @@ gg_scatter <- function(x,
   
   p <- ggplot(data, aes(x = .data[[x$pos]], y = .data$logP, color = .data$col,
                    fill = .data$bg)) +
+    (if (!is.null(pcutoff)) geom_hline(yintercept = -log10(pcutoff),
+                                       colour = "grey", linetype = "dashed")) +
     geom_point(shape = 21, size = size) +
     scale_fill_manual(breaks = levels(data$bg), values = scheme,
                       guide = guide_legend(reverse = TRUE),
