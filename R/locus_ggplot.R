@@ -86,4 +86,5 @@ locus_ggplot <- function(loc, height = unit(5, "cm"),
                     l = panels_extent$l, r = panels_extent$l +1)
   grid.newpage()
   grid.draw(pg)
+  invisible(pg)
 }

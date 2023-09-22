@@ -154,6 +154,6 @@ summary.locus <- function(object, ...) {
   cat(nrow(object$data), "SNPs/datapoints\n")
   cat(nrow(object$TX), "gene transcripts\n")
   tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
-  cat(paste(tb, names(tb), collapse = ", "))
+  cat(paste(tb, names(tb), collapse = ", "), "\n")
 }
 
