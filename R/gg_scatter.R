@@ -88,7 +88,7 @@ gg_scatter <- function(x,
       legend.position <- c(0.01, 0.99)
     } else if (legend_pos == "topright") {
       legend.justification <- c(1, 1)
-      legend.position <- c(1, 0.99)
+      legend.position <- c(0.99, 0.99)
     } else {
       legend.position <- legend_pos
     }
