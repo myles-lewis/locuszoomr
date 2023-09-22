@@ -31,6 +31,7 @@
 #'   SNP.
 #' @param legend_pos Position of legend e.g. "topleft", "topright" or ggplot2
 #'   settings. Set to `NULL` to hide legend.
+#' @param draw Logical whether to call [grid.draw()] to draw the plot.
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
 #'   colours of gene tracks etc.
 #' @seealso [gg_scatter()] [gg_genetracks()]
@@ -59,6 +60,7 @@ locus_ggplot <- function(loc, height = unit(5, "cm"),
                          LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                        'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
+                         draw = TRUE,
                          ...) {
   p <- gg_scatter(loc,
                   index_snp = index_snp,
@@ -84,7 +86,9 @@ locus_ggplot <- function(loc, height = unit(5, "cm"),
                                   cex.lab = cex.lab, draw = FALSE, ...),
                     t = -1, b = -1,
                     l = panels_extent$l, r = panels_extent$l +1)
-  grid.newpage()
-  grid.draw(pg)
+  if (draw) {
+    grid.newpage()
+    grid.draw(pg)
+  }
   invisible(pg)
 }

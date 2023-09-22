@@ -20,6 +20,7 @@ locus_ggplot(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   legend_pos = "topleft",
+  draw = TRUE,
   ...
 )
 }
@@ -62,6 +63,8 @@ SNP.}
 
 \item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
 settings. Set to \code{NULL} to hide legend.}
+
+\item{draw}{Logical whether to call \code{\link[=grid.draw]{grid.draw()}} to draw the plot.}
 
 \item{...}{Additional arguments passed to \code{\link[=gg_genetracks]{gg_genetracks()}} to control
 colours of gene tracks etc.}

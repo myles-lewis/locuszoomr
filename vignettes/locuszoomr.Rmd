@@ -299,6 +299,25 @@ gg_addgenes(p, loc)
 For users who prefer the grid system we recommend also looking at Bioconductor
 packages `Gviz` or `ggbio` as possible alternatives.
 
+# Layout multiple locus ggplots
+
+It is possible to use either the `cowplot` or `ggpubr` packages to layout
+multiple locus ggplots on the same page.
+
+```{r, fig.dim = c(12, 7)}
+library(cowplot)
+p1 <- locus_ggplot(loc, draw = FALSE)
+p2 <- locus_ggplot(loc2, legend_pos = NULL, draw = FALSE)
+plot_grid(p1, p2, ncol = 2)
+```
+
+Or using ggpubr:
+
+```{r eval=FALSE}
+library(ggpubr)
+ggarrange(p1, p2, ncol = 2)
+```
+
 # References
 
 Pruim RJ, Welch RP, Sanna S, Teslovich TM, Chines PS, Gliedt TP, Boehnke M,
