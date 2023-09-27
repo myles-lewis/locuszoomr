@@ -311,11 +311,18 @@ p2 <- locus_ggplot(loc2, legend_pos = NULL, draw = FALSE)
 plot_grid(p1, p2, ncol = 2)
 ```
 
-Or using ggpubr:
+Or using ggpubr or gridExtra:
 
 ```{r eval=FALSE}
 library(ggpubr)
+pdf("my_ggplot.pdf", width = 10)
 ggarrange(p1, p2, ncol = 2)
+dev.off()
+
+library(gridExtra)
+pdf("my_ggplot.pdf", width = 10)
+grid.arrange(p1, p2, ncol = 2)
+dev.off()
 ```
 
 # References
