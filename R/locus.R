@@ -23,8 +23,11 @@
 #' information. If `NULL` tries to autodetect the column.
 #' @param pos Determines which column in `data` contains position information. 
 #' If `NULL` tries to autodetect the column.
-#' @param p Determines which column in `data` contains SNP p values. 
+#' @param p Determines which column in `data` contains SNP p-values. 
 #' If `NULL` tries to autodetect the column.
+#' @param yvar Specifies column in `data` for plotting on the y axis as an
+#'   alternative to specifying p-values. Both `p` and `yvar` cannot be specified
+#'   simultaneously.
 #' @param labs Determines which column in `data` contains SNP rs IDs.
 #' If `NULL` tries to autodetect the column.
 #' @param index_snp Specifies the index SNP. If not specified, the SNP with the
@@ -35,7 +38,8 @@
 #' the subset of GWAS data to be plotted, 
 #' chromosome and genomic position range, 
 #' Ensembl database version number, 
-#' column names for chromosome, position, SNP ID, p value
+#' column names for chromosome, position, SNP ID, p-value or variable for
+#' plotting on y axis,
 #' locus gene information from Ensembl and
 #' locus exon information from Ensembl.
 #' @examples
@@ -57,7 +61,7 @@
 locus <- function(data, xrange = NULL, seqname = NULL,
                   gene = NULL, flank = 5e4,
                   ens_version = "EnsDb.Hsapiens.v75",
-                  chrom = NULL, pos = NULL, p = NULL,
+                  chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,
                   index_snp = NULL,
                   LD = NULL) {
@@ -80,29 +84,30 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     w <- grep("chr", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       chrom <- colnames(data)[w]
-    } else stop("cannot autodetect chromosome column")
+    } else stop("unable to autodetect chromosome column")
   }
   if (is.null(pos)) {
     w <- grep("pos", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       pos <- colnames(data)[w]
-    } else stop("cannot autodetect SNP position column")
+    } else stop("unable to autodetect SNP position column")
   }
-  if (is.null(p)) {
+  if (!is.null(p) && !is.null(yvar)) stop("cannot specify both `p` and `yvar`")
+  if (is.null(p) && is.null(yvar)) {
     if ("p" %in% colnames(data)) {
       p <- "p"
     } else {
       w <- grep("^p?val", colnames(data), ignore.case = TRUE)
       if (length(w) == 1) {
         p <- colnames(data)[w]
-      } else stop("cannot autodetect p-value column")
+      } else stop("unable to autodetect p-value column")
     }
   }
   if (is.null(labs)) {
     w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       labs <- colnames(data)[w]
-    } else stop("cannot autodetect SNP id column")
+    } else stop("unable to autodetect SNP id column")
   }
   
   # check headings
@@ -114,12 +119,20 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     stop("Column specified by `p` not found in `data`")}
   if (!labs %in% colnames(data)) {
     stop("Column specified by `labs` not found in `data`")}
+  if (!is.null(yvar)) {
+    if (!yvar %in% colnames(data)) {
+      stop("Column specified by `yvar` not found in `data`")
+    }
+  }
   
   data <- data[data[, chrom] == seqname &
                  data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
-  data$logP <- -log10(data[, p])
+  if (is.null(yvar)) {
+    data$logP <- -log10(data[, p])
+    yvar <- "logP"
+  }
   data <- as.data.frame(data)
-  if (is.null(index_snp)) index_snp <- data[which.max(data$logP), labs]
+  if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
   if (is.character(LD)) {
     colnames(data)[which(colnames(data) == LD)] <- "ld"
   }
@@ -137,7 +150,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_version = ens_version,
-              chrom = chrom, pos = pos, p = p, labs = labs,
+              chrom = chrom, pos = pos, p = p, yvar = yvar, labs = labs,
               index_snp = index_snp,
               data = data, TX = TX, EX = EX)
   class(loc) <- "locus"

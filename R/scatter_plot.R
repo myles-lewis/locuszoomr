@@ -18,6 +18,7 @@
 #' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
+#' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
@@ -46,7 +47,8 @@ scatter_plot <- function(x,
                          cex.axis = 0.9,
                          cex.lab = 1,
                          xlab = NULL,
-                         ylab = expression("-log"[10] ~ "P"),
+                         ylab = NULL,
+                         yzero = TRUE,
                          xticks = TRUE,
                          border = FALSE,
                          showLD = TRUE,
@@ -58,6 +60,9 @@ scatter_plot <- function(x,
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (is.null(ylab)) {
+    ylab <- if (x$yvar == "logP") expression("-log"[10] ~ "P") else x$yvar
+  }
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
@@ -92,18 +97,20 @@ scatter_plot <- function(x,
   
   new.args <- list(...)
   if (add) {
-    plot.args <- list(x = data[, x$pos], y = data$logP,
+    plot.args <- list(x = data[, x$pos], y = data[, x$yvar],
                       pch = pch, bg = data$bg, cex = cex)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     do.call("points", plot.args)
     return()
   }
-  plot.args <- list(x = data[, x$pos], y = data$logP,
+  ylim <- range(data[, x$yvar], na.rm = TRUE)
+  ylim[1] <- if (yzero) min(c(0, ylim[1]))
+  plot.args <- list(x = data[, x$pos], y = data[, x$yvar],
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
                cex = cex, cex.axis = cex.axis, cex.lab = cex.lab,
                xlim = x$xrange,
-               ylim = c(0, max(data$logP, na.rm = TRUE)),
+               ylim = ylim,
                xlab = if (xticks) xlab else "",
                ylab = ylab,
                bty = if (border) 'o' else 'l',

@@ -14,6 +14,7 @@ locus(
   chrom = NULL,
   pos = NULL,
   p = NULL,
+  yvar = NULL,
   labs = NULL,
   index_snp = NULL,
   LD = NULL
@@ -41,8 +42,12 @@ information. If \code{NULL} tries to autodetect the column.}
 \item{pos}{Determines which column in \code{data} contains position information.
 If \code{NULL} tries to autodetect the column.}
 
-\item{p}{Determines which column in \code{data} contains SNP p values.
+\item{p}{Determines which column in \code{data} contains SNP p-values.
 If \code{NULL} tries to autodetect the column.}
+
+\item{yvar}{Specifies column in \code{data} for plotting on the y axis as an
+alternative to specifying p-values. Both \code{p} and \code{yvar} cannot be specified
+simultaneously.}
 
 \item{labs}{Determines which column in \code{data} contains SNP rs IDs.
 If \code{NULL} tries to autodetect the column.}
@@ -58,7 +63,8 @@ Returns an object of class 'locus' ready for plotting, containing
 the subset of GWAS data to be plotted,
 chromosome and genomic position range,
 Ensembl database version number,
-column names for chromosome, position, SNP ID, p value
+column names for chromosome, position, SNP ID, p-value or variable for
+plotting on y axis,
 locus gene information from Ensembl and
 locus exon information from Ensembl.
 }
