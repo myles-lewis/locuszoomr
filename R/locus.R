@@ -16,7 +16,10 @@
 #' @param gene Optional specifies which gene to view. Either `xrange` with 
 #' `seqname`, or `gene` must be specified.
 #' @param flank Single value or vector with 2 values for how much flanking 
-#' region left and right of the gene to show.
+#' region left and right of the gene to show. Defaults to 50,000.
+#' @param fix_window Optional alternative to `flank`, which allows users to
+#'   specify a fixed genomic window centred on the specified gene. Both `flank`
+#'   and `fix_window` cannot be specified simultaneously.
 #' @param ens_version Specifies which Ensembl database to query for gene and 
 #' exon positions. See `ensembldb` Bioconductor package.
 #' @param chrom Determines which column in `data` contains chromosome 
@@ -59,7 +62,7 @@
 #' @export
 
 locus <- function(data, xrange = NULL, seqname = NULL,
-                  gene = NULL, flank = 5e4,
+                  gene = NULL, flank = NULL, fix_window = NULL,
                   ens_version = "EnsDb.Hsapiens.v75",
                   chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,
@@ -70,12 +73,21 @@ locus <- function(data, xrange = NULL, seqname = NULL,
          call. = FALSE)
   }
   edb <- get(ens_version)
+  if (!is.null(flank) & !is.null(fix_window))
+    stop("both `flank` and `fix_window` cannot be specified at the same time")
+  if (is.null(flank)) flank <- 5e4
   flank <- rep_len(flank, 2)
   if (!is.null(gene)) {
     locus <- genes(edb, filter = GeneNameFilter(gene))
-    xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
     seqname <- names(seqlengths(locus))
+    if (is.null(fix_window)) {
+      xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
+    } else {
+      m <- mean(c(start(locus), end(locus)))
+      xrange <- c(m - fix_window/2, m + fix_window/2)
+    }
   }
+  xrange <- as.integer(xrange)
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
   message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
   

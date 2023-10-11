@@ -9,7 +9,8 @@ locus(
   xrange = NULL,
   seqname = NULL,
   gene = NULL,
-  flank = 50000,
+  flank = NULL,
+  fix_window = NULL,
   ens_version = "EnsDb.Hsapiens.v75",
   chrom = NULL,
   pos = NULL,
@@ -31,7 +32,11 @@ locus(
 \code{seqname}, or \code{gene} must be specified.}
 
 \item{flank}{Single value or vector with 2 values for how much flanking
-region left and right of the gene to show.}
+region left and right of the gene to show. Defaults to 50,000.}
+
+\item{fix_window}{Optional alternative to \code{flank}, which allows users to
+specify a fixed genomic window centred on the specified gene. Both \code{flank}
+and \code{fix_window} cannot be specified simultaneously.}
 
 \item{ens_version}{Specifies which Ensembl database to query for gene and
 exon positions. See \code{ensembldb} Bioconductor package.}
