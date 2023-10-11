@@ -13,7 +13,8 @@ gg_scatter(
   cex.axis = 1,
   cex.lab = 1,
   xlab = NULL,
-  ylab = expression("-log"[10] ~ "P"),
+  ylab = NULL,
+  yzero = TRUE,
   xticks = TRUE,
   border = FALSE,
   showLD = TRUE,
@@ -43,6 +44,8 @@ to \code{NULL} to disable.}
 \item{xlab}{x axis title.}
 
 \item{ylab}{y axis title.}
+
+\item{yzero}{Logical whether to force y axis limit to include y=0.}
 
 \item{xticks}{Logical whether x axis numbers and axis title are plotted.}
 

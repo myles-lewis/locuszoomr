@@ -16,6 +16,7 @@
 #' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
+#' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around the plot.
 #' @param showLD Logical whether to show LD with colours
@@ -45,7 +46,8 @@ gg_scatter <- function(x,
                        cex.axis = 1,
                        cex.lab = 1,
                        xlab = NULL,
-                       ylab = expression("-log"[10] ~ "P"),
+                       ylab = NULL,
+                       yzero = TRUE,
                        xticks = TRUE,
                        border = FALSE,
                        showLD = TRUE,
@@ -55,6 +57,9 @@ gg_scatter <- function(x,
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
   data <- x$data
   if (is.null(xlab) & xticks) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (is.null(ylab)) {
+    ylab <- if (x$yvar == "logP") expression("-log"[10] ~ "P") else x$yvar
+  }
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
@@ -98,8 +103,10 @@ gg_scatter <- function(x,
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else legend.position = "none"
   } else legend.position = "none"
+  ymin <- min(data[, x$yvar], na.rm = TRUE)
+  if (yzero) ymin <- min(c(0, ymin))
   
-  p <- ggplot(data, aes(x = .data[[x$pos]], y = .data$logP, color = .data$col,
+  p <- ggplot(data, aes(x = .data[[x$pos]], y = .data[[x$yvar]], color = .data$col,
                    fill = .data$bg)) +
     (if (!is.null(pcutoff)) geom_hline(yintercept = -log10(pcutoff),
                                        colour = "grey", linetype = "dashed")) +
@@ -110,7 +117,7 @@ gg_scatter <- function(x,
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(0, NA) +
+    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(ymin, NA) +
     labs(x = xlab, y = ylab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
