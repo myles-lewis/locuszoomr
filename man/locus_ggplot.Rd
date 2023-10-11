@@ -14,7 +14,7 @@ locus_ggplot(
   cex.axis = 1,
   cex.lab = 1,
   xlab = NULL,
-  ylab = expression("-log"[10] ~ "P"),
+  ylab = NULL,
   xticks = "top",
   border = FALSE,
   showLD = TRUE,
