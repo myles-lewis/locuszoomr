@@ -127,7 +127,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
     stop("Column specified by `chrom` not found in `data`")}
   if (!pos %in% colnames(data)) {
     stop("Column specified by `pos` not found in `data`")}
-  if (!p %in% colnames(data)) {
+  if (is.null(yvar) && !p %in% colnames(data)) {
     stop("Column specified by `p` not found in `data`")}
   if (!labs %in% colnames(data)) {
     stop("Column specified by `labs` not found in `data`")}

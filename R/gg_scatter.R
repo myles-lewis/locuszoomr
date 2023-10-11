@@ -103,13 +103,17 @@ gg_scatter <- function(x,
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else legend.position = "none"
   } else legend.position = "none"
-  ymin <- min(data[, x$yvar], na.rm = TRUE)
-  if (yzero) ymin <- min(c(0, ymin))
+  yrange <- range(data[, x$yvar], na.rm = TRUE)
+  yrange[1] <- if (yzero) min(c(0, yrange[1]))
+  ycut <- -log10(pcutoff)
   
   p <- ggplot(data, aes(x = .data[[x$pos]], y = .data[[x$yvar]], color = .data$col,
                    fill = .data$bg)) +
-    (if (!is.null(pcutoff)) geom_hline(yintercept = -log10(pcutoff),
-                                       colour = "grey", linetype = "dashed")) +
+    (if (x$yvar == "logP" & !is.null(pcutoff) & ycut >= yrange[1] & ycut <= yrange[2]) {
+      geom_hline(yintercept = ycut,
+                 colour = "grey", linetype = "dashed")
+    }
+    ) +
     geom_point(shape = 21, size = size) +
     scale_fill_manual(breaks = levels(data$bg), values = scheme,
                       guide = guide_legend(reverse = TRUE),
@@ -117,7 +121,7 @@ gg_scatter <- function(x,
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(ymin, NA) +
+    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(yrange[1], NA) +
     labs(x = xlab, y = ylab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
