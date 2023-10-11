@@ -74,7 +74,7 @@ scatter_plot <- function(x,
       data$bg <- LD_scheme[data$bg]
     } else {
       data$bg <- chromCol
-      data$bg[data[, x$p] < pcutoff] <- sigCol
+      if (x$yvar == "logP") data$bg[data[, x$p] < pcutoff] <- sigCol
       data$bg[data[, x$labs] == index_snp] <- "purple"
     }
   }

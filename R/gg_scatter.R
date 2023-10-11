@@ -72,7 +72,7 @@ gg_scatter <- function(x,
       if (is.null(index_snp)) scheme <- scheme[1:6]
     } else {
       data$bg <- scheme[1]
-      data$bg[data[, x$p] < pcutoff] <- scheme[2]
+      if (x$yvar == "logP") data$bg[data[, x$p] < pcutoff] <- scheme[2]
       data$bg[data[, x$labs] == index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme)
     }
