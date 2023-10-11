@@ -85,7 +85,7 @@ scatter_plot <- function(x,
     on.exit(par(op))
   }
   
-  if (!is.null(pcutoff)) {
+  if (x$yvar == "logP" & !is.null(pcutoff)) {
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
