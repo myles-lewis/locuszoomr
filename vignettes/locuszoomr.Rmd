@@ -80,6 +80,24 @@ summary(loc)
 locus_plot(loc)
 ```
 
+When `locus()` is called, the function tries to autodetect which columns in the
+data object refer to chromosome, position, SNP/feature ID and p-value. These
+columns can be specified manually using the arguments `chrom`, `pos`, `labs` and
+`p` respectively.
+
+# Controlling the locus
+
+The genomic locus can be specified in several ways. The simplest is to specify a
+gene by name/symbol using the `gene` argument. The location of the gene is
+obtained from the specified Ensembl database. The amount of flanking regions can
+either be controlled by specifying `flank` which defaults to 50kb either side of
+the ends of the gene. `flank` can either be a single number or a vector of 2
+numbers if different down/upstream flanking lengths are required. Alternatively
+a fixed genomic window (eg. 1 Mb) centred on the gene of interest can be
+specified using the argument `fix_window`. The locus can be specified manually
+by specifying chromosome using `seqname` and genomic position range using
+`xrange`.
+
 # Obtaining LD information
 
 Once an API personal access token has been obtained, the
@@ -202,6 +220,16 @@ overlay_plot(loc2, eqtl_gene = "IRF5")
 
 ```{r, out.width='60%', fig.align="center", echo=FALSE}
 knitr::include_graphics("eqtl_overlay.png")
+```
+
+# Change *y*-axis variable
+
+Instead of plotting -log~10~ p-value on the y axis, it is possible to specify a
+different variable in your dataset using the argument `yvar`.
+
+```{r fig.dim=c(8, 7)}
+locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta")
+locus_plot(locb)
 ```
 
 # Arrange multiple plots
