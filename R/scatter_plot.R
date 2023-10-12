@@ -100,8 +100,7 @@ scatter_plot <- function(x,
     plot.args <- list(x = data[, x$pos], y = data[, x$yvar],
                       pch = pch, bg = data$bg, cex = cex)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
-    do.call("points", plot.args)
-    return()
+    return(do.call("points", plot.args))
   }
   ylim <- range(data[, x$yvar], na.rm = TRUE)
   ylim[1] <- if (yzero) min(c(0, ylim[1]))
