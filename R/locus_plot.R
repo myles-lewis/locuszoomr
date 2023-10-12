@@ -78,10 +78,6 @@ locus_plot <- function(x,
     on.exit(par(op0), add = TRUE)
   }
   
-  dots <- list(...)
-  # cex.axis <- if ("cex.axis" %in% names(dots)) dots$cex.axis else 1
-  # cex.lab <- if ("cex.lab" %in% names(dots)) dots$cex.lab else 1
-  
   # lower panel gene tracks at locus
   genetracks(x, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.lab, cex.text, gene_col, exon_col, exon_border,
