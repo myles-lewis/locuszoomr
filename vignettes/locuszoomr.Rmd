@@ -268,6 +268,8 @@ par(oldpar)  # reset to default
 
 # Layering plots
 
+## Column of plots
+
 `locuszoomr` has been designed with modular functions to enable layering of
 plots on top of each other in a column with gene tracks on the bottom.
 `scatter_plot()` is used to generate the locus plot. `line_plot()` is used as an
@@ -291,6 +293,25 @@ scatter_plot(loc, xticks = FALSE)
 line_plot(loc, col = "orange", xticks = FALSE)
 genetracks(loc)
 par(oldpar)
+```
+
+## Overlaid plots
+
+`scatter_plot()` can be called with argument `add = TRUE` to add multiple sets
+of points overlaid on one plot.
+
+```{r, echo=FALSE, message=FALSE, fig.dim = c(7,7)}
+dat <- SLE_gwas_sub
+dat$p2 <- -log10(dat$p * 0.1)
+locp <- locus(dat, gene = 'UBE2L3', flank = 1e5)
+locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2")
+
+# set up overlaid plot with 1 plot & a gene track; store old par() settings
+oldpar <- set_layers(1)
+scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
+scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange", add = TRUE)
+genetracks(loc)
+par(oldpar)  # revert par() settings
 ```
 
 # ggplot2 version
