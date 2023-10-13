@@ -116,12 +116,12 @@ query(ah, c("EnsDb", "Homo sapiens"))
 ## 
 ##              title
 ##   AH53211  | Ensembl 87 EnsDb for Homo Sapiens
-##   AH53715  | Ensembl 88 EnsDb for Homo Sapiens
-##   AH56681  | Ensembl 89 EnsDb for Homo Sapiens
-##   AH57757  | Ensembl 90 EnsDb for Homo Sapiens
-##   AH60773  | Ensembl 91 EnsDb for Homo Sapiens
 ##   ...        ...
 ##   AH100643 | Ensembl 106 EnsDb for Homo sapiens
+##   AH104864 | Ensembl 107 EnsDb for Homo sapiens
+##   AH109336 | Ensembl 108 EnsDb for Homo sapiens
+##   AH109606 | Ensembl 109 EnsDb for Homo sapiens
+##   AH113665 | Ensembl 110 EnsDb for Homo sapiens
 ```
 
 Fetch ensembl database version 106.
