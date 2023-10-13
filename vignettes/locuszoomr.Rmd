@@ -328,6 +328,39 @@ genetracks(loc)
 par(oldpar)  # revert par() settings
 ```
 
+# Add custom legend / features
+
+The power of base graphics is that it gives complete control over plotting. In
+the example below, we show how to add your own legend, text labels, lines to
+demarcate a gene and extra points on top or underneath the main plot. When
+`plot()` is called, base graphics allows additional plotting using the arguments
+`panel.first` and `panel.last`. Since these are called inside the `locus_plot()`
+function they need to be quoted using `quote()`.
+
+```{r, message=FALSE, fig.dim = c(7,7)}
+# add vertical lines for gene of interest under the main plot
+pf <- quote({
+  v <- locp$TX[locp$TX$gene_name == "UBE2L3", c("start", "end")]
+  abline(v = v, col = "orange")
+})
+
+pl <- quote({
+  # add text label for index SNP
+  x <- locp$data$pos[locp$data$rsid == locp$index_snp]
+  y <- locp$data$logP[locp$data$rsid == locp$index_snp]
+  text(x, y, locp$index_snp, pos = 4, cex = 0.8)
+  # add extra points
+  x <- rep(22.05e6, 3)
+  y <- 10:12
+  points(x, y, pch = 21, bg = "green")
+  # add custom legend
+  legend("topleft", legend = c("group A", "group B"),
+         pch = 21, pt.bg = c("blue", "green"), bty = "n")
+})
+
+locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl)
+```
+
 # ggplot2 version
 
 `ggplot2` versions of several of the above functions are available. For a whole
