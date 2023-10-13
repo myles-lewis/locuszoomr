@@ -51,4 +51,4 @@ link_eqtl <- function(loc,
 
 mem_LDexpress <- if (requireNamespace("LDlinkR", quietly = TRUE)) {
   memoise(LDlinkR::LDexpress)
-}
+} else function() stop("Package 'LDlinkR' not installed")

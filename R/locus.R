@@ -69,7 +69,7 @@
 
 locus <- function(data, xrange = NULL, seqname = NULL,
                   gene = NULL, flank = NULL, fix_window = NULL,
-                  ens_db = NULL,
+                  ens_db,
                   chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,
                   index_snp = NULL,

@@ -11,7 +11,7 @@ locus(
   gene = NULL,
   flank = NULL,
   fix_window = NULL,
-  ens_db = NULL,
+  ens_db,
   chrom = NULL,
   pos = NULL,
   p = NULL,
