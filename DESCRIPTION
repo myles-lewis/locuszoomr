@@ -8,10 +8,10 @@ Authors@R:
     comment = c(ORCID = "0000-0001-9365-5345")))
 Description:
     Produces publication-ready regional gene locus plots similar to those 
-    produced by the web interface "LocusZoom" (<http://locuszoom.org/>), but 
+    produced by the web interface 'LocusZoom' (<http://locuszoom.org/>), but 
     running locally in R. Genetic or genomic data with gene annotation tracks 
-    are plotted via R base graphics system or ggplot2, allowing flexibility and 
-    easy customisation including laying out multiple locus plots on the same 
+    are plotted via R base graphics system or 'ggplot2', allowing flexibility 
+    and easy customisation including laying out multiple locus plots on the same 
     page. It uses the 'LDlink' API to query linkage disequilibrium data from the 
     1000 Genomes Project and can overlay this on plots.
 Language: en-gb
