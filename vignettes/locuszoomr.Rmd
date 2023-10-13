@@ -49,10 +49,10 @@ Install from Github
 devtools::install_github("myles-lewis/locuszoomr")
 ```
 
-`locuszoomr` automatically leverages the `LDlinkR` package to query 1000 Genomes 
-for linkage disequilibrium (LD) across SNPs. In order to make use of this API
-function you will need a personal access token (see the `LDlinkR` vignette), 
-available from the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
+`locuszoomr` can access the `LDlinkR` package to query 1000 Genomes for linkage
+disequilibrium (LD) across SNPs. In order to make use of this API function you
+will need a personal access token (see the `LDlinkR` vignette), available from
+the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
 
 Requests to LDlink are cached using the `memoise` package, to reduce API 
 requests. This is helpful when modifying plots for aesthetic reasons.
@@ -184,8 +184,8 @@ locus_plot(loc)
 # Plot customisation
 
 Various plotting options can be customised through arguments via the call to
-`locus_plot()`. Plot borders can be set using `border = TRUE`. The chromosome position
-$x$ axis labels can be placed under the top or bottom plots using 
+`locus_plot()`. Plot borders can be set using `border = TRUE`. The chromosome 
+position $x$ axis labels can be placed under the top or bottom plots using 
 `xtick = "top"` or `"bottom"`.
 
 See the help page at `?plot.locus` for more details.
