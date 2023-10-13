@@ -41,11 +41,8 @@ link_LD <- function(loc,
   loc
 }
 
-# original
-# mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
 
 # use memoise to reduce calls to LDlink API
-
 mem_LDmatrix <- if (requireNamespace("LDlinkR", quietly = TRUE)) {
   memoise(LDlinkR::LDmatrix)
 } else function() stop("Package 'LDlinkR' not installed")
