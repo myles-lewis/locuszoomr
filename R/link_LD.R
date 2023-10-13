@@ -15,6 +15,7 @@
 #' @return Returns a list object of class 'locus'. LD information is added as a
 #'   column `ld` in list element `data`.
 #' @seealso [locus()]
+#' @importFrom LDlinkR LDmatrix LDexpress
 #' @export
 
 link_LD <- function(loc,
@@ -43,6 +44,4 @@ link_LD <- function(loc,
 
 
 # use memoise to reduce calls to LDlink API
-mem_LDmatrix <- if (requireNamespace("LDlinkR", quietly = TRUE)) {
-  memoise(LDlinkR::LDmatrix)
-} else function() stop("Package 'LDlinkR' not installed")
+mem_LDmatrix <- memoise(LDlinkR::LDmatrix)

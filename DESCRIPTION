@@ -33,6 +33,7 @@ Imports:
     grDevices,
     grid,
     gtable,
+    LDlinkR,
     memoise,
     plotly,
     rlang
@@ -44,6 +45,5 @@ Suggests:
     data.table,
     EnsDb.Hsapiens.v75,
     knitr,
-    LDlinkR,
     rmarkdown
 VignetteBuilder: knitr
