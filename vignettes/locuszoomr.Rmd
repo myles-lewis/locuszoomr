@@ -92,7 +92,7 @@ columns can be specified manually using the arguments `chrom`, `pos`, `labs` and
 Ensembl databases up to version 86 for *Homo sapiens* were loaded as individual
 packages on Bioconductor. Recent databases are available through the
 `AnnotationHub` Bioconductor package. Below we show a toy example to load
-*H. sapiens* ensembl database v87 (even though it is misaligned with the
+*H. sapiens* ensembl database v106 (even though it is misaligned with the
 genotype data). If the argument `ens_db` in `locus()` is a character string it
 specifies an Ensembl package which is queried through `get()`. For
 `AnnotationHub` databases `ens_db` needs to be set to be the object containing
@@ -102,12 +102,37 @@ the database (not a string).
 library(AnnotationHub)
 ah <- AnnotationHub()
 query(ah, c("EnsDb", "Homo sapiens"))
-ensDb_v87 <- ah[["AH53211"]]  # v87
+```
+
+```{r eval=FALSE}
+## AnnotationHub with 25 records
+## # snapshotDate(): 2023-04-25
+## # $dataprovider: Ensembl
+## # $species: Homo sapiens
+## # $rdataclass: EnsDb
+## # additional mcols(): taxonomyid, genome, description, coordinate_1_based, maintainer,
+## #   rdatadateadded, preparerclass, tags, rdatapath, sourceurl, sourcetype
+## # retrieve records with, e.g., 'object[["AH53211"]]'
+## 
+##              title
+##   AH53211  | Ensembl 87 EnsDb for Homo Sapiens
+##   AH53715  | Ensembl 88 EnsDb for Homo Sapiens
+##   AH56681  | Ensembl 89 EnsDb for Homo Sapiens
+##   AH57757  | Ensembl 90 EnsDb for Homo Sapiens
+##   AH60773  | Ensembl 91 EnsDb for Homo Sapiens
+##   ...        ...
+##   AH100643 | Ensembl 106 EnsDb for Homo sapiens
+```
+
+Fetch ensembl database version 106.
+
+```{r eval=FALSE}
+ensDb_v106 <- ah[["AH100643"]]
 
 # built-in mini dataset
 data("SLE_gwas_sub")
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6,
-             ens_db = ensDb_v87)
+             ens_db = ensDb_v106)
 locus_plot(loc)
 ```
 
