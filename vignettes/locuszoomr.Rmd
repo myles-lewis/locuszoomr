@@ -33,7 +33,8 @@ version is also available.
 
 # Installation
 
-Bioconductor packages `ensembldb` and an Ensembl database package are required 
+Bioconductor packages `ensembldb` and an Ensembl database installed either as a
+package or obtained through Bioconductor packages `AnnotationHub` are required
 before installation.
 
 ```{r eval = FALSE}
@@ -75,7 +76,8 @@ We plot a locus from this dataset by extracting a subset of the data using the
 
 ```{r warning=FALSE, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
+             ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
 ```
@@ -85,24 +87,27 @@ data object refer to chromosome, position, SNP/feature ID and p-value. These
 columns can be specified manually using the arguments `chrom`, `pos`, `labs` and
 `p` respectively.
 
-# Accessing recent Ensembl databases
+# Accessing Ensembl databases
 
-Ensembl database up to version 86 for Homo sapiens were loaded as individual
+Ensembl databases up to version 86 for *Homo sapiens* were loaded as individual
 packages on Bioconductor. Recent databases are available through the
-`AnnotationHub` Bioconductor package. Below we show a toy example to load H.
-sapiens ensembl database v87 (even though it is misaligned with the genotype
-data).
+`AnnotationHub` Bioconductor package. Below we show a toy example to load
+*H. sapiens* ensembl database v87 (even though it is misaligned with the
+genotype data). If the argument `ens_db` in `locus()` is a character string it
+specifies an Ensembl package which is queried through `get()`. For
+`AnnotationHub` databases `ens_db` needs to be set to be the object containing
+the database (not a string).
 
 ```{r eval=FALSE}
 library(AnnotationHub)
 ah <- AnnotationHub()
 query(ah, c("EnsDb", "Homo sapiens"))
-my_ensdb <- ah[["AH53211"]]  # v87
+ensDb_v87 <- ah[["AH53211"]]  # v87
 
 # built-in mini dataset
 data("SLE_gwas_sub")
-
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6, ens_db = my_ensdb)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6,
+             ens_db = ensDb_v87)
 locus_plot(loc)
 ```
 
@@ -134,7 +139,8 @@ the lowest p-value (or the SNP can be specified manually).
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
-loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
+loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5,
+             ens_db = "EnsDb.Hsapiens.v75")
 loc <- link_LD(loc, LDtoken = "your_token")
 locus_plot(loc)
 ```
@@ -337,7 +343,8 @@ locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2")
 # set up overlaid plot with 1 plot & a gene track; store old par() settings
 oldpar <- set_layers(1)
 scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
-scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange", add = TRUE)
+scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
+             add = TRUE)
 genetracks(loc)
 par(oldpar)  # revert par() settings
 ```
@@ -346,12 +353,14 @@ par(oldpar)  # revert par() settings
 dat <- SLE_gwas_sub
 dat$p2 <- -log10(dat$p * 0.1)
 locp <- locus(dat, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
-locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2", ens_db = "EnsDb.Hsapiens.v75")
+locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2",
+               ens_db = "EnsDb.Hsapiens.v75")
 
 # set up overlaid plot with 1 plot & a gene track; store old par() settings
 oldpar <- set_layers(1)
 scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
-scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange", add = TRUE)
+scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
+             add = TRUE)
 genetracks(loc)
 par(oldpar)  # revert par() settings
 ```
