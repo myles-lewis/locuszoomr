@@ -44,4 +44,6 @@ link_LD <- function(loc,
 
 
 # use memoise to reduce calls to LDlink API
-mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
+mem_LDmatrix <- if (requireNamespace("LDlinkR", quietly = TRUE)) {
+  memoise(LDlinkR::LDmatrix)
+}

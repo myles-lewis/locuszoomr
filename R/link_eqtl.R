@@ -49,4 +49,6 @@ link_eqtl <- function(loc,
 }
 
 
-mem_LDexpress <- memoise(LDlinkR::LDexpress)
+mem_LDexpress <- if (requireNamespace("LDlinkR", quietly = TRUE)) {
+  memoise(LDlinkR::LDexpress)
+}
