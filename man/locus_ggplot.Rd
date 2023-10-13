@@ -75,7 +75,8 @@ Genomic locus plot similar to locuszoom.
 \examples{
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
-loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+             ens_db = "EnsDb.Hsapiens.v75")
 locus_ggplot(loc)
 }
 \seealso{

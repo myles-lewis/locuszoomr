@@ -75,7 +75,7 @@ We plot a locus from this dataset by extracting a subset of the data using the
 
 ```{r warning=FALSE, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
 ```
@@ -84,6 +84,27 @@ When `locus()` is called, the function tries to autodetect which columns in the
 data object refer to chromosome, position, SNP/feature ID and p-value. These
 columns can be specified manually using the arguments `chrom`, `pos`, `labs` and
 `p` respectively.
+
+# Accessing recent Ensembl databases
+
+Ensembl database up to version 86 for Homo sapiens were loaded as individual
+packages on Bioconductor. Recent databases are available through the
+`AnnotationHub` Bioconductor package. Below we show a toy example to load H.
+sapiens ensembl database v87 (even though it is misaligned with the genotype
+data).
+
+```{r eval=FALSE}
+library(AnnotationHub)
+ah <- AnnotationHub()
+query(ah, c("EnsDb", "Homo sapiens"))
+my_ensdb <- ah[["AH53211"]]  # v87
+
+# built-in mini dataset
+data("SLE_gwas_sub")
+
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6, ens_db = my_ensdb)
+locus_plot(loc)
+```
 
 # Controlling the locus
 
@@ -113,7 +134,7 @@ the lowest p-value (or the SNP can be specified manually).
 # https://www.ebi.ac.uk/gwas/studies/GCST003156
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
-loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5)
+loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
 loc <- link_LD(loc, LDtoken = "your_token")
 locus_plot(loc)
 ```
@@ -124,7 +145,8 @@ by setting `LD = "r2"`. This method also allows users to add their own LD
 information from their own datasets to loci.
 
 ```{r fig.dim=c(8, 7)}
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2")
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2",
+             ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc)
 ```
 
@@ -183,7 +205,8 @@ object.
 ```{r eval=FALSE}
 # obtain GTEx eQTL data from LDlinkR
 # needs personal access token for LDlink
-loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+              ens_db = "EnsDb.Hsapiens.v75")
 loc2 <- link_eqtl(loc2, LDtoken = "..")
 head(loc2$LDexp)  # show eQTL data
 ```
@@ -228,7 +251,8 @@ Instead of plotting -log~10~ p-value on the y axis, it is possible to specify a
 different variable in your dataset using the argument `yvar`.
 
 ```{r fig.dim=c(8, 7)}
-locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta")
+locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta",
+              ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(locb)
 ```
 
@@ -241,8 +265,10 @@ plotting locus objects. `multi_layout()` returns a list of original `par()`
 parameters so they can be reset after plotting has finished.
 
 ```{r eval = FALSE}
-loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
-loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+              ens_db = "EnsDb.Hsapiens.v75")
+loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
+              ens_db = "EnsDb.Hsapiens.v75")
 
 # multiplot
 pdf("myplot.pdf", width = 10, height = 7)
@@ -255,8 +281,10 @@ dev.off()
 ```
 
 ```{r, echo=FALSE, fig.dim = c(10,5)}
-loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
-loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2")
+loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+              ens_db = "EnsDb.Hsapiens.v75")
+loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
+              ens_db = "EnsDb.Hsapiens.v75")
 
 # multiplot
 oldpar <- multi_layout(nrow = 1, ncol = 3)
@@ -317,8 +345,8 @@ par(oldpar)  # revert par() settings
 ```{r, echo=FALSE, message=FALSE, fig.dim = c(7,7)}
 dat <- SLE_gwas_sub
 dat$p2 <- -log10(dat$p * 0.1)
-locp <- locus(dat, gene = 'UBE2L3', flank = 1e5)
-locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2")
+locp <- locus(dat, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
+locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2", ens_db = "EnsDb.Hsapiens.v75")
 
 # set up overlaid plot with 1 plot & a gene track; store old par() settings
 oldpar <- set_layers(1)

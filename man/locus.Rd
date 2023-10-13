@@ -11,7 +11,7 @@ locus(
   gene = NULL,
   flank = NULL,
   fix_window = NULL,
-  ens_version = "EnsDb.Hsapiens.v75",
+  ens_db = NULL,
   chrom = NULL,
   pos = NULL,
   p = NULL,
@@ -38,8 +38,12 @@ region left and right of the gene to show. Defaults to 50,000.}
 specify a fixed genomic window centred on the specified gene. Both \code{flank}
 and \code{fix_window} cannot be specified simultaneously.}
 
-\item{ens_version}{Specifies which Ensembl database to query for gene and
-exon positions. See \code{ensembldb} Bioconductor package.}
+\item{ens_db}{Either a character string which specifies which Ensembl
+database package (version 86 and earlier for Homo sapiens) to query for
+gene and exon positions (see \code{ensembldb} Bioconductor package). Or an
+\code{ensembldb} object which can be obtained from the AnnotationHub database.
+See the vignette and the \code{AnnotationHub} Bioconductor package for how to
+create this object.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
 information. If \code{NULL} tries to autodetect the column.}
@@ -86,9 +90,11 @@ genes and exons in the locus.
 \examples{
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
+             ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
-loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
+loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5,
+              ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc2)
 }

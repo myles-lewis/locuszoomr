@@ -20,8 +20,12 @@
 #' @param fix_window Optional alternative to `flank`, which allows users to
 #'   specify a fixed genomic window centred on the specified gene. Both `flank`
 #'   and `fix_window` cannot be specified simultaneously.
-#' @param ens_version Specifies which Ensembl database to query for gene and 
-#' exon positions. See `ensembldb` Bioconductor package.
+#' @param ens_db Either a character string which specifies which Ensembl
+#'   database package (version 86 and earlier for Homo sapiens) to query for
+#'   gene and exon positions (see `ensembldb` Bioconductor package). Or an
+#'   `ensembldb` object which can be obtained from the AnnotationHub database.
+#'   See the vignette and the `AnnotationHub` Bioconductor package for how to
+#'   create this object.
 #' @param chrom Determines which column in `data` contains chromosome 
 #' information. If `NULL` tries to autodetect the column.
 #' @param pos Determines which column in `data` contains position information. 
@@ -48,10 +52,12 @@
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
-#' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = FALSE)
+#' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
+#'              ens_db = "EnsDb.Hsapiens.v75")
 #' summary(loc)
 #' locus_plot(loc)
-#' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = FALSE)
+#' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5,
+#'               ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc2)
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
@@ -63,16 +69,18 @@
 
 locus <- function(data, xrange = NULL, seqname = NULL,
                   gene = NULL, flank = NULL, fix_window = NULL,
-                  ens_version = "EnsDb.Hsapiens.v75",
+                  ens_db = NULL,
                   chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,
                   index_snp = NULL,
                   LD = NULL) {
-  if (!ens_version %in% (.packages())) {
-    stop("Ensembl database not loaded. Try: library(", ens_version, ")",
-         call. = FALSE)
-  }
-  edb <- get(ens_version)
+  if (is.character(ens_db)) {
+    if (!ens_db %in% (.packages())) {
+      stop("Ensembl database not loaded. Try: library(", ens_db, ")",
+           call. = FALSE)
+    }
+    edb <- get(ens_db)
+  } else edb <- ens_db
   if (!is.null(flank) & !is.null(fix_window))
     stop("both `flank` and `fix_window` cannot be specified at the same time")
   if (is.null(flank)) flank <- 5e4
@@ -161,7 +169,7 @@ locus <- function(data, xrange = NULL, seqname = NULL,
   EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
-              ens_version = ens_version,
+              ens_db = ens_db,
               chrom = chrom, pos = pos, p = p, yvar = yvar, labs = labs,
               index_snp = index_snp,
               data = data, TX = TX, EX = EX)

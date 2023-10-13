@@ -45,11 +45,13 @@
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
-#' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
+#' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
+#'              ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc)
 #' 
 #' ## Use embedded LD information in column `r2`
-#' loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2")
+#' loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+#'               ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc2)
 #' @export
 
