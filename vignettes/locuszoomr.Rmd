@@ -483,6 +483,12 @@ grid.arrange(p1, p2, ncol = 2)
 dev.off()
 ```
 
+A known issue with the ggplot2 version `locus_ggplot()` is that the system for
+ensuring that gene labels seems to go wrong when the plot window is resized
+during arrangement of multiple plots. The workable solution at present is to
+make sure that the height and width of the final pdf/output is enlarged as per
+the example above, which plots fine without any text overlapping.
+
 # References
 
 Pruim RJ, Welch RP, Sanna S, Teslovich TM, Chines PS, Gliedt TP, Boehnke M,
