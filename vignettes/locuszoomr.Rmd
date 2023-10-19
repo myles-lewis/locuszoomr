@@ -369,7 +369,7 @@ locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2")
 oldpar <- set_layers(1)
 scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
 scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
-             add = TRUE)
+             pch = 22, add = TRUE)
 genetracks(loc)
 par(oldpar)  # revert par() settings
 ```
@@ -385,7 +385,7 @@ locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2",
 oldpar <- set_layers(1)
 scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
 scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
-             add = TRUE)
+             pch = 22, add = TRUE)
 genetracks(loc)
 par(oldpar)  # revert par() settings
 ```
@@ -487,7 +487,8 @@ A known issue with the ggplot2 version `locus_ggplot()` is that the system for
 ensuring that gene labels seems to go wrong when the plot window is resized
 during arrangement of multiple plots. The workable solution at present is to
 make sure that the height and width of the final pdf/output is enlarged as per
-the example above, which plots fine without any text overlapping.
+the example above, which plots fine without any text overlapping when exported
+to pdf at an appropriate size.
 
 # References
 
