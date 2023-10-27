@@ -130,7 +130,7 @@ scatter_plot <- function(x,
   # add labels
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
-    if (i) labels[i] <- x$index_snp
+    if (i) labels[i] <- index_snp
     ind <- match(labels, data[, x$labs])
     lx <- data[ind, x$pos]
     ly <- data[ind, x$yvar]

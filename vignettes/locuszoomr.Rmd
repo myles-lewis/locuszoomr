@@ -183,7 +183,7 @@ information from their own datasets to loci.
 ```{r fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
-locus_plot(loc)
+locus_plot(loc, labels = c("index", "rs7444"))
 ```
 
 # Plot customisation
@@ -193,7 +193,12 @@ Various plotting options can be customised through arguments via the call to
 position $x$ axis labels can be placed under the top or bottom plots using 
 `xtick = "top"` or `"bottom"`.
 
-See the help page at `?plot.locus` for more details.
+Labels can be added by specifying a vector of SNP or genomic feature IDs as
+shown in the plot above. The value `"index"` refers to the index SNP as the
+highest point in the locus or as defined by the argument `index_snp` when
+`locus()` is called.
+
+See the help page at `?locus_plot` for more details.
 
 # Customising gene tracks
 
@@ -445,8 +450,7 @@ pl <- quote({
          pch = 21, pt.bg = c("blue", "green"), bty = "n")
 })
 
-locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl,
-           labels = NULL)
+locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl)
 ```
 
 # ggplot2 version
