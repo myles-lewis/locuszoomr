@@ -21,6 +21,9 @@ scatter_plot(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   legend_pos = "topleft",
+  labels = index_snp,
+  label_x = 4,
+  label_y = 4,
   add = FALSE,
   align = TRUE,
   ...
@@ -67,6 +70,14 @@ SNP.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
+
+\item{labels}{Character vector of SNP or genomic feature IDs to label.
+Defaults to the highest point or index SNP as defined when \code{\link[=locus]{locus()}} is
+called. Set to \code{NULL} to remove all labels.}
+
+\item{label_x}{Value for position of label as percentage of x axis scale.}
+
+\item{label_y}{Value for position of label as percentage of y axis scale.}
 
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}

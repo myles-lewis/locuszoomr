@@ -292,7 +292,7 @@ locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta",
 locus_plot(locb)
 ```
 
-# Produce multiple locus plots
+# Arrange multiple locus plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
 plots side by side, use the function `multi_layout()` to set the number of locus
@@ -336,7 +336,7 @@ multi_layout(ncol = 3,
 dev.off()
 ```
 
-```{r, echo=FALSE, fig.dim = c(10,5)}
+```{r, echo=FALSE, fig.dim = c(9,5)}
 loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",

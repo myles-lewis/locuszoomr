@@ -29,6 +29,11 @@
 #'   SNP.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
+#' @param labels Character vector of SNP or genomic feature IDs to label.
+#'   Defaults to the highest point or index SNP as defined when [locus()] is
+#'   called. Set to `NULL` to remove all labels.
+#' @param label_x Value for position of label as percentage of x axis scale.
+#' @param label_y Value for position of label as percentage of y axis scale.
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -55,6 +60,8 @@ scatter_plot <- function(x,
                          LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                        'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
+                         labels = index_snp,
+                         label_x = 4, label_y = 4,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(x, "locus")) stop("Object of class 'locus' required")
@@ -120,6 +127,22 @@ scatter_plot <- function(x,
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
   
+  # add labels
+  if (!is.null(labels)) {
+    ind <- match(labels, data[, x$labs])
+    lx <- data[ind, x$pos]
+    ly <- data[ind, x$yvar]
+    dx <- diff(par("usr")[1:2]) * label_x /100
+    dy <- diff(par("usr")[3:4]) * label_y /100
+    dlines(lx, ly, dx, dy, xpd = NA)
+    adj <- c(-sign(dx[1]) *0.56+0.5, -sign(dy[1]) +0.5)
+    if (abs(label_x[1]) > abs(label_y[1])) adj[2] <- 0.5
+    if (abs(label_x[1]) < abs(label_y[1])) adj[1] <- 0.5
+    text(lx + dx, ly + dy, data[ind, x$labs],
+         adj = adj,
+         cex = cex.axis *0.95, xpd = NA)
+  }
+  
   if (xticks) {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
          mgp = c(1.7, 0.4, 0), tcl = -0.3)
@@ -137,3 +160,11 @@ scatter_plot <- function(x,
   }
 }
 
+
+dlines <- function(x, y, dx, dy, ...) {
+  mx <- cbind(x, x + dx, NA)
+  my <- cbind(y, y + dy, NA)
+  xs <- as.vector(t(mx))
+  ys <- as.vector(t(my))
+  lines(xs, ys, ...)
+}
