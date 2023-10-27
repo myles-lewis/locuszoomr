@@ -10,11 +10,11 @@
 #' databases using the `ensembldb` Bioconductor package framework for annotating
 #' genes and exons in the locus.
 #' 
+#' @param gene Optional character value specifying which gene to view. Either
+#'   `gene` or `xrange` plus `seqname` must be specified.
 #' @param data Dataset (data.frame or data.table) to use for plot.
-#' @param xrange Vector of genomic position range for the x axis.
-#' @param seqname Specifies which chromosome to plot.
-#' @param gene Optional specifies which gene to view. Either `xrange` with 
-#' `seqname`, or `gene` must be specified.
+#' @param xrange Optional vector of genomic position range for the x axis.
+#' @param seqname Optional, specifies which chromosome to plot.
 #' @param flank Single value or vector with 2 values for how much flanking 
 #' region left and right of the gene to show. Defaults to 50,000.
 #' @param fix_window Optional alternative to `flank`, which allows users to
@@ -67,8 +67,10 @@
 #' @importFrom memoise memoise
 #' @export
 
-locus <- function(data, xrange = NULL, seqname = NULL,
-                  gene = NULL, flank = NULL, fix_window = NULL,
+locus <- function(gene = NULL,
+                  data,
+                  xrange = NULL, seqname = NULL,
+                  flank = NULL, fix_window = NULL,
                   ens_db,
                   chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,

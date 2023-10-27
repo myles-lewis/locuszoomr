@@ -292,27 +292,47 @@ locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta",
 locus_plot(locb)
 ```
 
-# Arrange multiple plots
+# Produce multiple locus plots
 
 `locuszoomr` uses `graphics::layout` to arrange plots. To layout multiple locus
 plots side by side, use the function `multi_layout()` to set the number of locus
-plots per row and column. Then set the argument `use_layout = FALSE` when
-plotting locus objects. `multi_layout()` returns a list of original `par()`
-parameters so they can be reset after plotting has finished.
+plots per row and column. The `plots` argument in `multi_layout()` can either be
+a list of locus class objects, one for each gene. Or for full control it can be
+an 'expression' with a series of manual calls to `locus_plot()`. Alternatively a
+`for` loop could be called within the `plots` expression.
 
 ```{r eval = FALSE}
+genes <- c("STAT4", "IRF5", "UBE2L3")
+
+# generate list of 'locus' class objects, one for each gene
+loclist <- lapply(genes, locus,
+                  data = SLE_gwas_sub,
+                  ens_db = "EnsDb.Hsapiens.v75",
+                  LD = "r2")
+
+## produce 3 locus plots, one on each page
+pdf("myplot.pdf")
+multi_layout(loclist)
+dev.off()
+
+## place 3 locus plots in a row on a single page
+pdf("myplot.pdf")
+multi_layout(loclist, ncol = 3)
+dev.off()
+
+## full control
 loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 
-# multiplot
-pdf("myplot.pdf", width = 10, height = 7)
-oldpar <- multi_layout(nrow = 1, ncol = 3)
-locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
-locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
-locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
-par(oldpar)  # reset to default
+pdf("myplot.pdf", width = 9, height = 6)
+multi_layout(ncol = 3,
+             plots = {
+               locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
+               locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
+               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
+             })
 dev.off()
 ```
 
@@ -322,12 +342,12 @@ loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 
-# multiplot
-oldpar <- multi_layout(nrow = 1, ncol = 3)
-locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
-locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
-locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
-par(oldpar)  # reset to default
+multi_layout(ncol = 3,
+             plots = {
+               locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
+               locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
+               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
+             })
 ```
 
 # Layering plots

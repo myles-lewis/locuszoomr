@@ -5,10 +5,10 @@
 \title{Create locus object for plotting}
 \usage{
 locus(
+  gene = NULL,
   data,
   xrange = NULL,
   seqname = NULL,
-  gene = NULL,
   flank = NULL,
   fix_window = NULL,
   ens_db,
@@ -22,14 +22,14 @@ locus(
 )
 }
 \arguments{
+\item{gene}{Optional character value specifying which gene to view. Either
+\code{gene} or \code{xrange} plus \code{seqname} must be specified.}
+
 \item{data}{Dataset (data.frame or data.table) to use for plot.}
 
-\item{xrange}{Vector of genomic position range for the x axis.}
+\item{xrange}{Optional vector of genomic position range for the x axis.}
 
-\item{seqname}{Specifies which chromosome to plot.}
-
-\item{gene}{Optional specifies which gene to view. Either \code{xrange} with
-\code{seqname}, or \code{gene} must be specified.}
+\item{seqname}{Optional, specifies which chromosome to plot.}
 
 \item{flank}{Single value or vector with 2 values for how much flanking
 region left and right of the gene to show. Defaults to 50,000.}
