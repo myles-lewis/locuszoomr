@@ -432,20 +432,21 @@ pf <- quote({
 })
 
 pl <- quote({
-  # add text label for index SNP
-  x <- locp$data$pos[locp$data$rsid == locp$index_snp]
-  y <- locp$data$logP[locp$data$rsid == locp$index_snp]
-  text(x, y, locp$index_snp, pos = 4, cex = 0.8)
+  # add custom text label for index SNP
+  lx <- locp$data$pos[locp$data$rsid == locp$index_snp]
+  ly <- locp$data$logP[locp$data$rsid == locp$index_snp]
+  text(lx, ly, locp$index_snp, pos = 4, cex = 0.8)
   # add extra points
-  x <- rep(22.05e6, 3)
-  y <- 10:12
-  points(x, y, pch = 21, bg = "green")
+  px <- rep(22.05e6, 3)
+  py <- 10:12
+  points(px, py, pch = 21, bg = "green")
   # add custom legend
   legend("topleft", legend = c("group A", "group B"),
          pch = 21, pt.bg = c("blue", "green"), bty = "n")
 })
 
-locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl)
+locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl,
+           labels = NULL)
 ```
 
 # ggplot2 version
@@ -519,7 +520,7 @@ to pdf at an appropriate size.
 
 For Manhattan plots, log p-value QQ plot and easy labelling of volcano plots or
 other scatter plots, check out our sister package `easylabel` on
-(CRAN)[https://cran.r-project.org/package=easylabel].
+[CRAN](https://cran.r-project.org/package=easylabel).
 
 # References
 
