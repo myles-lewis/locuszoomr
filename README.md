@@ -6,7 +6,8 @@ linkage disequilibrium data from 1000 Genomes.
 
 # Installation
 
-Bioconductor packages `ensembldb` and an Ensembl database package are required 
+Bioconductor packages `ensembldb` and an Ensembl database installed either as a
+package or obtained through Bioconductor packages `AnnotationHub` are required
 before installation.
 
 ```
@@ -14,6 +15,11 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("ensembldb")
 BiocManager::install("EnsDb.Hsapiens.v75")
+```
+
+Install from CRAN
+```
+install.packages("locuszoomr")
 ```
 
 Install from Github

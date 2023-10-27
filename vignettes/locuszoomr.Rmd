@@ -44,6 +44,11 @@ BiocManager::install("ensembldb")
 BiocManager::install("EnsDb.Hsapiens.v75")
 ```
 
+Install from CRAN
+```
+install.packages("locuszoomr")
+```
+
 Install from Github
 ```{r eval = FALSE}
 devtools::install_github("myles-lewis/locuszoomr")
@@ -489,6 +494,12 @@ during arrangement of multiple plots. The workable solution at present is to
 make sure that the height and width of the final pdf/output is enlarged as per
 the example above, which plots fine without any text overlapping when exported
 to pdf at an appropriate size.
+
+# Manhattan & other plots
+
+For Manhattan plots, log p-value QQ plot and easy labelling of volcano plots or
+other scatter plots, check out our sister package `easylabel` on
+(CRAN)[https://cran.r-project.org/package=easylabel].
 
 # References
 
