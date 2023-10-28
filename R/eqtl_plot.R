@@ -4,7 +4,7 @@
 #' Produces a plot of eQTL data embedded in a 'locus' class object. Intended for
 #' use with [set_layers()].
 #'
-#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param tissue GTex tissue in which eQTL has been measured
 #' @param eqtl_gene Gene showing eQTL effect
 #' @param scheme Character string specifying palette for effect size showing
@@ -29,9 +29,9 @@
 #' @importFrom graphics points
 #' @export
 #' 
-eqtl_plot <- function(x,
+eqtl_plot <- function(loc,
                       tissue = "Whole Blood",
-                      eqtl_gene = x$gene,
+                      eqtl_gene = loc$gene,
                       scheme = "RdYlBu",
                       col = NA,
                       pcutoff = NULL,
@@ -43,10 +43,10 @@ eqtl_plot <- function(x,
                       add = FALSE,
                       align = TRUE, 
                       legend_pos = "topright", ...) {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
   if (!"LDexp" %in% names(x)) stop("Contains no eQTL data")
-  data <- x$LDexp
+  data <- loc$LDexp
   data <- data[data$Tissue == tissue & data$Gene_Symbol == eqtl_gene, ]
   if (nrow(data) == 0) stop("No data")
   
@@ -74,7 +74,7 @@ eqtl_plot <- function(x,
                   upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
   cutlev <- signif(cutlev, 2)
   
-  if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   
   # scatter plot
   if (align) {
@@ -97,7 +97,7 @@ eqtl_plot <- function(x,
   plot.args <- list(x = data$pos, y = data$logP,
                     pch = data$pch, bg = data$bg, col = col,
                     las = 1, font.main = 1,
-                    xlim = x$xrange,
+                    xlim = loc$xrange,
                     ylim = c(0, max(data$logP, na.rm = TRUE)),
                     xlab = if (xticks) xlab else "",
                     ylab = ylab,

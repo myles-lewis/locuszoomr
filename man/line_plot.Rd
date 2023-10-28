@@ -5,7 +5,7 @@
 \title{Locus line plot}
 \usage{
 line_plot(
-  x,
+  loc,
   pcutoff = 5e-08,
   xlab = NULL,
   ylab = expression("-log"[10] ~ "P"),
@@ -17,7 +17,7 @@ line_plot(
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \link{locus}.}
+\item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}

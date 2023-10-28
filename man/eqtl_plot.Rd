@@ -5,9 +5,9 @@
 \title{Locus eQTL plot}
 \usage{
 eqtl_plot(
-  x,
+  loc,
   tissue = "Whole Blood",
-  eqtl_gene = x$gene,
+  eqtl_gene = loc$gene,
   scheme = "RdYlBu",
   col = NA,
   pcutoff = NULL,
@@ -23,7 +23,7 @@ eqtl_plot(
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \link{locus}.}
+\item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
 
 \item{tissue}{GTex tissue in which eQTL has been measured}
 

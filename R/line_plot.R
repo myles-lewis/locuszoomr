@@ -4,7 +4,7 @@
 #' Produces a line plot from a 'locus' class object. Intended for use with
 #' [set_layers()].
 #'
-#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param xlab x axis title.
@@ -19,7 +19,7 @@
 #' @seealso [locus()] [set_layers()] [scatter_plot()]
 #' @export
 #' 
-line_plot <- function(x,
+line_plot <- function(loc,
                       pcutoff = 5e-08,
                       xlab = NULL,
                       ylab = expression("-log"[10] ~ "P"),
@@ -27,9 +27,9 @@ line_plot <- function(x,
                       xticks = FALSE,
                       border = FALSE,
                       align = TRUE, ...) {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
-  data <- x$data
-  if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  data <- loc$data
+  if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   
   # line plot
   if (align) {
@@ -42,10 +42,10 @@ line_plot <- function(x,
   } else abl <- NULL
   
   new.args <- list(...)
-  plot.args <- list(x = data[, x$pos], y = data$logP,
+  plot.args <- list(x = data[, loc$pos], y = data$logP,
                     type = "l",
                     las = 1, font.main = 1,
-                    xlim = x$xrange,
+                    xlim = loc$xrange,
                     xlab = if (xticks) xlab else "",
                     ylab = ylab,
                     bty = if (border) 'o' else 'l',
