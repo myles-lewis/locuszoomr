@@ -4,7 +4,7 @@
 #' Produces a scatter plot from a 'locus' class object. Intended for use with
 #' [set_layers()].
 #'
-#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param index_snp Specifies index SNP to be shown in a different colour and
 #'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
 #'   show this.
@@ -43,8 +43,8 @@
 #' @importFrom graphics par legend
 #' @export
 #' 
-scatter_plot <- function(x,
-                         index_snp = x$index_snp,
+scatter_plot <- function(loc,
+                         index_snp = loc$index_snp,
                          pcutoff = 5e-08,
                          chromCol = 'royalblue',
                          sigCol = 'red',
@@ -64,25 +64,25 @@ scatter_plot <- function(x,
                          label_x = 4, label_y = 4,
                          add = FALSE,
                          align = TRUE, ...) {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
-  data <- x$data
-  if (is.null(xlab)) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  data <- loc$data
+  if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
-    ylab <- if (x$yvar == "logP") expression("-log"[10] ~ "P") else x$yvar
+    ylab <- if (loc$yvar == "logP") expression("-log"[10] ~ "P") else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[data[, x$labs] == index_snp] <- 7L
+      data$bg[data[, loc$labs] == index_snp] <- 7L
       data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
     } else {
       data$bg <- chromCol
-      if (x$yvar == "logP") data$bg[data[, x$p] < pcutoff] <- sigCol
-      data$bg[data[, x$labs] == index_snp] <- "purple"
+      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- sigCol
+      data$bg[data[, loc$labs] == index_snp] <- "purple"
     }
   }
   
@@ -92,30 +92,30 @@ scatter_plot <- function(x,
     on.exit(par(op))
   }
   
-  if (x$yvar == "logP" & !is.null(pcutoff)) {
+  if (loc$yvar == "logP" & !is.null(pcutoff)) {
     abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
   } else abl <- NULL
   
   pch <- rep(21L, nrow(data))
-  pch[data[, x$labs] == index_snp] <- 23L
+  pch[data[, loc$labs] == index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
   
   new.args <- list(...)
   if (add) {
-    plot.args <- list(x = data[, x$pos], y = data[, x$yvar],
+    plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                       pch = pch, bg = data$bg, cex = cex)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     return(do.call("points", plot.args))
   }
-  ylim <- range(data[, x$yvar], na.rm = TRUE)
+  ylim <- range(data[, loc$yvar], na.rm = TRUE)
   ylim[1] <- if (yzero) min(c(0, ylim[1]))
-  plot.args <- list(x = data[, x$pos], y = data[, x$yvar],
+  plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
                cex = cex, cex.axis = cex.axis, cex.lab = cex.lab,
-               xlim = x$xrange,
+               xlim = loc$xrange,
                ylim = ylim,
                xlab = if (xticks) xlab else "",
                ylab = ylab,
@@ -131,16 +131,16 @@ scatter_plot <- function(x,
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
     if (i) labels[i] <- index_snp
-    ind <- match(labels, data[, x$labs])
-    lx <- data[ind, x$pos]
-    ly <- data[ind, x$yvar]
+    ind <- match(labels, data[, loc$labs])
+    lx <- data[ind, loc$pos]
+    ly <- data[ind, loc$yvar]
     dx <- diff(par("usr")[1:2]) * label_x /100
     dy <- diff(par("usr")[3:4]) * label_y /100
     dlines(lx, ly, dx, dy, xpd = NA)
     adj <- c(-sign(dx[1]) *0.56+0.5, -sign(dy[1]) +0.5)
     if (abs(label_x[1]) > abs(label_y[1])) adj[2] <- 0.5
     if (abs(label_x[1]) < abs(label_y[1])) adj[1] <- 0.5
-    text(lx + dx, ly + dy, data[ind, x$labs],
+    text(lx + dx, ly + dy, data[ind, loc$labs],
          adj = adj,
          cex = cex.axis *0.95, xpd = NA)
   }
