@@ -45,7 +45,7 @@ eqtl_plot <- function(loc,
                       legend_pos = "topright", ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
-  if (!"LDexp" %in% names(x)) stop("Contains no eQTL data")
+  if (!"LDexp" %in% names(loc)) stop("Contains no eQTL data")
   data <- loc$LDexp
   data <- data[data$Tissue == tissue & data$Gene_Symbol == eqtl_gene, ]
   if (nrow(data) == 0) stop("No data")
