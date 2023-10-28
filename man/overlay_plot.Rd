@@ -5,18 +5,18 @@
 \title{Plot overlaying eQTL and GWAS data}
 \usage{
 overlay_plot(
-  x,
+  loc,
   base_col = "black",
   alpha = 0.5,
   scheme = "RdYlBu",
   tissue = "Whole Blood",
-  eqtl_gene = x$gene,
+  eqtl_gene = loc$gene,
   legend_pos = "topright",
   ...
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
+\item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
 \item{base_col}{Colour of points for SNPs which do not have eQTLs.}
 

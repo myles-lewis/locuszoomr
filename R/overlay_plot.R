@@ -6,7 +6,7 @@
 #' Significant eQTL for the specified gene are overlaid using colours and
 #' symbols.
 #' 
-#' @param x Object of class 'locus' to use for plot. See [locus()].
+#' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param base_col Colour of points for SNPs which do not have eQTLs.
 #' @param alpha Alpha opacity for non-eQTL points
 #' @param scheme Character string specifying palette for effect size showing
@@ -21,58 +21,58 @@
 #' @importFrom grDevices adjustcolor hcl.colors
 #' @export
 
-overlay_plot <- function(x,
+overlay_plot <- function(loc,
                          base_col = 'black',
                          alpha = 0.5,
                          scheme = "RdYlBu",
                          tissue = "Whole Blood",
-                         eqtl_gene = x$gene,
+                         eqtl_gene = loc$gene,
                          legend_pos = "topright",
                          ...) {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
-  if (!"LDexp" %in% names(x)) stop("Missing eQTL data")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  if (!"LDexp" %in% names(loc)) stop("Missing eQTL data")
   if (is.null(eqtl_gene)) stop("eqtl_gene not specified")
   
-  x$data$bg <- adjustcolor(base_col, alpha.f = alpha)
-  x$data$pch <- 21
-  # x$data$col <- NA
+  loc$data$bg <- adjustcolor(base_col, alpha.f = alpha)
+  loc$data$pch <- 21
+  # loc$data$col <- NA
   
-  LDX <- x$LDexp[x$LDexp$Tissue == tissue & x$LDexp$Gene_Symbol == eqtl_gene, ]
+  LDX <- loc$LDexp[loc$LDexp$Tissue == tissue & loc$LDexp$Gene_Symbol == eqtl_gene, ]
   # match by rsid
-  ind <- match(x$data[, x$labs], LDX$RS_ID)
+  ind <- match(loc$data[, loc$labs], LDX$RS_ID)
   message(sum(!is.na(ind)), "/", nrow(LDX), " matched eQTL SNPs (total ", 
-          nrow(x$data), ")")
+          nrow(loc$data), ")")
   
   if (all(is.na(ind))) {
     message("No significant eQTL")
   } else {
-    x$data$eqtl_effect <- NA
-    x$data$eqtl_effect <- LDX$Effect_Size[ind]
-    x$data$eqtl_p <- LDX$P_value[ind]
-    x$data$eqtl_effect_allele <- LDX$Effect_Allele[ind]
+    loc$data$eqtl_effect <- NA
+    loc$data$eqtl_effect <- LDX$Effect_Size[ind]
+    loc$data$eqtl_p <- LDX$P_value[ind]
+    loc$data$eqtl_effect_allele <- LDX$Effect_Allele[ind]
     # gwas allele and eqtl effect allele are the same
-    mismatch <- which(x$data$eqtl_effect_allele != x$data$effect_allele)
-    which_rev <- x$data$other_allele[mismatch] == x$data$eqtl_effect_allele[mismatch]
+    mismatch <- which(loc$data$eqtl_effect_allele != loc$data$effect_allele)
+    which_rev <- loc$data$other_allele[mismatch] == loc$data$eqtl_effect_allele[mismatch]
     rev_effect <- mismatch[which_rev]
     mismatch <- mismatch[!which_rev]
-    x$data$eqtl_effect[rev_effect] <- -x$data$eqtl_effect[rev_effect]
-    x$data$eqtl_effect[mismatch] <- NA
+    loc$data$eqtl_effect[rev_effect] <- -loc$data$eqtl_effect[rev_effect]
+    loc$data$eqtl_effect[mismatch] <- NA
     if (length(scheme) == 1) {
       scheme <- hcl.colors(9, scheme)[-c(4:6)]
     }
     up_cols <- rev(scheme[1:3])
     down_cols <- scheme[4:6]
-    ecol <- cut(abs(x$data$eqtl_effect), breaks = 3)
-    eqind <- !is.na(x$data$eqtl_effect)
-    eqdown <- eqind & sign(x$data$eqtl_effect) == -1
-    equp <- eqind & sign(x$data$eqtl_effect) == 1
-    x$data$bg[equp] <- up_cols[ecol[equp]]
-    x$data$bg[eqdown] <- down_cols[ecol[eqdown]]
-    x$data$pch[eqind] <- 24.5 - sign(x$data$eqtl_effect[eqind]) / 2
-    # x$data$col[eqind] <- "black"
-    x$data <- x$data[order(x$data$pch), ]
-    pcex <- rep_len(0.9, nrow(x$data))
-    pcex[x$data$pch != 21] <- 1.1
+    ecol <- cut(abs(loc$data$eqtl_effect), breaks = 3)
+    eqind <- !is.na(loc$data$eqtl_effect)
+    eqdown <- eqind & sign(loc$data$eqtl_effect) == -1
+    equp <- eqind & sign(loc$data$eqtl_effect) == 1
+    loc$data$bg[equp] <- up_cols[ecol[equp]]
+    loc$data$bg[eqdown] <- down_cols[ecol[eqdown]]
+    loc$data$pch[eqind] <- 24.5 - sign(loc$data$eqtl_effect[eqind]) / 2
+    # loc$data$col[eqind] <- "black"
+    loc$data <- loc$data[order(loc$data$pch), ]
+    pcex <- rep_len(0.9, nrow(loc$data))
+    pcex[loc$data$pch != 21] <- 1.1
     labs <- levels(ecol)
     cutlev <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
                     upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
@@ -93,5 +93,5 @@ overlay_plot <- function(x,
                                  cols = c(rev(up_cols), down_cols)))
   } else legendFUN <- NULL
   
-  locus_plot(x, cex = pcex, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
+  locus_plot(loc, cex = pcex, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
 }
