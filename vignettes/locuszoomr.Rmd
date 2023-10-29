@@ -322,7 +322,7 @@ dev.off()
 
 ## place 3 locus plots in a row on a single page
 pdf("myplot.pdf")
-multi_layout(loclist, ncol = 3)
+multi_layout(loclist, ncol = 3, labels = "index")
 dev.off()
 
 ## full control
@@ -336,7 +336,8 @@ multi_layout(ncol = 3,
              plots = {
                locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
                locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
-               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
+               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL,
+                          labels = "index")
              })
 dev.off()
 ```
@@ -351,7 +352,8 @@ multi_layout(ncol = 3,
              plots = {
                locus_plot(loc, use_layout = FALSE, legend_pos = 'topleft')
                locus_plot(loc2, use_layout = FALSE, legend_pos = NULL)
-               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
+               locus_plot(loc3, use_layout = FALSE, legend_pos = NULL,
+                          labels = "index")
              })
 ```
 

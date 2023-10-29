@@ -65,6 +65,7 @@ genetrack_ly <- function(locus,
   exon_col <- col2hex(exon_col)
   exon_border <- col2hex(exon_border)
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
+  EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   shapes <- lapply(seq_len(nrow(EX)), function(i) {
     list(type = "rect", fillcolor = exon_col, line = list(color = exon_border),
          x0 = EX$start[i], x1 = EX$end[i], xref = "x",
@@ -72,6 +73,11 @@ genetrack_ly <- function(locus,
   })
   TX$tx <- rowMeans(TX[, c('start', 'end')])
   TX$ty <- -TX$row + 0.4
+  TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
+  
+  xlim <- range(locus$data[, locus$pos], na.rm = TRUE) / 1e6
+  xext <- diff(xlim) * 0.05
+  xlim <- xlim + c(-xext, xext)
   
   plot_ly(TX) %>%
     add_segments(x = ~start, y = ~-row,
@@ -82,7 +88,8 @@ genetrack_ly <- function(locus,
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
-                                color = 'black', ticklen = 5),
+                                color = 'black', ticklen = 5,
+                                range = as.list(xlim)),
                    yaxis = list(title = "", showgrid = FALSE, 
                                 showticklabels = FALSE))
 }
