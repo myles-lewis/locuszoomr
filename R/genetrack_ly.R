@@ -96,6 +96,7 @@ genetrack_ly <- function(locus,
                  text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
     add_text(x = ~tx, y = ~ty, text = ~gene_name2,
+             textfont = list(size = 15 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
