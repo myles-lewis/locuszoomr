@@ -44,6 +44,7 @@ scatter_plotly <- function(loc,
     ylab <- if (loc$yvar == "logP") "-log<sub>10</sub> P" else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
+  leg <- list()
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
@@ -56,10 +57,16 @@ scatter_plotly <- function(loc,
                         labels = c("unknown", "0.0 - 0.2", "0.2 - 0.4", "0.4 - 0.6",
                                    "0.6 - 0.8", "0.8 - 1.0", "index"))
       data$bg <- droplevels(data$bg)
+      leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
     } else {
+      showLD <- FALSE
       data$bg <- chromCol
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- sigCol
       data$bg[data[, loc$labs] == index_snp] <- "purple"
+      LD_scheme <- c(chromCol, sigCol, "purple")
+      data$bg <- factor(data$bg, levels = LD_scheme,
+                        labels = c("ns", paste("P <", pcutoff), "index"))
+      data$bg <- droplevels(data$bg)
     }
   }
   
@@ -100,5 +107,7 @@ scatter_plotly <- function(loc,
                                 range = as.list(xlim)),
                    yaxis = list(title = ylab,
                                 ticks = "outside",
-                                showline = TRUE, range = ylim))
+                                showline = TRUE, range = ylim),
+                   legend = leg,
+                   showlegend = showLD | !is.null(pcutoff))
 }
