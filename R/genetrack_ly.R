@@ -67,7 +67,8 @@ genetrack_ly <- function(locus,
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   shapes <- lapply(seq_len(nrow(EX)), function(i) {
-    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border),
+    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
+                                                          width = 0.5),
          x0 = EX$start[i], x1 = EX$end[i], xref = "x",
          y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
   })
@@ -75,17 +76,27 @@ genetrack_ly <- function(locus,
   TX$ty <- -TX$row + 0.4
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  xlim <- locus$xrange / 1e6
+  xlim <- xrange / 1e6
   xext <- diff(xlim) * 0.05
   xlim <- xlim + c(-xext, xext)
+  tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
+             (TX$tmax < xrange[2] + diff(xrange) * 0.04)
+  TX$gene_name2 <- TX$gene_name
+  TX$gene_name2[!tfilter] <- NA
+  
+  hovertext <- paste0(TX$gene_name,
+                      "<br>Gene ID: ", TX$gene_id,
+                      "<br>Biotype: ", TX$gene_biotype,
+                      "<br>Start: ", TX$start * 1e6,
+                      "<br>End: ", TX$end * 1e6)
   
   plot_ly(TX) %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
-                 text = ~gene_name, hoverinfo = 'text',
+                 text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
-    add_text(x = ~tx, y = ~ty, text = ~gene_name,
+    add_text(x = ~tx, y = ~ty, text = ~gene_name2,
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
