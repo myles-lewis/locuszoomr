@@ -74,6 +74,10 @@ scatter_plotly <- function(loc,
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
   
+  xlim <- loc$xrange / 1e6
+  xext <- diff(xlim) * 0.05
+  xlim <- xlim + c(-xext, xext)
+  
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
   ylim[1] <- if (yzero) min(c(0, ylim[1]))
   ydiff <- diff(ylim)
@@ -92,7 +96,8 @@ scatter_plotly <- function(loc,
           hoverinfo = 'text',
           type = "scattergl", mode = "markers") %>%
     plotly::layout(xaxis = list(title = xlab,
-                                ticks = "outside"),
+                                ticks = "outside",
+                                range = as.list(xlim)),
                    yaxis = list(title = ylab,
                                 ticks = "outside",
                                 showline = TRUE, range = ylim))

@@ -75,7 +75,7 @@ genetrack_ly <- function(locus,
   TX$ty <- -TX$row + 0.4
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  xlim <- range(locus$data[, locus$pos], na.rm = TRUE) / 1e6
+  xlim <- locus$xrange / 1e6
   xext <- diff(xlim) * 0.05
   xlim <- xlim + c(-xext, xext)
   
@@ -83,7 +83,8 @@ genetrack_ly <- function(locus,
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
-                 text = ~gene_name, hoverinfo = 'text') %>%
+                 text = ~gene_name, hoverinfo = 'text',
+                 showlegend = FALSE) %>%
     add_text(x = ~tx, y = ~ty, text = ~gene_name,
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
