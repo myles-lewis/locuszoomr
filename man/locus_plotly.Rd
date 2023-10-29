@@ -14,13 +14,27 @@ locus_plotly(loc, heights = c(0.6, 0.4), ...)
 \item{...}{Optional arguments passed to \code{\link[=genetrack_ly]{genetrack_ly()}} to control the gene
 tracks.}
 }
+\value{
+A 'plotly' plotting object showing a scatter plot above gene tracks.
+}
 \description{
 Genomic locus plot similar to locuszoom, using plotly.
 }
 \details{
-This is an R/plotly version of locuszoom for generating publication ready
-Manhattan plots of gene loci. It references Ensembl databases for annotating
-genes and exons. Use \code{\link[=locus]{locus()}} first to generate an object of class 'locus'
-for plotting. LDlink web server can be queried using function \code{\link[=link_LD]{link_LD()}} to
-retrieve linkage disequilibrium (LD) information on the index SNP.
+This is an R/plotly version of locuszoom for exploring regional Manhattan
+plots of gene loci. Use \code{\link[=locus]{locus()}} first to generate an object of class
+'locus' for plotting. This references a selected Ensembl database for
+annotating genes and exons. Hover over the points or gene tracks for more
+information.
+}
+\examples{
+library(EnsDb.Hsapiens.v75)
+data(SLE_gwas_sub)
+loc <- locus(SLE_gwas_sub, gene = "IRF5", flank = c(7e4, 2e5), LD = "r2",
+             ens_db = "EnsDb.Hsapiens.v75")
+locus_plotly(loc)
+
+}
+\seealso{
+\code{\link[=genetrack_ly]{genetrack_ly()}} \code{\link[=locus]{locus()}}
 }
