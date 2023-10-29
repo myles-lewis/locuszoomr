@@ -42,10 +42,14 @@ object is made.}
 
 \item{showLD}{Logical whether to show LD with colours}
 
-\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for SNPs
-which lack LD information. The next 5 colours are for r2 or D' LD results
-ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
-SNP.}
+\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for
+SNPs which lack LD information. The next 5 colours are for r^2 or D' LD
+results ranging from 0 to 1 in intervals of 0.2. The final colour is for
+the index SNP.}
+
+\item{marker_outline}{Specifies colour for outlining points.}
+
+\item{marker_size}{Value for size of markers in plotly units.}
 }
 \value{
 A \code{plotly} scatter plot.
@@ -54,5 +58,5 @@ A \code{plotly} scatter plot.
 Produces a scatter plot from a 'locus' class object using plotly.
 }
 \seealso{
-\code{\link[=locus]{locus()}}
+\code{\link[=locus]{locus()}} \code{\link[=locus_plotly]{locus_plotly()}}
 }

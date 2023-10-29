@@ -16,12 +16,14 @@
 #' @param ylab y axis title.
 #' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param showLD Logical whether to show LD with colours
-#' @param LD_scheme Vector of colours for plotting LD. The first colour is for SNPs
-#'   which lack LD information. The next 5 colours are for r2 or D' LD results
-#'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
-#'   SNP.
+#' @param LD_scheme Vector of colours for plotting LD. The first colour is for
+#'   SNPs which lack LD information. The next 5 colours are for r^2 or D' LD
+#'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
+#'   the index SNP.
+#' @param marker_outline Specifies colour for outlining points.
+#' @param marker_size Value for size of markers in plotly units.
 #' @return A `plotly` scatter plot.
-#' @seealso [locus()]
+#' @seealso [locus()] [locus_plotly()]
 #' @export
 #' 
 scatter_plotly <- function(loc,
