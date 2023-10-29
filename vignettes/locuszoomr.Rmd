@@ -45,7 +45,7 @@ BiocManager::install("EnsDb.Hsapiens.v75")
 ```
 
 Install from CRAN
-```
+```{r eval = FALSE}
 install.packages("locuszoomr")
 ```
 
@@ -342,7 +342,7 @@ multi_layout(ncol = 3,
 dev.off()
 ```
 
-```{r, echo=FALSE, fig.dim = c(9,5)}
+```{r, echo=FALSE, message=FALSE, fig.dim = c(9,5)}
 loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
