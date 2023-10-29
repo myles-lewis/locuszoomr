@@ -7,8 +7,8 @@
 #' This is an R/plotly version of locuszoom for exploring regional Manhattan
 #' plots of gene loci. Use [locus()] first to generate an object of class
 #' 'locus' for plotting. This references a selected Ensembl database for
-#' annotating genes and exons. Hover over the points or gene tracks for more
-#' information.
+#' annotating genes and exons. Hover over the points or gene tracks to reveal
+#' more information.
 #' 
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param heights Vector controlling relative height of each panel on 0-1 scale. 

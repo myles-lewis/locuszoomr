@@ -90,7 +90,7 @@ scatter_plotly <- function(loc,
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
   ylim[1] <- if (yzero) min(c(0, ylim[1]))
   ydiff <- diff(ylim)
-  ylim[2] <- ylim[2] + ydiff * 0.04
+  ylim[2] <- ylim[2] + ydiff * 0.05
   if (ylim[1] != 0) ylim[1] <- ylim[2] - ydiff * 0.02
   
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
@@ -111,5 +111,9 @@ scatter_plotly <- function(loc,
                                 ticks = "outside",
                                 showline = TRUE, range = ylim),
                    legend = leg,
-                   showlegend = showLD | !is.null(pcutoff))
+                   showlegend = showLD | !is.null(pcutoff)) %>%
+    plotly::config(displaylogo = FALSE)
+                   # modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d",
+                   #                            "lasso2d", "zoomIn2d", "zoomOut2d", 
+                   #                            "autoScale2d", "toggleHover"))
 }

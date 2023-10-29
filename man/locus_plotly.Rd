@@ -24,8 +24,8 @@ Genomic locus plot similar to locuszoom, using plotly.
 This is an R/plotly version of locuszoom for exploring regional Manhattan
 plots of gene loci. Use \code{\link[=locus]{locus()}} first to generate an object of class
 'locus' for plotting. This references a selected Ensembl database for
-annotating genes and exons. Hover over the points or gene tracks for more
-information.
+annotating genes and exons. Hover over the points or gene tracks to reveal
+more information.
 }
 \examples{
 library(EnsDb.Hsapiens.v75)

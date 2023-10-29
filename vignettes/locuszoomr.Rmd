@@ -183,7 +183,7 @@ information from their own datasets to loci.
 ```{r fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
-locus_plot(loc, labels = c("index", "rs7444"))
+locus_plot(loc, labels = c("index", "rs5754467"))
 ```
 
 # Plot customisation
@@ -522,11 +522,27 @@ make sure that the height and width of the final pdf/output is enlarged as per
 the example above, which plots fine without any text overlapping when exported
 to pdf at an appropriate size.
 
+# Plotly version
+
+`locuszoomr` includes a ['plotly'](https://plotly.com/r/) version for plotting
+locus plots which is interactive. This allows users to hover over the plot and
+reveal additional information such as SNP rs IDs for each point and information
+about each gene in the gene tracks. This can help when exploring a locus or
+region and trying to identify particular SNPs (or genomic features) of interest.
+
+```{r eval=FALSE}
+locus_plotly(loc2)
+```
+
+```{r, out.width='70%', fig.align="center", echo=FALSE}
+knitr::include_graphics("plotly.png")
+```
+
 # Manhattan & other plots
 
 For Manhattan plots, log p-value QQ plot and easy labelling of volcano plots or
-other scatter plots, check out our sister package `easylabel` on
-[CRAN](https://cran.r-project.org/package=easylabel).
+other scatter plots, check out our sister package `easylabel` on CRAN at
+https://cran.r-project.org/package=easylabel.
 
 # References
 

@@ -103,7 +103,8 @@ genetrack_ly <- function(locus,
                                 color = 'black', ticklen = 5,
                                 range = as.list(xlim)),
                    yaxis = list(title = "", showgrid = FALSE, 
-                                showticklabels = FALSE))
+                                showticklabels = FALSE)) %>%
+    plotly::config(displaylogo = FALSE)
 }
 
 
