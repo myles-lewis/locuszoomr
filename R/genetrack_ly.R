@@ -8,19 +8,16 @@
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
-#' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.text Font size for gene text.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
-#' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
-#' @param border Logical whether a bounding box is plotted.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
 #' border.
-#' @return No return value.
+#' @return A 'plotly' plotting object showing gene tracks.
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
@@ -34,14 +31,11 @@
 genetrack_ly <- function(locus,
                          filter_gene_name = NULL,
                          filter_gene_biotype = NULL,
-                         border = FALSE,
-                         cex.axis = 0.8,
                          cex.text = 0.7,
                          gene_col = 'blue4',
                          exon_col = 'blue4',
                          exon_border = 'blue4',
-                         maxrows = NULL,
-                         xticks = TRUE,
+                         maxrows = 8,
                          xlab = NULL) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
@@ -57,14 +51,19 @@ genetrack_ly <- function(locus,
     message('No genes to plot')
     return(plotly_empty())
   }
+  if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
+  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
+  if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
+  TX <- TX[TX$row <= maxrows, ]
+  EX <- EX[EX$gene_id %in% TX$gene_id, ]
   
   gene_col <- col2hex(gene_col)
   exon_col <- col2hex(exon_col)
   exon_border <- col2hex(exon_border)
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
+  
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   shapes <- lapply(seq_len(nrow(EX)), function(i) {
     list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,

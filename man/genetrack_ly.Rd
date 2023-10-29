@@ -8,14 +8,11 @@ genetrack_ly(
   locus,
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
-  border = FALSE,
-  cex.axis = 0.8,
   cex.text = 0.7,
   gene_col = "blue4",
   exon_col = "blue4",
   exon_border = "blue4",
-  maxrows = NULL,
-  xticks = TRUE,
+  maxrows = 8,
   xlab = NULL
 )
 }
@@ -27,10 +24,6 @@ genetrack_ly(
 \item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
 \code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
-
-\item{border}{Logical whether a bounding box is plotted.}
-
-\item{cex.axis}{Specifies font size for axis numbering.}
 
 \item{cex.text}{Font size for gene text.}
 
@@ -44,13 +37,11 @@ border.}
 \item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
 
-\item{xticks}{Logical whether x axis ticks and numbers are plotted.}
-
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
 }
 \value{
-No return value.
+A 'plotly' plotting object showing gene tracks.
 }
 \description{
 Plot gene annotation tracks from \code{ensembldb} data using \code{plotly}.
