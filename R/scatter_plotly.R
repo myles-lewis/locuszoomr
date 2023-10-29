@@ -91,7 +91,7 @@ scatter_plotly <- function(loc,
   ylim[1] <- if (yzero) min(c(0, ylim[1]))
   ydiff <- diff(ylim)
   ylim[2] <- ylim[2] + ydiff * 0.05
-  if (ylim[1] != 0) ylim[1] <- ylim[2] - ydiff * 0.02
+  ylim[1] <- if (ylim[1] != 0) ylim[1] - ydiff *0.05 else ylim[1] - ydiff *0.02
   
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
