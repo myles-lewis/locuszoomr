@@ -51,11 +51,11 @@ scatter_plotly <- function(loc,
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] == index_snp] <- 7L
       data <- data[order(data$bg), ]
-      LD_scheme <- rep_len(LD_scheme, 7)
-      data$bg <- LD_scheme[data$bg]
-      data$bg <- factor(data$bg, levels = LD_scheme,
-                        labels = c("unknown", "0.0 - 0.2", "0.2 - 0.4", "0.4 - 0.6",
-                                   "0.6 - 0.8", "0.8 - 1.0", "index"))
+      LD_scheme <- rep_len(LD_scheme, 7 - is.null(index_snp))
+      data$bg <- factor(data$bg, levels = 1:7,
+                        labels = c("unknown", "0.0 - 0.2", "0.2 - 0.4",
+                                   "0.4 - 0.6", "0.6 - 0.8", "0.8 - 1.0",
+                                   "index"))
       data$bg <- droplevels(data$bg)
       leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
     } else {
