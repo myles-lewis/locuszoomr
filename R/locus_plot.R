@@ -10,7 +10,7 @@
 #' plotting. LDlink web server can be queried using function [link_LD()] to
 #' retrieve linkage disequilibrium (LD) information on the index SNP.
 #' 
-#' @param x Object of class 'locus' to use for plot. See [locus()].
+#' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param filter_gene_name Vector of gene names to display.
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
@@ -55,7 +55,7 @@
 #' locus_plot(loc2)
 #' @export
 
-locus_plot <- function(x,
+locus_plot <- function(loc,
                        filter_gene_name = NULL,
                        filter_gene_biotype = NULL,
                        xlab = NULL,
@@ -73,7 +73,7 @@ locus_plot <- function(x,
                        exon_col = 'blue4',
                        exon_border = 'blue4',
                        text_pos = 'top', ...) {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
   if (use_layout) {
     op0 <- set_layers(1, heights, rev = TRUE)
@@ -81,13 +81,13 @@ locus_plot <- function(x,
   }
   
   # lower panel gene tracks at locus
-  genetracks(x, filter_gene_name, filter_gene_biotype,
+  genetracks(loc, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.lab, cex.text, gene_col, exon_col, exon_border,
              showExons, maxrows, text_pos, xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "")
   
   # upper panel plot points
-  scatter_plot(x, xticks = (xticks == 'top'),
+  scatter_plot(loc, xticks = (xticks == 'top'),
                border = border, xlab = xlab,
                cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, ...)
 }

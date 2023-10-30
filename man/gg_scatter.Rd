@@ -5,8 +5,8 @@
 \title{Locus scatter plot using ggplot2}
 \usage{
 gg_scatter(
-  x,
-  index_snp = x$index_snp,
+  loc,
+  index_snp = loc$index_snp,
   pcutoff = 5e-08,
   scheme = c("royalblue", "red", "purple"),
   size = 2,
@@ -23,7 +23,7 @@ gg_scatter(
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \link{locus}.}
+\item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
 
 \item{index_snp}{Specifies index SNP to be shown in a different colour and
 symbol. Defaults to the SNP with the lowest p-value. Set to \code{NULL} to not

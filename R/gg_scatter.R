@@ -3,7 +3,7 @@
 #'
 #' Produces a scatter plot from a 'locus' class object (without gene tracks).
 #'
-#' @param x Object of class 'locus' to use for plot. See [locus].
+#' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param index_snp Specifies index SNP to be shown in a different colour and
 #'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
 #'   show this.
@@ -39,8 +39,8 @@
 #' @importFrom rlang .data
 #' @export
 #' 
-gg_scatter <- function(x,
-                       index_snp = x$index_snp,
+gg_scatter <- function(loc,
+                       index_snp = loc$index_snp,
                        pcutoff = 5e-08,
                        scheme = c('royalblue', 'red', 'purple'),
                        size = 2,
@@ -55,32 +55,32 @@ gg_scatter <- function(x,
                        LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                      'orange', 'red', 'purple'),
                        legend_pos = 'topleft') {
-  if (!inherits(x, "locus")) stop("Object of class 'locus' required")
-  data <- x$data
-  if (is.null(xlab) & xticks) xlab <- paste("Chromosome", x$seqname, "(Mb)")
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  data <- loc$data
+  if (is.null(xlab) & xticks) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
-    ylab <- if (x$yvar == "logP") expression("-log"[10] ~ "P") else x$yvar
+    ylab <- if (loc$yvar == "logP") expression("-log"[10] ~ "P") else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[data[, x$labs] == index_snp] <- 7L
+      data$bg[data[, loc$labs] == index_snp] <- 7L
       data$bg <- factor(data$bg)
       data <- data[order(data$bg), ]
       scheme <- rep_len(LD_scheme, 7)
       if (is.null(index_snp)) scheme <- scheme[1:6]
     } else {
       data$bg <- scheme[1]
-      if (x$yvar == "logP") data$bg[data[, x$p] < pcutoff] <- scheme[2]
-      data$bg[data[, x$labs] == index_snp] <- scheme[3]
+      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
+      data$bg[data[, loc$labs] == index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme)
     }
   }
   
   # scatter plot
-  data[, x$pos] <- data[, x$pos] / 1e6
+  data[, loc$pos] <- data[, loc$pos] / 1e6
   if (!"col" %in% colnames(data)) data$col <- "black"
   data$col <- as.factor(data$col)
   # if (!"pch" %in% colnames(data)) data$pch <- 21
@@ -104,13 +104,13 @@ gg_scatter <- function(x,
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else legend.position = "none"
   } else legend.position = "none"
-  yrange <- range(data[, x$yvar], na.rm = TRUE)
+  yrange <- range(data[, loc$yvar], na.rm = TRUE)
   yrange[1] <- if (yzero) min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
   
-  p <- ggplot(data, aes(x = .data[[x$pos]], y = .data[[x$yvar]], color = .data$col,
+  p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], color = .data$col,
                    fill = .data$bg)) +
-    (if (x$yvar == "logP" & !is.null(pcutoff) & ycut >= yrange[1] & ycut <= yrange[2]) {
+    (if (loc$yvar == "logP" & !is.null(pcutoff) & ycut >= yrange[1] & ycut <= yrange[2]) {
       geom_hline(yintercept = ycut,
                  colour = "grey", linetype = "dashed")
     }
@@ -122,7 +122,7 @@ gg_scatter <- function(x,
     scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                        guide = "none") +
     # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    xlim(x$xrange[1] / 1e6, x$xrange[2] / 1e6) + ylim(yrange[1], NA) +
+    xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) + ylim(yrange[1], NA) +
     labs(x = xlab, y = ylab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),

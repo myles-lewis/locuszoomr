@@ -5,7 +5,7 @@
 \title{Locus plot}
 \usage{
 locus_plot(
-  x,
+  loc,
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   xlab = NULL,
@@ -27,7 +27,7 @@ locus_plot(
 )
 }
 \arguments{
-\item{x}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
+\item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
 \item{filter_gene_name}{Vector of gene names to display.}
 
