@@ -25,15 +25,17 @@
 #' @param border Logical whether a bounding box is plotted around top and bottom
 #'   plots.
 #' @param showLD Logical whether to show LD with colours
-#' @param LD_scheme Vector of colours for plotting LD. The first colour is for SNPs
-#'   which lack LD information. The next 5 colours are for r2 or D' LD results
-#'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
-#'   SNP.
+#' @param LD_scheme Vector of colours for plotting LD. The first colour is for
+#'   SNPs which lack LD information. The next 5 colours are for r2 or D' LD
+#'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
+#'   the index SNP.
 #' @param legend_pos Position of legend e.g. "topleft", "topright" or ggplot2
 #'   settings. Set to `NULL` to hide legend.
 #' @param draw Logical whether to call [grid.draw()] to draw the plot.
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
 #'   colours of gene tracks etc.
+#' @return Returns a ggplot2 plot containing a scatter plot with genetracks
+#'   underneath.
 #' @seealso [gg_scatter()] [gg_genetracks()]
 #' @examples
 #' library(EnsDb.Hsapiens.v75)

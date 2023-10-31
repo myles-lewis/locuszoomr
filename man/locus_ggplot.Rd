@@ -56,10 +56,10 @@ plots.}
 
 \item{showLD}{Logical whether to show LD with colours}
 
-\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for SNPs
-which lack LD information. The next 5 colours are for r2 or D' LD results
-ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
-SNP.}
+\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for
+SNPs which lack LD information. The next 5 colours are for r2 or D' LD
+results ranging from 0 to 1 in intervals of 0.2. The final colour is for
+the index SNP.}
 
 \item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
 settings. Set to \code{NULL} to hide legend.}
@@ -68,6 +68,10 @@ settings. Set to \code{NULL} to hide legend.}
 
 \item{...}{Additional arguments passed to \code{\link[=gg_genetracks]{gg_genetracks()}} to control
 colours of gene tracks etc.}
+}
+\value{
+Returns a ggplot2 plot containing a scatter plot with genetracks
+underneath.
 }
 \description{
 Genomic locus plot similar to locuszoom.
