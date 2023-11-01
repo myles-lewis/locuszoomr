@@ -67,11 +67,13 @@ Returns a ggplot2 plot.
 Produces a scatter plot from a 'locus' class object (without gene tracks).
 }
 \examples{
+if(require(EnsDb.Hsapiens.v75)) {
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
 loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
 gg_scatter(loc)
+}
 }
 \seealso{
 \code{\link[=locus]{locus()}} \code{\link[=gg_addgenes]{gg_addgenes()}}

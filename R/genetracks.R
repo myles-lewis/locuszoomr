@@ -32,6 +32,7 @@
 #' @param align Logical whether to set [par()] to align the plot.
 #' @return No return value.
 #' @examples
+#' if(require(EnsDb.Hsapiens.v75)) {
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
@@ -47,7 +48,7 @@
 #' ## Customise colours
 #' genetracks(loc, gene_col = 'grey', exon_col = 'orange',
 #'            exon_border = 'darkgrey')
-#' 
+#' }
 #' @importFrom BiocGenerics start end
 #' @importFrom graphics axTicks axis lines rect text plot.new strwidth
 #' @export

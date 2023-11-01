@@ -38,6 +38,7 @@ No return value.
 Produces pages with multiple locus plots on.
 }
 \examples{
+if(require(EnsDb.Hsapiens.v75)) {
 library(EnsDb.Hsapiens.v75)
 data(SLE_gwas_sub)
 genes <- c("STAT4", "UBE2L3", "IRF5")
@@ -65,6 +66,7 @@ multi_layout(ncol = 3,
                locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
              })
 
+}
 }
 \seealso{
 \code{\link[=locus_plot]{locus_plot()}}

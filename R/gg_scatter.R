@@ -28,11 +28,13 @@
 #' @return Returns a ggplot2 plot.
 #' @seealso [locus()] [gg_addgenes()]
 #' @examples
+#' if(require(EnsDb.Hsapiens.v75)) {
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
 #'              ens_db = "EnsDb.Hsapiens.v75")
 #' gg_scatter(loc)
+#' }
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
 #'  element_blank element_rect unit geom_hline

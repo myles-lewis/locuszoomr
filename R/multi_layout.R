@@ -17,6 +17,7 @@
 #' @return No return value.
 #' @seealso [locus_plot()]
 #' @examples
+#' if(require(EnsDb.Hsapiens.v75)) {
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' genes <- c("STAT4", "UBE2L3", "IRF5")
@@ -44,6 +45,7 @@
 #'                locus_plot(loc3, use_layout = FALSE, legend_pos = NULL)
 #'              })
 #' 
+#' }
 #' @export
 
 multi_layout <- function(plots,

@@ -19,12 +19,13 @@
 #' border.
 #' @return A 'plotly' plotting object showing gene tracks.
 #' @examples
+#' if(require(EnsDb.Hsapiens.v75)) {
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
 #'              ens_db = "EnsDb.Hsapiens.v75")
 #' genetrack_ly(loc)
-#' 
+#' }
 #' @importFrom plotly plot_ly plotly_empty add_segments add_text %>%
 #' @export
 

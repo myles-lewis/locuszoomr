@@ -12,6 +12,7 @@ vignette: >
   %\VignetteIndexEntry{locuszoomr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{EnsDb.Hsapiens.v75, cowplot}
 ---
 
 ```{r, include = FALSE}

@@ -50,6 +50,7 @@
 #' locus gene information from Ensembl and
 #' locus exon information from Ensembl.
 #' @examples
+#' if(require(EnsDb.Hsapiens.v75)) {
 #' library(EnsDb.Hsapiens.v75)
 #' data(SLE_gwas_sub)
 #' loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
@@ -59,6 +60,7 @@
 #' loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5,
 #'               ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc2)
+#' }
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
