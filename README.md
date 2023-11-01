@@ -27,10 +27,11 @@ Install from Github
 devtools::install_github("myles-lewis/locuszoomr")
 ```
 
-`locuszoomr` automatically leverages the `LDlinkR` package to query 1000 genomes 
-for linkage disequilibrium (LD) across SNPs. In order to make use of this API
-function you will need a personal access token (see the `LDlinkR` vignette), 
-available from the LDlink website https://ldlink.nci.nih.gov/?tab=apiaccess.
+`locuszoomr` can leverage the `LDlinkR` package to query the 1000 Genomes
+Project for linkage disequilibrium (LD) across SNPs. In order to make use of
+this API function you will need a personal access token (see the `LDlinkR`
+vignette), available from the LDlink website
+https://ldlink.nci.nih.gov/?tab=apiaccess.
 
 Requests to LDlink are cached using the `memoise` package, to reduce API 
 requests. This is helpful when modifying plots for aesthetic reasons.
@@ -44,7 +45,7 @@ library(locuszoomr)
 data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
 
 library(EnsDb.Hsapiens.v75)
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5)
+loc <- locus(gene = 'UBE2L3', SLE_gwas_sub, flank = 1e5)
 summary(loc)
 locus_plot(loc)
 
@@ -53,6 +54,6 @@ locus_plot(loc)
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 
-loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5, LDtoken = "..")
-plot(loc)
+loc <- locus(gene = 'UBE2L3', SLE_gwas, flank = 1e5, LDtoken = "..")
+locus_plot(loc)
 ```
