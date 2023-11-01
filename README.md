@@ -31,7 +31,7 @@ devtools::install_github("myles-lewis/locuszoomr")
 Project for linkage disequilibrium (LD) across SNPs. In order to make use of
 this API function you will need a personal access token (see the `LDlinkR`
 vignette), available from the LDlink website
-https://ldlink.nci.nih.gov/?tab=apiaccess.
+https://ldlink.nih.gov/?tab=apiaccess.
 
 Requests to LDlink are cached using the `memoise` package, to reduce API 
 requests. This is helpful when modifying plots for aesthetic reasons.
