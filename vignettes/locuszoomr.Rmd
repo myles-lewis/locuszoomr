@@ -24,9 +24,9 @@ library(locuszoomr)
 # Introduction
 
 The `locuszoomr` package allows users to produce publication ready gene locus 
-plots very similar to those produced by the web interface locuszoom 
-(http://locuszoom.org), but running purely locally in R. It provides 
-customisation to the plots.
+plots very similar to those produced by the web interface 'locuszoom' 
+(http://locuszoom.org), but running purely locally in R. Plots can easily be 
+customised.
 
 These gene annotation plots are produced via R base graphics system. 'ggplot2'
 and 'plotly' versions can also be generated.
@@ -35,7 +35,9 @@ and 'plotly' versions can also be generated.
 
 Bioconductor packages `ensembldb` and an Ensembl database installed either as a
 package or obtained through Bioconductor packages `AnnotationHub` are required
-before installation.
+before installation. To run the examples in this vignette the
+'EnsDb.Hsapiens.v75' ensembl database package needs to be installed from
+Bioconductor.
 
 ```{r eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -98,8 +100,8 @@ locus_plot(loc)
 
 When `locus()` is called, the function tries to autodetect which columns in the
 data object refer to chromosome, position, SNP/feature ID and p-value. These
-columns can be specified manually using the arguments `chrom`, `pos`, `labs` and
-`p` respectively.
+columns may need to be specified manually using the arguments `chrom`, `pos`,
+`labs` and `p` respectively.
 
 # Accessing Ensembl databases
 
@@ -159,15 +161,15 @@ either be controlled by specifying `flank` which defaults to 50kb either side of
 the ends of the gene. `flank` can either be a single number or a vector of 2
 numbers if different down/upstream flanking lengths are required. Alternatively
 a fixed genomic window (eg. 1 Mb) centred on the gene of interest can be
-specified using the argument `fix_window`. The locus can be specified manually
-by specifying chromosome using `seqname` and genomic position range using
-`xrange`.
+specified using the argument `fix_window`. Finally, the locus can be specified
+manually by specifying the chromosome using `seqname` and genomic position range
+using `xrange`.
 
 # Obtaining LD information
 
 Once an API personal access token has been obtained, the
 [LDlink](https://ldlink.nih.gov/?tab=home) API can be called using the function
-`link_LD()` to retrieve LD (linkage disequilibium) information at the locus
+`link_LD()` to retrieve LD (linkage disequilibrium) information at the locus
 which is overlaid on the locus plot. This is shown as a colour overlay showing
 the level of $r^2$ between SNPs and the index SNP which defaults to the SNP with
 the lowest p-value (or the SNP can be specified manually).
