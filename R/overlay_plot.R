@@ -93,5 +93,6 @@ overlay_plot <- function(loc,
                                  cols = c(rev(up_cols), down_cols)))
   } else legendFUN <- NULL
   
-  locus_plot(loc, cex = pcex, col = NA, showLD = FALSE, panel.last = legendFUN, ...)
+  locus_plot(loc, cex = pcex, col = NA, showLD = FALSE,
+             panel.last = legendFUN, ...)
 }

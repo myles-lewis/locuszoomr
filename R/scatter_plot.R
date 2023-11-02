@@ -157,7 +157,8 @@ scatter_plot <- function(loc,
              legend = c("0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
                         "0.0 - 0.2"),
              title = expression({r^2}), y.intersp = 0.96,
-             pch = 21, col = 'black', pt.bg = rev(LD_scheme[-c(1, 7)]), bty = 'n', cex = 0.8)
+             pch = 21, col = 'black', pt.bg = rev(LD_scheme[-c(1, 7)]), 
+             bty = 'n', cex = 0.8)
     }
   }
 }

@@ -30,6 +30,6 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4), ...) {
   g <- genetrack_ly(loc, ...)
   p <- scatter_plotly(loc)
   
-  plotly::subplot(p, g, shareX = T, nrows = 2, heights = c(0.6, 0.4),
+  plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = c(0.6, 0.4),
                   titleY = TRUE)
 }
