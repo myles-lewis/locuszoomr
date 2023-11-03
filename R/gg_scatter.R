@@ -49,7 +49,7 @@ gg_scatter <- function(loc,
                        cex.lab = 1,
                        xlab = NULL,
                        ylab = NULL,
-                       yzero = TRUE,
+                       yzero = (loc$yvar == "logP"),
                        xticks = TRUE,
                        border = FALSE,
                        showLD = TRUE,
@@ -106,7 +106,7 @@ gg_scatter <- function(loc,
     } else legend.position = "none"
   } else legend.position = "none"
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
-  yrange[1] <- if (yzero) min(c(0, yrange[1]))
+  if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
   
   p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], color = .data$col,

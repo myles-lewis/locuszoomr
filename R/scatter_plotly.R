@@ -33,7 +33,7 @@ scatter_plotly <- function(loc,
                            sigCol = 'red',
                            xlab = NULL,
                            ylab = NULL,
-                           yzero = TRUE,
+                           yzero = (loc$yvar == "logP"),
                            showLD = TRUE,
                            LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                          'orange', 'red', 'purple'),
@@ -88,7 +88,7 @@ scatter_plotly <- function(loc,
   xlim <- xlim + c(-xext, xext)
   
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
-  ylim[1] <- if (yzero) min(c(0, ylim[1]))
+  if (yzero) ylim[1] <- min(c(0, ylim[1]))
   ydiff <- diff(ylim)
   ylim[2] <- ylim[2] + ydiff * 0.05
   ylim[1] <- if (ylim[1] != 0) ylim[1] - ydiff *0.05 else ylim[1] - ydiff *0.02
