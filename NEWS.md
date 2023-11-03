@@ -2,6 +2,11 @@ News
 =====
 
 # locuszoomr 0.1.3
+###### 03/11/2023
+
+* Added arrows to the gene labels in `locus_plotly()`
+
+# locuszoomr 0.1.2
 ###### 02/11/2023
 
 * This is the initial build of locuszoomr
