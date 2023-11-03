@@ -206,7 +206,7 @@ See the help page at `?locus_plot` for more details.
 # Customising gene tracks
 
 The gene tracks can be also customised with colours and gene label text
-position. See the help page at `?plot.locus` for more details.
+position. See the help page at `?genetracks` and `?locus_plot` for more details.
 
 ```{r eval = FALSE}
 # Filter by gene biotype
@@ -220,8 +220,10 @@ locus_plot(loc, filter_gene_name = c('UBE2L3', 'RIMBP3C', 'YDJC', 'PPIL2',
 # Plot gene annotation only
 
 The gene track can be plotted from a `locus` class object using the function 
-`genetrack()`. This uses base graphics, so `layout()` can be used to stack 
-custom-made plots above or below the gene tracks.
+`genetracks()`. This uses base graphics, so `layout()` can be used to stack 
+custom-made plots above or below the gene tracks. The function `set_layers()` is
+designed to make this easier for users. See section [Layering
+plots](#layering-plots) below.
 
 ```{r, fig.dim=c(7, 3.5)}
 genetracks(loc)
@@ -368,9 +370,13 @@ multi_layout(ncol = 3,
 
 `locuszoomr` has been designed with modular functions to enable layering of
 plots on top of each other in a column with gene tracks on the bottom.
+`set_layers()` is used to set layout of plots in base graphics by calling
+`layout()`. You will need to reset par() to original layout settings once the
+multi-panel plot is finished.
+
 `scatter_plot()` is used to generate the locus plot. `line_plot()` is used as an
 example of an additional plot. Also see `eqtl_plot()` for plotting eQTL
-information retrieved via LDlinkR.
+information retrieved via the LDlinkR package.
 
 ```{r eval=FALSE}
 pdf("myplot2.pdf", width = 6, height = 8)
