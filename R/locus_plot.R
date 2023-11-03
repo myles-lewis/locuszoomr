@@ -50,7 +50,9 @@
 #' locus_plot(loc)
 #' 
 #' ## Use embedded LD information in column `r2`
-#' loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
+#' ## Add label for index SNP
+#' loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5),
+#'               LD = "r2", labels = "index",
 #'               ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc2)
 #' }
