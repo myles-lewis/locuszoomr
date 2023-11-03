@@ -18,7 +18,7 @@
 #' @seealso [locus_plot()]
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {
-#' library(EnsDb.Hsapiens.v75)
+#' 
 #' data(SLE_gwas_sub)
 #' genes <- c("STAT4", "UBE2L3", "IRF5")
 #' loclist <- lapply(genes, locus,
