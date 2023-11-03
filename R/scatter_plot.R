@@ -110,7 +110,7 @@ scatter_plot <- function(loc,
     return(do.call("points", plot.args))
   }
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
-  ylim[1] <- if (yzero) min(c(0, ylim[1]))
+  if (yzero) ylim[1] <- min(c(0, ylim[1]))
   plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
