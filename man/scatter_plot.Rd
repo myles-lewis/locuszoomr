@@ -15,7 +15,7 @@ scatter_plot(
   cex.lab = 1,
   xlab = NULL,
   ylab = NULL,
-  yzero = TRUE,
+  yzero = (loc$yvar == "logP"),
   xticks = TRUE,
   border = FALSE,
   showLD = TRUE,
