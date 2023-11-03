@@ -5,6 +5,7 @@ News
 ###### 03/11/2023
 
 * Added arrows to the gene labels in `locus_plotly()`
+* Fix bug relating `yzero` argument in scatter plots
 
 # locuszoomr 0.1.2
 ###### 02/11/2023
