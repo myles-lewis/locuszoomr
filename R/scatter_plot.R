@@ -135,7 +135,7 @@ scatter_plot <- function(loc,
     if (i) labels[i] <- index_snp
     ind <- match(labels, data[, loc$labs])
     if (any(is.na(ind))) {
-      message("labels ", paste(labels[is.na(ind)], collapse = ", "),
+      message("label ", paste(labels[is.na(ind)], collapse = ", "),
               " not found")
     }
     lx <- data[ind, loc$pos]
