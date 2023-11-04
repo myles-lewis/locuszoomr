@@ -140,29 +140,8 @@ scatter_plot <- function(loc,
     }
     lx <- data[ind, loc$pos]
     ly <- data[ind, loc$yvar]
-    label_x <- rep_len(label_x, length(lx))
-    label_y <- rep_len(label_y, length(ly))
-    dx <- diff(par("usr")[1:2]) * label_x /100
-    dy <- diff(par("usr")[3:4]) * label_y /100
-    dlines(lx, ly, dx, dy, xpd = NA)
-    adj1 <- -sign(dx) *0.56+0.5
-    adj2 <- -sign(dy) +0.5
-    adj2[abs(label_x) > abs(label_y)] <- 0.5
-    adj1[abs(label_x) < abs(label_y)] <- 0.5
     labs <- data[ind, loc$labs]
-    if (length(unique(adj1)) == 1 & length(unique(adj2)) == 1) {
-      # unique adj
-      adj <- c(adj1[1], adj2[1])
-      text(lx + dx, ly + dy, labs,
-           adj = adj, cex = cex.axis *0.95, xpd = NA)
-    } else {
-      # varying adj
-      adj <- cbind(adj1, adj2)
-      for (i in seq_along(labs)) {
-        text(lx[i] + dx[i], ly[i] + dy[i], labs[i],
-             adj = adj[i,], cex = cex.axis *0.95, xpd = NA)
-      }
-    }
+    add_labels(lx, ly, labs, label_x, label_y, cex = cex.axis *0.95)
   }
   
   if (xticks) {
@@ -179,6 +158,32 @@ scatter_plot <- function(loc,
              title = expression({r^2}), y.intersp = 0.96,
              pch = 21, col = 'black', pt.bg = rev(LD_scheme[-c(1, 7)]), 
              bty = 'n', cex = 0.8)
+    }
+  }
+}
+
+
+add_labels <- function(lx, ly, labs, label_x, label_y, cex = 1) {
+  label_x <- rep_len(label_x, length(lx))
+  label_y <- rep_len(label_y, length(ly))
+  dx <- diff(par("usr")[1:2]) * label_x /100
+  dy <- diff(par("usr")[3:4]) * label_y /100
+  dlines(lx, ly, dx, dy, xpd = NA)
+  adj1 <- -sign(dx) *0.56+0.5
+  adj2 <- -sign(dy) +0.5
+  adj2[abs(label_x) > abs(label_y)] <- 0.5
+  adj1[abs(label_x) < abs(label_y)] <- 0.5
+  if (length(unique(adj1)) == 1 & length(unique(adj2)) == 1) {
+    # unique adj
+    adj <- c(adj1[1], adj2[1])
+    text(lx + dx, ly + dy, labs,
+         adj = adj, cex = cex, xpd = NA)
+  } else {
+    # varying adj
+    adj <- cbind(adj1, adj2)
+    for (i in seq_along(labs)) {
+      text(lx[i] + dx[i], ly[i] + dy[i], labs[i],
+           adj = adj[i,], cex = cex, xpd = NA)
     }
   }
 }
