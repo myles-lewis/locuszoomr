@@ -88,6 +88,11 @@ plots of gene loci. It references Ensembl databases for annotating genes
 and exons. Use \code{\link[=locus]{locus()}} first to generate an object of class 'locus' for
 plotting. LDlink web server can be queried using function \code{\link[=link_LD]{link_LD()}} to
 retrieve linkage disequilibrium (LD) information on the index SNP.
+
+Arguments to control plotting of the gene tracks are passed onto
+\code{\link[=genetracks]{genetracks()}} and for the scatter plot are passed via \code{...} to
+\code{\link[=scatter_plot]{scatter_plot()}}. See the documentation for each of these functions for
+details.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {

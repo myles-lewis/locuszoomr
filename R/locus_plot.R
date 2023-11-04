@@ -10,6 +10,11 @@
 #' plotting. LDlink web server can be queried using function [link_LD()] to
 #' retrieve linkage disequilibrium (LD) information on the index SNP.
 #' 
+#' Arguments to control plotting of the gene tracks are passed onto
+#' [genetracks()] and for the scatter plot are passed via `...` to
+#' [scatter_plot()]. See the documentation for each of these functions for
+#' details.
+#' 
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param filter_gene_name Vector of gene names to display.
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
