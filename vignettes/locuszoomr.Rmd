@@ -186,7 +186,8 @@ information from their own datasets to loci.
 ```{r, fig.dim=c(8, 7)}
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
-locus_plot(loc, labels = c("index", "rs5754467"))
+locus_plot(loc, labels = c("index", "rs140492"),
+                label_x = c(4, -5))
 ```
 
 # Plot customisation
@@ -206,9 +207,11 @@ Additional arguments can also be passed onto `plot()` via the `...` system, e.g.
 scatter plot markers.
 
 Labels can be added by specifying a vector of SNP or genomic feature IDs as
-shown in the plot above. The value `"index"` refers to the index SNP as the
-highest point in the locus or as defined by the argument `index_snp` when
-`locus()` is called.
+shown in the plot above using the argument `labels` (see `scatter_plot()`). The
+value `"index"` refers to the index SNP as the highest point in the locus or as
+defined by the argument `index_snp` when `locus()` is called. `label_x` and
+`label_y` control the position of the labels and can be specified as a single
+value or a vector of values.
 
 See the help pages at `?locus_plot` and `?scatter_plot` for more details.
 
