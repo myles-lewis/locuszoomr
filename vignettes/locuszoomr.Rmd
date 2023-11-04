@@ -192,16 +192,24 @@ locus_plot(loc, labels = c("index", "rs5754467"))
 # Plot customisation
 
 Various plotting options can be customised through arguments via the call to
-`locus_plot()`. Plot borders can be set using `border = TRUE`. The chromosome 
+`locus_plot()`. When calling `locus_plot()` arguments are passed to either
+`genetracks()` to control the gene tracks or passed via the `...` system onto
+`scatter_plot()` to control the scatter plot.
+
+Plot borders can be set using `border = TRUE`. The chromosome 
 position $x$ axis labels can be placed under the top or bottom plots using 
 `xtick = "top"` or `"bottom"`.
+
+Additional arguments can also be passed onto `plot()` via the `...` system. For
+example `col = NA` can be added to `locus_plot()` or `scatter_plot()` to remove
+the black outline around the scatter plot markers.
 
 Labels can be added by specifying a vector of SNP or genomic feature IDs as
 shown in the plot above. The value `"index"` refers to the index SNP as the
 highest point in the locus or as defined by the argument `index_snp` when
 `locus()` is called.
 
-See the help page at `?locus_plot` for more details.
+See the help pages at `?locus_plot` and `?scatter_plot` for more details.
 
 # Customising gene tracks
 
@@ -404,7 +412,7 @@ par(oldpar)
 `scatter_plot()` can be called with argument `add = TRUE` to add multiple sets
 of points overlaid on one plot.
 
-```{r, echo=FALSE, message=FALSE, fig.dim = c(7,7)}
+```{r, message=FALSE, fig.dim = c(7,7)}
 dat <- SLE_gwas_sub
 dat$p2 <- -log10(dat$p * 0.1)
 locp <- locus(dat, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
