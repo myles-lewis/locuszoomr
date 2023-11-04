@@ -200,9 +200,10 @@ Plot borders can be set using `border = TRUE`. The chromosome
 position $x$ axis labels can be placed under the top or bottom plots using 
 `xtick = "top"` or `"bottom"`.
 
-Additional arguments can also be passed onto `plot()` via the `...` system. For
-example `col = NA` can be added to `locus_plot()` or `scatter_plot()` to remove
-the black outline around the scatter plot markers.
+Additional arguments can also be passed onto `plot()` via the `...` system, e.g.
+`ylim`, `par()` settings etc. For example `col = NA` can be added to
+`locus_plot()` or `scatter_plot()` to remove the black outline around the
+scatter plot markers.
 
 Labels can be added by specifying a vector of SNP or genomic feature IDs as
 shown in the plot above. The value `"index"` refers to the index SNP as the
