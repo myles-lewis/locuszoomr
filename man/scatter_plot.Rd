@@ -75,9 +75,11 @@ legend.}
 value "index" selects the highest point or index SNP as defined when
 \code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
 
-\item{label_x}{Value for position of label as percentage of x axis scale.}
+\item{label_x}{Value or vector for position of label as percentage of x axis
+scale.}
 
-\item{label_y}{Value for position of label as percentage of y axis scale.}
+\item{label_y}{Value or vector for position of label as percentage of y axis
+scale.}
 
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}
