@@ -82,7 +82,7 @@ head(SLE_gwas_sub)
 We plot a locus from this dataset by extracting a subset of the data using the
 `locus()` function. Make sure you load the correct Ensembl database.
 
-```{r, fig.dim=c(8, 7)}
+```{r, message=FALSE, fig.dim=c(8, 7)}
 library(EnsDb.Hsapiens.v75)
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
              ens_db = "EnsDb.Hsapiens.v75")
@@ -190,7 +190,7 @@ locus_plot(loc, labels = c("index", "rs140492"),
                 label_x = c(4, -5))
 ```
 
-# Plot customisation
+# Customise plots and labels
 
 Various plotting options can be customised through arguments via the call to
 `locus_plot()`. When calling `locus_plot()` arguments are passed to either
@@ -209,13 +209,15 @@ scatter plot markers.
 Labels can be added by specifying a vector of SNP or genomic feature IDs as
 shown in the plot above using the argument `labels` (see `scatter_plot()`). The
 value `"index"` refers to the index SNP as the highest point in the locus or as
-defined by the argument `index_snp` when `locus()` is called. `label_x` and
-`label_y` control the position of the labels and can be specified as a single
-value or a vector of values.
+defined by the argument `index_snp` when `locus()` is called. The easiest way to
+identify points is using the [plotly version](#plotly-version) `locus_plotly()`
+which allows you to hover over points and see their rsid or feature label.
+`label_x` and `label_y` control the position of the labels and can be specified
+as a single value or a vector of values.
 
 See the help pages at `?locus_plot` and `?scatter_plot` for more details.
 
-# Customising gene tracks
+# Customise gene tracks
 
 The gene tracks can be also customised with colours and gene label text
 position. See the help page at `?genetracks` and `?locus_plot` for more details.
@@ -383,7 +385,7 @@ multi_layout(ncol = 3,
 `locuszoomr` has been designed with modular functions to enable layering of
 plots on top of each other in a column with gene tracks on the bottom.
 `set_layers()` is used to set layout of plots in base graphics by calling
-`layout()`. You will need to reset par() to original layout settings once the
+`layout()`. You will need to reset `par()` to original layout settings once the
 multi-panel plot is finished.
 
 `scatter_plot()` is used to generate the locus plot. `line_plot()` is used as an
