@@ -40,7 +40,7 @@
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
 #' @param ... Other arguments passed to [plot()] to control the scatter plot
-#'   e.g. `ylab`, `main`, etc.
+#'   e.g. `main`, `ylim` etc.
 #' @return No return value. Produces a scatter plot using base graphics.
 #' @seealso [locus()] [set_layers()]
 #' @importFrom graphics par legend
