@@ -86,7 +86,8 @@ new plot.}
 
 \item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 
-\item{...}{Other arguments passed to \code{\link[=plot]{plot()}} for the scatter plot.}
+\item{...}{Other arguments passed to \code{\link[=plot]{plot()}} to control the scatter plot
+e.g. \code{ylab}, \code{main}, etc.}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.

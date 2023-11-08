@@ -73,8 +73,8 @@ lower plots.}
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
 
-\item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} to control the scatter
-plot.}
+\item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} and \code{\link[=plot]{plot()}} to control
+the scatter plot, e.g. \code{ylab}, \code{main}, etc.}
 }
 \value{
 No return value.

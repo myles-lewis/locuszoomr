@@ -43,8 +43,8 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
-#' @param ... Other arguments passed to [scatter_plot()] to control the scatter
-#'   plot.
+#' @param ... Other arguments passed to [scatter_plot()] and [plot()] to control
+#'   the scatter plot, e.g. `ylab`, `main`, etc.
 #' @return No return value.
 #' @seealso [locus()] [scatter_plot()] [genetracks()]
 #' @examples
