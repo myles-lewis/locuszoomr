@@ -68,7 +68,7 @@ gg_scatter <- function(loc,
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] == index_snp] <- 7L
-      data$bg <- factor(data$bg)
+      data$bg <- factor(data$bg, levels = 1:7)
       data <- data[order(data$bg), ]
       scheme <- rep_len(LD_scheme, 7)
       if (is.null(index_snp)) scheme <- scheme[1:6]
