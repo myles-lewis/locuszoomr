@@ -35,5 +35,7 @@ Suggests:
     cowplot,
     EnsDb.Hsapiens.v75,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

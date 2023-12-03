@@ -156,6 +156,11 @@ locus <- function(gene = NULL,
     yvar <- "logP"
   }
   data <- as.data.frame(data)
+
+  if(nrow(data) == 0) {
+    stop("Locus contains no SNPs/datapoints")
+  }
+
   if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
   if (is.character(LD)) {
     colnames(data)[which(colnames(data) == LD)] <- "ld"
