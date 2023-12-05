@@ -83,11 +83,12 @@ We plot a locus from this dataset by extracting a subset of the data using the
 `locus()` function. Make sure you load the correct Ensembl database.
 
 ```{r, message=FALSE, fig.dim=c(8, 7)}
-library(EnsDb.Hsapiens.v75)
+if (require(EnsDb.Hsapiens.v75)) {
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
              ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
+}
 ```
 
 When `locus()` is called, the function tries to autodetect which columns in the
@@ -184,10 +185,12 @@ by setting `LD = "r2"`. This method also allows users to add their own LD
 information from their own datasets to loci.
 
 ```{r, fig.dim=c(8, 7)}
+if (require(EnsDb.Hsapiens.v75)) {
 loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc, labels = c("index", "rs140492"),
                 label_x = c(4, -5))
+}
 ```
 
 # Customise plots and labels
@@ -240,7 +243,9 @@ designed to make this easier for users. See section [Layering
 plots](#layering-plots) below.
 
 ```{r, fig.dim=c(7, 3.5)}
+if (require(EnsDb.Hsapiens.v75)) {
 genetracks(loc)
+}
 ```
 
 The function allows control over plotting of the gene tracks such as changing
@@ -248,11 +253,13 @@ the number of gene annotation tracks and the colour scheme. Set
 `showExons=FALSE` to show only genes and hide the exons.
 
 ```{r, fig.dim=c(7, 2.5)}
+if (require(EnsDb.Hsapiens.v75)) {
 # Limit the number of tracks
 # Filter by gene biotype
 # Customise colours
 genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
            gene_col = 'grey', exon_col = 'orange', exon_border = 'darkgrey')
+}
 ```
 
 # Add eQTL data via LDlink
@@ -311,9 +318,11 @@ Instead of plotting -log~10~ p-value on the y axis, it is possible to specify a
 different variable in your dataset using the argument `yvar`.
 
 ```{r, fig.dim=c(8, 7)}
+if (require(EnsDb.Hsapiens.v75)) {
 locb <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5, yvar = "beta",
               ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(locb)
+}
 ```
 
 # Arrange multiple locus plots
@@ -419,6 +428,7 @@ par(oldpar)
 of points overlaid on one plot.
 
 ```{r, message=FALSE, fig.dim = c(7,7)}
+if (require(EnsDb.Hsapiens.v75)) {
 dat <- SLE_gwas_sub
 dat$p2 <- -log10(dat$p * 0.1)
 locp <- locus(dat, gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
@@ -431,6 +441,7 @@ scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
              pch = 22, add = TRUE)
 genetracks(loc)
 par(oldpar)
+}
 ```
 
 # Add custom legend / features
@@ -443,6 +454,7 @@ demarcate a gene and extra points on top or underneath the main plot. When
 function they need to be quoted using `quote()`.
 
 ```{r, fig.dim = c(7,7)}
+if (require(EnsDb.Hsapiens.v75)) {
 # add vertical lines for gene of interest under the main plot
 pf <- quote({
   v <- locp$TX[locp$TX$gene_name == "UBE2L3", c("start", "end")]
@@ -464,6 +476,7 @@ pl <- quote({
 })
 
 locus_plot(locp, pcutoff = NULL, panel.first = pf, panel.last = pl)
+}
 ```
 
 # ggplot2 version
@@ -506,10 +519,12 @@ It is possible to use either the `cowplot` or `ggpubr` packages to layout
 multiple locus ggplots on the same page.
 
 ```{r, fig.dim = c(12, 7)}
+if (require(EnsDb.Hsapiens.v75)) {
 library(cowplot)
 p1 <- locus_ggplot(loc, draw = FALSE)
 p2 <- locus_ggplot(loc2, legend_pos = NULL, draw = FALSE)
 plot_grid(p1, p2, ncol = 2)
+}
 ```
 
 Or using ggpubr or gridExtra:
