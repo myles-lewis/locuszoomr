@@ -1,6 +1,12 @@
 News
 =====
 
+# locuszoomr 0.1.4
+###### 09/12/2023
+
+* Improved ggplot2 gene track plotting via `gg_genetracks()` to enable easy 
+layering of several ggplot2 plots above a row of gene tracks
+
 # locuszoomr 0.1.3
 ###### 03/11/2023
 
