@@ -63,8 +63,6 @@ gg_genetracks <- function(loc,
                        filter_gene_name,
                        filter_gene_biotype,
                        border,
-                       cex.axis,
-                       cex.lab,
                        cex.text,
                        gene_col,
                        exon_col,
@@ -79,7 +77,8 @@ gg_genetracks <- function(loc,
     gggrid::grid_panel(g) +
     xlab(xlab) +
     theme_classic() +
-    theme(axis.text = element_text(colour = "black"),
+    theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
+          axis.title = element_text(size = 10 * cex.lab),
           axis.line.y = element_blank())
   if (!xticks) {
     g2 <- g2 +

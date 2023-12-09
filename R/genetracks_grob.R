@@ -1,5 +1,5 @@
 
-#' Plot gene tracks grob
+#' Create gene tracks grob
 #' 
 #' Plot gene annotation tracks from `ensembldb` data using the grid package to
 #' create a grob.
@@ -11,8 +11,6 @@
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
-#' @param cex.axis Specifies font size for axis numbering.
-#' @param cex.lab Specifies font size for axis titles.
 #' @param cex.text Font size for gene text.
 #' @param showExons Logical whether to show exons or simply show whole gene as a
 #'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
@@ -44,8 +42,6 @@ genetracks_grob <- function(locus,
                             filter_gene_name = NULL,
                             filter_gene_biotype = NULL,
                             border = FALSE,
-                            cex.axis = 1,
-                            cex.lab = 1,
                             cex.text = 0.7,
                             gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                             exon_col = 'blue4',
@@ -86,7 +82,6 @@ genetracks_grob <- function(locus,
       if (border) rectGrob(gp = gpar(lwd = 1.5), vp = "genetrack"),
       exonGrob(TX, EX, showExons, gene_col, exon_col, exon_border, exheight),
       genetextGrob(text_pos, TX, xrange, cex.text)),
-      # axGrob(xticks, xlab, cex.lab, cex.axis)),
     gp = gpar()
   )
   

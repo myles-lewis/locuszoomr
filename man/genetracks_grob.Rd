@@ -2,15 +2,13 @@
 % Please edit documentation in R/genetracks_grob.R
 \name{genetracks_grob}
 \alias{genetracks_grob}
-\title{Plot gene tracks grob}
+\title{Create gene tracks grob}
 \usage{
 genetracks_grob(
   locus,
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   border = FALSE,
-  cex.axis = 1,
-  cex.lab = 1,
   cex.text = 0.7,
   gene_col = ifelse(showExons, "blue4", "skyblue"),
   exon_col = "blue4",
@@ -30,10 +28,6 @@ genetracks_grob(
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
 
 \item{border}{Logical whether a bounding box is plotted.}
-
-\item{cex.axis}{Specifies font size for axis numbering.}
-
-\item{cex.lab}{Specifies font size for axis titles.}
 
 \item{cex.text}{Font size for gene text.}
 

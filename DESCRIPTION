@@ -25,7 +25,6 @@ Imports:
     graphics,
     grDevices,
     grid,
-    gtable,
     LDlinkR,
     memoise,
     plotly,

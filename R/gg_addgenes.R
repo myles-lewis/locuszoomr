@@ -10,10 +10,7 @@
 #'   gene track.
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
 #'   colours of gene tracks etc.
-#' @return A gtable plotting object.
-#' @details
-#' The combined plot is outputted to the current device. A `gtable` plotting
-#' object is returned invisibly. This can be plotted using [grid.draw()].
+#' @return A ggplot2 plotting object.
 #' @seealso [gg_scatter()] [gg_genetracks()]
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {
@@ -32,7 +29,7 @@ gg_addgenes <- function(p, loc,
                         ...) {
   # check x axis range
   xl <- layer_scales(p)$x$get_limits() * 1e6
-  if (!identical(loc$xrange, xl)) {
+  if (!identical(as.numeric(loc$xrange), xl)) {
     message("Plot x axis limits and locus range differ: check correct locus?")
     message("x axis limits: ", xl[1], " to ", xl[2])
     message("locus range: ", loc$xrange[1], " to ", loc$xrange[2])
