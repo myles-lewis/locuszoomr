@@ -488,7 +488,7 @@ locus plot use `locus_ggplot()`.
 locus_ggplot(loc)
 ```
 
-The gene tracks can be produced on their own as a grid package grob using
+The gene tracks can be produced on their own as a ggplot2 object using
 `gg_genetracks()`.
 
 ```{r, eval=FALSE}
