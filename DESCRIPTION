@@ -1,6 +1,6 @@
 Package: locuszoomr
 Title: Gene Locus Plot with Gene Annotations
-Version: 0.1.3
+Version: 0.1.4
 Authors@R:
     c(person(given = "Myles",family = "Lewis",
     role = c("aut", "cre"),
@@ -17,8 +17,10 @@ biocViews:
 Imports:
     AnnotationFilter,
     BiocGenerics,
+    cowplot,
     ensembldb,
     GenomeInfoDb,
+    gggrid,
     ggplot2,
     graphics,
     grDevices,
@@ -32,7 +34,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
     AnnotationHub,
-    cowplot,
     EnsDb.Hsapiens.v75,
     knitr,
     rmarkdown

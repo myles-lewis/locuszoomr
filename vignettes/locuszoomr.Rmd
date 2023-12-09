@@ -492,7 +492,6 @@ The gene tracks can be produced on their own as a grid package grob using
 `gg_genetracks()`.
 
 ```{r, eval=FALSE}
-grid::grid.newpage()
 gg_genetracks(loc)
 ```
 
@@ -521,8 +520,8 @@ multiple locus ggplots on the same page.
 ```{r, fig.dim = c(12, 7)}
 if (require(EnsDb.Hsapiens.v75)) {
 library(cowplot)
-p1 <- locus_ggplot(loc, draw = FALSE)
-p2 <- locus_ggplot(loc2, legend_pos = NULL, draw = FALSE)
+p1 <- locus_ggplot(loc)
+p2 <- locus_ggplot(loc2, legend_pos = NULL)
 plot_grid(p1, p2, ncol = 2)
 }
 ```
