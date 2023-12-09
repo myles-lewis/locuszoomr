@@ -12,7 +12,7 @@ vignette: >
   %\VignetteIndexEntry{locuszoomr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{EnsDb.Hsapiens.v75, cowplot}
+  %\VignetteDepends{EnsDb.Hsapiens.v75}
 ---
 
 ```{r, include = FALSE}
@@ -492,7 +492,6 @@ The gene tracks can be produced on their own as a grid package grob using
 `gg_genetracks()`.
 
 ```{r, eval=FALSE}
-grid::grid.newpage()
 gg_genetracks(loc)
 ```
 
@@ -510,6 +509,19 @@ plot that has been previously created and customised.
 gg_addgenes(p, loc)
 ```
 
+Plots can be layered above gene tracks, using `cowplot::plot_grid()` or using
+the `patchwork` package.
+
+```{r, eval=FALSE}
+g <- gg_genetracks(loc)
+library(cowplot)
+plot_grid(p, p, g, nrow = 3, rel_heights = c(2, 2, 1), align = "v")
+
+# patchwork method
+library(patchwork)
+p / p / g
+```
+
 For users who prefer the grid system we recommend also looking at Bioconductor
 packages `Gviz` or `ggbio` as possible alternatives.
 
@@ -521,8 +533,8 @@ multiple locus ggplots on the same page.
 ```{r, fig.dim = c(12, 7)}
 if (require(EnsDb.Hsapiens.v75)) {
 library(cowplot)
-p1 <- locus_ggplot(loc, draw = FALSE)
-p2 <- locus_ggplot(loc2, legend_pos = NULL, draw = FALSE)
+p1 <- locus_ggplot(loc)
+p2 <- locus_ggplot(loc2, legend_pos = NULL)
 plot_grid(p1, p2, ncol = 2)
 }
 ```

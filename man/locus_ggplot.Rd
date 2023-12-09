@@ -6,7 +6,7 @@
 \usage{
 locus_ggplot(
   loc,
-  height = unit(5, "cm"),
+  heights = c(3, 2),
   index_snp = loc$index_snp,
   pcutoff = 5e-08,
   scheme = c("royalblue", "red", "purple"),
@@ -20,14 +20,13 @@ locus_ggplot(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   legend_pos = "topleft",
-  draw = TRUE,
   ...
 )
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
-\item{height}{A unit object specifying height of the lower gene track.}
+\item{heights}{Vector supplying the ratio of top to bottom plot.}
 
 \item{index_snp}{Specifies index SNP to be shown in a different colour and
 symbol. Defaults to the SNP with the lowest p-value. Set to \code{NULL} to not
@@ -63,8 +62,6 @@ the index SNP.}
 
 \item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
 settings. Set to \code{NULL} to hide legend.}
-
-\item{draw}{Logical whether to call \code{\link[=grid.draw]{grid.draw()}} to draw the plot.}
 
 \item{...}{Additional arguments passed to \code{\link[=gg_genetracks]{gg_genetracks()}} to control
 colours of gene tracks etc.}
