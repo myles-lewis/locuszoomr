@@ -509,6 +509,19 @@ plot that has been previously created and customised.
 gg_addgenes(p, loc)
 ```
 
+Plots can be layered above gene tracks, using `cowplot::plot_grid()` or using
+the `patchwork` package.
+
+```{r, eval=FALSE}
+g <- gg_genetracks(loc)
+library(cowplot)
+plot_grid(p, p, g, nrow = 3, rel_heights = c(2, 2, 1), align = "v")
+
+# patchwork method
+library(patchwork)
+p / p / g
+```
+
 For users who prefer the grid system we recommend also looking at Bioconductor
 packages `Gviz` or `ggbio` as possible alternatives.
 

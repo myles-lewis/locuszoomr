@@ -19,14 +19,10 @@ gene track.}
 colours of gene tracks etc.}
 }
 \value{
-A gtable plotting object.
+A ggplot2 plotting object.
 }
 \description{
 Adds gene tracks to an existing ggplot2 plot.
-}
-\details{
-The combined plot is outputted to the current device. A \code{gtable} plotting
-object is returned invisibly. This can be plotted using \code{\link[=grid.draw]{grid.draw()}}.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {

@@ -92,9 +92,9 @@ genetracks_grob <- function(locus,
 genetrack.vp <- function(xrange, ylim) {
   viewport(name = "genetrack",
            x = unit(0, "lines"),
-           y = unit(0.5, "lines"),
+           y = unit(0, "lines"),
            width = unit(1, "npc"),
-           height = unit(1, "npc") - unit(0.5, "lines"),
+           height = unit(1, "npc") - unit(0, "lines"),
            just = c("left", "bottom"),
            xscale = xrange + c(-0.04, 0.04) * diff(xrange),
            yscale = ylim)
