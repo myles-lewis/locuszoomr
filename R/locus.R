@@ -163,14 +163,23 @@ locus <- function(gene = NULL,
   message(nrow(data), " SNPs/datapoints")
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(c(seq_len(22), "X", "Y")),
+    SeqNameFilter(seqname),
+    TxStartFilter(xrange[2], condition = "<"),
+    TxEndFilter(xrange[1], condition = ">"),
     GeneIdFilter("ENSG", "startsWith")))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
-  TX <- TX[TX$seqnames == seqname, ]
-  TX <- TX[TX$end > xrange[1], ]
-  TX <- TX[TX$start < xrange[2], ]
-  EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+ 
+  if(nrow(TX) == 0) {
+    # Creating empty exons object here in suitable format
+   EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+    SeqNameFilter(seqname),
+    ExonStartFilter(xrange[2], condition = "<"),
+    ExonEndFilter(xrange[1], condition = ">"),
+    GeneIdFilter("ENSG", "startsWith")))
+  } else {
+   EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+  }
   
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
