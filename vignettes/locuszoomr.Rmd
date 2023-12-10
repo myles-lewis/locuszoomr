@@ -27,10 +27,10 @@ library(locuszoomr)
 The `locuszoomr` package allows users to produce publication ready gene locus 
 plots very similar to those produced by the web interface 'locuszoom' 
 (http://locuszoom.org), but running purely locally in R. Plots can easily be 
-customised.
+customised, labelled and stacked.
 
-These gene annotation plots are produced via R base graphics system. 'ggplot2'
-and 'plotly' versions can also be generated.
+These gene annotation plots are produced via R base graphics or 'ggplot2'. A
+'plotly' version can also be generated.
 
 # Installation
 
