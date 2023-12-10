@@ -515,11 +515,14 @@ the `patchwork` package.
 ```{r, eval=FALSE}
 g <- gg_genetracks(loc)
 library(cowplot)
-plot_grid(p, p, g, nrow = 3, rel_heights = c(2, 2, 1), align = "v")
+plot_grid(p, p, g, ncol = 1, rel_heights = c(2, 2, 1), align = "v")
 
 # patchwork method
 library(patchwork)
 p / p / g
+
+# patchwork method 2
+wrap_plots(p, p, g, ncol = 1)
 ```
 
 For users who prefer the grid system we recommend also looking at Bioconductor
