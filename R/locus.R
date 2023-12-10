@@ -99,6 +99,7 @@ locus <- function(gene = NULL,
       xrange <- c(m - fix_window/2, m + fix_window/2)
     }
   }
+  # TODO no NA r2 here 
   xrange <- as.integer(xrange)
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
   message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
@@ -166,7 +167,7 @@ locus <- function(gene = NULL,
     colnames(data)[which(colnames(data) == LD)] <- "ld"
   }
   message(nrow(data), " SNPs/datapoints")
-  
+
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
     TxStartFilter(xrange[2], condition = "<"),
@@ -174,6 +175,7 @@ locus <- function(gene = NULL,
     GeneIdFilter("ENSG", "startsWith")))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
+  TX <- TX[!duplicated(TX$gene_id), ]
  
   if(nrow(TX) == 0) {
     # Creating empty exons object here in suitable format
