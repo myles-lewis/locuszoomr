@@ -2,6 +2,9 @@
 
 0 errors | 0 warnings | 0 note
 
+* Fixed CRAN ERROR: in vignette added conditional `if(require())` for packages
+in Suggests
+
 * Fixed CRAN ERROR: in examples added conditional `if(require())` for packages
 in Suggests
 
