@@ -62,6 +62,8 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                                        'orange', 'red', 'purple'),
                          legend_pos = 'topleft',
                          ...) {
+  if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  if (is.null(loc$data)) stop("No data points, only gene tracks")
   p <- gg_scatter(loc,
                   index_snp = index_snp,
                   pcutoff = pcutoff,
