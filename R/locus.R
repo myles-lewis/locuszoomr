@@ -64,7 +64,7 @@
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
-#' SeqNameFilter GeneIdFilter
+#' SeqNameFilter GeneIdFilter TxStartFilter TxEndFilter ExonStartFilter ExonEndFilter
 #' @importFrom GenomeInfoDb seqlengths
 #' @importFrom memoise memoise
 #' @export
@@ -90,7 +90,11 @@ locus <- function(gene = NULL,
   if (is.null(flank)) flank <- 5e4
   flank <- rep_len(flank, 2)
   if (!is.null(gene)) {
-    locus <- genes(edb, filter = GeneNameFilter(gene))
+    locus <- genes(edb, filter = AnnotationFilterList(
+      GeneNameFilter(gene),
+      SeqNameFilter(c(1:22, 'X', 'Y'))
+      )
+    )
     seqname <- names(seqlengths(locus))
     if (is.null(fix_window)) {
       xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
