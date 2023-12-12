@@ -95,6 +95,12 @@ locus <- function(gene = NULL,
       SeqNameFilter(c(1:22, 'X', 'Y'))
       )
     )
+     
+    if(length(locus) > 1) {
+      warning(sprintf('Identified %d genes matching name \'%s\', taking first\n', length(locus), gene))
+      locus <- locus[1]
+      
+      }
     seqname <- names(seqlengths(locus))
     if (is.null(fix_window)) {
       xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
