@@ -84,12 +84,15 @@ We plot a locus from this dataset by extracting a subset of the data using the
 
 ```{r, message=FALSE, fig.dim=c(8, 7)}
 if (require(EnsDb.Hsapiens.v75)) {
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
+loc <- locus(data = SLE_gwas_sub, gene = 'UBE2L3', flank = 1e5,
              ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
 }
 ```
+
+For users who only want to plot the gene tracks alone alongside their own plots, 
+see section [Plot gene annotation only](#plot-gene-annotation-only) below.
 
 When `locus()` is called, the function tries to autodetect which columns in the
 data object refer to chromosome, position, SNP/feature ID and p-value. These
@@ -140,7 +143,7 @@ ensDb_v106 <- ah[["AH100643"]]
 
 # built-in mini dataset
 data("SLE_gwas_sub")
-loc <- locus(SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6,
+loc <- locus(data = SLE_gwas_sub, gene = 'UBE2L3', fix_window = 1e6,
              ens_db = ensDb_v106)
 locus_plot(loc)
 ```
