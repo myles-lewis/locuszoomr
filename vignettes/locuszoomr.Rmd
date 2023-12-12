@@ -262,6 +262,19 @@ genetracks(loc, maxrows = 3, filter_gene_biotype = 'protein_coding',
 }
 ```
 
+For advanced users who only want the gene tracks to add to their own plots,
+`locus()` can be called without the `data` argument specified (or `data` can be
+set to `NULL`). Then genetracks can be plotted in base graphics, ggplot2 or 
+plotly.
+
+```{r eval = FALSE}
+loc00 <- locus(gene = 'UBE2L3', flank = 1e5, ens_db = "EnsDb.Hsapiens.v75")
+
+genetracks(loc00)  # base graphics
+gg_genetracks(loc00)  # ggplot2
+genetrack_ly(loc00)  # plotly
+```
+
 # Add eQTL data via LDlink
 
 GTEx eQTL data can be accessed via the LDlinkR package which queries the
