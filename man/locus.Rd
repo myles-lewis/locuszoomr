@@ -6,7 +6,7 @@
 \usage{
 locus(
   gene = NULL,
-  data,
+  data = NULL,
   xrange = NULL,
   seqname = NULL,
   flank = NULL,
@@ -25,7 +25,8 @@ locus(
 \item{gene}{Optional character value specifying which gene to view. Either
 \code{gene} or \code{xrange} plus \code{seqname} must be specified.}
 
-\item{data}{Dataset (data.frame or data.table) to use for plot.}
+\item{data}{Dataset (data.frame or data.table) to use for plot. If
+unspecified or \code{NULL}, gene track information alone is returned.}
 
 \item{xrange}{Optional vector of genomic position range for the x axis.}
 
@@ -75,7 +76,8 @@ Ensembl database version number,
 column names for chromosome, position, SNP ID, p-value or variable for
 plotting on y axis,
 locus gene information from Ensembl and
-locus exon information from Ensembl.
+locus exon information from Ensembl. If \code{data} is \code{NULL} then gene track
+information alone is returned.
 }
 \description{
 Creates object of class 'locus' for genomic locus plot similar to

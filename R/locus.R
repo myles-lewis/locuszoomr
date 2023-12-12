@@ -12,7 +12,8 @@
 #' 
 #' @param gene Optional character value specifying which gene to view. Either
 #'   `gene` or `xrange` plus `seqname` must be specified.
-#' @param data Dataset (data.frame or data.table) to use for plot.
+#' @param data Dataset (data.frame or data.table) to use for plot. If
+#'   unspecified or `NULL`, gene track information alone is returned.
 #' @param xrange Optional vector of genomic position range for the x axis.
 #' @param seqname Optional, specifies which chromosome to plot.
 #' @param flank Single value or vector with 2 values for how much flanking 
@@ -48,7 +49,8 @@
 #' column names for chromosome, position, SNP ID, p-value or variable for
 #' plotting on y axis,
 #' locus gene information from Ensembl and
-#' locus exon information from Ensembl.
+#' locus exon information from Ensembl. If `data` is `NULL` then gene track
+#' information alone is returned.
 #' @examples
 #' ## Bioconductor package EnsDb.Hsapiens.v75 is needed for these examples
 #' if(require(EnsDb.Hsapiens.v75)) {
