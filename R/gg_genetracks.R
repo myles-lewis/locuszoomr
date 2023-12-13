@@ -56,7 +56,7 @@ gg_genetracks <- function(loc,
                           showExons = TRUE,
                           maxrows = NULL,
                           text_pos = 'top',
-                          xticks = FALSE,
+                          xticks = TRUE,
                           xlab = NULL) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   g <- genetracks_grob(loc,

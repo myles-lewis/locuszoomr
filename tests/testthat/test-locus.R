@@ -7,8 +7,6 @@ test_that("Error is raised when locus has no SNPs", {
 })
 
 test_that("Locus returns xrange of appropriate dimension when more than one gene matches specified name", {
-  #16929816:16972118
-  
   dummy_daf <- data.frame(chrom = 17, pos = 16929816, rsid = 'rs1', p = 1)
   
   library(EnsDb.Hsapiens.v86)

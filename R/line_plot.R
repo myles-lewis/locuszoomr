@@ -28,6 +28,7 @@ line_plot <- function(loc,
                       border = FALSE,
                       align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   

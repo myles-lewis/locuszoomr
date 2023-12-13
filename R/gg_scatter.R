@@ -57,6 +57,7 @@ gg_scatter <- function(loc,
                                      'orange', 'red', 'purple'),
                        legend_pos = 'topleft') {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
   if (is.null(xlab) & xticks) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {

@@ -40,6 +40,7 @@ scatter_plotly <- function(loc,
                            marker_outline = "black",
                            marker_size = 7) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
@@ -58,7 +59,6 @@ scatter_plotly <- function(loc,
                         labels = c("unknown", "0.0 - 0.2", "0.2 - 0.4",
                                    "0.4 - 0.6", "0.6 - 0.8", "0.8 - 1.0",
                                    "index"))
-      data$bg <- droplevels(data$bg)
       leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
     } else {
       showLD <- FALSE
@@ -68,7 +68,6 @@ scatter_plotly <- function(loc,
       LD_scheme <- c(chromCol, sigCol, "purple")
       data$bg <- factor(data$bg, levels = LD_scheme,
                         labels = c("ns", paste("P <", pcutoff), "index"))
-      data$bg <- droplevels(data$bg)
     }
   }
   
