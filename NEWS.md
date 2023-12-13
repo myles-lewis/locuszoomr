@@ -2,13 +2,14 @@ News
 =====
 
 # locuszoomr 0.1.5
-###### 12/12/2023
+###### 13/12/2023
 
 * Improved ggplot2 gene track plotting via `gg_genetracks()` to enable easy 
 layering of several ggplot2 plots above a row of gene tracks
 * For those that only want the gene tracks for their own plots, this is now 
 easier by simply not specifying `data` (or setting it to `NULL`) when calling 
 `locus()`.
+* Fixed bug when plotting LD in `locus_ggplot()` and `locus_plotly()`.
 
 # locuszoomr 0.1.3
 ###### 03/11/2023
