@@ -2,6 +2,8 @@
 
 0 errors | 0 warnings | 0 note
 
+* Bugfixes and improvements to plotting functions for the ggplot2 version
+
 * Fixed CRAN ERROR: in vignette added conditional `if(require())` for packages
 in Suggests
 
