@@ -213,7 +213,7 @@ locus <- function(gene = NULL,
 
 #' @export
 summary.locus <- function(object, ...) {
-  cat("Gene", object$gene, "\n")
+  if (!is.null(object$gene)) cat("Gene", object$gene, "\n")
   cat(paste0("Chromosome ", object$seqname, ", position ",
              format(object$xrange[1], big.mark=","), " to ",
              format(object$xrange[2], big.mark=","), "\n"))
@@ -221,7 +221,9 @@ summary.locus <- function(object, ...) {
   if (is.null(nr)) nr <- 0
   cat(nr, "SNPs/datapoints\n")
   cat(nrow(object$TX), "gene transcripts\n")
-  tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
-  cat(paste(tb, names(tb), collapse = ", "), "\n")
+  if (nrow(object$TX) > 0) {
+    tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
+    cat(paste(tb, names(tb), collapse = ", "), "\n")
+  }
 }
 
