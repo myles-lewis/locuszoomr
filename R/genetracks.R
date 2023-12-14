@@ -78,10 +78,6 @@ genetracks <- function(locus,
   if (!is.null(filter_gene_biotype)) {
     TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
   }
-  if (nrow(TX) == 0) {
-    message('No genes to plot')
-    return(plot.new())
-  }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
   if (align) {
@@ -89,10 +85,12 @@ genetracks <- function(locus,
     on.exit(par(op))
   }
   
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
-  maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
-  TX <- TX[TX$row <= maxrows, ]
+  if (nrow(TX) != 0) {
+    TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
+    maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
+    if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
+    TX <- TX[TX$row <= maxrows, ]
+  } else maxrows <- 1
   
   plot(NA, xlim = xrange,
        ylim = c(-maxrows - 0.3, -0.3), 
@@ -110,8 +108,12 @@ genetracks <- function(locus,
          lwd = 0, lwd.ticks = 1,
          tcl = -0.3, mgp = c(1.7, 0.4, 0))
   }
-  exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
+  if (nrow(TX) == 0) {
+    message("No genes to plot")
+    return(invisible(NULL))
+  }
   
+  exheight <- switch(text_pos, "top" = 0.15, "left" = 0.3)
   if (showExons) {
     for (i in seq_len(nrow(TX))) {
       lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),

@@ -47,11 +47,22 @@ genetrack_ly <- function(locus,
   if (!is.null(filter_gene_biotype)) {
     TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
   }
+  xlim <- xrange / 1e6
+  xext <- diff(xlim) * 0.05
+  xlim <- xlim + c(-xext, xext)
+  if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   if (nrow(TX) == 0) {
     message('No genes to plot')
-    return(plotly_empty())
+    # blank gene tracks
+    p <- plot_ly(data.frame(NA), mode = "markers", type = "scattergl") %>%
+      plotly::layout(xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
+                                  color = 'black', ticklen = 5,
+                                  range = as.list(xlim)),
+                     yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
+                                  showticklabels = FALSE)) %>%
+      plotly::config(displaylogo = FALSE)
+    return(p)
   }
-  if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
@@ -75,9 +86,6 @@ genetrack_ly <- function(locus,
   TX$ty <- -TX$row + 0.4
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  xlim <- xrange / 1e6
-  xext <- diff(xlim) * 0.05
-  xlim <- xlim + c(-xext, xext)
   tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
              (TX$tmax < xrange[2] + diff(xrange) * 0.04)
   pos <- TX$strand == "+"

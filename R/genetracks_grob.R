@@ -61,7 +61,7 @@ genetracks_grob <- function(locus,
   }
   if (nrow(TX) == 0) {
     message('No genes to plot')
-    return()
+    return(invisible(NULL))
   }
   
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)

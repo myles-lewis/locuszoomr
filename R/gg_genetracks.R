@@ -74,7 +74,7 @@ gg_genetracks <- function(loc,
   
   g2 <- ggplot(data.frame(x = NA),
                aes(xmin = loc$xrange[1] / 1e6, xmax = loc$xrange[2] / 1e6)) +
-    gggrid::grid_panel(g) +
+    (if (!is.null(g)) gggrid::grid_panel(g)) +
     xlab(xlab) +
     theme_classic() +
     theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
