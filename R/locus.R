@@ -66,7 +66,7 @@
 #' @importFrom ensembldb genes exons
 #' @importFrom BiocGenerics start end
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
-#' SeqNameFilter GeneIdFilter
+#' SeqNameFilter GeneIdFilter TxStartFilter TxEndFilter ExonStartFilter ExonEndFilter
 #' @importFrom GenomeInfoDb seqlengths
 #' @importFrom memoise memoise
 #' @export
@@ -92,7 +92,17 @@ locus <- function(gene = NULL,
   if (is.null(flank)) flank <- 5e4
   flank <- rep_len(flank, 2)
   if (!is.null(gene)) {
-    locus <- genes(edb, filter = GeneNameFilter(gene))
+    locus <- genes(edb, filter = AnnotationFilterList(
+      GeneNameFilter(gene),
+      SeqNameFilter(c(1:22, 'X', 'Y'))
+      )
+    )
+     
+    if(length(locus) > 1) {
+      warning(sprintf('Identified %d genes matching name \'%s\', taking first\n', length(locus), gene))
+      locus <- locus[1]
+      
+      }
     seqname <- names(seqlengths(locus))
     if (is.null(fix_window)) {
       xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
@@ -101,6 +111,7 @@ locus <- function(gene = NULL,
       xrange <- c(m - fix_window/2, m + fix_window/2)
     }
   }
+  
   xrange <- as.integer(xrange)
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
   message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
@@ -159,6 +170,11 @@ locus <- function(gene = NULL,
       yvar <- "logP"
     }
     data <- as.data.frame(data)
+
+    if(nrow(data) == 0) {
+      stop("Locus contains no SNPs/datapoints")
+    }
+
     if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
     if (is.character(LD)) {
       colnames(data)[which(colnames(data) == LD)] <- "ld"
@@ -167,15 +183,25 @@ locus <- function(gene = NULL,
   }
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(c(seq_len(22), "X", "Y")),
+    SeqNameFilter(seqname),
+    TxStartFilter(xrange[2], condition = "<"),
+    TxEndFilter(xrange[1], condition = ">"),
     GeneIdFilter("ENSG", "startsWith")))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
-  TX <- TX[TX$seqnames == seqname, ]
-  TX <- TX[TX$end > xrange[1], ]
-  TX <- TX[TX$start < xrange[2], ]
-  EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
-  
+  TX <- TX[!duplicated(TX$gene_id), ]
+ 
+  if(nrow(TX) == 0) {
+    # Creating empty exons object here in suitable format
+   EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+    SeqNameFilter(seqname),
+    ExonStartFilter(xrange[2], condition = "<"),
+    ExonEndFilter(xrange[1], condition = ">"),
+    GeneIdFilter("ENSG", "startsWith")))
+  } else {
+   EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+  }
+
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
               chrom = chrom, pos = pos, p = p, yvar = yvar, labs = labs,
@@ -184,7 +210,6 @@ locus <- function(gene = NULL,
   class(loc) <- "locus"
   loc
 }
-
 
 #' @export
 summary.locus <- function(object, ...) {
