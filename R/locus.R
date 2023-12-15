@@ -165,8 +165,10 @@ locus <- function(gene = NULL,
       # region based on index SNP
       if (!index_snp %in% data[, labs])
         stop("SNP specified by `index_snp` not found")
-      seqname <- data[data[, labs] == index_snp, chrom]
-      snp_pos <- data[data[, labs] == index_snp, pos]
+      ind <- which(data[, labs] == index_snp)
+      if (length(ind) > 1) message("SNP found more than once")
+      seqname <- data[ind[1], chrom]
+      snp_pos <- data[ind[1], pos]
       xrange <- if (is.null(fix_window)) {
         c(snp_pos - flank[1], snp_pos + flank[2])
       } else {
