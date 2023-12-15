@@ -11,6 +11,9 @@
 #' @param p_cutoff Specifies cut-off for p-value significance above which
 #'   p-values are ignored.
 #' @param span Minimum genomic distance between peaks
+#' @param min_points Minimum number of p-value significant points which must lie
+#'   within the span of a peak. This removes peaks with single or only a few low
+#'   p-value SNPs. To disable set `min_points` to 1 or less.
 #' @param chrom Determines which column in `data` contains chromosome
 #'   information. If `NULL` tries to autodetect the column.
 #' @param pos Determines which column in `data` contains position information.
@@ -26,7 +29,8 @@
 #' @returns Vector of row indices
 #' @export
 
-quick_peak <- function(data, npeaks = NA, p_cutoff = 5e-08, span = 1e7,
+quick_peak <- function(data, npeaks = NA, p_cutoff = 5e-08, span = 1e6,
+                       min_points = 2,
                        chrom = NULL, pos = NULL, p = NULL) {
   start <- Sys.time()
   # autodetect column headings
@@ -64,16 +68,19 @@ quick_peak <- function(data, npeaks = NA, p_cutoff = 5e-08, span = 1e7,
   while (length(pks) < npeaks & i <= length(index)) {
     if (all(abs(data[index[i], pos] - data[pks, pos]) > span |
             data[index[i], chrom] != data[pks, chrom])) {
-      pks <- c(pks, index[i])
       del <- which(abs(data[index[i], pos] - data[index, pos]) <= span & 
-                     data[index[i], chrom] == data[index, chrom])[-1]
-      if (length(del) > 0) index <- index[-del]
+                     data[index[i], chrom] == data[index, chrom])
+      if (length(del) >= min_points) {
+        pks <- c(pks, index[i])
+        del <- del[-1]
+        if (length(del) > 0) index <- index[-del]
+      }
     }
     i <- i + 1
   }
   end <- Sys.time()
-  if (is.infinite(npeaks)) {
-    message(length(pks), " peaks found (", format(end - start, digits = 3), ")")
-  }
+  message(length(pks), " peaks found (", format(end - start, digits = 3), ")")
+  if (!is.infinite(npeaks) & length(pks) < npeaks)
+    message("lower p_cutoff to find more peaks")
   pks
 }
