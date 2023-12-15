@@ -166,6 +166,8 @@ locus <- function(gene = NULL,
     
     if (!is.null(index_snp) & is.null(gene) & is.null(seqname) & is.null(xrange)) {
       # region based on index SNP
+      if (!index_snp %in% data[, labs])
+        stop("SNP specified by `index_snp` not found")
       seqname <- data[data[, labs] == index_snp, chrom]
       snp_pos <- data[data[, labs] == index_snp, pos]
       xrange <- if (is.null(fix_window)) {
