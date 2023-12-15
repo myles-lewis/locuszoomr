@@ -114,9 +114,6 @@ locus <- function(gene = NULL,
     xrange[xrange < 0] <- 0
   }
   
-  if ((is.null(xrange) | is.null(seqname)) & is.null(index_snp))
-    stop('No locus specified')
-  
   if (!is.null(data)) {
     # autodetect headings
     if (is.null(chrom)) {
@@ -177,7 +174,12 @@ locus <- function(gene = NULL,
       }
       xrange[xrange < 0] <- 0
     }
-    
+  }
+  
+  if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
+  message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
+  
+  if (!is.null(data)) { 
     data <- data[data[, chrom] == seqname &
                    data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
     if (is.null(yvar)) {
@@ -194,8 +196,6 @@ locus <- function(gene = NULL,
     }
     message(nrow(data), " SNPs/datapoints")
   }
-  
-  message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
