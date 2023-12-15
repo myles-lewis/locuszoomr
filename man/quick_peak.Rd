@@ -8,7 +8,8 @@ quick_peak(
   data,
   npeaks = NA,
   p_cutoff = 5e-08,
-  span = 1e+07,
+  span = 1e+06,
+  min_points = 2,
   chrom = NULL,
   pos = NULL,
   p = NULL
@@ -25,6 +26,10 @@ distinct peaks separated from one another by region size specified by
 p-values are ignored.}
 
 \item{span}{Minimum genomic distance between peaks}
+
+\item{min_points}{Minimum number of p-value significant points which must lie
+within the span of a peak. This removes peaks with single or only a few low
+p-value SNPs. To disable set \code{min_points} to 1 or less.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
 information. If \code{NULL} tries to autodetect the column.}
