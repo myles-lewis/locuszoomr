@@ -2,7 +2,7 @@
 #' Fast peak finder in GWAS data
 #' 
 #' Simple but fast function for finding peaks in genome-wide association study
-#' (GWAS) data based on fixed region size.
+#' (GWAS) data based on setting a minimum distance between peaks.
 #' 
 #' @param data GWAS dataset (data.frame or data.table)
 #' @param npeaks Number of peaks to find. If set to `NA`, algorithm finds all

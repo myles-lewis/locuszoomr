@@ -2,7 +2,7 @@ News
 =====
 
 # locuszoomr 0.1.6
-###### 14/12/2023
+###### 15/12/2023
 
 ### New features
 * Improved ggplot2 gene track plotting via `gg_genetracks()` to enable easy 

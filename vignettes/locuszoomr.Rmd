@@ -595,11 +595,46 @@ locus_plotly(loc2)
 knitr::include_graphics("plotly.png")
 ```
 
+# Plot all GWAS peaks
+
+`locuszoomr` includes a function `quick_peak()` to quickly find GWAS peaks based
+on a set p-value threshold (default 5e-08) and specifying a minimum distance
+between peaks (default 1e07). The function will either find all peaks ordered by
+lowest p-value, or the top *n* peaks can be identified by setting `npeaks`.
+
+```{r eval=FALSE}
+# FTP download full summary statistics of this SLE GWAS from
+# https://www.ebi.ac.uk/gwas/studies/GCST003156
+library(data.table)
+SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
+
+pks <- quick_peak(SLE_gwas)
+## 36 peaks found (0.328 secs)
+
+top_snps <- SLE_gwas$rsid[pks]
+head(top_snps)
+## [1] "rs141910407" "rs13019891"  "rs4274624"   "rs17849501"  "rs1143679"   "rs35000415"
+```
+
+We can now plot locus plots for all the GWAS peaks as a single pdf, as specified
+by the vector of top SNPs.
+
+```{r eval=FALSE}
+all_loci <- lapply(top_snps, function(i) {
+  locus(data = SLE_gwas, index_snp = i, fix_window = 1e6,
+        ens_db = "EnsDb.Hsapiens.v75")
+})
+
+pdf("sle_loci.pdf")
+tmp <- lapply(all_loci, locus_plot)
+dev.off()
+```
+
 # Manhattan & other plots
 
 For Manhattan plots, log p-value QQ plot and easy labelling of volcano plots or
-other scatter plots, check out our sister package `easylabel` on CRAN at
-https://cran.r-project.org/package=easylabel.
+other scatter plots with draggable labels, check out our sister package
+`easylabel` on CRAN at https://cran.r-project.org/package=easylabel.
 
 # References
 
