@@ -23,7 +23,7 @@ locus(
 }
 \arguments{
 \item{gene}{Optional character value specifying which gene to view. Either
-\code{gene} or \code{xrange} plus \code{seqname} must be specified.}
+\code{gene}, or \code{xrange} plus \code{seqname}, or \code{index_snp} must be specified.}
 
 \item{data}{Dataset (data.frame or data.table) to use for plot. If
 unspecified or \code{NULL}, gene track information alone is returned.}
@@ -63,7 +63,8 @@ simultaneously.}
 If \code{NULL} tries to autodetect the column.}
 
 \item{index_snp}{Specifies the index SNP. If not specified, the SNP with the
-lowest P value is selected.}
+lowest P value is selected. Can be used to specify locus region instead of
+specifying \code{gene}, or \code{seqname} and \code{xrange}.}
 
 \item{LD}{Optional character value to specify which column in \code{data} contains
 LD information.}

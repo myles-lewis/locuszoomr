@@ -544,7 +544,7 @@ wrap_plots(p, p, g, ncol = 1)
 For users who prefer the grid system we recommend also looking at Bioconductor
 packages `Gviz` or `ggbio` as possible alternatives.
 
-# Arrange multiple ggplots
+## Arrange multiple ggplots
 
 It is possible to use either the `cowplot` or `ggpubr` packages to layout
 multiple locus ggplots on the same page.

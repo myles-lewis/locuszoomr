@@ -11,7 +11,7 @@
 #' genes and exons in the locus.
 #' 
 #' @param gene Optional character value specifying which gene to view. Either
-#'   `gene` or `xrange` plus `seqname` must be specified.
+#'   `gene`, or `xrange` plus `seqname`, or `index_snp` must be specified.
 #' @param data Dataset (data.frame or data.table) to use for plot. If
 #'   unspecified or `NULL`, gene track information alone is returned.
 #' @param xrange Optional vector of genomic position range for the x axis.
@@ -39,7 +39,8 @@
 #' @param labs Determines which column in `data` contains SNP rs IDs.
 #' If `NULL` tries to autodetect the column.
 #' @param index_snp Specifies the index SNP. If not specified, the SNP with the
-#'   lowest P value is selected.
+#'   lowest P value is selected. Can be used to specify locus region instead of
+#'   specifying `gene`, or `seqname` and `xrange`.
 #' @param LD Optional character value to specify which column in `data` contains
 #'   LD information.
 #' @return Returns an object of class 'locus' ready for plotting, containing 
@@ -91,30 +92,30 @@ locus <- function(gene = NULL,
     stop("both `flank` and `fix_window` cannot be specified at the same time")
   if (is.null(flank)) flank <- 5e4
   flank <- rep_len(flank, 2)
+  
   if (!is.null(gene)) {
     locus <- genes(edb, filter = AnnotationFilterList(
       GeneNameFilter(gene),
       SeqNameFilter(c(1:22, 'X', 'Y'))
-      )
-    )
-     
+    ))
+    
     if(length(locus) > 1) {
-      warning(sprintf('Identified %d genes matching name \'%s\', taking first\n', length(locus), gene))
+      warning(sprintf('Identified %d genes matching name \'%s\', taking first\n',
+                      length(locus), gene))
       locus <- locus[1]
-      
-      }
+    }
     seqname <- names(seqlengths(locus))
     if (is.null(fix_window)) {
       xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
     } else {
       m <- mean(c(start(locus), end(locus)))
-      xrange <- c(m - fix_window/2, m + fix_window/2)
+      xrange <- as.integer(c(m - fix_window/2, m + fix_window/2))
     }
+    xrange[xrange < 0] <- 0
   }
   
-  xrange <- as.integer(xrange)
-  if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
+  if ((is.null(xrange) | is.null(seqname)) & is.null(index_snp))
+    stop('No locus specified')
   
   if (!is.null(data)) {
     # autodetect headings
@@ -163,6 +164,18 @@ locus <- function(gene = NULL,
       }
     }
     
+    if (!is.null(index_snp) & is.null(gene) & is.null(seqname) & is.null(xrange)) {
+      # region based on index SNP
+      seqname <- data[data[, labs] == index_snp, chrom]
+      snp_pos <- data[data[, labs] == index_snp, pos]
+      xrange <- if (is.null(fix_window)) {
+        c(snp_pos - flank[1], snp_pos + flank[2])
+      } else {
+        as.integer(c(snp_pos - fix_window/2, snp_pos + fix_window/2))
+      }
+      xrange[xrange < 0] <- 0
+    }
+    
     data <- data[data[, chrom] == seqname &
                    data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
     if (is.null(yvar)) {
@@ -171,9 +184,7 @@ locus <- function(gene = NULL,
     }
     data <- as.data.frame(data)
 
-    if(nrow(data) == 0) {
-      stop("Locus contains no SNPs/datapoints")
-    }
+    if (nrow(data) == 0) stop("Locus contains no SNPs/datapoints")
 
     if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
     if (is.character(LD)) {
@@ -181,6 +192,8 @@ locus <- function(gene = NULL,
     }
     message(nrow(data), " SNPs/datapoints")
   }
+  
+  message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
   
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
