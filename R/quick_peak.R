@@ -8,8 +8,8 @@
 #' @param npeaks Number of peaks to find. If set to `NA`, algorithm finds all
 #'   distinct peaks separated from one another by region size specified by
 #'   `span`.
-#' @param p_cutoff Specifies cut-off for p-value significance above which peaks
-#'   are ignored.
+#' @param p_cutoff Specifies cut-off for p-value significance above which
+#'   p-values are ignored.
 #' @param span Minimum genomic distance between peaks
 #' @param chrom Determines which column in `data` contains chromosome
 #'   information. If `NULL` tries to autodetect the column.
@@ -17,6 +17,12 @@
 #'   If `NULL` tries to autodetect the column.
 #' @param p Determines which column in `data` contains SNP p-values. If `NULL`
 #'   tries to autodetect the column.
+#' @details
+#' This function is designed for speed. SNP p-values are filtered to only those
+#' which are significant as specified by `p_cutoff`. Each peak is identified as
+#' the SNP with the lowest p-value and then SNPs in proximity to each peak
+#' within the distance specified by `span` are removed. Regions such as the HLA
+#' whose peaks may well be broader than `span` may produce multiple entries.
 #' @returns Vector of row indices
 #' @export
 

@@ -21,8 +21,8 @@ quick_peak(
 distinct peaks separated from one another by region size specified by
 \code{span}.}
 
-\item{p_cutoff}{Specifies cut-off for p-value significance above which peaks
-are ignored.}
+\item{p_cutoff}{Specifies cut-off for p-value significance above which
+p-values are ignored.}
 
 \item{span}{Minimum genomic distance between peaks}
 
@@ -40,5 +40,12 @@ Vector of row indices
 }
 \description{
 Simple but fast function for finding peaks in genome-wide association study
-(GWAS) data based on fixed region size.
+(GWAS) data based on setting a minimum distance between peaks.
+}
+\details{
+This function is designed for speed. SNP p-values are filtered to only those
+which are significant as specified by \code{p_cutoff}. Each peak is identified as
+the SNP with the lowest p-value and then SNPs in proximity to each peak
+within the distance specified by \code{span} are removed. Regions such as the HLA
+whose peaks may well be broader than \code{span} may produce multiple entries.
 }
