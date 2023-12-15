@@ -609,11 +609,11 @@ library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 
 pks <- quick_peak(SLE_gwas)
-## 36 peaks found (0.328 secs)
+## 34 peaks found (0.328 secs)
 
 top_snps <- SLE_gwas$rsid[pks]
 head(top_snps)
-## [1] "rs141910407" "rs13019891"  "rs4274624"   "rs17849501"  "rs1143679"   "rs35000415"
+## [1] "rs141910407" "rs114056368" "rs4274624"   "rs17849501"  "rs1143679"   "rs114115096"
 ```
 
 We can now plot locus plots for all the GWAS peaks as a single pdf, as specified
