@@ -226,9 +226,14 @@ locus <- function(gene = NULL,
   loc
 }
 
+
 #' @export
 summary.locus <- function(object, ...) {
-  if (!is.null(object$gene)) cat("Gene", object$gene, "\n")
+  if (!is.null(object$gene)) {
+    cat("Gene", object$gene, "\n")
+  } else if (!is.null(object$index_snp)) {
+    cat("Index SNP", object$index_snp, "\n")
+  }
   cat(paste0("Chromosome ", object$seqname, ", position ",
              format(object$xrange[1], big.mark=","), " to ",
              format(object$xrange[2], big.mark=","), "\n"))
