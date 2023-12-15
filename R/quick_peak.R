@@ -5,7 +5,7 @@
 #' (GWAS) data based on fixed region size.
 #' 
 #' @param data GWAS dataset (data.frame or data.table)
-#' @param npeaks Number of peaks to find. If set to NA, algorithm finds all
+#' @param npeaks Number of peaks to find. If set to `NA`, algorithm finds all
 #'   distinct peaks separated from one another by region size specified by
 #'   `span`.
 #' @param p_cutoff Specifies cut-off for p-value significance above which peaks
