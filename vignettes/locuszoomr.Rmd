@@ -157,9 +157,11 @@ either be controlled by specifying `flank` which defaults to 50kb either side of
 the ends of the gene. `flank` can either be a single number or a vector of 2
 numbers if different down/upstream flanking lengths are required. Alternatively
 a fixed genomic window (eg. 1 Mb) centred on the gene of interest can be
-specified using the argument `fix_window`. Finally, the locus can be specified
+specified using the argument `fix_window`. The locus can be specified
 manually by specifying the chromosome using `seqname` and genomic position range
-using `xrange`.
+using `xrange`. Finally, a region can be specified by naming the `index_snp`, in
+which case the object `data` is searched for the coordinates of that SNP and the
+size of the region defined using `fix_window` or `flank`.
 
 # Obtaining LD information
 
