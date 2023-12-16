@@ -80,8 +80,10 @@ genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
+  recomb <- !is.null(loc$recomb)
   if (align) {
-    op <- par(mar = c(ifelse(xticks, 3.5, 1), 3.5, 0.25, 1.5))
+    op <- par(mar = c(ifelse(xticks, 3.5, 1), 3.5, 0.25,
+                      ifelse(recomb, 3.5, 1.5)))
     on.exit(par(op))
   }
   

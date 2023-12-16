@@ -91,14 +91,29 @@ scatter_plot <- function(loc,
   }
   
   # scatter plot
+  recomb <- !is.null(loc$recomb)
   if (align) {
-    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2, 1.5))
+    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2,
+                      ifelse(recomb, 3.5, 1.5)))
     on.exit(par(op))
   }
   
-  if (loc$yvar == "logP" & !is.null(pcutoff)) {
-    abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
-  } else abl <- NULL
+  ylim <- range(data[, loc$yvar], na.rm = TRUE)
+  if (yzero) ylim[1] <- min(c(0, ylim[1]))
+  panel.first <- quote({
+    if (loc$yvar == "logP" & !is.null(pcutoff)) {
+      abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+    }
+    if (recomb) {
+      ry <- loc$recomb$value * diff(ylim) / 100 + ylim[1]
+      lines(loc$recomb$start, ry, col = "blue")
+      at <- 0:5 * (diff(ylim) / 5) + ylim[1]
+      axis(4, at = at, labels = 0:5 * 20,
+           las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
+           cex.axis = cex.axis)
+      mtext("Recombination rate (%)", 4, cex = cex.axis, line = 1.7)
+    }
+  })
   
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] == index_snp] <- 23L
@@ -113,8 +128,8 @@ scatter_plot <- function(loc,
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     return(do.call("points", plot.args))
   }
-  ylim <- range(data[, loc$yvar], na.rm = TRUE)
-  if (yzero) ylim[1] <- min(c(0, ylim[1]))
+  
+  bty <- if (border | recomb) 'o' else 'l'
   plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
@@ -123,11 +138,11 @@ scatter_plot <- function(loc,
                ylim = ylim,
                xlab = if (xticks) xlab else "",
                ylab = ylab,
-               bty = if (border) 'o' else 'l',
+               bty = bty,
                xaxt = 'n',
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
-               panel.first = abl)
+               panel.first = panel.first)
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
   
