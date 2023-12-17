@@ -115,7 +115,7 @@ scatter_plot <- function(loc,
       axis(4, at = at, labels = 0:5 * 20,
            las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
            cex.axis = cex.axis)
-      mtext("Recombination rate (%)", 4, cex = cex.axis, line = 1.7)
+      mtext("Recombination rate (%)", 4, cex = cex.lab, line = 1.7)
     }
   })
   
