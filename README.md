@@ -1,5 +1,8 @@
 # locuszoomr
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/locuszoomr)](https://cran.r-project.org/package=locuszoomr)
+[![Downloads](http://cranlogs.r-pkg.org/badges/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
+
 This is a pure R implementation of locuszoom for plotting genetic data at 
 genomic loci accompanied by gene annotations. It uses the LDlink API to query 
 linkage disequilibrium data from 1000 Genomes.
