@@ -146,7 +146,7 @@ gg_scatter <- function(loc,
             legend.position = legend.position,
             legend.title.align = 0.5,
             legend.text.align = 0,
-            legend.key.size = unit(1, 'lines'),
+            legend.key.size = unit(0.9, 'lines'),
             legend.spacing.y = unit(0, 'lines')) +
       if (!xticks) theme(axis.text.x=element_blank(),
                          axis.ticks.x=element_blank())
@@ -174,7 +174,7 @@ gg_scatter <- function(loc,
             legend.position = legend.position,
             legend.title.align = 0.5,
             legend.text.align = 0,
-            legend.key.size = unit(1, 'lines'),
+            legend.key.size = unit(0.9, 'lines'),
             legend.spacing.y = unit(0, 'lines')) +
       if (!xticks) theme(axis.text.x=element_blank(),
                          axis.ticks.x=element_blank())
