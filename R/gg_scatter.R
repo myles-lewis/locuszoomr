@@ -34,11 +34,7 @@
 #' to [link_recomb()], this is plotted as an additional line with a secondary y
 #' axis. In the base graphics version the line is placed under the scatter
 #' points, but this is not possible with ggplot2 as the secondary y axis data
-#' must be plotted on top of the primary scatter point data. Also ggplot2 forces
-#' a merging of the recombination data x axis positions with the scatter plot
-#' data, which leads to a slightly different line plot compared to the base
-#' graphics version (missing recombination positions are filled in using last
-#' observation carried forward).
+#' must be plotted on top of the primary scatter point data.
 #' 
 #' @seealso [locus()] [gg_addgenes()]
 #' @examples
@@ -54,7 +50,7 @@
 #'  geom_line
 #' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
-#' @importFrom zoo na.locf0
+#' @importFrom zoo na.approx
 #' @export
 #' 
 gg_scatter <- function(loc,
@@ -132,7 +128,7 @@ gg_scatter <- function(loc,
     colnames(df) <- c(loc$pos, "recomb")
     data <- dplyr::bind_rows(data, df)
     data <- data[order(data[, loc$pos]), ]
-    data$recomb <- zoo::na.locf0(data$recomb)
+    data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos])
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
   
