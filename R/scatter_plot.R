@@ -23,10 +23,13 @@
 #' @param border Logical whether a bounding box is plotted around upper and
 #'   lower plots.
 #' @param showLD Logical whether to show LD with colours
-#' @param LD_scheme Vector of colours for plotting LD. The first colour is for SNPs
-#'   which lack LD information. The next 5 colours are for r2 or D' LD results
-#'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
-#'   SNP.
+#' @param LD_scheme Vector of colours for plotting LD. The first colour is for
+#'   SNPs which lack LD information. The next 5 colours are for r2 or D' LD
+#'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
+#'   the index SNP.
+#' @param recomb_col Colour for recombination rate line if recombination rate
+#'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
+#'   recombination rate data.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
@@ -62,6 +65,7 @@ scatter_plot <- function(loc,
                          showLD = TRUE,
                          LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                        'orange', 'red', 'purple'),
+                         recomb_col = "blue",
                          legend_pos = 'topleft',
                          labels = NULL,
                          label_x = 4, label_y = 4,
@@ -91,14 +95,29 @@ scatter_plot <- function(loc,
   }
   
   # scatter plot
+  recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   if (align) {
-    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2, 1.5))
+    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2,
+                      ifelse(recomb, 3.5, 1.5)))
     on.exit(par(op))
   }
   
-  if (loc$yvar == "logP" & !is.null(pcutoff)) {
-    abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
-  } else abl <- NULL
+  ylim <- range(data[, loc$yvar], na.rm = TRUE)
+  if (yzero) ylim[1] <- min(c(0, ylim[1]))
+  panel.first <- quote({
+    if (loc$yvar == "logP" & !is.null(pcutoff)) {
+      abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
+    }
+    if (recomb) {
+      ry <- loc$recomb$value * diff(ylim) / 100 + ylim[1]
+      lines(loc$recomb$start, ry, col = recomb_col)
+      at <- 0:5 * (diff(ylim) / 5) + ylim[1]
+      axis(4, at = at, labels = 0:5 * 20,
+           las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
+           cex.axis = cex.axis)
+      mtext("Recombination rate (%)", 4, cex = cex.lab, line = 1.7)
+    }
+  })
   
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] == index_snp] <- 23L
@@ -113,8 +132,8 @@ scatter_plot <- function(loc,
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     return(do.call("points", plot.args))
   }
-  ylim <- range(data[, loc$yvar], na.rm = TRUE)
-  if (yzero) ylim[1] <- min(c(0, ylim[1]))
+  
+  bty <- if (border | recomb) 'o' else 'l'
   plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                pch = pch, bg = data$bg, col = col,
                las = 1, font.main = 1,
@@ -123,11 +142,11 @@ scatter_plot <- function(loc,
                ylim = ylim,
                xlab = if (xticks) xlab else "",
                ylab = ylab,
-               bty = if (border) 'o' else 'l',
+               bty = bty,
                xaxt = 'n',
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
-               panel.first = abl)
+               panel.first = panel.first)
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
   

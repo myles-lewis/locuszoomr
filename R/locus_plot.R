@@ -41,8 +41,11 @@
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons (or genes if
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
-#' @param text_pos Character value of either 'top' or 'left' specifying 
-#' placement of gene name labels.
+#' @param text_pos Character value of either 'top' or 'left' specifying
+#'   placement of gene name labels.
+#' @param recomb_col Colour for recombination rate line if recombination rate
+#'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
+#'   recombination rate data.
 #' @param ... Other arguments passed to [scatter_plot()] and [plot()] to control
 #'   the scatter plot, e.g. `ylab`, `main`, etc.
 #' @return No return value.
@@ -79,7 +82,8 @@ locus_plot <- function(loc,
                        gene_col = 'blue4',
                        exon_col = 'blue4',
                        exon_border = 'blue4',
-                       text_pos = 'top', ...) {
+                       text_pos = 'top',
+                       recomb_col = "blue", ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   
@@ -92,10 +96,12 @@ locus_plot <- function(loc,
   genetracks(loc, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.lab, cex.text, gene_col, exon_col, exon_border,
              showExons, maxrows, text_pos, xticks = (xticks == 'bottom'),
-             xlab = if (xticks == 'bottom') xlab else "")
+             xlab = if (xticks == 'bottom') xlab else "",
+             showRecomb = !is.na(recomb_col))
   
   # upper panel plot points
   scatter_plot(loc, xticks = (xticks == 'top'),
                border = border, xlab = xlab,
-               cex = cex, cex.axis = cex.axis, cex.lab = cex.lab, ...)
+               cex = cex, cex.axis = cex.axis, cex.lab = cex.lab,
+               recomb_col = recomb_col, ...)
 }

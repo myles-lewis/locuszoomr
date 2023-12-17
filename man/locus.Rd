@@ -33,7 +33,7 @@ unspecified or \code{NULL}, gene track information alone is returned.}
 \item{seqname}{Optional, specifies which chromosome to plot.}
 
 \item{flank}{Single value or vector with 2 values for how much flanking
-region left and right of the gene to show. Defaults to 50,000.}
+region left and right of the gene to show. Defaults to 100kb.}
 
 \item{fix_window}{Optional alternative to \code{flank}, which allows users to
 specify a fixed genomic window centred on the specified gene. Both \code{flank}

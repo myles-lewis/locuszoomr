@@ -23,6 +23,7 @@ locus_plot(
   exon_col = "blue4",
   exon_border = "blue4",
   text_pos = "top",
+  recomb_col = "blue",
   ...
 )
 }
@@ -72,6 +73,10 @@ lower plots.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{recomb_col}{Colour for recombination rate line if recombination rate
+data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+recombination rate data.}
 
 \item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} and \code{\link[=plot]{plot()}} to control
 the scatter plot, e.g. \code{ylab}, \code{main}, etc.}

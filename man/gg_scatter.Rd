@@ -19,6 +19,7 @@ gg_scatter(
   border = FALSE,
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
+  recomb_col = "blue",
   legend_pos = "topleft"
 )
 }
@@ -32,8 +33,8 @@ show this.}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{scheme}{Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
-= colour for significant points, 3rd = index SNP.}
+\item{scheme}{Vector of 3 colours if LD is not shown: 1st = normal points,
+2nd = colour for significant points, 3rd = index SNP.}
 
 \item{size}{Specifies size for points.}
 
@@ -58,6 +59,10 @@ which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
 
+\item{recomb_col}{Colour for recombination rate line if recombination rate
+data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+recombination rate data.}
+
 \item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
 }
 \value{
@@ -65,6 +70,13 @@ Returns a ggplot2 plot.
 }
 \description{
 Produces a scatter plot from a 'locus' class object (without gene tracks).
+}
+\details{
+If recombination rate data is included in the locus object following a call
+to \code{\link[=link_recomb]{link_recomb()}}, this is plotted as an additional line with a secondary y
+axis. In the base graphics version the line is placed under the scatter
+points, but this is not possible with ggplot2 as the secondary y axis data
+must be plotted on top of the primary scatter point data.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {

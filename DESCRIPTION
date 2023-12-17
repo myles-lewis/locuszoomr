@@ -18,17 +18,22 @@ Imports:
     AnnotationFilter,
     BiocGenerics,
     cowplot,
+    dplyr,
     ensembldb,
     GenomeInfoDb,
+    GenomicRanges,
     gggrid,
     ggplot2,
     graphics,
     grDevices,
     grid,
+    IRanges,
     LDlinkR,
     memoise,
     plotly,
-    rlang
+    rlang,
+    rtracklayer,
+    zoo
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
