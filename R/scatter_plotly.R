@@ -124,17 +124,18 @@ scatter_plotly <- function(loc,
   } else {
     # double y axis with recombination
     plot_ly() %>%
+      add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                hoverinfo = "none", colors = LD_scheme,  # colors must go here
+                name = "recombination", yaxis = "y2",
+                line = list(color = recomb_col),
+                mode = "lines", type = "scattergl", showlegend = FALSE) %>%
       add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                color = data$bg, colors = LD_scheme,
+                color = data$bg,
                 marker = list(size = marker_size, opacity = 0.8,
                               line = list(width = 1, color = marker_outline)),
                 text = hovertext,
                 hoverinfo = 'text',
                 type = "scattergl", mode = "markers") %>%
-      add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                hoverinfo = "none",
-                name = "recombination", yaxis = "y2", color = I(recomb_col),
-                mode = "lines", type = "scattergl", showlegend = FALSE) %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
                                   range = as.list(xlim)),
