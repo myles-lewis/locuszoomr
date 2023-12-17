@@ -17,7 +17,7 @@
 #' @param xrange Optional vector of genomic position range for the x axis.
 #' @param seqname Optional, specifies which chromosome to plot.
 #' @param flank Single value or vector with 2 values for how much flanking 
-#' region left and right of the gene to show. Defaults to 50,000.
+#' region left and right of the gene to show. Defaults to 100kb.
 #' @param fix_window Optional alternative to `flank`, which allows users to
 #'   specify a fixed genomic window centred on the specified gene. Both `flank`
 #'   and `fix_window` cannot be specified simultaneously.
@@ -90,7 +90,7 @@ locus <- function(gene = NULL,
   } else edb <- ens_db
   if (!is.null(flank) & !is.null(fix_window))
     stop("both `flank` and `fix_window` cannot be specified at the same time")
-  if (is.null(flank)) flank <- 5e4
+  if (is.null(flank)) flank <- 1e5
   flank <- rep_len(flank, 2)
   
   if (!is.null(gene)) {
