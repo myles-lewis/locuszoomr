@@ -66,6 +66,17 @@ Returns a ggplot2 plot.
 \description{
 Produces a scatter plot from a 'locus' class object (without gene tracks).
 }
+\details{
+If recombination rate data is included in the locus object following a call
+to \code{\link[=link_recomb]{link_recomb()}}, this is plotted as an additional line with a secondary y
+axis. In the base graphics version the line is placed under the scatter
+points, but this is not possible with ggplot2 as the secondary y axis data
+must be plotted on top of the primary scatter point data. Also ggplot2 forces
+a merging of the recombination data x axis positions with the scatter plot
+data, which leads to a slightly different line plot compared to the base
+graphics version (missing recombination positions are filled in using last
+observation carried forward).
+}
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {
 data(SLE_gwas_sub)
