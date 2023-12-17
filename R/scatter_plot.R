@@ -28,7 +28,7 @@
 #'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
 #'   the index SNP.
 #' @param recomb_col Colour for recombination rate line if recombination rate
-#'   data is present. Set to NA to hide the line. See [link_recomb()] to add
+#'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.

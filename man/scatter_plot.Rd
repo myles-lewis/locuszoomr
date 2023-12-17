@@ -70,7 +70,7 @@ results ranging from 0 to 1 in intervals of 0.2. The final colour is for
 the index SNP.}
 
 \item{recomb_col}{Colour for recombination rate line if recombination rate
-data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide

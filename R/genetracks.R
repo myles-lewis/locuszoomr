@@ -27,8 +27,10 @@
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons (or genes if
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
-#' @param text_pos Character value of either 'top' or 'left' specifying 
-#' placement of gene name labels.
+#' @param text_pos Character value of either 'top' or 'left' specifying
+#'   placement of gene name labels.
+#' @param showRecomb Logical controls alignment of right margin if
+#'   recombination data present.
 #' @param align Logical whether to set [par()] to align the plot.
 #' @return No return value.
 #' @examples
@@ -67,6 +69,7 @@ genetracks <- function(locus,
                        text_pos = 'top',
                        xticks = TRUE,
                        xlab = NULL,
+                       showRecomb = TRUE,
                        align = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
@@ -80,7 +83,7 @@ genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
-  recomb <- !is.null(locus$recomb)
+  recomb <- !is.null(locus$recomb) & showRecomb
   if (align) {
     op <- par(mar = c(ifelse(xticks, 3.5, 1), 3.5, 0.25,
                       ifelse(recomb, 3.5, 1.5)))

@@ -20,6 +20,7 @@ genetracks(
   text_pos = "top",
   xticks = TRUE,
   xlab = NULL,
+  showRecomb = TRUE,
   align = TRUE
 )
 }
@@ -61,6 +62,9 @@ placement of gene name labels.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
+
+\item{showRecomb}{Logical controls alignment of right margin if
+recombination data present.}
 
 \item{align}{Logical whether to set \code{\link[=par]{par()}} to align the plot.}
 }
