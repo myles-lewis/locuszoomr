@@ -4,15 +4,48 @@
 \alias{locus_plotly}
 \title{Locus plotly}
 \usage{
-locus_plotly(loc, heights = c(0.6, 0.4), ...)
+locus_plotly(
+  loc,
+  heights = c(0.6, 0.4),
+  filter_gene_name = NULL,
+  filter_gene_biotype = NULL,
+  cex.text = 0.7,
+  gene_col = "blue4",
+  exon_col = "blue4",
+  exon_border = "blue4",
+  maxrows = 8,
+  xlab = NULL,
+  ...
+)
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
 \item{heights}{Vector controlling relative height of each panel on 0-1 scale.}
 
-\item{...}{Optional arguments passed to \code{\link[=genetrack_ly]{genetrack_ly()}} to control the gene
-tracks.}
+\item{filter_gene_name}{Vector of gene names to display.}
+
+\item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
+\code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
+\code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
+
+\item{cex.text}{Font size for gene text.}
+
+\item{gene_col}{Colour for gene lines.}
+
+\item{exon_col}{Fill colour for exons.}
+
+\item{exon_border}{Border line colour outlining exons. Set to \code{NA} for no
+border.}
+
+\item{maxrows}{Specifies maximum number of rows to display in gene
+annotation panel.}
+
+\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
+in \code{locus}.}
+
+\item{...}{Optional arguments passed to \code{\link[=scatterplot_ly]{scatterplot_ly()}} to control the
+scatter plot.}
 }
 \value{
 A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -36,5 +69,5 @@ locus_plotly(loc)
 }
 }
 \seealso{
-\code{\link[=genetrack_ly]{genetrack_ly()}} \code{\link[=locus]{locus()}}
+\code{\link[=locus]{locus()}} \code{\link[=genetrack_ly]{genetrack_ly()}} \code{\link[=scatterplot_ly]{scatterplot_ly()}}
 }

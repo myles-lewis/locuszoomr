@@ -22,8 +22,12 @@
 #'   the index SNP.
 #' @param marker_outline Specifies colour for outlining points.
 #' @param marker_size Value for size of markers in plotly units.
+#' @param recomb_col Colour for recombination rate line if recombination rate
+#'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
+#'   recombination rate data.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
+#' @importFrom plotly add_trace
 #' @export
 #' 
 scatter_plotly <- function(loc,
@@ -38,7 +42,8 @@ scatter_plotly <- function(loc,
                            LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                          'orange', 'red', 'purple'),
                            marker_outline = "black",
-                           marker_size = 7) {
+                           marker_size = 7,
+                           recomb_col = "blue") {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
@@ -72,9 +77,7 @@ scatter_plotly <- function(loc,
   }
   
   # scatter plotly
-  if (loc$yvar == "logP" & !is.null(pcutoff)) {
-    abl <- quote(abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2))
-  } else abl <- NULL
+  recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] == index_snp] <- 23L
@@ -95,24 +98,56 @@ scatter_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
+  ylim2 <- c(-2, 102)
   
-  plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-          color = data$bg, colors = LD_scheme,
-          marker = list(size = marker_size, opacity = 0.8,
-                        line = list(width = 1, color = marker_outline)),
-          text = hovertext,
-          hoverinfo = 'text',
-          type = "scattergl", mode = "markers") %>%
-    plotly::layout(xaxis = list(title = xlab,
-                                ticks = "outside",
-                                range = as.list(xlim)),
-                   yaxis = list(title = ylab,
-                                ticks = "outside",
-                                showline = TRUE, range = ylim),
-                   legend = leg,
-                   showlegend = showLD | !is.null(pcutoff)) %>%
-    plotly::config(displaylogo = FALSE)
-                   # modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d",
-                   #                            "lasso2d", "zoomIn2d", "zoomOut2d", 
-                   #                            "autoScale2d", "toggleHover"))
+  if (!recomb) {
+    # standard plotly
+    plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+            color = data$bg, colors = LD_scheme,
+            marker = list(size = marker_size, opacity = 0.8,
+                          line = list(width = 1, color = marker_outline)),
+            text = hovertext,
+            hoverinfo = 'text',
+            type = "scattergl", mode = "markers") %>%
+      plotly::layout(xaxis = list(title = xlab,
+                                  ticks = "outside",
+                                  range = as.list(xlim)),
+                     yaxis = list(title = ylab,
+                                  ticks = "outside",
+                                  showline = TRUE, range = ylim),
+                     legend = leg,
+                     showlegend = showLD | !is.null(pcutoff)) %>%
+      plotly::config(displaylogo = FALSE)
+    # modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d",
+    #                            "lasso2d", "zoomIn2d", "zoomOut2d", 
+    #                            "autoScale2d", "toggleHover"))
+  } else {
+    # double y axis with recombination
+    plot_ly() %>%
+      add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+                color = data$bg, colors = LD_scheme,
+                marker = list(size = marker_size, opacity = 0.8,
+                              line = list(width = 1, color = marker_outline)),
+                text = hovertext,
+                hoverinfo = 'text', legendgroup = 2,
+                type = "scattergl", mode = "markers") %>%
+      add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                legendgroup = 1,
+                name = "recombination", yaxis = "y2", color = I(recomb_col),
+                mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+      plotly::layout(xaxis = list(title = xlab,
+                                  ticks = "outside",
+                                  range = as.list(xlim)),
+                     yaxis = list(title = ylab,
+                                  ticks = "outside",
+                                  showline = TRUE, range = ylim),
+                     yaxis2 = list(overlaying = "y", side = "right",
+                                   title = "Recombination rate (%)",
+                                   ticks = "outside", showgrid = FALSE,
+                                   showline = TRUE,
+                                   zeroline = FALSE, range = ylim2),
+                     legend = c(leg, x = 1.1, y = 1),
+                     showlegend = showLD | !is.null(pcutoff)) %>%
+      plotly::config(displaylogo = FALSE)
+  }
 }

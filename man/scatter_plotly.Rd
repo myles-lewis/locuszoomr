@@ -16,7 +16,8 @@ scatter_plotly(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   marker_outline = "black",
-  marker_size = 7
+  marker_size = 7,
+  recomb_col = "blue"
 )
 }
 \arguments{
@@ -50,6 +51,10 @@ the index SNP.}
 \item{marker_outline}{Specifies colour for outlining points.}
 
 \item{marker_size}{Value for size of markers in plotly units.}
+
+\item{recomb_col}{Colour for recombination rate line if recombination rate
+data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+recombination rate data.}
 }
 \value{
 A \code{plotly} scatter plot.
