@@ -129,10 +129,10 @@ scatter_plotly <- function(loc,
                 marker = list(size = marker_size, opacity = 0.8,
                               line = list(width = 1, color = marker_outline)),
                 text = hovertext,
-                hoverinfo = 'text', legendgroup = 2,
+                hoverinfo = 'text',
                 type = "scattergl", mode = "markers") %>%
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                legendgroup = 1,
+                hoverinfo = "none",
                 name = "recombination", yaxis = "y2", color = I(recomb_col),
                 mode = "lines", type = "scattergl", showlegend = FALSE) %>%
       plotly::layout(xaxis = list(title = xlab,

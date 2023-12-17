@@ -25,10 +25,10 @@
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons. Set to `NA` for no 
 #' border.
-#' @param ... Optional arguments passed to [scatterplot_ly()] to control the
+#' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
-#' @seealso [locus()] [genetrack_ly()] [scatterplot_ly()]
+#' @seealso [locus()] [genetrack_ly()] [scatter_plotly()]
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {
 #' data(SLE_gwas_sub)
@@ -50,7 +50,7 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          ...) {
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     gene_col, exon_col, exon_border, maxrows, xlab)
-  p <- scatter_plotly(loc, ...)
+  p <- scatter_plotly(loc, xlab = xlab, ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = c(0.6, 0.4),
                   titleY = TRUE)

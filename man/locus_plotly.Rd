@@ -44,7 +44,7 @@ annotation panel.}
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
 
-\item{...}{Optional arguments passed to \code{\link[=scatterplot_ly]{scatterplot_ly()}} to control the
+\item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}
 }
 \value{
@@ -69,5 +69,5 @@ locus_plotly(loc)
 }
 }
 \seealso{
-\code{\link[=locus]{locus()}} \code{\link[=genetrack_ly]{genetrack_ly()}} \code{\link[=scatterplot_ly]{scatterplot_ly()}}
+\code{\link[=locus]{locus()}} \code{\link[=genetrack_ly]{genetrack_ly()}} \code{\link[=scatter_plotly]{scatter_plotly()}}
 }
