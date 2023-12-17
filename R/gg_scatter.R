@@ -40,7 +40,7 @@
 #'  geom_line
 #' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
-#' @importFrom zoo na.locf
+#' @importFrom zoo na.locf0
 #' @export
 #' 
 gg_scatter <- function(loc,
@@ -117,7 +117,7 @@ gg_scatter <- function(loc,
     colnames(df) <- c(loc$pos, "recomb")
     data <- dplyr::bind_rows(data, df)
     data <- data[order(data[, loc$pos]), ]
-    data$recomb <- zoo::na.locf(data$recomb)
+    data$recomb <- zoo::na.locf0(data$recomb)
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
   
