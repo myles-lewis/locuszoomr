@@ -52,6 +52,6 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                     gene_col, exon_col, exon_border, maxrows, xlab)
   p <- scatter_plotly(loc, xlab = xlab, ...)
   
-  plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = c(0.6, 0.4),
+  plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                   titleY = TRUE)
 }
