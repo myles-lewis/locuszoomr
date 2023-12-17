@@ -7,6 +7,16 @@
 #' @param genome Either `"hg38"` or `"hg19"`
 #' @param table Optional character value specifying which recombination table to
 #'   use.
+#' @details
+#' Uses the `rtracklayer` package to query UCSC genome browser for recombination
+#' rate data. The results are cached using `memoise` to reduce API requests.
+#' 
+#' Possible options for `table` for hg19 are `"hapMapRelease24YRIRecombMap"`,
+#' `"hapMapRelease24CEURecombMap"`, `"hapMapRelease24CombinedRecombMap"` (the
+#' default).
+#' 
+#' The only options for `table` for hg38 is `"recomb1000GAvg"` (the default).
+#' 
 #' @returns A list object of class 'locus'. Recombination data is added as list
 #'   element `recomb`.
 #' @importFrom GenomeInfoDb genome<-
