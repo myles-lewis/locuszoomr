@@ -163,7 +163,7 @@ gg_scatter <- function(loc,
                          guide = "none") +
       geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = "blue") +
       scale_y_continuous(name = ylab,
-                         sec.axis = sec_axis(~. * ymult + yrange[1],
+                         sec.axis = sec_axis(~(. - yrange[1]) * ymult,
                                              name = "Recombination rate (%)")) +
       xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) +
       xlab(xlab) +
