@@ -15,7 +15,7 @@
 #' `"hapMapRelease24CEURecombMap"`, `"hapMapRelease24CombinedRecombMap"` (the
 #' default).
 #' 
-#' The only options for `table` for hg38 is `"recomb1000GAvg"` (the default).
+#' The only option for `table` for hg38 is `"recomb1000GAvg"` (the default).
 #' 
 #' @returns A list object of class 'locus'. Recombination data is added as list
 #'   element `recomb`.

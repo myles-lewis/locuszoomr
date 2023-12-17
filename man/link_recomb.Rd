@@ -29,5 +29,5 @@ Possible options for \code{table} for hg19 are \code{"hapMapRelease24YRIRecombMa
 \code{"hapMapRelease24CEURecombMap"}, \code{"hapMapRelease24CombinedRecombMap"} (the
 default).
 
-The only options for \code{table} for hg38 is \code{"recomb1000GAvg"} (the default).
+The only option for \code{table} for hg38 is \code{"recomb1000GAvg"} (the default).
 }
