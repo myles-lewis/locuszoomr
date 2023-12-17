@@ -29,6 +29,9 @@
 #'   SNPs which lack LD information. The next 5 colours are for r2 or D' LD
 #'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
 #'   the index SNP.
+#' @param recomb_col Colour for recombination rate line if recombination rate
+#'   data is present. Set to NA to hide the line. See [link_recomb()] to add
+#'   recombination rate data.
 #' @param legend_pos Position of legend e.g. "topleft", "topright" or ggplot2
 #'   settings. Set to `NULL` to hide legend.
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
@@ -60,6 +63,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                          showLD = TRUE,
                          LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                        'orange', 'red', 'purple'),
+                         recomb_col = "blue",
                          legend_pos = 'topleft',
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -77,6 +81,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                   border = border,
                   showLD = showLD,
                   LD_scheme = LD_scheme,
+                  recomb_col = recomb_col,
                   legend_pos = legend_pos)
   g <- gg_genetracks(loc, xticks = (xticks != "top"),
                      border = border, xlab = xlab,

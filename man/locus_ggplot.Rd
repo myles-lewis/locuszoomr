@@ -19,6 +19,7 @@ locus_ggplot(
   border = FALSE,
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
+  recomb_col = "blue",
   legend_pos = "topleft",
   ...
 )
@@ -59,6 +60,10 @@ plots.}
 SNPs which lack LD information. The next 5 colours are for r2 or D' LD
 results ranging from 0 to 1 in intervals of 0.2. The final colour is for
 the index SNP.}
+
+\item{recomb_col}{Colour for recombination rate line if recombination rate
+data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+recombination rate data.}
 
 \item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
 settings. Set to \code{NULL} to hide legend.}

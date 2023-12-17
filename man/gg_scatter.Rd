@@ -19,6 +19,7 @@ gg_scatter(
   border = FALSE,
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
+  recomb_col = "blue",
   legend_pos = "topleft"
 )
 }
@@ -32,8 +33,8 @@ show this.}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{scheme}{Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
-= colour for significant points, 3rd = index SNP.}
+\item{scheme}{Vector of 3 colours if LD is not shown: 1st = normal points,
+2nd = colour for significant points, 3rd = index SNP.}
 
 \item{size}{Specifies size for points.}
 
@@ -57,6 +58,10 @@ to \code{NULL} to disable.}
 which lack LD information. The next 5 colours are for r2 or D' LD results
 ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 SNP.}
+
+\item{recomb_col}{Colour for recombination rate line if recombination rate
+data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
+recombination rate data.}
 
 \item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
 }

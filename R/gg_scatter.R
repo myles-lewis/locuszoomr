@@ -9,8 +9,8 @@
 #'   show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param scheme Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
-#'   = colour for significant points, 3rd = index SNP.
+#' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
+#'   2nd = colour for significant points, 3rd = index SNP.
 #' @param size Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
@@ -24,6 +24,9 @@
 #'   which lack LD information. The next 5 colours are for r2 or D' LD results
 #'   ranging from 0 to 1 in intervals of 0.2. The final colour is for the index
 #'   SNP.
+#' @param recomb_col Colour for recombination rate line if recombination rate
+#'   data is present. Set to NA to hide the line. See [link_recomb()] to add
+#'   recombination rate data.
 #' @param legend_pos Position of legend. Set to `NULL` to hide legend.
 #' @return Returns a ggplot2 plot.
 #' @details
@@ -69,6 +72,7 @@ gg_scatter <- function(loc,
                        showLD = TRUE,
                        LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                      'orange', 'red', 'purple'),
+                       recomb_col = "blue",
                        legend_pos = 'topleft') {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
@@ -122,7 +126,7 @@ gg_scatter <- function(loc,
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
-  recomb <- !is.null(loc$recomb)
+  recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   if (recomb) {
     df <- loc$recomb[, c("start", "value")]
     colnames(df) <- c(loc$pos, "recomb")
@@ -172,7 +176,7 @@ gg_scatter <- function(loc,
                         labels = legend_labels, name = expression({r^2})) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
-      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = "blue") +
+      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col) +
       scale_y_continuous(name = ylab,
                          sec.axis = sec_axis(~(. - yrange[1]) * ymult,
                                              name = "Recombination rate (%)")) +
