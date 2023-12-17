@@ -36,8 +36,11 @@
 #' }
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
-#'  element_blank element_rect unit geom_hline
+#'  element_blank element_rect unit geom_hline scale_y_continuous sec_axis
+#'  geom_line
+#' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
+#' @importFrom zoo na.locf
 #' @export
 #' 
 gg_scatter <- function(loc,
@@ -82,7 +85,6 @@ gg_scatter <- function(loc,
   }
   
   # scatter plot
-  data[, loc$pos] <- data[, loc$pos] / 1e6
   if (!"col" %in% colnames(data)) data$col <- "black"
   data$col <- as.factor(data$col)
   # if (!"pch" %in% colnames(data)) data$pch <- 21
@@ -101,43 +103,84 @@ gg_scatter <- function(loc,
       legend.position <- legend_pos
     }
     if (showLD & hasLD) {
-      legend_labels <- rev(c("Index SNP", "0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
-                             "0.0 - 0.2", "NA"))
+      legend_labels <- rev(c("Index SNP", "0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6",
+                             "0.2 - 0.4", "0.0 - 0.2", "NA"))
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else legend.position = "none"
   } else legend.position = "none"
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
+  recomb <- !is.null(loc$recomb)
+  if (recomb) {
+    df <- loc$recomb[, c("start", "value")]
+    colnames(df) <- c(loc$pos, "recomb")
+    data <- dplyr::bind_rows(data, df)
+    data <- data[order(data[, loc$pos]), ]
+    data$recomb <- zoo::na.locf(data$recomb)
+  }
+  data[, loc$pos] <- data[, loc$pos] / 1e6
   
-  p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], color = .data$col,
-                   fill = .data$bg)) +
-    (if (loc$yvar == "logP" & !is.null(pcutoff) & ycut >= yrange[1] & ycut <= yrange[2]) {
-      geom_hline(yintercept = ycut,
-                 colour = "grey", linetype = "dashed")
-    }
-    ) +
-    geom_point(shape = 21, size = size) +
-    scale_fill_manual(breaks = levels(data$bg), values = scheme,
-                      guide = guide_legend(reverse = TRUE),
-                      labels = legend_labels, name = expression({r^2})) +
-    scale_color_manual(breaks = levels(data$col), values = levels(data$col),
-                       guide = "none") +
-    # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-    xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) + ylim(yrange[1], NA) +
-    labs(x = xlab, y = ylab) +
-    theme_classic() +
-    theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
-          axis.title = element_text(size = 10 * cex.lab),
-          legend.justification = legend.justification,
-          legend.position = legend.position,
-          legend.title.align = 0.5,
-          legend.text.align = 0,
-          legend.key.size = unit(1, 'lines'),
-          legend.spacing.y = unit(0, 'lines')) +
-    if (!xticks) theme(axis.text.x=element_blank(),
-                       axis.ticks.x=element_blank())
-  if (border) p <- p + theme(panel.border = element_rect(colour = "black", fill = NA))
+  if (!recomb) {
+    # standard plot
+    p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+                          color = .data$col, fill = .data$bg)) +
+      (if (loc$yvar == "logP" & !is.null(pcutoff) &
+           ycut >= yrange[1] & ycut <= yrange[2]) {
+        geom_hline(yintercept = ycut,
+                   colour = "grey", linetype = "dashed")
+      }) +
+      geom_point(shape = 21, size = size) +
+      scale_fill_manual(breaks = levels(data$bg), values = scheme,
+                        guide = guide_legend(reverse = TRUE),
+                        labels = legend_labels, name = expression({r^2})) +
+      scale_color_manual(breaks = levels(data$col), values = levels(data$col),
+                         guide = "none") +
+      # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
+      xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) + ylim(yrange[1], NA) +
+      labs(x = xlab, y = ylab) +
+      theme_classic() +
+      theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
+            axis.title = element_text(size = 10 * cex.lab),
+            legend.justification = legend.justification,
+            legend.position = legend.position,
+            legend.title.align = 0.5,
+            legend.text.align = 0,
+            legend.key.size = unit(1, 'lines'),
+            legend.spacing.y = unit(0, 'lines')) +
+      if (!xticks) theme(axis.text.x=element_blank(),
+                         axis.ticks.x=element_blank())
+  } else {
+    # recombination plot with dual y axis
+    ymult <- 100 / diff(yrange)
+    p <- ggplot(data, aes(x = .data[[loc$pos]])) +
+      geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
+                     fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
+      scale_fill_manual(breaks = levels(data$bg), values = scheme,
+                        guide = guide_legend(reverse = TRUE),
+                        labels = legend_labels, name = expression({r^2})) +
+      scale_color_manual(breaks = levels(data$col), values = levels(data$col),
+                         guide = "none") +
+      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = "blue") +
+      scale_y_continuous(name = ylab,
+                         sec.axis = sec_axis(~. * ymult + yrange[1],
+                                             name = "Recombination rate (%)")) +
+      xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) +
+      xlab(xlab) +
+      theme_classic() +
+      theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
+            axis.title = element_text(size = 10 * cex.lab),
+            legend.justification = legend.justification,
+            legend.position = legend.position,
+            legend.title.align = 0.5,
+            legend.text.align = 0,
+            legend.key.size = unit(1, 'lines'),
+            legend.spacing.y = unit(0, 'lines')) +
+      if (!xticks) theme(axis.text.x=element_blank(),
+                         axis.ticks.x=element_blank())
+  }
+  if (border | recomb) {
+    p <- p + theme(panel.border = element_rect(colour = "black", fill = NA))
+  }
   p
 }
-
