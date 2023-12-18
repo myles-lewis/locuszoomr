@@ -165,6 +165,11 @@ gg_scatter <- function(loc,
     # recombination plot with dual y axis
     ymult <- 100 / diff(yrange)
     p <- ggplot(data, aes(x = .data[[loc$pos]])) +
+      (if (loc$yvar == "logP" & !is.null(pcutoff) &
+           ycut >= yrange[1] & ycut <= yrange[2]) {
+        geom_hline(yintercept = ycut,
+                   colour = "grey", linetype = "dashed")
+      }) +
       geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
                      fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
@@ -196,3 +201,4 @@ gg_scatter <- function(loc,
   }
   p
 }
+
