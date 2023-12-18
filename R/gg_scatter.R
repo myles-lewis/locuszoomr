@@ -128,7 +128,7 @@ gg_scatter <- function(loc,
     colnames(df) <- c(loc$pos, "recomb")
     data <- dplyr::bind_rows(data, df)
     data <- data[order(data[, loc$pos]), ]
-    data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos])
+    data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
   
@@ -172,7 +172,8 @@ gg_scatter <- function(loc,
                         labels = legend_labels, name = expression({r^2})) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
-      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col) +
+      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
+                na.rm = TRUE) +
       scale_y_continuous(name = ylab,
                          sec.axis = sec_axis(~(. - yrange[1]) * ymult,
                                              name = "Recombination rate (%)")) +
