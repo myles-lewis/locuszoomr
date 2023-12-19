@@ -200,6 +200,7 @@ locus <- function(gene = NULL,
     message(nrow(data), " SNPs/datapoints")
   }
   
+  seqname <- gsub("chr", "", seqname)
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
     TxStartFilter(xrange[2], condition = "<"),
