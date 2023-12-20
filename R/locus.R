@@ -201,6 +201,8 @@ locus <- function(gene = NULL,
   }
   
   seqname <- gsub("chr", "", seqname)
+  if (!seqname %in% c(1:22, "X", "Y")) 
+    warning("`seqname` refers to a non-conventional chromosome")
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
     TxStartFilter(xrange[2], condition = "<"),
@@ -209,16 +211,17 @@ locus <- function(gene = NULL,
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
   TX <- TX[!duplicated(TX$gene_id), ]
- 
-  if(nrow(TX) == 0) {
+  
+  if (nrow(TX) == 0) {
+    message("No gene transcripts")
     # Creating empty exons object here in suitable format
-   EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
-    SeqNameFilter(seqname),
-    ExonStartFilter(xrange[2], condition = "<"),
-    ExonEndFilter(xrange[1], condition = ">"),
-    GeneIdFilter("ENSG", "startsWith")))
+    EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+      SeqNameFilter(seqname),
+      ExonStartFilter(xrange[2], condition = "<"),
+      ExonEndFilter(xrange[1], condition = ">"),
+      GeneIdFilter("ENSG", "startsWith")))
   } else {
-   EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+    EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   }
 
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
