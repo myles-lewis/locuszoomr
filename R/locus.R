@@ -200,7 +200,7 @@ locus <- function(gene = NULL,
     message(nrow(data), " SNPs/datapoints")
   }
   
-  seqname <- gsub("chr", "", seqname)
+  seqname <- gsub("chr|[[:punct:]]", "", seqname, ignore.case = TRUE)
   if (!seqname %in% c(1:22, "X", "Y")) 
     warning("`seqname` refers to a non-conventional chromosome")
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
