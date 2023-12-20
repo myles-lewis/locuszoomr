@@ -90,9 +90,6 @@ genetracks <- function(locus,
     on.exit(par(op))
   }
   
-  blank <- TX$gene_name == ""
-  if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
-  
   if (nrow(TX) != 0) {
     TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
     maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
@@ -170,6 +167,8 @@ genetracks <- function(locus,
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
                    text_pos = 'top') {
+  blank <- TX$gene_name == ""
+  if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
