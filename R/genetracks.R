@@ -90,6 +90,9 @@ genetracks <- function(locus,
     on.exit(par(op))
   }
   
+  blank <- TX$gene_name == ""
+  if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
+  
   if (nrow(TX) != 0) {
     TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
     maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))

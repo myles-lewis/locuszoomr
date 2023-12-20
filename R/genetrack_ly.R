@@ -64,6 +64,9 @@ genetrack_ly <- function(locus,
     return(p)
   }
   
+  blank <- TX$gene_name == ""
+  if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
+  
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
