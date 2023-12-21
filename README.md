@@ -5,12 +5,13 @@
 
 This is a pure R implementation of locuszoom for plotting genetic data at 
 genomic loci accompanied by gene annotations. It uses the LDlink API to query 
-linkage disequilibrium data from 1000 Genomes.
+linkage disequilibrium data from 1000 Genomes. Recombination rate can also be
+shown by querying UCSC genome browser.
 
 # Installation
 
-Bioconductor packages `ensembldb` and an Ensembl database installed either as a
-package or obtained through Bioconductor packages `AnnotationHub` are required
+Bioconductor package `ensembldb` and an Ensembl database installed either as a
+package or accessed through Bioconductor package `AnnotationHub` are required
 before installation.
 
 ```
@@ -38,6 +39,9 @@ https://ldlink.nih.gov/?tab=apiaccess.
 
 Requests to LDlink are cached using the `memoise` package, to reduce API 
 requests. This is helpful when modifying plots for aesthetic reasons.
+
+See the vignette for code examples of how to add 1000 Genomes LD data and/or
+recombination rate.
 
 # Example locus plot
 
