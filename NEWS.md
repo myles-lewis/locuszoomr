@@ -2,7 +2,7 @@ News
 =====
 
 # locuszoomr 0.2.0
-###### 17/12/2023
+###### 21/12/2023
 
 ### New features
 * Improved ggplot2 gene track plotting via `gg_genetracks()` to enable easy 
@@ -15,6 +15,8 @@ easier by simply not specifying `data` (or setting it to `NULL`) when calling
 * Added function `link_recomb()` for retrieving recombination data from UCSC.
 * Recombination rate is shown on a secondary y axis by `locus_plot()` and 
 `locus_ggplot()`.
+* Added `...` to `link_LD()` and `link_eqtl()` to allow passing of additional 
+arguments such as `genome_build` to `LDlinkR` queries.
 
 ### Bugfixes
 * Fixed bug when plotting LD with absent levels in `locus_ggplot()` and 
