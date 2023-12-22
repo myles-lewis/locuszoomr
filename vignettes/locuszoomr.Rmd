@@ -180,7 +180,7 @@ library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 loc <- locus(SLE_gwas, gene = 'UBE2L3', flank = 1e5,
              ens_db = "EnsDb.Hsapiens.v75")
-loc <- link_LD(loc, LDtoken = "your_token")
+loc <- link_LD(loc, token = "your_token")
 locus_plot(loc)
 ```
 
@@ -308,7 +308,7 @@ object.
 # needs personal access token for LDlink
 loc2 <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
-loc2 <- link_eqtl(loc2, LDtoken = "..")
+loc2 <- link_eqtl(loc2, token = "..")
 head(loc2$LDexp)  # show eQTL data
 ```
 

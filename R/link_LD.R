@@ -10,9 +10,10 @@
 #' allowed, default = "CEU". Passed to `LDlinkR::LDmatrix()`.
 #' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
 #' to `LDlinkR::LDmatrix()`.
-#' @param LDtoken Personal access token for accessing 1000 Genomes LD data via 
+#' @param token Personal access token for accessing 1000 Genomes LD data via 
 #' LDlink API. See `LDlinkR` package documentation.
-#' @param ... Optional arguments passed on `LDlinkR::LDmatrix()`
+#' @param ... Optional arguments such as `genome_build` which are passed on to
+#'   `LDlinkR::LDmatrix()`
 #' @return Returns a list object of class 'locus'. LD information is added as a
 #'   column `ld` in list element `data`.
 #' @seealso [locus()]
@@ -22,7 +23,7 @@
 link_LD <- function(loc,
                     pop = "CEU",
                     r2d = "r2",
-                    LDtoken = "", ...) {
+                    token = "", ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -31,13 +32,13 @@ link_LD <- function(loc,
   labs <- loc$labs
   index_snp <- loc$index_snp
   
-  if (LDtoken == "") stop("LDtoken is missing")
+  if (token == "") stop("token is missing")
   rslist <- loc$data[, labs]
   if (length(rslist) > 1000) {
     rslist <- rslist[order(loc$data$logP, decreasing = TRUE)[seq_len(1000)]]
   }
   message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
-  ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = LDtoken, ...)
+  ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
   ld <- ldm[, index_snp]
   loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
   loc

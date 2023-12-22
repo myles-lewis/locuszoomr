@@ -18,6 +18,10 @@ easier by simply not specifying `data` (or setting it to `NULL`) when calling
 * Added `...` to `link_LD()` and `link_eqtl()` to allow passing of additional 
 arguments such as `genome_build` to `LDlinkR` queries.
 
+### Changes
+* Argument `LDtoken` in `link_LD()` and `link_eqtl()` has been renamed `token` 
+to be consistent with `LDlinkR`.
+
 ### Bugfixes
 * Fixed bug when plotting LD with absent levels in `locus_ggplot()` and 
 `locus_plotly()`.
