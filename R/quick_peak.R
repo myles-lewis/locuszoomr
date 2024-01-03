@@ -10,7 +10,7 @@
 #'   `span`.
 #' @param p_cutoff Specifies cut-off for p-value significance above which
 #'   p-values are ignored.
-#' @param span Minimum genomic distance between peaks
+#' @param span Minimum genomic distance between peaks (default 1 Mb)
 #' @param min_points Minimum number of p-value significant points which must lie
 #'   within the span of a peak. This removes peaks with single or only a few low
 #'   p-value SNPs. To disable set `min_points` to 1 or less.

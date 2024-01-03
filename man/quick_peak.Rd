@@ -25,7 +25,7 @@ distinct peaks separated from one another by region size specified by
 \item{p_cutoff}{Specifies cut-off for p-value significance above which
 p-values are ignored.}
 
-\item{span}{Minimum genomic distance between peaks}
+\item{span}{Minimum genomic distance between peaks (default 1 Mb)}
 
 \item{min_points}{Minimum number of p-value significant points which must lie
 within the span of a peak. This removes peaks with single or only a few low

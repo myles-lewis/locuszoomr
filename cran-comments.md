@@ -2,8 +2,8 @@
 
 0 errors | 0 warnings | 0 note
 
-* Fixes for several bugs; improvements to plotting functions to handle edge
-cases; a couple of extra features
+* This release includes fixes for several bugs and improved handling of edge 
+cases, as well as a couple of extra features
 
 * Fixed CRAN ERROR: in vignette added conditional `if(require())` for packages
 in Suggests
