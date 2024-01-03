@@ -26,6 +26,7 @@ to be consistent with `LDlinkR`.
 * Fixed bug when plotting LD with absent levels in `locus_ggplot()` and 
 `locus_plotly()`.
 * Fixed plots with no gene tracks (thanks to Tom Willis).
+* Genes with missing gene symbols now display the ensembl gene ID
 
 # locuszoomr 0.1.3
 ###### 03/11/2023
