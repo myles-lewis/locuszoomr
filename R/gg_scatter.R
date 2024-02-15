@@ -217,7 +217,6 @@ gg_scatter <- function(loc,
   }
 
   if(!is.null(labels)) {
-    print('call geom_text_repel')
     p <- p+
       do.call(geom_text_repel, c(list(data = data[text_label_ind,], mapping = aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], label = .data[[loc$labs]]), point.size = size), ggrepel_args))
   }
