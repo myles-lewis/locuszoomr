@@ -570,7 +570,7 @@ multiple locus ggplots on the same page.
 ```{r, fig.dim = c(12, 7)}
 if (require(EnsDb.Hsapiens.v75)) {
 library(cowplot)
-p1 <- locus_ggplot(loc)
+p1 <- locus_ggplot(loc, labels = c("index"))
 p2 <- locus_ggplot(loc2, legend_pos = NULL)
 plot_grid(p1, p2, ncol = 2)
 }

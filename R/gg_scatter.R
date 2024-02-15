@@ -28,6 +28,10 @@
 #'   data is present. Set to NA to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
 #' @param legend_pos Position of legend. Set to `NULL` to hide legend.
+#' @param labels Character vector of SNP or genomic feature IDs to label. The
+#'   value "index" selects the highest point or index SNP as defined when
+#'   [locus()] is called. Set to `NULL` to remove all labels.
+#' @param ggrepel_args List of arguments to pass to `geom_text_repel` to configure label drawing
 #' @return Returns a ggplot2 plot.
 #' @details
 #' If recombination rate data is included in the locus object following a call
@@ -48,6 +52,7 @@
 #'  scale_fill_manual scale_color_manual aes guide_legend element_text
 #'  element_blank element_rect unit geom_hline scale_y_continuous sec_axis
 #'  geom_line
+#' @importFrom ggrepel geom_text_repel
 #' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
 #' @importFrom zoo na.approx
@@ -69,7 +74,10 @@ gg_scatter <- function(loc,
                        LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                      'orange', 'red', 'purple'),
                        recomb_col = "blue",
-                       legend_pos = 'topleft') {
+                       legend_pos = 'topleft',
+                       labels = NULL,
+                       ggrepel_args = list())
+                       {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
@@ -131,7 +139,18 @@ gg_scatter <- function(loc,
     data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
-  
+
+  # add labels
+  if (!is.null(labels)) {
+    i <- grep("index", labels, ignore.case = TRUE)
+    if (i) labels[i] <- index_snp
+    text_label_ind <- match(labels, data[, loc$labs])
+    if (any(is.na(text_label_ind))) {
+      message("label ", paste(labels[is.na(text_label_ind)], collapse = ", "),
+              " not found")
+    }
+  }
+
   if (!recomb) {
     # standard plot
     p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
@@ -196,6 +215,13 @@ gg_scatter <- function(loc,
       if (!xticks) theme(axis.text.x=element_blank(),
                          axis.ticks.x=element_blank())
   }
+
+  if(!is.null(labels)) {
+    print('call geom_text_repel')
+    p <- p+
+      do.call(geom_text_repel, c(list(data = data[text_label_ind,], mapping = aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], label = .data[[loc$labs]]), point.size = size), ggrepel_args))
+  }
+
   if (border | recomb) {
     p <- p + theme(panel.border = element_rect(colour = "black", fill = NA))
   }

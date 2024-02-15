@@ -34,6 +34,10 @@
 #'   recombination rate data.
 #' @param legend_pos Position of legend e.g. "topleft", "topright" or ggplot2
 #'   settings. Set to `NULL` to hide legend.
+#' @param labels Character vector of SNP or genomic feature IDs to label. The
+#'   value "index" selects the highest point or index SNP as defined when
+#'   [locus()] is called. Set to `NULL` to remove all labels.
+#' @param ggrepel_args List of arguments to pass to `geom_text_repel` to configure label drawing
 #' @param ... Additional arguments passed to [gg_genetracks()] to control
 #'   colours of gene tracks etc.
 #' @return Returns a ggplot2 plot containing a scatter plot with genetracks
@@ -65,6 +69,8 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                                        'orange', 'red', 'purple'),
                          recomb_col = "blue",
                          legend_pos = 'topleft',
+                         labels = NULL,
+                         ggrepel_args = list(),
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
@@ -82,11 +88,13 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                   showLD = showLD,
                   LD_scheme = LD_scheme,
                   recomb_col = recomb_col,
-                  legend_pos = legend_pos)
+                  legend_pos = legend_pos,
+                  labels = labels,
+                  ggrepel_args = ggrepel_args)
   g <- gg_genetracks(loc, xticks = (xticks != "top"),
                      border = border, xlab = xlab,
                      cex.axis = cex.axis,
                      cex.lab = cex.lab, ...)
-  
+
   plot_grid(p, g, nrow = 2, rel_heights = heights, align = "v")
 }
