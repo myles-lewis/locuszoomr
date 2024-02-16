@@ -639,12 +639,24 @@ by the vector of top SNPs.
 
 ```{r eval=FALSE}
 all_loci <- lapply(top_snps, function(i) {
-  locus(data = SLE_gwas, index_snp = i, fix_window = 1e6,
+  loc <- locus(data = SLE_gwas, index_snp = i, fix_window = 1e6,
         ens_db = "EnsDb.Hsapiens.v75")
+  link_recomb(loc, genome = "hg19")
 })
 
+# base graphics version
 pdf("sle_loci.pdf")
-tmp <- lapply(all_loci, locus_plot)
+tmp <- lapply(all_loci, locus_plot, labels = "index")
+dev.off()
+
+# ggplot2 version
+pp <- lapply(all_loci, locus_ggplot, labels = "index", nudge_y = 1)
+
+library(gridExtra)
+pdf("sle_loci_gg.pdf")
+for (i in seq_along(pp)) {
+  grid.arrange(pp[[i]])
+}
 dev.off()
 ```
 

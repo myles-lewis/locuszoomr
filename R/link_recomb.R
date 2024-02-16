@@ -44,7 +44,9 @@ query_recomb <- function(gen, xrange, seqname, table = NULL) {
   session <- browserSession("UCSC")
   genome(session) <- gen
   query <- ucscTableQuery(session, table = table, range = gr)
-  getTable(query)
+  gtab <- try(getTable(query))
+  if (inherits(gtab, "try-error")) return(NULL)
+  gtab
 }
 
 # use memoise to reduce calls to UCSC API

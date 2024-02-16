@@ -180,7 +180,11 @@ locus <- function(gene = NULL,
   }
   
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  message("Chromosome ", seqname, ", position ", xrange[1], " to ", xrange[2])
+  msg <- paste0("chromosome ", seqname, ", position ", xrange[1], " to ",
+                xrange[2])
+  if (!is.null(gene)) msg <- paste(gene, msg, sep = ", ")
+  if (!is.null(index_snp)) msg <- paste(index_snp, msg, sep = ", ")
+  message(msg)
   
   if (!is.null(data)) { 
     data <- data[data[, chrom] == seqname &
