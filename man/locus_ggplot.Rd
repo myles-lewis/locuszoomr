@@ -17,7 +17,7 @@ locus_ggplot(
   exon_col = "blue4",
   exon_border = "blue4",
   showExons = TRUE,
-  maxrows = NULL,
+  maxrows = 12,
   text_pos = "top",
   xticks = "top",
   xlab = NULL,
