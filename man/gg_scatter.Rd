@@ -22,7 +22,7 @@ gg_scatter(
   recomb_col = "blue",
   legend_pos = "topleft",
   labels = NULL,
-  ggrepel_args = list()
+  ...
 )
 }
 \arguments{
@@ -71,7 +71,8 @@ recombination rate data.}
 value "index" selects the highest point or index SNP as defined when
 \code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
 
-\item{ggrepel_args}{List of arguments to pass to \code{geom_text_repel} to configure label drawing}
+\item{...}{Optional arguments passed to \code{geom_text_repel()} to configure
+label drawing.}
 }
 \value{
 Returns a ggplot2 plot.

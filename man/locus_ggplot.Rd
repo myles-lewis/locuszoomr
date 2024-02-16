@@ -7,22 +7,20 @@
 locus_ggplot(
   loc,
   heights = c(3, 2),
-  index_snp = loc$index_snp,
-  pcutoff = 5e-08,
-  scheme = c("royalblue", "red", "purple"),
-  size = 2,
+  filter_gene_name = NULL,
+  filter_gene_biotype = NULL,
+  border = FALSE,
   cex.axis = 1,
   cex.lab = 1,
-  xlab = NULL,
-  ylab = NULL,
+  cex.text = 0.7,
+  gene_col = ifelse(showExons, "blue4", "skyblue"),
+  exon_col = "blue4",
+  exon_border = "blue4",
+  showExons = TRUE,
+  maxrows = NULL,
+  text_pos = "top",
   xticks = "top",
-  border = FALSE,
-  showLD = TRUE,
-  LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
-  recomb_col = "blue",
-  legend_pos = "topleft",
-  labels = NULL,
-  ggrepel_args = list(),
+  xlab = NULL,
   ...
 )
 }
@@ -31,53 +29,44 @@ locus_ggplot(
 
 \item{heights}{Vector supplying the ratio of top to bottom plot.}
 
-\item{index_snp}{Specifies index SNP to be shown in a different colour and
-symbol. Defaults to the SNP with the lowest p-value. Set to \code{NULL} to not
-show this.}
+\item{filter_gene_name}{Vector of gene names to display.}
 
-\item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
-to \code{NULL} to disable.}
+\item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
+\code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
+\code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
 
-\item{scheme}{Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
-= colour for significant points, 3rd = index SNP.}
-
-\item{size}{Specifies size for points.}
+\item{border}{Logical whether a bounding box is plotted.}
 
 \item{cex.axis}{Specifies font size for axis numbering.}
 
 \item{cex.lab}{Specifies font size for axis titles.}
 
-\item{xlab}{x axis title.}
+\item{cex.text}{Font size for gene text.}
 
-\item{ylab}{y axis title.}
+\item{gene_col}{Colour for gene lines.}
 
-\item{xticks}{Logical whether x axis numbers and axis title are plotted.}
+\item{exon_col}{Fill colour for exons.}
 
-\item{border}{Logical whether a bounding box is plotted around top and bottom
-plots.}
+\item{exon_border}{Border line colour outlining exons (or genes if
+\code{showExons} is \code{FALSE}). Set to \code{NA} for no border.}
 
-\item{showLD}{Logical whether to show LD with colours}
+\item{showExons}{Logical whether to show exons or simply show whole gene as a
+rectangle. If \code{showExons = FALSE} colours are specified by \code{exon_border}
+for rectangle border and \code{gene_col} for the fill colour.}
 
-\item{LD_scheme}{Vector of colours for plotting LD. The first colour is for
-SNPs which lack LD information. The next 5 colours are for r2 or D' LD
-results ranging from 0 to 1 in intervals of 0.2. The final colour is for
-the index SNP.}
+\item{maxrows}{Specifies maximum number of rows to display in gene annotation
+panel.}
 
-\item{recomb_col}{Colour for recombination rate line if recombination rate
-data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
-recombination rate data.}
+\item{text_pos}{Character value of either 'top' or 'left' specifying
+placement of gene name labels.}
 
-\item{legend_pos}{Position of legend e.g. "topleft", "topright" or ggplot2
-settings. Set to \code{NULL} to hide legend.}
+\item{xticks}{Logical whether x axis ticks and numbers are plotted.}
 
-\item{labels}{Character vector of SNP or genomic feature IDs to label. The
-value "index" selects the highest point or index SNP as defined when
-\code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
+\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified in
+\code{locus}.}
 
-\item{ggrepel_args}{List of arguments to pass to \code{geom_text_repel} to configure label drawing}
-
-\item{...}{Additional arguments passed to \code{\link[=gg_genetracks]{gg_genetracks()}} to control
-colours of gene tracks etc.}
+\item{...}{Additional arguments passed to \code{\link[=gg_scatter]{gg_scatter()}} to control
+the scatter plot.}
 }
 \value{
 Returns a ggplot2 plot containing a scatter plot with genetracks
@@ -85,6 +74,12 @@ underneath.
 }
 \description{
 Genomic locus plot similar to locuszoom.
+}
+\details{
+Arguments to control plotting of the gene tracks are passed onto
+\code{\link[=gg_genetracks]{gg_genetracks()}} and for the scatter plot are passed via \code{...} to
+\code{\link[=gg_scatter]{gg_scatter()}}. See the documentation for each of these functions for
+details.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {

@@ -50,16 +50,16 @@ gg_genetracks(
 rectangle. If \code{showExons = FALSE} colours are specified by \code{exon_border}
 for rectangle border and \code{gene_col} for the fill colour.}
 
-\item{maxrows}{Specifies maximum number of rows to display in gene
-annotation panel.}
+\item{maxrows}{Specifies maximum number of rows to display in gene annotation
+panel.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
 
 \item{xticks}{Logical whether x axis ticks and numbers are plotted.}
 
-\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
-in \code{locus}.}
+\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified in
+\code{locus}.}
 }
 \value{
 A ggplot2 object.

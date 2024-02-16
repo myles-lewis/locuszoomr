@@ -31,7 +31,8 @@
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
 #'   value "index" selects the highest point or index SNP as defined when
 #'   [locus()] is called. Set to `NULL` to remove all labels.
-#' @param ggrepel_args List of arguments to pass to `geom_text_repel` to configure label drawing
+#' @param ... Optional arguments passed to `geom_text_repel()` to configure
+#'   label drawing.
 #' @return Returns a ggplot2 plot.
 #' @details
 #' If recombination rate data is included in the locus object following a call
@@ -75,9 +76,7 @@ gg_scatter <- function(loc,
                                      'orange', 'red', 'purple'),
                        recomb_col = "blue",
                        legend_pos = 'topleft',
-                       labels = NULL,
-                       ggrepel_args = list())
-                       {
+                       labels = NULL, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
@@ -216,9 +215,12 @@ gg_scatter <- function(loc,
                          axis.ticks.x=element_blank())
   }
 
-  if(!is.null(labels)) {
-    p <- p+
-      do.call(geom_text_repel, c(list(data = data[text_label_ind,], mapping = aes(x = .data[[loc$pos]], y = .data[[loc$yvar]], label = .data[[loc$labs]]), point.size = size), ggrepel_args))
+  if (!is.null(labels)) {
+    p <- p +
+      geom_text_repel(data = data[text_label_ind, ],
+                      mapping = aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+                                    label = .data[[loc$labs]]),
+                      point.size = size, ...)
   }
 
   if (border | recomb) {

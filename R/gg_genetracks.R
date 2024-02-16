@@ -10,24 +10,24 @@
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
+#' @param border Logical whether a bounding box is plotted.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
 #' @param cex.text Font size for gene text.
-#' @param showExons Logical whether to show exons or simply show whole gene as a
-#'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
-#'   for rectangle border and `gene_col` for the fill colour.
-#' @param maxrows Specifies maximum number of rows to display in gene 
-#' annotation panel.
-#' @param xticks Logical whether x axis ticks and numbers are plotted.
-#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
-#' in `locus`.
-#' @param border Logical whether a bounding box is plotted.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons (or genes if
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
-#' @param text_pos Character value of either 'top' or 'left' specifying 
-#' placement of gene name labels.
+#' @param showExons Logical whether to show exons or simply show whole gene as a
+#'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
+#'   for rectangle border and `gene_col` for the fill colour.
+#' @param maxrows Specifies maximum number of rows to display in gene annotation
+#'   panel.
+#' @param text_pos Character value of either 'top' or 'left' specifying
+#'   placement of gene name labels.
+#' @param xticks Logical whether x axis ticks and numbers are plotted.
+#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
+#'   `locus`.
 #' @return A ggplot2 object.
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {

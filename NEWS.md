@@ -1,6 +1,10 @@
 News
 =====
 
+# locuszoomr 0.2.1
+###### 16/02/2024
+* Added labels to `locus_ggplot()` and `gg_scatter()` (thanks to Tom Willis).
+
 # locuszoomr 0.2.0
 ###### 21/12/2023
 

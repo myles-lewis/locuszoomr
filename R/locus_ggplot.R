@@ -3,43 +3,37 @@
 #'
 #' Genomic locus plot similar to locuszoom.
 #'
+#' Arguments to control plotting of the gene tracks are passed onto
+#' [gg_genetracks()] and for the scatter plot are passed via `...` to
+#' [gg_scatter()]. See the documentation for each of these functions for
+#' details.
+#'
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param heights Vector supplying the ratio of top to bottom plot.
-#' @param index_snp Specifies index SNP to be shown in a different colour and
-#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
-#'   show this.
-#' @param xticks Character value of either 'top' or 'bottom' specifying whether
-#'   x axis ticks and numbers are plotted on top or bottom plot window.
-#' @param border Logical whether a bounding box is plotted around upper and
-#'   lower plots.
-#' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
-#'   to `NULL` to disable.
-#' @param scheme Vector of 3 colors if LD is not shown: 1st = normal points, 2nd
-#'   = colour for significant points, 3rd = index SNP.
-#' @param size Specifies size for points.
+#' @param filter_gene_name Vector of gene names to display.
+#' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
+#' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
+#' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
+#' @param border Logical whether a bounding box is plotted.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
-#' @param xlab x axis title.
-#' @param ylab y axis title.
-#' @param xticks Logical whether x axis numbers and axis title are plotted.
-#' @param border Logical whether a bounding box is plotted around top and bottom
-#'   plots.
-#' @param showLD Logical whether to show LD with colours
-#' @param LD_scheme Vector of colours for plotting LD. The first colour is for
-#'   SNPs which lack LD information. The next 5 colours are for r2 or D' LD
-#'   results ranging from 0 to 1 in intervals of 0.2. The final colour is for
-#'   the index SNP.
-#' @param recomb_col Colour for recombination rate line if recombination rate
-#'   data is present. Set to NA to hide the line. See [link_recomb()] to add
-#'   recombination rate data.
-#' @param legend_pos Position of legend e.g. "topleft", "topright" or ggplot2
-#'   settings. Set to `NULL` to hide legend.
-#' @param labels Character vector of SNP or genomic feature IDs to label. The
-#'   value "index" selects the highest point or index SNP as defined when
-#'   [locus()] is called. Set to `NULL` to remove all labels.
-#' @param ggrepel_args List of arguments to pass to `geom_text_repel` to configure label drawing
-#' @param ... Additional arguments passed to [gg_genetracks()] to control
-#'   colours of gene tracks etc.
+#' @param cex.text Font size for gene text.
+#' @param gene_col Colour for gene lines.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons (or genes if
+#'   `showExons` is `FALSE`). Set to `NA` for no border.
+#' @param showExons Logical whether to show exons or simply show whole gene as a
+#'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
+#'   for rectangle border and `gene_col` for the fill colour.
+#' @param maxrows Specifies maximum number of rows to display in gene annotation
+#'   panel.
+#' @param text_pos Character value of either 'top' or 'left' specifying
+#'   placement of gene name labels.
+#' @param xticks Logical whether x axis ticks and numbers are plotted.
+#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
+#'   `locus`.
+#' @param ... Additional arguments passed to [gg_scatter()] to control
+#'   the scatter plot.
 #' @return Returns a ggplot2 plot containing a scatter plot with genetracks
 #'   underneath.
 #' @seealso [gg_scatter()] [gg_genetracks()]
@@ -54,47 +48,37 @@
 #' @export
 
 locus_ggplot <- function(loc, heights = c(3, 2),
-                         index_snp = loc$index_snp,
-                         pcutoff = 5e-08,
-                         scheme = c('royalblue', 'red', 'purple'),
-                         size = 2,
+                         filter_gene_name = NULL,
+                         filter_gene_biotype = NULL,
+                         border = FALSE,
                          cex.axis = 1,
                          cex.lab = 1,
-                         xlab = NULL,
-                         ylab = NULL,
+                         cex.text = 0.7,
+                         gene_col = ifelse(showExons, 'blue4', 'skyblue'),
+                         exon_col = 'blue4',
+                         exon_border = 'blue4',
+                         showExons = TRUE,
+                         maxrows = NULL,
+                         text_pos = 'top',
                          xticks = "top",
-                         border = FALSE,
-                         showLD = TRUE,
-                         LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
-                                       'orange', 'red', 'purple'),
-                         recomb_col = "blue",
-                         legend_pos = 'topleft',
-                         labels = NULL,
-                         ggrepel_args = list(),
+                         xlab = NULL,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   p <- gg_scatter(loc,
-                  index_snp = index_snp,
-                  pcutoff = pcutoff,
-                  scheme = scheme,
-                  size = size,
                   cex.axis = cex.axis,
                   cex.lab = cex.lab,
                   xlab = xlab,
-                  ylab = ylab,
                   xticks = (xticks == "top"),
-                  border = border,
-                  showLD = showLD,
-                  LD_scheme = LD_scheme,
-                  recomb_col = recomb_col,
-                  legend_pos = legend_pos,
-                  labels = labels,
-                  ggrepel_args = ggrepel_args)
-  g <- gg_genetracks(loc, xticks = (xticks != "top"),
-                     border = border, xlab = xlab,
-                     cex.axis = cex.axis,
-                     cex.lab = cex.lab, ...)
+                  border = border, ...)
+  g <- gg_genetracks(loc,
+                     filter_gene_name, filter_gene_biotype,
+                     border,
+                     cex.axis, cex.lab, cex.text,
+                     gene_col, exon_col, exon_border,
+                     showExons,
+                     maxrows, text_pos,
+                     xticks = (xticks != "top"), xlab)
 
   plot_grid(p, g, nrow = 2, rel_heights = heights, align = "v")
 }
