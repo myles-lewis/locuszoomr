@@ -36,11 +36,15 @@ link_LD <- function(loc,
   rslist <- loc$data[, labs]
   if (length(rslist) > 1000) {
     rslist <- rslist[order(loc$data$logP, decreasing = TRUE)[seq_len(1000)]]
+    rslist <- unique(c(index_snp, rslist))[seq_len(1000)]
   }
   message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
   ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
-  ld <- ldm[, index_snp]
-  loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
+  if (index_snp %in% colnames(ldm)) {
+    ld <- ldm[, index_snp]
+    loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
+  } else message("Index SNP not found in LDlink data")
+  
   loc
 }
 
