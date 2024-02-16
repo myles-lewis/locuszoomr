@@ -20,7 +20,9 @@ gg_scatter(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   recomb_col = "blue",
-  legend_pos = "topleft"
+  legend_pos = "topleft",
+  labels = NULL,
+  ggrepel_args = list()
 )
 }
 \arguments{
@@ -64,6 +66,12 @@ data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_
 recombination rate data.}
 
 \item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
+
+\item{labels}{Character vector of SNP or genomic feature IDs to label. The
+value "index" selects the highest point or index SNP as defined when
+\code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
+
+\item{ggrepel_args}{List of arguments to pass to \code{geom_text_repel} to configure label drawing}
 }
 \value{
 Returns a ggplot2 plot.
