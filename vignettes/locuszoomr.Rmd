@@ -644,12 +644,14 @@ all_loci <- lapply(top_snps, function(i) {
   link_recomb(loc, genome = "hg19")
 })
 
-# base graphics version
 pdf("sle_loci.pdf")
 tmp <- lapply(all_loci, locus_plot, labels = "index")
 dev.off()
+```
 
-# ggplot2 version
+Alternatively export plots using ggplot2.
+
+```{r eval=FALSE}
 pp <- lapply(all_loci, locus_ggplot, labels = "index", nudge_y = 1)
 
 library(gridExtra)

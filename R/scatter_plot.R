@@ -104,6 +104,9 @@ scatter_plot <- function(loc,
   
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) ylim[1] <- min(c(0, ylim[1]))
+  if (!is.null(labels) & (border | recomb)) {
+    ylim[2] <- ylim[2] + diff(ylim) * 0.08
+  }
   panel.first <- quote({
     if (loc$yvar == "logP" & !is.null(pcutoff)) {
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
