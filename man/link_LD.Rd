@@ -30,6 +30,9 @@ Adds LD information to a 'locus' class object. It queries LDlink
 (https://ldlink.nci.nih.gov/) via the \code{LDlinkR} package to retrieve linkage
 disequilibrium (LD) information on a reference SNP.
 }
+\details{
+Results are cached using \code{memoise} to reduce API requests.
+}
 \seealso{
 \code{\link[=locus]{locus()}}
 }

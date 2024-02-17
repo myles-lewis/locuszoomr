@@ -14,6 +14,9 @@
 #' LDlink API. See `LDlinkR` package documentation.
 #' @param ... Optional arguments such as `genome_build` which are passed on to
 #'   `LDlinkR::LDmatrix()`
+#' @details
+#' Results are cached using `memoise` to reduce API requests.
+#' 
 #' @return Returns a list object of class 'locus'. LD information is added as a
 #'   column `ld` in list element `data`.
 #' @seealso [locus()]

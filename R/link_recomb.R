@@ -9,13 +9,16 @@
 #'   use.
 #' @details
 #' Uses the `rtracklayer` package to query UCSC genome browser for recombination
-#' rate data. The results are cached using `memoise` to reduce API requests.
+#' rate data. Results are cached using `memoise` to reduce API requests.
 #' 
 #' Possible options for `table` for hg19 are `"hapMapRelease24YRIRecombMap"`,
 #' `"hapMapRelease24CEURecombMap"`, `"hapMapRelease24CombinedRecombMap"` (the
 #' default).
 #' 
 #' The only option for `table` for hg38 is `"recomb1000GAvg"` (the default).
+#' 
+#' Sometimes `rtracklayer` generates an intermittent API error. Try calling
+#' `link_recomb()` again.
 #' 
 #' @returns A list object of class 'locus'. Recombination data is added as list
 #'   element `recomb`.

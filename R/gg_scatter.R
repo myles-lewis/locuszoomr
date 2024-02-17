@@ -152,6 +152,7 @@ gg_scatter <- function(loc,
               " not found")
     }
   }
+  df2 <- data[data[, loc$labs] == index_snp, ]
 
   if (!recomb) {
     # standard plot
@@ -163,6 +164,7 @@ gg_scatter <- function(loc,
                    colour = "grey", linetype = "dashed")
       }) +
       geom_point(shape = 21, size = size) +
+      geom_point(data = df2, shape = 23, size = size +0.3, show.legend = FALSE) +  # index SNP
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
                         labels = legend_labels, name = expression({r^2})) +
@@ -193,6 +195,11 @@ gg_scatter <- function(loc,
       }) +
       geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
                      fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
+      # index SNP
+      geom_point(data = df2,
+                 aes(y = .data[[loc$yvar]], color = .data$col,
+                     fill = .data$bg), shape = 23, size = size +0.3, na.rm = TRUE,
+                 show.legend = FALSE) +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
                         labels = legend_labels, name = expression({r^2})) +
