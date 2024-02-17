@@ -23,7 +23,7 @@ Adds recombination data to a 'locus' object by querying UCSC genome browser.
 }
 \details{
 Uses the \code{rtracklayer} package to query UCSC genome browser for recombination
-rate data. Results are cached using \code{memoise} to reduce API requests.
+rate data.
 
 Possible options for \code{table} for hg19 are \code{"hapMapRelease24YRIRecombMap"},
 \code{"hapMapRelease24CEURecombMap"}, \code{"hapMapRelease24CombinedRecombMap"} (the
@@ -31,6 +31,9 @@ default).
 
 The only option for \code{table} for hg38 is \code{"recomb1000GAvg"} (the default).
 
-Sometimes \code{rtracklayer} generates an intermittent API error. Try calling
-\code{link_recomb()} again.
+Sometimes \code{rtracklayer} generates an intermittent API error: try calling
+\code{link_recomb()} again. Errors are handled gracefully using \code{try()} to allow
+users to wrap \code{link_recomb()} in a loop without quitting halfway. Error
+messages are still shown. Successful API calls are cached using \code{memoise} to
+reduce API requests.
 }
