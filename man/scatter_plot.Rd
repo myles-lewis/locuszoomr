@@ -39,10 +39,8 @@ show this.}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{scheme}{Vector of 3 colours to use if locus object contains no LD data
-or if \code{showLD} is set to \code{FALSE}. The 1st colour is for non-significant
-points, 2nd colour for points reaching p-value significance, 3rd colour is
-for the index SNP (if specified).}
+\item{scheme}{Vector of 3 colours if LD is not shown: 1st = normal points,
+2nd = colour for significant points, 3rd = index SNP.}
 
 \item{cex}{Specifies size for points.}
 

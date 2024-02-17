@@ -102,6 +102,7 @@ gg_scatter <- function(loc,
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
       data$bg[data[, loc$labs] == index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme)
+      data <- data[order(data$bg), ]
     }
   }
   

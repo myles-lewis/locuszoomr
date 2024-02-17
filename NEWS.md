@@ -3,8 +3,12 @@ News
 
 # locuszoomr 0.2.1
 ###### 16/02/2024
+
 * Added labels to `locus_ggplot()` and `gg_scatter()` (thanks to Tom Willis).
 * Improved error handling in `link_recomb()`
+* Ensure index SNP is plotted on top in `locus_plot()` and `locus_ggplot()`.
+* In `scatter_plot()` arguments `chromCol` and `sigCol` are replaced by `scheme` 
+which now allows setting of the index SNP colour.
 
 # locuszoomr 0.2.0
 ###### 21/12/2023

@@ -10,10 +10,8 @@
 #'   show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param scheme Vector of 3 colours to use if locus object contains no LD data
-#'   or if `showLD` is set to `FALSE`. The 1st colour is for non-significant
-#'   points, 2nd colour for points reaching p-value significance, 3rd colour is
-#'   for the index SNP (if specified).
+#' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
+#'   2nd = colour for significant points, 3rd = index SNP.
 #' @param cex Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
