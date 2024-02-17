@@ -23,11 +23,12 @@
 #' @importFrom GenomicRanges GRanges
 #' @importFrom IRanges IRanges
 #' @importFrom rtracklayer browserSession ucscTableQuery getTable
+#' @importFrom memoise drop_cache
 #' @export
 #'
 link_recomb <- function(loc, genome = "hg38", table = NULL) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
-  loc$recomb <- mem_query_recomb(genome, loc$xrange, loc$seqname, table)
+  loc$recomb <- get_recomb(genome, loc$xrange, loc$seqname, table)
   loc
 }
 
@@ -51,3 +52,10 @@ query_recomb <- function(gen, xrange, seqname, table = NULL) {
 
 # use memoise to reduce calls to UCSC API
 mem_query_recomb <- memoise(query_recomb)
+
+# drop memoise cache if error occurs
+get_recomb <- function(gen, xrange, seqname, table = NULL) {
+  ret <- mem_query_recomb(gen, xrange, seqname, table)
+  if (is.null(ret)) drop_cache(mem_query_recomb)(gen, xrange, seqname, table)
+  ret
+}

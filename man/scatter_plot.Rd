@@ -8,8 +8,7 @@ scatter_plot(
   loc,
   index_snp = loc$index_snp,
   pcutoff = 5e-08,
-  chromCol = "royalblue",
-  sigCol = "red",
+  scheme = c("royalblue", "red", "purple"),
   cex = 1,
   cex.axis = 0.9,
   cex.lab = 1,
@@ -40,10 +39,10 @@ show this.}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{chromCol}{Colour for normal points if \code{LD} is \code{FALSE} when the locus
-object is made.}
-
-\item{sigCol}{Colour for significant points if \code{LD} is \code{FALSE}.}
+\item{scheme}{Vector of 3 colours to use if locus object contains no LD data
+or if \code{showLD} is set to \code{FALSE}. The 1st colour is for non-significant
+points, 2nd colour for points reaching p-value significance, 3rd colour is
+for the index SNP (if specified).}
 
 \item{cex}{Specifies size for points.}
 

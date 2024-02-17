@@ -10,9 +10,10 @@
 #'   show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
-#'   object is made.
-#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param scheme Vector of 3 colours to use if locus object contains no LD data
+#'   or if `showLD` is set to `FALSE`. The 1st colour is for non-significant
+#'   points, 2nd colour for points reaching p-value significance, 3rd colour is
+#'   for the index SNP (if specified).
 #' @param cex Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.
@@ -52,8 +53,7 @@
 scatter_plot <- function(loc,
                          index_snp = loc$index_snp,
                          pcutoff = 5e-08,
-                         chromCol = 'royalblue',
-                         sigCol = 'red',
+                         scheme = c('royalblue', 'red', 'purple'),
                          cex = 1,
                          cex.axis = 0.9,
                          cex.lab = 1,
@@ -88,9 +88,11 @@ scatter_plot <- function(loc,
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
     } else {
-      data$bg <- chromCol
-      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- sigCol
-      data$bg[data[, loc$labs] == index_snp] <- "purple"
+      data$bg <- 1L
+      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- 2L
+      data$bg[data[, loc$labs] == index_snp] <- 3L
+      data <- data[order(data$bg), ]
+      data$bg <- scheme[data$bg]
     }
   }
   
