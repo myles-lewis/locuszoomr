@@ -152,19 +152,20 @@ gg_scatter <- function(loc,
               " not found")
     }
   }
-  df2 <- data[data[, loc$labs] == index_snp, ]
+  ind <- which(data[, loc$labs] == index_snp)
 
   if (!recomb) {
     # standard plot
-    p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
-                          color = .data$col, fill = .data$bg)) +
+    p <- ggplot(data[-ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+                                  color = .data$col, fill = .data$bg)) +
       (if (loc$yvar == "logP" & !is.null(pcutoff) &
            ycut >= yrange[1] & ycut <= yrange[2]) {
         geom_hline(yintercept = ycut,
                    colour = "grey", linetype = "dashed")
       }) +
       geom_point(shape = 21, size = size) +
-      geom_point(data = df2, shape = 23, size = size +0.3, show.legend = FALSE) +  # index SNP
+      geom_point(data = data[ind, ], shape = 23, size = size,
+                 show.legend = FALSE) +  # index SNP
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
                         labels = legend_labels, name = expression({r^2})) +
@@ -187,7 +188,7 @@ gg_scatter <- function(loc,
   } else {
     # recombination plot with dual y axis
     ymult <- 100 / diff(yrange)
-    p <- ggplot(data, aes(x = .data[[loc$pos]])) +
+    p <- ggplot(data[-ind, ], aes(x = .data[[loc$pos]])) +
       (if (loc$yvar == "logP" & !is.null(pcutoff) &
            ycut >= yrange[1] & ycut <= yrange[2]) {
         geom_hline(yintercept = ycut,
@@ -196,9 +197,9 @@ gg_scatter <- function(loc,
       geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
                      fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
       # index SNP
-      geom_point(data = df2,
+      geom_point(data = data[ind, ],
                  aes(y = .data[[loc$yvar]], color = .data$col,
-                     fill = .data$bg), shape = 23, size = size +0.3, na.rm = TRUE,
+                     fill = .data$bg), shape = 23, size = size, na.rm = TRUE,
                  show.legend = FALSE) +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
