@@ -4,14 +4,13 @@
 #' Produces a scatter plot from a 'locus' class object using plotly.
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
-#' @param index_snp Specifies index SNP to be shown in a different colour and
-#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
-#'   show this.
+#' @param index_snp Specifies index SNP or a vector of SNPs to be shown in a
+#'   different colour and symbol. Defaults to the SNP with the lowest p-value.
+#'   Set to `NULL` to not show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param chromCol Colour for normal points if `LD` is `FALSE` when the locus
-#'   object is made.
-#' @param sigCol Colour for significant points if `LD` is `FALSE`.
+#' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
+#'   2nd = colour for significant points, 3rd = index SNP(s).
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param yzero Logical whether to force y axis limit to include y=0.
@@ -27,14 +26,13 @@
 #'   recombination rate data.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
-#' @importFrom plotly add_trace
+#' @importFrom plotly add_trace plotly_build
 #' @export
 #' 
 scatter_plotly <- function(loc,
                            index_snp = loc$index_snp,
                            pcutoff = 5e-08,
-                           chromCol = 'royalblue',
-                           sigCol = 'red',
+                           scheme = c('grey', 'dodgerblue', 'red'),
                            xlab = NULL,
                            ylab = NULL,
                            yzero = (loc$yvar == "logP"),
@@ -57,7 +55,7 @@ scatter_plotly <- function(loc,
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[data[, loc$labs] == index_snp] <- 7L
+      data$bg[data[, loc$labs] %in% index_snp] <- 7L
       data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7 - is.null(index_snp))
       data$bg <- factor(data$bg, levels = 1:7,
@@ -67,12 +65,12 @@ scatter_plotly <- function(loc,
       leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
     } else {
       showLD <- FALSE
-      data$bg <- chromCol
-      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- sigCol
-      data$bg[data[, loc$labs] == index_snp] <- "purple"
-      LD_scheme <- c(chromCol, sigCol, "purple")
-      data$bg <- factor(data$bg, levels = LD_scheme,
+      data$bg <- scheme[1]
+      if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
+      data$bg[data[, loc$labs] %in% index_snp] <- scheme[3]
+      data$bg <- factor(data$bg, levels = scheme,
                         labels = c("ns", paste("P <", pcutoff), "index"))
+      LD_scheme <- scheme
     }
   }
   
@@ -80,7 +78,7 @@ scatter_plotly <- function(loc,
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   
   pch <- rep(21L, nrow(data))
-  pch[data[, loc$labs] == index_snp] <- 23L
+  pch[data[, loc$labs] %in% index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
@@ -99,16 +97,18 @@ scatter_plotly <- function(loc,
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
   ylim2 <- c(-2, 102)
+  symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
   
   if (!recomb) {
     # standard plotly
-    plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-            color = data$bg, colors = LD_scheme,
-            marker = list(size = marker_size, opacity = 0.8,
-                          line = list(width = 1, color = marker_outline)),
-            text = hovertext,
-            hoverinfo = 'text',
-            type = "scattergl", mode = "markers") %>%
+    p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+                 color = data$bg, colors = LD_scheme,
+                 symbol = data$bg, symbols = symbols,
+                 marker = list(size = marker_size, opacity = 0.8,
+                               line = list(width = 1, color = marker_outline)),
+                 text = hovertext,
+                 hoverinfo = 'text',
+                 type = "scattergl", mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
                                   range = as.list(xlim)),
@@ -123,7 +123,7 @@ scatter_plotly <- function(loc,
     #                            "autoScale2d", "toggleHover"))
   } else {
     # double y axis with recombination
-    plot_ly() %>%
+    p <- plot_ly() %>%
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
                 hoverinfo = "none", colors = LD_scheme,  # colors must go here
                 name = "recombination", yaxis = "y2",
@@ -151,4 +151,5 @@ scatter_plotly <- function(loc,
                      showlegend = showLD | !is.null(pcutoff)) %>%
       plotly::config(displaylogo = FALSE)
   }
+  suppressWarnings(plotly_build(p))
 }

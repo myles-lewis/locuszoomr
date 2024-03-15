@@ -11,7 +11,7 @@
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
-#'   2nd = colour for significant points, 3rd = index SNP.
+#'   2nd = colour for significant points, 3rd = index SNP(s).
 #' @param cex Specifies size for points.
 #' @param cex.axis Specifies font size for axis numbering.
 #' @param cex.lab Specifies font size for axis titles.

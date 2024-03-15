@@ -40,7 +40,7 @@ Set to \code{NULL} to not show this.}
 to \code{NULL} to disable.}
 
 \item{scheme}{Vector of 3 colours if LD is not shown: 1st = normal points,
-2nd = colour for significant points, 3rd = index SNP.}
+2nd = colour for significant points, 3rd = index SNP(s).}
 
 \item{cex}{Specifies size for points.}
 
