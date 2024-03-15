@@ -8,7 +8,7 @@ scatter_plot(
   loc,
   index_snp = loc$index_snp,
   pcutoff = 5e-08,
-  scheme = c("royalblue", "red", "purple"),
+  scheme = c("grey", "dodgerblue", "red"),
   cex = 1,
   cex.axis = 0.9,
   cex.lab = 1,
@@ -32,9 +32,9 @@ scatter_plot(
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
 
-\item{index_snp}{Specifies index SNP to be shown in a different colour and
-symbol. Defaults to the SNP with the lowest p-value. Set to \code{NULL} to not
-show this.}
+\item{index_snp}{Specifies index SNP or a vector of SNPs to be shown in a
+different colour and symbol. Defaults to the SNP with the lowest p-value.
+Set to \code{NULL} to not show this.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}

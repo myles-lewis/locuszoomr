@@ -1,6 +1,13 @@
 News
 =====
 
+# locuszoomr 0.2.2
+###### 15/03/2024
+
+* Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
+(suggested by Luke Pilling).
+* Altered default colour scheme.
+
 # locuszoomr 0.2.1
 ###### 17/02/2024
 

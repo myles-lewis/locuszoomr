@@ -8,7 +8,7 @@ gg_scatter(
   loc,
   index_snp = loc$index_snp,
   pcutoff = 5e-08,
-  scheme = c("royalblue", "red", "purple"),
+  scheme = c("grey", "dodgerblue", "red"),
   size = 2,
   cex.axis = 1,
   cex.lab = 1,

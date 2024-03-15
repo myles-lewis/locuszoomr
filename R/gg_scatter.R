@@ -62,7 +62,7 @@
 gg_scatter <- function(loc,
                        index_snp = loc$index_snp,
                        pcutoff = 5e-08,
-                       scheme = c('royalblue', 'red', 'purple'),
+                       scheme = c('grey', 'dodgerblue', 'red'),
                        size = 2,
                        cex.axis = 1,
                        cex.lab = 1,
@@ -89,7 +89,7 @@ gg_scatter <- function(loc,
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[data[, loc$labs] == index_snp] <- 7L
+      data$bg[data[, loc$labs] %in% index_snp] <- 7L
       data$bg <- factor(data$bg, levels = 1:7)
       data <- data[order(data$bg), ]
       scheme <- rep_len(LD_scheme, 7)
@@ -100,7 +100,7 @@ gg_scatter <- function(loc,
     } else {
       data$bg <- scheme[1]
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
-      data$bg[data[, loc$labs] == index_snp] <- scheme[3]
+      data$bg[data[, loc$labs] %in% index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme)
     }
   }
@@ -145,18 +145,25 @@ gg_scatter <- function(loc,
   # add labels
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
-    if (i) labels[i] <- index_snp
+    if (i) {
+      if (length(index_snp) == 1) {
+        labels[i] <- index_snp
+      } else {
+        labels <- labels[-i]
+        labels <- c(index_snp, labels)
+      }
+    }
     text_label_ind <- match(labels, data[, loc$labs])
     if (any(is.na(text_label_ind))) {
       message("label ", paste(labels[is.na(text_label_ind)], collapse = ", "),
               " not found")
     }
   }
-  ind <- which(data[, loc$labs] == index_snp)
+  ind <- data[, loc$labs] %in% index_snp
 
   if (!recomb) {
     # standard plot
-    p <- ggplot(data[-ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+    p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
                                   color = .data$col, fill = .data$bg)) +
       (if (loc$yvar == "logP" & !is.null(pcutoff) &
            ycut >= yrange[1] & ycut <= yrange[2]) {
@@ -188,7 +195,7 @@ gg_scatter <- function(loc,
   } else {
     # recombination plot with dual y axis
     ymult <- 100 / diff(yrange)
-    p <- ggplot(data[-ind, ], aes(x = .data[[loc$pos]])) +
+    p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]])) +
       (if (loc$yvar == "logP" & !is.null(pcutoff) &
            ycut >= yrange[1] & ycut <= yrange[2]) {
         geom_hline(yintercept = ycut,

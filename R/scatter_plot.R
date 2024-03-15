@@ -5,9 +5,9 @@
 #' [set_layers()].
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
-#' @param index_snp Specifies index SNP to be shown in a different colour and
-#'   symbol. Defaults to the SNP with the lowest p-value. Set to `NULL` to not
-#'   show this.
+#' @param index_snp Specifies index SNP or a vector of SNPs to be shown in a
+#'   different colour and symbol. Defaults to the SNP with the lowest p-value.
+#'   Set to `NULL` to not show this.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
@@ -51,7 +51,7 @@
 scatter_plot <- function(loc,
                          index_snp = loc$index_snp,
                          pcutoff = 5e-08,
-                         scheme = c('royalblue', 'red', 'purple'),
+                         scheme = c('grey', 'dodgerblue', 'red'),
                          cex = 1,
                          cex.axis = 0.9,
                          cex.lab = 1,
@@ -81,14 +81,14 @@ scatter_plot <- function(loc,
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
-      data$bg[data[, loc$labs] == index_snp] <- 7L
+      data$bg[data[, loc$labs] %in% index_snp] <- 7L
       data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
     } else {
       data$bg <- 1L
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- 2L
-      data$bg[data[, loc$labs] == index_snp] <- 3L
+      data$bg[data[, loc$labs] %in% index_snp] <- 3L
       data <- data[order(data$bg), ]
       data$bg <- scheme[data$bg]
     }
@@ -123,7 +123,7 @@ scatter_plot <- function(loc,
   })
   
   pch <- rep(21L, nrow(data))
-  pch[data[, loc$labs] == index_snp] <- 23L
+  pch[data[, loc$labs] %in% index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
@@ -156,7 +156,14 @@ scatter_plot <- function(loc,
   # add labels
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
-    if (i) labels[i] <- index_snp
+    if (i) {
+      if (length(index_snp) == 1) {
+        labels[i] <- index_snp
+      } else {
+        labels <- labels[-i]
+        labels <- c(index_snp, labels)
+      }
+    }
     ind <- match(labels, data[, loc$labs])
     if (any(is.na(ind))) {
       message("label ", paste(labels[is.na(ind)], collapse = ", "),
