@@ -1,6 +1,12 @@
 News
 =====
 
+# locuszoomr 0.2.1.9000
+###### 15/03/2024
+
+* Added "highlight" to `scatter_plot()` - listed variants inherit the shape and colour of the index variant 
+
+
 # locuszoomr 0.2.1
 ###### 17/02/2024
 

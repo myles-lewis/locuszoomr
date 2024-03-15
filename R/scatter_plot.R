@@ -31,6 +31,8 @@
 #'   recombination rate data.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
+#' @param highlight Character vector of SNP or genomic feature IDs to highlight. 
+#'   "Highlighted" variants inherit the shape and colour of the index variant.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
 #'   value "index" selects the highest point or index SNP as defined when
 #'   [locus()] is called. Set to `NULL` to remove all labels.
@@ -65,6 +67,7 @@ scatter_plot <- function(loc,
                                        'orange', 'red', 'purple'),
                          recomb_col = "blue",
                          legend_pos = 'topleft',
+                         highlight = NULL,
                          labels = NULL,
                          label_x = 4, label_y = 4,
                          add = FALSE,
@@ -125,20 +128,25 @@ scatter_plot <- function(loc,
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] == index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
+  if (!is.null(highlight))  pch[data[, loc$labs] %in% highlight] <- 23L
+  
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
+  
+  bg = data$bg
+  if (!is.null(highlight))  bg[data[, loc$labs] %in% highlight] <- scheme[3]
   
   new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
-                      pch = pch, bg = data$bg, cex = cex)
+                      pch = pch, bg = bg, cex = cex)
     if (length(new.args)) plot.args[names(new.args)] <- new.args
     return(do.call("points", plot.args))
   }
   
   bty <- if (border | recomb) 'o' else 'l'
   plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
-               pch = pch, bg = data$bg, col = col,
+               pch = pch, bg = bg, col = col,
                las = 1, font.main = 1,
                cex = cex, cex.axis = cex.axis, cex.lab = cex.lab,
                xlim = loc$xrange,
