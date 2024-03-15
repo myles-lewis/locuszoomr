@@ -124,13 +124,17 @@ scatter_plotly <- function(loc,
   } else {
     # double y axis with recombination
     p <- plot_ly() %>%
+      # recombination line
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
                 hoverinfo = "none", colors = LD_scheme,  # colors must go here
+                symbols = symbols,
                 name = "recombination", yaxis = "y2",
                 line = list(color = recomb_col),
                 mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+      # scatter plot
       add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                 color = data$bg,
+                symbol = data$bg, 
                 marker = list(size = marker_size, opacity = 0.8,
                               line = list(width = 1, color = marker_outline)),
                 text = hovertext,
