@@ -7,6 +7,7 @@ News
 * Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
 (suggested by Luke Pilling).
 * Altered default colour scheme.
+* Improved plotly version by adding diamond symbols for index SNPs.
 
 # locuszoomr 0.2.1
 ###### 17/02/2024
