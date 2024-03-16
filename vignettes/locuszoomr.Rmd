@@ -239,6 +239,12 @@ which allows you to hover over points and see their rsid or feature label.
 `label_x` and `label_y` control the position of the labels and can be specified
 as a single value or a vector of values.
 
+Advanced users familiar with base graphics can customise every single point
+on the scatter plot, by adding columns named `bg`, `col`, `pch` or `cex`
+directly to the dataframe stored in `$data` element of the `locus` object.
+Setting these will overrule any default settings. These columns refer to
+their respective base graphics arguments, see `?points`.
+
 See the help pages at `?locus_plot` and `?scatter_plot` for more details.
 
 # Customise gene tracks
