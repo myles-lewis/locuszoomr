@@ -127,6 +127,7 @@ scatter_plot <- function(loc,
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
+  if ("cex" %in% colnames(data)) cex <- data$cex
   
   new.args <- list(...)
   if (add) {
