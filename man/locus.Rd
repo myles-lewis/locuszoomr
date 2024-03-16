@@ -70,15 +70,23 @@ specifying \code{gene}, or \code{seqname} and \code{xrange}.}
 LD information.}
 }
 \value{
-Returns an object of class 'locus' ready for plotting, containing
-the subset of GWAS data to be plotted,
-chromosome and genomic position range,
-Ensembl database version number,
-column names for chromosome, position, SNP ID, p-value or variable for
-plotting on y axis,
-locus gene information from Ensembl and
-locus exon information from Ensembl. If \code{data} is \code{NULL} then gene track
-information alone is returned.
+Returns an object of class 'locus' ready for plotting, containing:
+\item{seqname}{chromosome value}
+\item{xrange}{vector of genomic position range}
+\item{gene}{gene name}
+\item{ens_db}{Ensembl or AnnotationHub database version}
+\item{chrom}{column name in \code{data} containing chromosome information}
+\item{pos}{column name in \code{data} containing position}
+\item{p}{column name in \code{data} containing p-value}
+\item{yvar}{column name in \code{data} to be plotted on y axis as alternative to
+\code{p}}
+\item{labs}{column name in \code{data} containing SNP IDs}
+\item{index_snp}{id of the most significant SNP}
+\item{data}{the subset of GWAS data to be plotted}
+\item{TX}{dataframe of transcript annotations}
+\item{EX}{\code{GRanges} object of exon annotations}
+If \code{data} is \code{NULL} when \code{locus()} is called then gene track information
+alone is returned.
 }
 \description{
 Creates object of class 'locus' for genomic locus plot similar to
@@ -102,4 +110,7 @@ loc2 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5,
               ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc2)
 }
+}
+\seealso{
+\code{\link[=locus_plot]{locus_plot()}} \code{\link[=locus_ggplot]{locus_ggplot()}} \code{\link[=locus_plotly]{locus_plotly()}}
 }

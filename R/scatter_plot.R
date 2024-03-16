@@ -1,8 +1,9 @@
 
 #' Locus scatter plot
 #'
-#' Produces a scatter plot from a 'locus' class object. Intended for use with
-#' [set_layers()].
+#' Produces a base graphics scatter plot from a 'locus' class object. This
+#' function is called by [locus_plot()] to generate the scatter plot portion.
+#' Can be used manually with [set_layers()].
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param index_snp Specifies index SNP or a vector of SNPs to be shown in a
@@ -44,6 +45,13 @@
 #' @param ... Other arguments passed to [plot()] to control the scatter plot
 #'   e.g. `main`, `ylim` etc.
 #' @return No return value. Produces a scatter plot using base graphics.
+#' @details
+#' Advanced users familiar with base graphics can customise every single point
+#' on the scatter plot, by adding columns named `bg`, `col`, `pch` or `cex`
+#' directly to the dataframe stored in `$data` element of the 'locus' object.
+#' Setting these will overrule any default settings. These columns refer to
+#' their respective base graphics arguments, see [graphics::points()].
+#' 
 #' @seealso [locus()] [set_layers()]
 #' @importFrom graphics par legend
 #' @export

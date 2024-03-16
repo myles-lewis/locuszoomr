@@ -43,15 +43,24 @@
 #'   specifying `gene`, or `seqname` and `xrange`.
 #' @param LD Optional character value to specify which column in `data` contains
 #'   LD information.
-#' @return Returns an object of class 'locus' ready for plotting, containing 
-#' the subset of GWAS data to be plotted, 
-#' chromosome and genomic position range, 
-#' Ensembl database version number, 
-#' column names for chromosome, position, SNP ID, p-value or variable for
-#' plotting on y axis,
-#' locus gene information from Ensembl and
-#' locus exon information from Ensembl. If `data` is `NULL` then gene track
-#' information alone is returned.
+#' @return Returns an object of class 'locus' ready for plotting, containing:
+#' \item{seqname}{chromosome value}
+#' \item{xrange}{vector of genomic position range}
+#' \item{gene}{gene name}
+#' \item{ens_db}{Ensembl or AnnotationHub database version}
+#' \item{chrom}{column name in `data` containing chromosome information}
+#' \item{pos}{column name in `data` containing position}
+#' \item{p}{column name in `data` containing p-value}
+#' \item{yvar}{column name in `data` to be plotted on y axis as alternative to 
+#' `p`}
+#' \item{labs}{column name in `data` containing SNP IDs}
+#' \item{index_snp}{id of the most significant SNP}
+#' \item{data}{the subset of GWAS data to be plotted}
+#' \item{TX}{dataframe of transcript annotations}
+#' \item{EX}{`GRanges` object of exon annotations}
+#' If `data` is `NULL` when `locus()` is called then gene track information
+#' alone is returned.
+#' @seealso [locus_plot()] [locus_ggplot()] [locus_plotly()]
 #' @examples
 #' ## Bioconductor package EnsDb.Hsapiens.v75 is needed for these examples
 #' if(require(EnsDb.Hsapiens.v75)) {

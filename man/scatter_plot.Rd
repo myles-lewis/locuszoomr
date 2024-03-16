@@ -95,8 +95,16 @@ e.g. \code{main}, \code{ylim} etc.}
 No return value. Produces a scatter plot using base graphics.
 }
 \description{
-Produces a scatter plot from a 'locus' class object. Intended for use with
-\code{\link[=set_layers]{set_layers()}}.
+Produces a base graphics scatter plot from a 'locus' class object. This
+function is called by \code{\link[=locus_plot]{locus_plot()}} to generate the scatter plot portion.
+Can be used manually with \code{\link[=set_layers]{set_layers()}}.
+}
+\details{
+Advanced users familiar with base graphics can customise every single point
+on the scatter plot, by adding columns named \code{bg}, \code{col}, \code{pch} or \code{cex}
+directly to the dataframe stored in \verb{$data} element of the 'locus' object.
+Setting these will overrule any default settings. These columns refer to
+their respective base graphics arguments, see \code{\link[graphics:points]{graphics::points()}}.
 }
 \seealso{
 \code{\link[=locus]{locus()}} \code{\link[=set_layers]{set_layers()}}
