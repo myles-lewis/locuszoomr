@@ -126,50 +126,11 @@ locus <- function(gene = NULL,
   
   if (!is.null(data)) {
     # autodetect headings
-    if (is.null(chrom)) {
-      w <- grep("chr", colnames(data), ignore.case = TRUE)
-      if (length(w) == 1) {
-        chrom <- colnames(data)[w]
-      } else stop("unable to autodetect chromosome column")
-    }
-    if (is.null(pos)) {
-      w <- grep("pos", colnames(data), ignore.case = TRUE)
-      if (length(w) == 1) {
-        pos <- colnames(data)[w]
-      } else stop("unable to autodetect SNP position column")
-    }
-    if (!is.null(p) && !is.null(yvar)) stop("cannot specify both `p` and `yvar`")
-    if (is.null(p) && is.null(yvar)) {
-      if ("p" %in% colnames(data)) {
-        p <- "p"
-      } else {
-        w <- grep("^p?val", colnames(data), ignore.case = TRUE)
-        if (length(w) == 1) {
-          p <- colnames(data)[w]
-        } else stop("unable to autodetect p-value column")
-      }
-    }
-    if (is.null(labs)) {
-      w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
-      if (length(w) == 1) {
-        labs <- colnames(data)[w]
-      } else stop("unable to autodetect SNP id column")
-    }
-    
-    # check headings
-    if (!chrom %in% colnames(data)) {
-      stop("Column specified by `chrom` not found in `data`")}
-    if (!pos %in% colnames(data)) {
-      stop("Column specified by `pos` not found in `data`")}
-    if (is.null(yvar) && !p %in% colnames(data)) {
-      stop("Column specified by `p` not found in `data`")}
-    if (!labs %in% colnames(data)) {
-      stop("Column specified by `labs` not found in `data`")}
-    if (!is.null(yvar)) {
-      if (!yvar %in% colnames(data)) {
-        stop("Column specified by `yvar` not found in `data`")
-      }
-    }
+    dc <- detect_cols(data, chrom, pos, p, labs, yvar)
+    chrom <- dc$chrom
+    pos <- dc$pos
+    p <- dc$p
+    labs <- dc$labs
     
     if (!is.null(index_snp) & is.null(gene) & is.null(seqname) & is.null(xrange)) {
       # region based on index SNP
@@ -267,3 +228,53 @@ summary.locus <- function(object, ...) {
   }
 }
 
+
+detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
+  # autodetect headings
+  if (is.null(chrom)) {
+    w <- grep("chr", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {
+      chrom <- colnames(data)[w]
+    } else stop("unable to autodetect chromosome column")
+  }
+  if (is.null(pos)) {
+    w <- grep("pos", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {
+      pos <- colnames(data)[w]
+    } else stop("unable to autodetect SNP position column")
+  }
+  if (!is.null(p) && !is.null(yvar)) stop("cannot specify both `p` and `yvar`")
+  if (is.null(p) && is.null(yvar)) {
+    if ("p" %in% colnames(data)) {
+      p <- "p"
+    } else {
+      w <- grep("^p?val", colnames(data), ignore.case = TRUE)
+      if (length(w) == 1) {
+        p <- colnames(data)[w]
+      } else stop("unable to autodetect p-value column")
+    }
+  }
+  if (is.null(labs)) {
+    w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
+    if (length(w) == 1) {
+      labs <- colnames(data)[w]
+    } else stop("unable to autodetect SNP id column")
+  }
+  
+  # check headings
+  if (!chrom %in% colnames(data)) {
+    stop("Column specified by `chrom` not found in `data`")}
+  if (!pos %in% colnames(data)) {
+    stop("Column specified by `pos` not found in `data`")}
+  if (is.null(yvar) && !p %in% colnames(data)) {
+    stop("Column specified by `p` not found in `data`")}
+  if (!labs %in% colnames(data)) {
+    stop("Column specified by `labs` not found in `data`")}
+  if (!is.null(yvar)) {
+    if (!yvar %in% colnames(data)) {
+      stop("Column specified by `yvar` not found in `data`")
+    }
+  }
+  
+  list(chrom = chrom, pos = pos, p = p, labs = labs)
+}

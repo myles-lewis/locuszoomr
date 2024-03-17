@@ -155,5 +155,6 @@ scatter_plotly <- function(loc,
                      showlegend = showLD | !is.null(pcutoff)) %>%
       plotly::config(displaylogo = FALSE)
   }
-  suppressWarnings(plotly_build(p))
+  
+  if (hasLD) suppressWarnings(plotly_build(p)) else p
 }

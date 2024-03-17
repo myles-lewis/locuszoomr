@@ -34,28 +34,11 @@ quick_peak <- function(data, npeaks = NA, p_cutoff = 5e-08, span = 1e6,
                        chrom = NULL, pos = NULL, p = NULL) {
   start <- Sys.time()
   # autodetect column headings
-  if (is.null(chrom)) {
-    w <- grep("chr", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {
-      chrom <- colnames(data)[w]
-    } else stop("unable to autodetect chromosome column")
-  }
-  if (is.null(pos)) {
-    w <- grep("pos", colnames(data), ignore.case = TRUE)
-    if (length(w) == 1) {
-      pos <- colnames(data)[w]
-    } else stop("unable to autodetect SNP position column")
-  }
-  if (is.null(p)) {
-    if ("p" %in% colnames(data)) {
-      p <- "p"
-    } else {
-      w <- grep("^p?val", colnames(data), ignore.case = TRUE)
-      if (length(w) == 1) {
-        p <- colnames(data)[w]
-      } else stop("unable to autodetect p-value column")
-    }
-  }
+  dc <- detect_cols(data, chrom, pos, p)
+  chrom <- dc$chrom
+  pos <- dc$pos
+  p <- dc$p
+  
   if (is.na(npeaks)) npeaks <- Inf
   
   i <- 2
