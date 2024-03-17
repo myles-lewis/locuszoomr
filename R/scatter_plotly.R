@@ -108,6 +108,7 @@ scatter_plotly <- function(loc,
                                line = list(width = 1, color = marker_outline)),
                  text = hovertext,
                  hoverinfo = 'text',
+                 source = "plotly_locus",
                  type = "scattergl", mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",

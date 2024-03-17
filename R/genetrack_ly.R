@@ -99,7 +99,7 @@ genetrack_ly <- function(locus,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
   
-  plot_ly(TX) %>%
+  plot_ly(TX, source = "plotly_locus") %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
