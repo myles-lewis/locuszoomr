@@ -124,7 +124,7 @@ scatter_plotly <- function(loc,
     #                            "autoScale2d", "toggleHover"))
   } else {
     # double y axis with recombination
-    p <- plot_ly() %>%
+    p <- plot_ly(source = "plotly_locus") %>%
       # recombination line
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
                 hoverinfo = "none", colors = LD_scheme,  # colors must go here
