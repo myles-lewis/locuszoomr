@@ -110,6 +110,7 @@ genetrack_ly <- function(locus,
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
+                                zeroline = FALSE,
                                 color = 'black', ticklen = 5,
                                 range = as.list(xlim)),
                    yaxis = list(title = "", showgrid = FALSE, 
