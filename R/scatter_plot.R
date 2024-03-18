@@ -134,7 +134,10 @@ scatter_plot <- function(loc,
   if ("col" %in% colnames(data)) col <- data$col
   
   bg = data$bg
-  if (!is.null(highlight))  bg[data[, loc$labs] %in% highlight] <- scheme[3]
+  if (!is.null(highlight))  {
+    col[data[, loc$labs] %in% highlight] <- "black"
+    bg[data[, loc$labs] %in% highlight] <- scheme[3]
+  }
   
   new.args <- list(...)
   if (add) {
@@ -161,6 +164,16 @@ scatter_plot <- function(loc,
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
   
+  # replot points if "highlighted" so they are on top
+  if (!is.null(highlight))  {
+      plot.args <- list(x = data[ data[, loc$labs] %in% highlight, loc$pos], 
+                        y = data[ data[, loc$labs] %in% highlight, loc$yvar],
+                        pch = pch[ data[, loc$labs] %in% highlight ], 
+                        bg = bg[ data[, loc$labs] %in% highlight ], 
+                        col = col[ data[, loc$labs] %in% highlight ])
+      do.call("points", plot.args)
+  }
+
   # add labels
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
