@@ -11,6 +11,8 @@
 #' @param cex.text Font size for gene text.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
+#' @param width Width of plotly plot in pixels which is purely used to prevent
+#'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
 #' @param gene_col Colour for gene lines.
@@ -36,6 +38,7 @@ genetrack_ly <- function(locus,
                          exon_col = 'blue4',
                          exon_border = 'blue4',
                          maxrows = 8,
+                         width = 600,
                          xlab = NULL) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
@@ -48,7 +51,7 @@ genetrack_ly <- function(locus,
     TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
   }
   xlim <- xrange / 1e6
-  xext <- diff(xlim) * 0.05
+  xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   if (nrow(TX) == 0) {
@@ -64,7 +67,8 @@ genetrack_ly <- function(locus,
     return(p)
   }
   
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text)
+  cex.width <- cex.text * par("pin")[1] * 105 / width
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.width)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]
@@ -86,8 +90,8 @@ genetrack_ly <- function(locus,
   TX$ty <- -TX$row + 0.4
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
-             (TX$tmax < xrange[2] + diff(xrange) * 0.04)
+  tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.005) & 
+             (TX$tmax < xrange[2] + diff(xrange) * 0.005)
   pos <- TX$strand == "+"
   TX$gene_name2[pos] <- paste0(TX$gene_name[pos], "&#8594;")
   TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name[!pos])
@@ -113,7 +117,7 @@ genetrack_ly <- function(locus,
                                 zeroline = FALSE,
                                 color = 'black', ticklen = 5,
                                 range = as.list(xlim)),
-                   yaxis = list(title = "", showgrid = FALSE, 
+                   yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
                                 showticklabels = FALSE)) %>%
     plotly::config(displaylogo = FALSE)
 }

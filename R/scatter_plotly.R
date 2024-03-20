@@ -84,7 +84,7 @@ scatter_plotly <- function(loc,
   if ("col" %in% colnames(data)) col <- data$col
   
   xlim <- loc$xrange / 1e6
-  xext <- diff(xlim) * 0.05
+  xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
   
   ylim <- range(data[, loc$yvar], na.rm = TRUE)

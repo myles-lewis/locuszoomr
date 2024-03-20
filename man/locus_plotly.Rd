@@ -14,6 +14,7 @@ locus_plotly(
   exon_col = "blue4",
   exon_border = "blue4",
   maxrows = 8,
+  width = 600,
   xlab = NULL,
   ...
 )
@@ -40,6 +41,9 @@ border.}
 
 \item{maxrows}{Specifies maximum number of rows to display in gene
 annotation panel.}
+
+\item{width}{Width of plotly plot in pixels which is purely used to prevent
+overlapping text for gene names.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}

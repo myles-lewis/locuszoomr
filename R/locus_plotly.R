@@ -19,6 +19,8 @@
 #' @param cex.text Font size for gene text.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
+#' @param width Width of plotly plot in pixels which is purely used to prevent
+#'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
 #' @param gene_col Colour for gene lines.
@@ -46,10 +48,11 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          exon_col = 'blue4',
                          exon_border = 'blue4',
                          maxrows = 8,
+                         width = 600,
                          xlab = NULL,
                          ...) {
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
-                    gene_col, exon_col, exon_border, maxrows, xlab)
+                    gene_col, exon_col, exon_border, maxrows, width, xlab)
   p <- scatter_plotly(loc, xlab = xlab, ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
