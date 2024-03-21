@@ -14,7 +14,8 @@ genetrack_ly(
   exon_border = "blue4",
   maxrows = 8,
   width = 600,
-  xlab = NULL
+  xlab = NULL,
+  plot = TRUE
 )
 }
 \arguments{
@@ -43,9 +44,14 @@ overlapping text for gene names.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
+
+\item{plot}{Logical whether to produce plotly object or return plot
+coordinates.}
 }
 \value{
-A 'plotly' plotting object showing gene tracks.
+Either a 'plotly' plotting object showing gene tracks, or if
+\code{plot = FALSE} a list containing \code{TX}, a dataframe of coordinates for
+gene transcripts, and \code{EX}, a dataframe of coordinates for exons.
 }
 \description{
 Plot gene annotation tracks from \code{ensembldb} data using \code{plotly}.

@@ -9,17 +9,21 @@
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param cex.text Font size for gene text.
+#' @param gene_col Colour for gene lines.
+#' @param exon_col Fill colour for exons.
+#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
+#' border.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param width Width of plotly plot in pixels which is purely used to prevent
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
-#' @param gene_col Colour for gene lines.
-#' @param exon_col Fill colour for exons.
-#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
-#' border.
-#' @return A 'plotly' plotting object showing gene tracks.
+#' @param plot Logical whether to produce plotly object or return plot
+#'   coordinates.
+#' @return Either a 'plotly' plotting object showing gene tracks, or if 
+#'   `plot = FALSE` a list containing `TX`, a dataframe of coordinates for
+#'   gene transcripts, and `EX`, a dataframe of coordinates for exons.
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {
 #' data(SLE_gwas_sub)
@@ -39,7 +43,8 @@ genetrack_ly <- function(locus,
                          exon_border = 'blue4',
                          maxrows = 8,
                          width = 600,
-                         xlab = NULL) {
+                         xlab = NULL,
+                         plot = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   TX <- locus$TX
   EX <- as.data.frame(locus$EX)
@@ -54,7 +59,7 @@ genetrack_ly <- function(locus,
   xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
-  if (nrow(TX) == 0) {
+  if (nrow(TX) == 0 & plot) {
     message('No genes to plot')
     # blank gene tracks
     p <- plot_ly(data.frame(NA), mode = "markers", type = "scattergl") %>%
@@ -80,12 +85,6 @@ genetrack_ly <- function(locus,
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
-  shapes <- lapply(seq_len(nrow(EX)), function(i) {
-    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
-                                                          width = 0.5),
-         x0 = EX$start[i], x1 = EX$end[i], xref = "x",
-         y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
-  })
   TX$tx <- rowMeans(TX[, c('start', 'end')])
   TX$ty <- -TX$row + 0.4
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
@@ -96,6 +95,14 @@ genetrack_ly <- function(locus,
   TX$gene_name2[pos] <- paste0(TX$gene_name[pos], "&#8594;")
   TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name[!pos])
   TX$gene_name2[!tfilter] <- NA
+  
+  if (!plot) return(list(TX = TX, EX = EX))
+  shapes <- lapply(seq_len(nrow(EX)), function(i) {
+    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
+                                                          width = 0.5),
+         x0 = EX$start[i], x1 = EX$end[i], xref = "x",
+         y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
+  })
   
   hovertext <- paste0(TX$gene_name,
                       "<br>Gene ID: ", TX$gene_id,
