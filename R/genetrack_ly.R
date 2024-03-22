@@ -11,8 +11,11 @@
 #' @param cex.text Font size for gene text.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
-#' @param exon_border Border line colour outlining exons. Set to `NA` for no 
-#' border.
+#' @param exon_border Border line colour outlining exons (or genes if
+#'   `showExons` is `FALSE`). Set to `NA` for no border.
+#' @param showExons Logical whether to show exons or simply show whole gene as a
+#'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
+#'   for rectangle border and `gene_col` for the fill colour.
 #' @param maxrows Specifies maximum number of rows to display in gene 
 #' annotation panel.
 #' @param width Width of plotly plot in pixels which is purely used to prevent
@@ -38,9 +41,10 @@ genetrack_ly <- function(locus,
                          filter_gene_name = NULL,
                          filter_gene_biotype = NULL,
                          cex.text = 0.7,
-                         gene_col = 'blue4',
+                         gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                          exon_col = 'blue4',
                          exon_border = 'blue4',
+                         showExons = TRUE,
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
@@ -87,7 +91,7 @@ genetrack_ly <- function(locus,
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   TX$tx <- rowMeans(TX[, c('start', 'end')])
-  TX$ty <- -TX$row + 0.4
+  TX$ty <- -TX$row + 0.35
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
   tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.005) & 
@@ -98,25 +102,39 @@ genetrack_ly <- function(locus,
   TX$gene_name2[!tfilter] <- NA
   
   if (!plot) return(list(TX = TX, EX = EX))
-  shapes <- lapply(seq_len(nrow(EX)), function(i) {
-    list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
-                                                          width = 0.5),
-         x0 = EX$start[i], x1 = EX$end[i], xref = "x",
-         y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
-  })
+  
+  if (showExons) {
+    shapes <- lapply(seq_len(nrow(EX)), function(i) {
+      list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
+                                                            width = 0.5),
+           x0 = EX$start[i], x1 = EX$end[i], xref = "x",
+           y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
+    })
+  } else {
+    shapes <- lapply(seq_len(nrow(TX)), function(i) {
+      list(type = "rect", fillcolor = gene_col, line = list(color = exon_border,
+                                                            width = 1),
+           x0 = TX$start[i], x1 = TX$end[i], xref = "x",
+           y0 = -TX$row[i] - 0.15, y1 = -TX$row[i] + 0.15, yref = "y")
+    })
+  }
   
   hovertext <- paste0(TX$gene_name,
                       "<br>Gene ID: ", TX$gene_id,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  
-  plot_ly(TX, source = "plotly_locus") %>%
-    add_segments(x = ~start, y = ~-row,
-                 xend = ~end, yend = ~-row,
-                 color = I(gene_col),
-                 text = hovertext, hoverinfo = 'text',
-                 showlegend = FALSE) %>%
+  if (showExons) {
+    p <- plot_ly(TX, source = "plotly_locus") %>%
+      add_segments(x = ~start, y = ~-row,
+                   xend = ~end, yend = ~-row,
+                   color = I(gene_col),
+                   text = hovertext, hoverinfo = 'text',
+                   showlegend = FALSE) 
+  } else {
+    p <- plot_ly(TX, source = "plotly_locus")
+  }
+  p %>%
     add_text(x = ~tx, y = ~ty, text = ~gene_name2,
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
