@@ -9,24 +9,30 @@
 #' @param pop A 1000 Genomes Project population, (e.g. YRI or CEU), multiple 
 #' allowed, default = "CEU". Passed to `LDlinkR::LDmatrix()`.
 #' @param r2d Either "r2" for LD r^2 or "d" for LD D', default = "r2". Passed 
-#' to `LDlinkR::LDmatrix()`.
+#' to `LDlinkR::LDmatrix()` or `LDproxy()`.
 #' @param token Personal access token for accessing 1000 Genomes LD data via 
 #' LDlink API. See `LDlinkR` package documentation.
+#' @param method Either "proxy" or "matrix". Controls whether to use
+#'   `LDmatrix()` or `LDproxy()` to obtain LD data.
 #' @param ... Optional arguments such as `genome_build` which are passed on to
-#'   `LDlinkR::LDmatrix()`
-#' @details
-#' Results are cached using `memoise` to reduce API requests.
-#' 
+#'   `LDlinkR::LDmatrix()` or `LDlinkR::LDproxy()`
 #' @return Returns a list object of class 'locus'. LD information is added as a
 #'   column `ld` in list element `data`.
 #' @seealso [locus()]
-#' @importFrom LDlinkR LDmatrix LDexpress
+#' @details
+#' The argument `method` controls which LDlinkR function is used to retrieve LD
+#' data. `LDmatrix()` is slower but usually more complete for small queries
+#' (<1000 SNPs). However, it has a limit of 1000 SNPs which can be queried.
+#' `LDproxy()` is faster but data on some SNPs may be absent.
+#' 
+#' @importFrom LDlinkR LDmatrix LDexpress LDproxy
 #' @export
 
 link_LD <- function(loc,
                     pop = "CEU",
                     r2d = "r2",
-                    token = "", ...) {
+                    token = "",
+                    method = c("matrix", "proxy"), ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -41,12 +47,22 @@ link_LD <- function(loc,
     rslist <- rslist[order(loc$data$logP, decreasing = TRUE)[seq_len(1000)]]
     rslist <- unique(c(index_snp, rslist))[seq_len(1000)]
   }
-  message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
-  ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
-  if (index_snp %in% colnames(ldm)) {
-    ld <- ldm[, index_snp]
-    loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
-  } else message("Index SNP not found in LDlink data")
+  method <- match.arg(method)
+  if (method == "proxy") {
+    ldp <- try(mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token, ...))
+    if (!inherits(ldp, "try-error")) {
+      loc$data$ld <- ldp[match(loc$data[, labs], ldp$RS_Number), "R2"]
+    }
+  } else {
+    message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
+    ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
+    if (index_snp %in% colnames(ldm)) {
+      ld <- ldm[, index_snp]
+      loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
+    } else message("Index SNP not found in LDlink data")
+  }
+  m <- sum(!is.na(loc$data$ld))
+  if (m > 0) message("Matched ", m, " SNPs")
   
   loc
 }
@@ -54,3 +70,6 @@ link_LD <- function(loc,
 
 # use memoise to reduce calls to LDlink API
 mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
+
+mem_LDproxy <- memoise(LDlinkR::LDproxy)
+
