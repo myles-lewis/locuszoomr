@@ -44,7 +44,7 @@ scatter_plotly <- function(loc,
                            recomb_col = "blue") {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data) || nrow(loc$data) == 0)
-    stop("No SNPs/data points")
+    stop("No SNPs/data points", call. = FALSE)
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
