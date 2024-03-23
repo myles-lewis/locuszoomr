@@ -165,12 +165,15 @@ locus <- function(gene = NULL,
     }
     data <- as.data.frame(data)
 
-    if (nrow(data) == 0) {message("Locus contains no SNPs/datapoints")
-    } else message(nrow(data), " SNPs/datapoints")
-
-    if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
-    if (is.character(LD)) {
-      colnames(data)[which(colnames(data) == LD)] <- "ld"
+    if (nrow(data) == 0) {
+      message("Locus contains no SNPs/datapoints")
+      data <- NULL
+    } else {
+      message(nrow(data), " SNPs/datapoints")
+      if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
+      if (is.character(LD)) {
+        colnames(data)[which(colnames(data) == LD)] <- "ld"
+      }
     }
   }
   

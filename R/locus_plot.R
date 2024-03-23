@@ -85,7 +85,7 @@ locus_plot <- function(loc,
                        text_pos = 'top',
                        recomb_col = "blue", ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data)) stop("No data points, only gene tracks")
+  if (is.null(loc$data)) stop("No SNPs/data points")
   
   if (use_layout) {
     op0 <- set_layers(1, heights, rev = TRUE)

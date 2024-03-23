@@ -64,7 +64,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                          xlab = NULL,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data)) stop("No data points, only gene tracks")
+  if (is.null(loc$data)) stop("No SNPs/data points")
   p <- gg_scatter(loc,
                   cex.axis = cex.axis,
                   cex.lab = cex.lab,
