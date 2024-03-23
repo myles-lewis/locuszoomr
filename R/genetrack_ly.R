@@ -77,7 +77,7 @@ genetrack_ly <- function(locus,
     return(p)
   }
   
-  cex.width <- cex.text * par("pin")[1] * 105 / width
+  cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.width)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
