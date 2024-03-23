@@ -78,8 +78,7 @@ scatter_plot <- function(loc,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data) || nrow(loc$data) == 0)
-    stop("No SNPs/data points", call. = FALSE)
+  if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
