@@ -178,6 +178,8 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   } else if (text_pos == 'left') {
     TX$tmin <- TX$start - gw - gap
     TX$tmax <- TX$end
+  } else if (text_pos == 'none') {
+    TX$tmax <- TX$tmin <- TX$mean
   }
   TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
   TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
