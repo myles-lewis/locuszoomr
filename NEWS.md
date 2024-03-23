@@ -2,12 +2,13 @@ News
 =====
 
 # locuszoomr 0.2.2
-###### 15/03/2024
+###### 23/03/2024
 
 * Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
 (suggested by Luke Pilling).
 * Altered default colour scheme.
-* Improved plotly version by adding diamond symbols for index SNPs.
+* Multiple improvements to plotly version.
+* Added option to use the faster `LDproxy` in `link_LD()`
 
 # locuszoomr 0.2.1
 ###### 17/02/2024
