@@ -38,10 +38,10 @@ link_LD <- function(loc,
     stop("Package 'LDlinkR' must be installed to use this feature",
          call. = FALSE)
   }
+  if (token == "") stop("token is missing")
+  
   labs <- loc$labs
   index_snp <- loc$index_snp
-  
-  if (token == "") stop("token is missing")
   rslist <- loc$data[, labs]
   if (length(rslist) > 1000) {
     rslist <- rslist[order(loc$data$logP, decreasing = TRUE)[seq_len(1000)]]
