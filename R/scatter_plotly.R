@@ -157,7 +157,10 @@ scatter_plotly <- function(loc,
                                    zeroline = FALSE, range = ylim2),
                      legend = c(leg, x = 1.1, y = 1),
                      showlegend = showLD | !is.null(pcutoff)) %>%
-      plotly::config(displaylogo = FALSE)
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"))
   }
   
   if (hasLD) suppressWarnings(plotly_build(p)) else p
