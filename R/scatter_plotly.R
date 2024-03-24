@@ -116,13 +116,14 @@ scatter_plotly <- function(loc,
                                   range = as.list(xlim)),
                      yaxis = list(title = ylab,
                                   ticks = "outside",
+                                  fixedrange = TRUE,
                                   showline = TRUE, range = ylim),
                      legend = leg,
                      showlegend = showLD | !is.null(pcutoff)) %>%
-      plotly::config(displaylogo = FALSE)
-    # modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d",
-    #                            "lasso2d", "zoomIn2d", "zoomOut2d", 
-    #                            "autoScale2d", "toggleHover"))
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"))
   } else {
     # double y axis with recombination
     p <- plot_ly(source = "plotly_locus") %>%

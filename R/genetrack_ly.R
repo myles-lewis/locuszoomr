@@ -144,8 +144,12 @@ genetrack_ly <- function(locus,
                                 color = 'black', ticklen = 5,
                                 range = as.list(xlim)),
                    yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
+                                fixedrange = TRUE,
                                 showticklabels = FALSE)) %>%
-    plotly::config(displaylogo = FALSE)
+    plotly::config(displaylogo = FALSE,
+                   modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                              "autoScale2d", "resetScale2d",
+                                              "hoverClosest", "hoverCompare"))
 }
 
 
