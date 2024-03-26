@@ -124,17 +124,12 @@ genetrack_ly <- function(locus,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  if (showExons) {
-    p <- plot_ly(TX, source = "plotly_locus") %>%
-      add_segments(x = ~start, y = ~-row,
-                   xend = ~end, yend = ~-row,
-                   color = I(gene_col),
-                   text = hovertext, hoverinfo = 'text',
-                   showlegend = FALSE) 
-  } else {
-    p <- plot_ly(TX, source = "plotly_locus")
-  }
-  p %>%
+  plot_ly(TX, source = "plotly_locus") %>%
+    add_segments(x = ~start, y = ~-row,
+                 xend = ~end, yend = ~-row,
+                 color = I(gene_col),
+                 text = hovertext, hoverinfo = 'text',
+                 showlegend = FALSE) %>%
     add_text(x = ~tx, y = ~ty, text = ~gene_name2,
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
