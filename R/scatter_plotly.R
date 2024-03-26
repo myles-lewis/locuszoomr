@@ -100,9 +100,9 @@ scatter_plotly <- function(loc,
   symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
   
   hline <- list(type = "line",
-                line = list(width = 1, color = '#888888', dash = 'dash'),
+                line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
-                xref = "paper")
+                xref = "paper", layer = "below")
   
   if (!recomb) {
     # standard plotly
@@ -122,7 +122,7 @@ scatter_plotly <- function(loc,
                      yaxis = list(title = ylab,
                                   ticks = "outside",
                                   fixedrange = TRUE,
-                                  showline = TRUE, showgrid = FALSE,
+                                  showline = TRUE,
                                   range = ylim),
                      shapes = hline, legend = leg,
                      showlegend = showLD | !is.null(pcutoff)) %>%
@@ -154,7 +154,7 @@ scatter_plotly <- function(loc,
                                   zeroline = FALSE,
                                   range = as.list(xlim)),
                      yaxis = list(title = ylab,
-                                  ticks = "outside",
+                                  ticks = "outside", showgrid = FALSE,
                                   showline = TRUE, range = ylim),
                      yaxis2 = list(overlaying = "y", side = "right",
                                    title = "Recombination rate (%)",
