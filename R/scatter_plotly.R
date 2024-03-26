@@ -99,6 +99,11 @@ scatter_plotly <- function(loc,
   ylim2 <- c(-2, 102)
   symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
   
+  hline <- list(type = "line",
+                line = list(width = 1, color = '#888888', dash = 'dash'),
+                x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
+                xref = "paper")
+  
   if (!recomb) {
     # standard plotly
     p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
@@ -112,13 +117,14 @@ scatter_plotly <- function(loc,
                  type = "scattergl", mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
-                                  zeroline = FALSE,
+                                  zeroline = FALSE, showgrid = FALSE,
                                   range = as.list(xlim)),
                      yaxis = list(title = ylab,
                                   ticks = "outside",
                                   fixedrange = TRUE,
-                                  showline = TRUE, range = ylim),
-                     legend = leg,
+                                  showline = TRUE, showgrid = FALSE,
+                                  range = ylim),
+                     shapes = hline, legend = leg,
                      showlegend = showLD | !is.null(pcutoff)) %>%
       plotly::config(displaylogo = FALSE,
                      modeBarButtonsToRemove = c("select2d", "lasso2d",
@@ -155,6 +161,7 @@ scatter_plotly <- function(loc,
                                    ticks = "outside", showgrid = FALSE,
                                    showline = TRUE,
                                    zeroline = FALSE, range = ylim2),
+                     shapes = hline,
                      legend = c(leg, x = 1.1, y = 1),
                      showlegend = showLD | !is.null(pcutoff)) %>%
       plotly::config(displaylogo = FALSE,
