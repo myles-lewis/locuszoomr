@@ -159,6 +159,8 @@ locus <- function(gene = NULL,
   if (!is.null(data)) { 
     data <- data[data[, chrom] == seqname &
                    data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
+    # smallest floating point
+    data[data[, p] < 5e-324, p] <- 5e-324
     if (is.null(yvar)) {
       data$logP <- -log10(data[, p])
       yvar <- "logP"
