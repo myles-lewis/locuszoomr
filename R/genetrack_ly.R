@@ -120,6 +120,7 @@ genetrack_ly <- function(locus,
   }
   
   hovertext <- paste0(TX$gene_name,
+                      TX$fullname,
                       "<br>Gene ID: ", TX$gene_id,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
