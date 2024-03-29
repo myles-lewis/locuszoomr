@@ -16,7 +16,8 @@ scatter_plotly(
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   marker_outline = "black",
   marker_size = 7,
-  recomb_col = "blue"
+  recomb_col = "blue",
+  add_hover = NULL
 )
 }
 \arguments{
@@ -52,6 +53,9 @@ the index SNP.}
 \item{recomb_col}{Colour for recombination rate line if recombination rate
 data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
+
+\item{add_hover}{Optional vector of column names in \code{loc$data} to add to the
+plotly hover text for scatter points.}
 }
 \value{
 A \code{plotly} scatter plot.

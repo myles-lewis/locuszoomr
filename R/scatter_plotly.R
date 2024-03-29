@@ -24,6 +24,8 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
+#' @param add_hover Optional vector of column names in `loc$data` to add to the
+#'   plotly hover text for scatter points.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
 #' @importFrom plotly add_trace plotly_build
@@ -41,7 +43,8 @@ scatter_plotly <- function(loc,
                                          'orange', 'red', 'purple'),
                            marker_outline = "black",
                            marker_size = 7,
-                           recomb_col = "blue") {
+                           recomb_col = "blue",
+                           add_hover = NULL) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
   data <- loc$data
@@ -96,6 +99,11 @@ scatter_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
+  if (!is.null(add_hover)) {
+    for (i in add_hover) {
+      hovertext <- paste0(hovertext, "<br>", i, ": ", data[, i])
+    }
+  }
   ylim2 <- c(-2, 102)
   symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
   
