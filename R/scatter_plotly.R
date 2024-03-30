@@ -88,7 +88,6 @@ scatter_plotly <- function(loc,
   }
   if (!is.null(eqtl_beta)) {
     # beta symbols
-    if (is.null(eqtl_gene)) stop("`eqtl_gene` not specified")
     data[, eqtl_beta] <- signif(data[, eqtl_beta], 3)
     symbol <- as.character(sign(data[, eqtl_beta]))
     ind <- data[, loc$p] > pcutoff
@@ -96,6 +95,10 @@ scatter_plotly <- function(loc,
     data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
                           labels = c(" ", "up", "down"))
     symbols <- c(21L, 24L, 25L)
+    # ms <- rep(marker_size, nrow(data))
+    # ms[!ind] <- marker_size * 1.5
+    # marker_size <- ms
+    leg <- list(traceorder = "reversed")
   } else {
     if (is.null(eqtl_gene)) {
       # default plot
@@ -139,45 +142,30 @@ scatter_plotly <- function(loc,
   showlegend <- (showLD & hasLD) | !is.null(pcutoff)
   
   if (!recomb) {
-    if (is.null(eqtl_beta)) {
-      # standard plotly
-      p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                   color = data$bg, colors = LD_scheme,
-                   symbol = data$symbol, symbols = symbols,
-                   marker = list(size = marker_size, opacity = 0.8,
-                                 line = list(width = 1, color = marker_outline)),
-                   text = hovertext, hoverinfo = 'text',
-                   showlegend = showlegend,
-                   source = "plotly_locus",
-                   type = "scattergl", mode = "markers")
-    } else {
-      # eqtl shapes
-      data[, loc$pos] <- data[, loc$pos] / 1e6
-      data$hovertext <- hovertext
-      ns <- data$bg == "ns"
-      p <- plot_ly(source = "plotly_locus")
-      for (i in levels(data$bg)) {
-        p <- p %>%
-          add_markers(data = data[data$bg == i, ],
-                      x = as.formula(paste0("~", loc$pos)),
-                      y = as.formula(paste0("~", loc$yvar)),
-                      color = ~bg, colors = LD_scheme,
-                      symbol = ~symbol, symbols = symbols,
-                      marker = list(size = marker_size * ifelse(i == "ns", 1, 1.4),
-                                    opacity = 0.8,
-                                    line = list(width = 1, color = marker_outline)),
-                      text = ~hovertext, hoverinfo = 'text',
-                      showlegend = TRUE, type = "scattergl")
-      }
-    }
-    p <- p %>%
-      plotly::layout(xaxis = list(title = xlab, ticks = "outside",
+    # standard plotly
+    p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+                 color = data$bg, colors = LD_scheme,
+                 symbol = data$symbol, symbols = symbols,
+                 marker = list(size = marker_size, opacity = 0.8,
+                               line = list(width = 1, color = marker_outline)),
+                 text = hovertext, hoverinfo = 'text',
+                 showlegend = showlegend,
+                 source = "plotly_locus",
+                 type = "scattergl", mode = "markers") %>%
+      plotly::layout(xaxis = list(title = xlab,
+                                  ticks = "outside",
                                   zeroline = FALSE, showgrid = FALSE,
                                   range = as.list(xlim)),
-                     yaxis = list(title = ylab, ticks = "outside",
-                                  fixedrange = TRUE, showline = TRUE,
+                     yaxis = list(title = ylab,
+                                  ticks = "outside",
+                                  fixedrange = TRUE,
+                                  showline = TRUE,
                                   range = ylim),
-                     shapes = hline, legend = leg)
+                     shapes = hline, legend = leg) %>%
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"))
   } else {
     # double y axis with recombination
     p <- plot_ly(source = "plotly_locus") %>%
@@ -210,13 +198,12 @@ scatter_plotly <- function(loc,
                                    showline = TRUE,
                                    zeroline = FALSE, range = ylim2),
                      shapes = hline,
-                     legend = c(leg, x = 1.1, y = 1))
+                     legend = c(leg, x = 1.1, y = 1)) %>%
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"))
   }
-  p <- p %>%
-    plotly::config(displaylogo = FALSE,
-                   modeBarButtonsToRemove = c("select2d", "lasso2d",
-                                              "autoScale2d", "resetScale2d",
-                                              "hoverClosest", "hoverCompare"))
   
   if (hasLD) suppressWarnings(plotly_build(p)) else p
 }
