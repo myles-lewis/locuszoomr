@@ -95,7 +95,9 @@ scatter_plotly <- function(loc,
     symbols <- c(21, 24, 25)
   } else {
     data$symbol <- data$bg
-    symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
+    symbols <- if (is.null(eqtl_gene)) {
+      c(rep("circle", length(LD_scheme) -1), "diamond")
+    } else rep("circle", length(LD_scheme))
   }
   
   # scatter plotly
