@@ -221,6 +221,11 @@ scatter_plotly <- function(loc,
 
 
 eqtl_scheme <- function(n) {
-  n <- min(n, 7L)
-  c('grey', 'purple', 'green3', 'orange', 'royalblue', 'red', 'cyan')[1:n]
+  if (n < 8) {
+    scheme <- c('grey', 'purple', 'green3', 'orange', 'royalblue', 'red',
+                'cyan')[1:n]
+  } else {
+    scheme <- c('grey', rainbow(n -1))
+  }
+  scheme
 }
