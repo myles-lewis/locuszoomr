@@ -94,16 +94,21 @@ scatter_plotly <- function(loc,
     symbol[ind] <- "ns"
     data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
                           labels = c(" ", "up", "down"))
-    symbols <- c(21, 24, 25)
+    symbols <- c(21L, 24L, 25L)
     # ms <- rep(marker_size, nrow(data))
     # ms[!ind] <- marker_size * 1.5
     # marker_size <- ms
     leg <- list(traceorder = "reversed")
   } else {
-    data$symbol <- data$bg
-    symbols <- if (is.null(eqtl_gene)) {
-      c(rep("circle", length(LD_scheme) -1), "diamond")
-    } else rep("circle", length(LD_scheme))  # eqtl gene only
+    if (is.null(eqtl_gene)) {
+      # default plot
+      data$symbol <- data$bg
+      symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
+    } else {
+      # eqtl gene only
+      data$symbol <- 1L
+      symbols <- "circle"  
+    }
   }
   
   # scatter plotly
