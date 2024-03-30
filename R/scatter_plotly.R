@@ -104,12 +104,6 @@ scatter_plotly <- function(loc,
   # scatter plotly
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   
-  # pch <- rep(21L, nrow(data))
-  # pch[data[, loc$labs] %in% index_snp] <- 23L
-  if ("pch" %in% colnames(data)) pch <- data$pch
-  col <- "black"
-  if ("col" %in% colnames(data)) col <- data$col
-  
   xlim <- loc$xrange / 1e6
   xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
