@@ -40,6 +40,7 @@ link_LD <- function(loc,
   }
   if (token == "") stop("token is missing")
   
+  start <- Sys.time()
   labs <- loc$labs
   index_snp <- loc$index_snp
   rslist <- loc$data[, labs]
@@ -61,8 +62,9 @@ link_LD <- function(loc,
       loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
     } else message("Index SNP not found in LDlink data")
   }
+  end <- Sys.time()
   m <- sum(!is.na(loc$data$ld))
-  if (m > 0) message("Matched ", m, " SNPs")
+  message("Matched ", m, " SNPs (", format(end - start, digits = 3),")")
   
   loc
 }
