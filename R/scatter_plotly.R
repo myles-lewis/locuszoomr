@@ -132,7 +132,6 @@ scatter_plotly <- function(loc,
       hovertext <- paste0(hovertext, "<br>", i, ": ", data[, i])
     }
   }
-  ylim2 <- c(-2, 102)
   
   hline <- list(type = "line",
                 line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
@@ -178,6 +177,7 @@ scatter_plotly <- function(loc,
                      shapes = hline, legend = leg)
   } else {
     # double y axis with recombination
+    ylim2 <- c(-2, 102)
     p <- plot_ly(source = "plotly_locus") %>%
       # recombination line
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
