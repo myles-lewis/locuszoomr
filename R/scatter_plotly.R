@@ -24,6 +24,8 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
+#' @param eqtl_gene Column name in `loc$data` for eQTL genes.
+#' @param eqtl_beta Optional column name for eQTL beta coefficient.
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
 #' @return A `plotly` scatter plot.
@@ -44,6 +46,8 @@ scatter_plotly <- function(loc,
                            marker_outline = "black",
                            marker_size = 7,
                            recomb_col = "blue",
+                           eqtl_gene = NULL,
+                           eqtl_beta = NULL,
                            add_hover = NULL) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
@@ -66,7 +70,13 @@ scatter_plotly <- function(loc,
                                    "0.4 - 0.6", "0.6 - 0.8", "0.8 - 1.0",
                                    "index"))
       leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
+    } else if (!is.null(eqtl_gene)) {
+      bg <- data[, eqtl_gene]
+      bg[data[, loc$p] > pcutoff] <- "ns"
+      data$bg <- relevel(factor(bg), "ns")
+      LD_scheme <- eqtl_scheme(nlevels(data$bg))
     } else {
+      # default colours
       showLD <- FALSE
       data$bg <- scheme[1]
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
@@ -76,12 +86,23 @@ scatter_plotly <- function(loc,
       LD_scheme <- scheme
     }
   }
+  if (!is.null(eqtl_beta)) {
+    data[, eqtl_beta] <- signif(data[, eqtl_beta], 3)
+    symbol <- as.character(sign(data[, eqtl_beta]))
+    symbol[data[, loc$p] > pcutoff] <- "ns"
+    data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
+                          labels = c(" ", "up", "down"))
+    symbols <- c(21, 24, 25)
+  } else {
+    data$symbol <- data$bg
+    symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
+  }
   
   # scatter plotly
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   
-  pch <- rep(21L, nrow(data))
-  pch[data[, loc$labs] %in% index_snp] <- 23L
+  # pch <- rep(21L, nrow(data))
+  # pch[data[, loc$labs] %in% index_snp] <- 23L
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
@@ -99,28 +120,29 @@ scatter_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
+  add_hover <- c(eqtl_beta, eqtl_gene, add_hover)
   if (!is.null(add_hover)) {
     for (i in add_hover) {
       hovertext <- paste0(hovertext, "<br>", i, ": ", data[, i])
     }
   }
   ylim2 <- c(-2, 102)
-  symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
   
   hline <- list(type = "line",
                 line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
+  showlegend <- (showLD & hasLD) | (is.null(eqtl_beta) & !is.null(pcutoff))
   
   if (!recomb) {
     # standard plotly
     p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                  color = data$bg, colors = LD_scheme,
-                 symbol = data$bg, symbols = symbols,
+                 symbol = data$symbol, symbols = symbols,
                  marker = list(size = marker_size, opacity = 0.8,
                                line = list(width = 1, color = marker_outline)),
-                 text = hovertext,
-                 hoverinfo = 'text',
+                 text = hovertext, hoverinfo = 'text',
+                 showlegend = showlegend,
                  source = "plotly_locus",
                  type = "scattergl", mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
@@ -132,8 +154,7 @@ scatter_plotly <- function(loc,
                                   fixedrange = TRUE,
                                   showline = TRUE,
                                   range = ylim),
-                     shapes = hline, legend = leg,
-                     showlegend = showLD | !is.null(pcutoff)) %>%
+                     shapes = hline, legend = leg) %>%
       plotly::config(displaylogo = FALSE,
                      modeBarButtonsToRemove = c("select2d", "lasso2d",
                                                 "autoScale2d", "resetScale2d",
@@ -151,11 +172,11 @@ scatter_plotly <- function(loc,
       # scatter plot
       add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                 color = data$bg,
-                symbol = data$bg, 
+                symbol = data$symbol,
                 marker = list(size = marker_size, opacity = 0.8,
                               line = list(width = 1, color = marker_outline)),
-                text = hovertext,
-                hoverinfo = 'text',
+                text = hovertext, hoverinfo = 'text',
+                showlegend = showlegend,
                 type = "scattergl", mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
@@ -170,8 +191,7 @@ scatter_plotly <- function(loc,
                                    showline = TRUE,
                                    zeroline = FALSE, range = ylim2),
                      shapes = hline,
-                     legend = c(leg, x = 1.1, y = 1),
-                     showlegend = showLD | !is.null(pcutoff)) %>%
+                     legend = c(leg, x = 1.1, y = 1)) %>%
       plotly::config(displaylogo = FALSE,
                      modeBarButtonsToRemove = c("select2d", "lasso2d",
                                                 "autoScale2d", "resetScale2d",
@@ -179,4 +199,10 @@ scatter_plotly <- function(loc,
   }
   
   if (hasLD) suppressWarnings(plotly_build(p)) else p
+}
+
+
+eqtl_scheme <- function(n) {
+  n <- min(n, 7L)
+  c('grey', 'purple', 'green3', 'orange', 'royalblue', 'red', 'cyan')[1:n]
 }

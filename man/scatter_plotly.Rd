@@ -17,6 +17,8 @@ scatter_plotly(
   marker_outline = "black",
   marker_size = 7,
   recomb_col = "blue",
+  eqtl_gene = NULL,
+  eqtl_beta = NULL,
   add_hover = NULL
 )
 }
@@ -53,6 +55,10 @@ the index SNP.}
 \item{recomb_col}{Colour for recombination rate line if recombination rate
 data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
+
+\item{eqtl_gene}{Column name in \code{loc$data} for eQTL genes.}
+
+\item{eqtl_beta}{Optional column name for eQTL beta coefficient.}
 
 \item{add_hover}{Optional vector of column names in \code{loc$data} to add to the
 plotly hover text for scatter points.}
