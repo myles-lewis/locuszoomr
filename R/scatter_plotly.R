@@ -90,10 +90,15 @@ scatter_plotly <- function(loc,
     # beta symbols
     data[, eqtl_beta] <- signif(data[, eqtl_beta], 3)
     symbol <- as.character(sign(data[, eqtl_beta]))
-    symbol[data[, loc$p] > pcutoff] <- "ns"
+    ind <- data[, loc$p] > pcutoff
+    symbol[ind] <- "ns"
     data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
                           labels = c(" ", "up", "down"))
     symbols <- c(21, 24, 25)
+    # ms <- rep(marker_size, nrow(data))
+    # ms[!ind] <- marker_size * 1.5
+    # marker_size <- ms
+    leg <- list(traceorder = "reversed")
   } else {
     data$symbol <- data$bg
     symbols <- if (is.null(eqtl_gene)) {
@@ -129,7 +134,7 @@ scatter_plotly <- function(loc,
                 line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
-  showlegend <- (showLD & hasLD) | (is.null(eqtl_beta) & !is.null(pcutoff))
+  showlegend <- (showLD & hasLD) | !is.null(pcutoff)
   
   if (!recomb) {
     # standard plotly
