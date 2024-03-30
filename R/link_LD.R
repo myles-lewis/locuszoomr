@@ -12,8 +12,8 @@
 #' to `LDlinkR::LDmatrix()` or `LDproxy()`.
 #' @param token Personal access token for accessing 1000 Genomes LD data via 
 #' LDlink API. See `LDlinkR` package documentation.
-#' @param method Either "proxy" or "matrix". Controls whether to use
-#'   `LDmatrix()` or `LDproxy()` to obtain LD data.
+#' @param method Either `"proxy"` or `"matrix"`. Controls whether to use
+#'    `LDproxy()` or `LDmatrix()` to obtain LD data.
 #' @param ... Optional arguments such as `genome_build` which are passed on to
 #'   `LDlinkR::LDmatrix()` or `LDlinkR::LDproxy()`
 #' @return Returns a list object of class 'locus'. LD information is added as a
@@ -32,7 +32,7 @@ link_LD <- function(loc,
                     pop = "CEU",
                     r2d = "r2",
                     token = "",
-                    method = c("matrix", "proxy"), ...) {
+                    method = c("proxy", "matrix"), ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",

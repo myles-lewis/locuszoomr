@@ -9,7 +9,7 @@ link_LD(
   pop = "CEU",
   r2d = "r2",
   token = "",
-  method = c("matrix", "proxy"),
+  method = c("proxy", "matrix"),
   ...
 )
 }
@@ -25,8 +25,8 @@ to \code{LDlinkR::LDmatrix()} or \code{LDproxy()}.}
 \item{token}{Personal access token for accessing 1000 Genomes LD data via
 LDlink API. See \code{LDlinkR} package documentation.}
 
-\item{method}{Either "proxy" or "matrix". Controls whether to use
-\code{LDmatrix()} or \code{LDproxy()} to obtain LD data.}
+\item{method}{Either \code{"proxy"} or \code{"matrix"}. Controls whether to use
+\code{LDproxy()} or \code{LDmatrix()} to obtain LD data.}
 
 \item{...}{Optional arguments such as \code{genome_build} which are passed on to
 \code{LDlinkR::LDmatrix()} or \code{LDlinkR::LDproxy()}}
