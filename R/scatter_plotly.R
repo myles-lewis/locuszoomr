@@ -87,6 +87,7 @@ scatter_plotly <- function(loc,
     }
   }
   if (!is.null(eqtl_beta)) {
+    # beta symbols
     data[, eqtl_beta] <- signif(data[, eqtl_beta], 3)
     symbol <- as.character(sign(data[, eqtl_beta]))
     symbol[data[, loc$p] > pcutoff] <- "ns"
@@ -97,7 +98,7 @@ scatter_plotly <- function(loc,
     data$symbol <- data$bg
     symbols <- if (is.null(eqtl_gene)) {
       c(rep("circle", length(LD_scheme) -1), "diamond")
-    } else rep("circle", length(LD_scheme))
+    } else rep("circle", length(LD_scheme))  # eqtl gene only
   }
   
   # scatter plotly
