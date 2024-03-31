@@ -97,6 +97,7 @@ scatter_plotly <- function(loc,
     symbols <- c(21L, 24L, 25L)
     data$size <- 1L
     data$size[!ind] <- 2L
+    sizes <- if (sum(!ind) == 0) c(50, 50) else c(50, 100)
     leg <- list(traceorder = "reversed")
   } else {
     if (is.null(eqtl_gene)) {
@@ -156,7 +157,7 @@ scatter_plotly <- function(loc,
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                    color = data$bg, colors = LD_scheme,
                    symbol = data$symbol, symbols = symbols,
-                   size = data$size, sizes = c(50, 100),
+                   size = data$size, sizes = sizes,
                    marker = list(opacity = 0.8,
                                  line = list(width = 1, color = marker_outline)),
                    text = hovertext, hoverinfo = 'text',
