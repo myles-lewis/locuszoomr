@@ -145,7 +145,7 @@ gg_scatter <- function(loc,
   # add labels
   if (!is.null(labels)) {
     i <- grep("index", labels, ignore.case = TRUE)
-    if (i) {
+    if (length(i) > 0) {
       if (length(index_snp) == 1) {
         labels[i] <- index_snp
       } else {
