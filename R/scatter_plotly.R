@@ -175,7 +175,7 @@ scatter_plotly <- function(loc,
                                   fixedrange = TRUE,
                                   showline = TRUE,
                                   range = ylim),
-                     shapes = hline, legend = leg)
+                     shapes = hline, legend = leg, dragmode = "pan")
   } else {
     # double y axis with recombination
     ylim2 <- c(-2, 102)
