@@ -24,6 +24,9 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
+#'   missing gene symbols.
 #' @return A grob object.
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {

@@ -48,6 +48,10 @@ annotation panel.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
+blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
+missing gene symbols.}
 }
 \value{
 A grob object.

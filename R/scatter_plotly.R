@@ -31,6 +31,7 @@
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
 #' @importFrom plotly add_trace plotly_build
+#' @importFrom stats relevel
 #' @export
 #' 
 scatter_plotly <- function(loc,
@@ -221,6 +222,7 @@ scatter_plotly <- function(loc,
 }
 
 
+#' @importFrom grDevices rainbow
 eqtl_scheme <- function(n) {
   if (n < 8) {
     scheme <- c('grey', 'purple', 'green3', 'orange', 'royalblue', 'red',
