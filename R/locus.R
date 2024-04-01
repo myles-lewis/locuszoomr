@@ -156,9 +156,9 @@ locus <- function(gene = NULL,
   if (!is.null(index_snp)) msg <- paste(index_snp, msg, sep = ", ")
   message(msg)
   
-  if (!is.null(data)) { 
-    data <- data[data[, chrom] == seqname &
-                   data[, pos] > xrange[1] & data[, pos] < xrange[2], ]
+  if (!is.null(data)) {
+    data <- data[which(data[, chrom] == seqname), ]
+    data <- data[which(data[, pos] > xrange[1] & data[, pos] < xrange[2]), ]
     # smallest floating point
     data[data[, p] < 5e-324, p] <- 5e-324
     if (is.null(yvar)) {
