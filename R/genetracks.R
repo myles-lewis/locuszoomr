@@ -166,9 +166,11 @@ genetracks <- function(locus,
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
-                   text_pos = 'top') {
-  blank <- TX$gene_name == ""
-  if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
+                   text_pos = 'top', fill_blanks = TRUE) {
+  if (fill_blanks) {
+    blank <- TX$gene_name == ""
+    if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
+  }
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])

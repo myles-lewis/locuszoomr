@@ -110,7 +110,7 @@ locus <- function(gene = NULL,
     ))
     
     if(length(locus) > 1) {
-      warning(sprintf('Identified %d genes matching name \'%s\', taking first\n',
+      message(sprintf('Identified %d genes matching name \'%s\', taking first\n',
                       length(locus), gene))
       locus <- locus[1]
     }
