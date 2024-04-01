@@ -21,6 +21,7 @@ locus_ggplot(
   text_pos = "top",
   xticks = "top",
   xlab = NULL,
+  blanks = "fill",
   ...
 )
 }
@@ -64,6 +65,10 @@ placement of gene name labels.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified in
 \code{locus}.}
+
+\item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
+blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
+missing gene symbols.}
 
 \item{...}{Additional arguments passed to \code{\link[=gg_scatter]{gg_scatter()}} to control
 the scatter plot.}

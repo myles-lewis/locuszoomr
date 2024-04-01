@@ -16,6 +16,7 @@ genetrack_ly(
   maxrows = 8,
   width = 600,
   xlab = NULL,
+  blanks = c("fill", "hide", "show"),
   plot = TRUE
 )
 }
@@ -49,6 +50,11 @@ overlapping text for gene names.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
+
+\item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
+blank gene symbols with ensembl gene ids. \code{"hide"} completely hides genes
+which are missing gene symbols. \code{"show"} shows gene lines but no label
+(hovertext is still available).}
 
 \item{plot}{Logical whether to produce plotly object or return plot
 coordinates.}

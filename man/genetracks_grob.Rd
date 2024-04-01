@@ -15,7 +15,8 @@ genetracks_grob(
   exon_border = "blue4",
   showExons = TRUE,
   maxrows = NULL,
-  text_pos = "top"
+  text_pos = "top",
+  blanks = c("fill", "hide")
 )
 }
 \arguments{

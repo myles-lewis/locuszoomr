@@ -23,6 +23,7 @@ locus_plot(
   exon_col = "blue4",
   exon_border = "blue4",
   text_pos = "top",
+  blanks = "fill",
   recomb_col = "blue",
   ...
 )
@@ -73,6 +74,10 @@ lower plots.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
+blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
+missing gene symbols.}
 
 \item{recomb_col}{Colour for recombination rate line if recombination rate
 data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add

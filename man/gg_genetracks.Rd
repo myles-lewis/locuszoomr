@@ -19,7 +19,8 @@ gg_genetracks(
   maxrows = NULL,
   text_pos = "top",
   xticks = TRUE,
-  xlab = NULL
+  xlab = NULL,
+  blanks = c("fill", "hide")
 )
 }
 \arguments{
@@ -60,6 +61,10 @@ placement of gene name labels.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified in
 \code{locus}.}
+
+\item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
+blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
+missing gene symbols.}
 }
 \value{
 A ggplot2 object.
