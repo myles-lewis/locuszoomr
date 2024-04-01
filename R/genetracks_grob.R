@@ -48,8 +48,10 @@ genetracks_grob <- function(locus,
                             exon_border = 'blue4',
                             showExons = TRUE,
                             maxrows = NULL,
-                            text_pos = 'top') {
+                            text_pos = 'top',
+                            blanks = c("fill", "hide")) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
+  blanks <- match.arg(blanks)
   TX <- locus$TX
   EX <- locus$EX
   xrange <- locus$xrange
@@ -64,7 +66,8 @@ genetracks_grob <- function(locus,
     return(invisible(NULL))
   }
   
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
+               blanks = blanks)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]

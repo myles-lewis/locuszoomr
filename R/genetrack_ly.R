@@ -22,6 +22,10 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
+#'   which are missing gene symbols. `"show"` shows gene lines but no label
+#'   (hovertext is still available).
 #' @param plot Logical whether to produce plotly object or return plot
 #'   coordinates.
 #' @return Either a 'plotly' plotting object showing gene tracks, or if 
@@ -48,8 +52,10 @@ genetrack_ly <- function(locus,
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         blanks = c("fill", "hide", "show"),
                          plot = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
+  blanks <- match.arg(blanks)
   TX <- locus$TX
   EX <- as.data.frame(locus$EX)
   xrange <- locus$xrange
@@ -78,7 +84,7 @@ genetrack_ly <- function(locus,
   }
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, fill_blanks = FALSE)
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]

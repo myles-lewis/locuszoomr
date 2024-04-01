@@ -30,6 +30,10 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
+#'   which are missing gene symbols. `"show"` shows gene lines but no label
+#'   (hovertext is still available).
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -54,10 +58,11 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         blanks = "show",
                          ...) {
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     gene_col, exon_col, exon_border, showExons, maxrows, width, 
-                    xlab)
+                    xlab, blanks)
   p <- scatter_plotly(loc, xlab = xlab, ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,

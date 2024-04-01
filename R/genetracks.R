@@ -29,6 +29,9 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
+#'   missing gene symbols.
 #' @param showRecomb Logical controls alignment of right margin if
 #'   recombination data present.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -69,9 +72,11 @@ genetracks <- function(locus,
                        text_pos = 'top',
                        xticks = TRUE,
                        xlab = NULL,
+                       blanks = c("fill", "hide"),
                        showRecomb = TRUE,
                        align = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
+  blanks <- match.arg(blanks)
   TX <- locus$TX
   EX <- locus$EX
   xrange <- locus$xrange
@@ -91,7 +96,8 @@ genetracks <- function(locus,
   }
   
   if (nrow(TX) != 0) {
-    TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos)
+    TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
+                 blanks = blanks)
     maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
     if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
     TX <- TX[TX$row <= maxrows, ]
@@ -166,10 +172,14 @@ genetracks <- function(locus,
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
-                   text_pos = 'top', fill_blanks = TRUE) {
-  if (fill_blanks) {
-    blank <- TX$gene_name == ""
-    if (any(blank)) TX$gene_name[blank] <- TX$gene_id[blank]
+                   text_pos = 'top', blanks = "fill") {
+  blank <- TX$gene_name == ""
+  if (any(blank)) {
+    if (blanks == "fill") {
+      TX$gene_name[blank] <- TX$gene_id[blank]
+    } else if (blanks == "hide") {
+      TX <- TX[!blank, ]
+    }
   }
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]

@@ -28,6 +28,9 @@
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
 #'   `locus`.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
+#'   missing gene symbols.
 #' @return A ggplot2 object.
 #' @examples
 #' if(require(EnsDb.Hsapiens.v75)) {
@@ -57,8 +60,10 @@ gg_genetracks <- function(loc,
                           maxrows = NULL,
                           text_pos = 'top',
                           xticks = TRUE,
-                          xlab = NULL) {
+                          xlab = NULL,
+                          blanks = c("fill", "hide")) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
+  blanks <- match.arg(blanks)
   g <- genetracks_grob(loc,
                        filter_gene_name,
                        filter_gene_biotype,
@@ -69,7 +74,8 @@ gg_genetracks <- function(loc,
                        exon_border,
                        showExons,
                        maxrows,
-                       text_pos)
+                       text_pos,
+                       blanks)
   if (is.null(xlab) & xticks) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   
   g2 <- ggplot(data.frame(x = NA),

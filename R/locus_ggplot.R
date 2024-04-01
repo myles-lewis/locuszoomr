@@ -32,6 +32,9 @@
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
 #'   `locus`.
+#' @param blanks Controls handling of genes with blank names: `"fill"` replaces
+#'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
+#'   missing gene symbols.
 #' @param ... Additional arguments passed to [gg_scatter()] to control
 #'   the scatter plot.
 #' @return Returns a ggplot2 plot containing a scatter plot with genetracks
@@ -62,6 +65,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                          text_pos = 'top',
                          xticks = "top",
                          xlab = NULL,
+                         blanks = "fill",
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points")
@@ -78,7 +82,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                      gene_col, exon_col, exon_border,
                      showExons,
                      maxrows, text_pos,
-                     xticks = (xticks != "top"), xlab)
+                     xticks = (xticks != "top"), xlab, blanks)
 
   plot_grid(p, g, nrow = 2, rel_heights = heights, align = "v")
 }
