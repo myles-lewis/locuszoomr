@@ -147,7 +147,7 @@ scatter_plot <- function(loc,
   pch[data[, loc$labs] %in% index_snp] <- 23L
   if (!is.null(eqtl_beta)) {
     sig <- data[, loc$p] < pcutoff
-    pch[sig] <- 24L + (sign(data[sig, eqtl_beta]) + 1L) / 2L
+    pch[sig] <- 24 + (1 - sign(data[sig, eqtl_beta])) / 2
   }
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
