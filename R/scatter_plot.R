@@ -209,15 +209,16 @@ scatter_plot <- function(loc,
   }
   if (!is.null(legend_pos)) {
     if (!is.null(eqtl_gene) | !is.null(eqtl_beta)) {
-      leg <- pt.bg <- NULL
-      pch <- 21
+      leg <- pt.bg <- pch <- NULL
       if (!is.null(eqtl_gene)) {
         leg <- levels(bg)[-1]
         pt.bg <- scheme[-1]
+        pch <- c(rep(21, length(scheme) -1))
       }
       if (!is.null(eqtl_beta)) {
         leg <- c(leg, "up", "down")
-        pch <- c(rep(21, length(scheme) -1), 2, 6)
+        pch <- c(pch, 2, 6)
+        pt.bg <- c(pt.bg, NA)
       }
       legend(legend_pos, legend = leg, y.intersp = 0.96,
              pch = pch, pt.bg = pt.bg, col = 'black', bty = 'n', cex = 0.8)
