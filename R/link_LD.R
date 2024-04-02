@@ -59,7 +59,7 @@ link_LD <- function(loc,
       loc$data$ld <- ldp[match(loc$data[, labs], ldp$RS_Number), "R2"]
     }
   } else {
-    message("Obtaining LD on ", length(rslist), " SNPs", appendLF = FALSE)
+    message("Obtaining LD on ", length(rslist), " SNPs. ", appendLF = FALSE)
     ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
     if (index_snp %in% colnames(ldm)) {
       ld <- ldm[, index_snp]
