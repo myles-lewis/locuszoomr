@@ -24,6 +24,8 @@ scatter_plot(
   labels = NULL,
   label_x = 4,
   label_y = 4,
+  eqtl_gene = NULL,
+  eqtl_beta = NULL,
   add = FALSE,
   align = TRUE,
   ...
@@ -82,6 +84,10 @@ scale.}
 
 \item{label_y}{Value or vector for position of label as percentage of y axis
 scale.}
+
+\item{eqtl_gene}{Column name in \code{loc$data} for eQTL genes.}
+
+\item{eqtl_beta}{Optional column name for eQTL beta coefficient.}
 
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}

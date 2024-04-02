@@ -39,6 +39,8 @@
 #'   scale.
 #' @param label_y Value or vector for position of label as percentage of y axis
 #'   scale.
+#' @param eqtl_gene Column name in `loc$data` for eQTL genes.
+#' @param eqtl_beta Optional column name for eQTL beta coefficient.
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -75,6 +77,8 @@ scatter_plot <- function(loc,
                          legend_pos = 'topleft',
                          labels = NULL,
                          label_x = 4, label_y = 4,
+                         eqtl_gene = NULL,
+                         eqtl_beta = NULL,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -93,7 +97,15 @@ scatter_plot <- function(loc,
       data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
+    } else if (!is.null(eqtl_gene)) {
+      # eqtl gene colours
+      bg <- data[, eqtl_gene]
+      bg[data[, loc$p] > pcutoff] <- "ns"
+      bg <- relevel(factor(bg, levels = unique(bg)), "ns")
+      scheme <- eqtl_scheme(nlevels(bg))
+      data$bg <- scheme[bg]
     } else {
+      # default colours
       data$bg <- 1L
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- 2L
       data$bg[data[, loc$labs] %in% index_snp] <- 3L
@@ -130,8 +142,13 @@ scatter_plot <- function(loc,
     }
   })
   
+  # shapes
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] %in% index_snp] <- 23L
+  if (!is.null(eqtl_beta)) {
+    sig <- data[, loc$p] < pcutoff
+    pch[sig] <- 24L + (sign(data[sig, eqtl_beta]) + 1L) / 2L
+  }
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
   if ("col" %in% colnames(data)) col <- data$col
@@ -191,7 +208,20 @@ scatter_plot <- function(loc,
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
-    if (showLD & hasLD) {
+    if (!is.null(eqtl_gene) | !is.null(eqtl_beta)) {
+      leg <- pt.bg <- NULL
+      pch <- 21
+      if (!is.null(eqtl_gene)) {
+        leg <- levels(bg)[-1]
+        pt.bg <- scheme[-1]
+      }
+      if (!is.null(eqtl_beta)) {
+        leg <- c(leg, "up", "down")
+        pch <- c(rep(21, length(scheme) -1), 2, 6)
+      }
+      legend(legend_pos, legend = leg, y.intersp = 0.96,
+             pch = pch, pt.bg = pt.bg, col = 'black', bty = 'n', cex = 0.8)
+    } else if (showLD & hasLD) {
       legend(legend_pos,
              legend = c("0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
                         "0.0 - 0.2"),

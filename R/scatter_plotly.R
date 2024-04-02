@@ -74,7 +74,7 @@ scatter_plotly <- function(loc,
     } else if (!is.null(eqtl_gene)) {
       bg <- data[, eqtl_gene]
       bg[data[, loc$p] > pcutoff] <- "ns"
-      data$bg <- relevel(factor(bg), "ns")
+      data$bg <- relevel(factor(bg, levels = unique(bg)), "ns")
       LD_scheme <- eqtl_scheme(nlevels(data$bg))
     } else {
       # default colours
