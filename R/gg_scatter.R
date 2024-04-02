@@ -31,6 +31,7 @@
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
 #'   value "index" selects the highest point or index SNP as defined when
 #'   [locus()] is called. Set to `NULL` to remove all labels.
+#' @param eqtl_gene Optional column name in `loc$data` for colouring eQTL genes.
 #' @param ... Optional arguments passed to `geom_text_repel()` to configure
 #'   label drawing.
 #' @return Returns a ggplot2 plot.

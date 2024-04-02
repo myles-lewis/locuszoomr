@@ -85,7 +85,7 @@ scale.}
 \item{label_y}{Value or vector for position of label as percentage of y axis
 scale.}
 
-\item{eqtl_gene}{Column name in \code{loc$data} for eQTL genes.}
+\item{eqtl_gene}{Column name in \code{loc$data} for colouring eQTL genes.}
 
 \item{eqtl_beta}{Optional column name for eQTL beta coefficient.}
 

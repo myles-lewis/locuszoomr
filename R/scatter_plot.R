@@ -39,7 +39,7 @@
 #'   scale.
 #' @param label_y Value or vector for position of label as percentage of y axis
 #'   scale.
-#' @param eqtl_gene Column name in `loc$data` for eQTL genes.
+#' @param eqtl_gene Column name in `loc$data` for colouring eQTL genes.
 #' @param eqtl_beta Optional column name for eQTL beta coefficient.
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.

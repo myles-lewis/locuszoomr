@@ -22,6 +22,7 @@ gg_scatter(
   recomb_col = "blue",
   legend_pos = "topleft",
   labels = NULL,
+  eqtl_gene = NULL,
   ...
 )
 }
@@ -70,6 +71,8 @@ recombination rate data.}
 \item{labels}{Character vector of SNP or genomic feature IDs to label. The
 value "index" selects the highest point or index SNP as defined when
 \code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
+
+\item{eqtl_gene}{Optional column name in \code{loc$data} for colouring eQTL genes.}
 
 \item{...}{Optional arguments passed to \code{geom_text_repel()} to configure
 label drawing.}
