@@ -25,6 +25,10 @@
 #' (<1000 SNPs). However, it has a limit of 1000 SNPs which can be queried.
 #' `LDproxy()` is faster but data on some SNPs may be absent.
 #' 
+#' Note SNPs have to be correctly formatted as required by LDlinkR, either as
+#' rsID or chromosome coordinate e.g. "chr7:24966446". Default genome build is
+#' `grch37`, see `LDproxy()` or `LDmatrix()`.
+#' 
 #' @importFrom LDlinkR LDmatrix LDexpress LDproxy
 #' @export
 
@@ -45,7 +49,7 @@ link_LD <- function(loc,
   index_snp <- loc$index_snp
   rslist <- loc$data[, labs]
   if (length(rslist) > 1000) {
-    rslist <- rslist[order(loc$data$logP, decreasing = TRUE)[seq_len(1000)]]
+    rslist <- rslist[order(loc$data$logP, decreasing = TRUE)]
     rslist <- unique(c(index_snp, rslist))[seq_len(1000)]
   }
   method <- match.arg(method)
