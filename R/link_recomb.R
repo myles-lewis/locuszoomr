@@ -17,11 +17,12 @@
 #' 
 #' The only option for `table` for hg38 is `"recomb1000GAvg"` (the default).
 #' 
-#' Sometimes `rtracklayer` generates an intermittent API error: try calling
-#' `link_recomb()` again. Errors are handled gracefully using `try()` to allow
-#' users to wrap `link_recomb()` in a loop without quitting halfway. Error
-#' messages are still shown. Successful API calls are cached using `memoise` to
-#' reduce API requests.
+#' Sometimes `rtracklayer` generates intermittent API errors or warnings: try
+#' calling `link_recomb()` again. If warnings persist restart your R session.
+#' Errors are handled gracefully using `try()` to allow users to wrap
+#' `link_recomb()` in a loop without quitting halfway. Error messages are still
+#' shown. Successful API calls are cached using `memoise` to reduce API
+#' requests.
 #' 
 #' @returns A list object of class 'locus'. Recombination data is added as list
 #'   element `recomb`.

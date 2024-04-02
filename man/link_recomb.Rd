@@ -31,9 +31,10 @@ default).
 
 The only option for \code{table} for hg38 is \code{"recomb1000GAvg"} (the default).
 
-Sometimes \code{rtracklayer} generates an intermittent API error: try calling
-\code{link_recomb()} again. Errors are handled gracefully using \code{try()} to allow
-users to wrap \code{link_recomb()} in a loop without quitting halfway. Error
-messages are still shown. Successful API calls are cached using \code{memoise} to
-reduce API requests.
+Sometimes \code{rtracklayer} generates intermittent API errors or warnings: try
+calling \code{link_recomb()} again. If warnings persist restart your R session.
+Errors are handled gracefully using \code{try()} to allow users to wrap
+\code{link_recomb()} in a loop without quitting halfway. Error messages are still
+shown. Successful API calls are cached using \code{memoise} to reduce API
+requests.
 }
