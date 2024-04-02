@@ -76,7 +76,8 @@ gg_scatter <- function(loc,
                                      'orange', 'red', 'purple'),
                        recomb_col = "blue",
                        legend_pos = 'topleft',
-                       labels = NULL, ...) {
+                       labels = NULL,
+                       eqtl_gene = NULL, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
@@ -97,6 +98,13 @@ gg_scatter <- function(loc,
         scheme <- scheme[1:6]
         data$bg <- factor(data$bg, levels = 1:6)
       }
+    } else if (!is.null(eqtl_gene)) {
+      # eqtl gene colours
+      bg <- data[, eqtl_gene]
+      bg[data[, loc$p] > pcutoff] <- "ns"
+      bg <- relevel(factor(bg, levels = unique(bg)), "ns")
+      scheme <- eqtl_scheme(nlevels(bg))
+      data$bg <- bg
     } else {
       data$bg <- scheme[1]
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
@@ -112,7 +120,7 @@ gg_scatter <- function(loc,
   # data$pch <- as.factor(data$pch)
   
   legend.justification <- NULL
-  legend_labels <- NULL
+  legend_labels <- legend_title <- NULL
   if (!is.null(legend_pos)) {
     if (legend_pos == "topleft") {
       legend.justification <- c(0, 1)
@@ -124,11 +132,14 @@ gg_scatter <- function(loc,
       legend.position <- legend_pos
     }
     if (showLD & hasLD) {
+      legend_title <- expression({r^2})
       legend_labels <- rev(c("Index SNP", "0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6",
                              "0.2 - 0.4", "0.0 - 0.2", "NA"))
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
-    } else legend.position = "none"
-  } else legend.position = "none"
+    } else if (!is.null(eqtl_gene)) {
+      legend_labels <- levels(bg)
+    } else legend.position <- "none"
+  } else legend.position <- "none"
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
@@ -175,7 +186,7 @@ gg_scatter <- function(loc,
                  show.legend = FALSE) +  # index SNP
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
-                        labels = legend_labels, name = expression({r^2})) +
+                        labels = legend_labels, name = legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
       # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
@@ -210,7 +221,7 @@ gg_scatter <- function(loc,
                  show.legend = FALSE) +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
-                        labels = legend_labels, name = expression({r^2})) +
+                        labels = legend_labels, name =legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
       geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
