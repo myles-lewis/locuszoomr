@@ -18,7 +18,7 @@ scatter_plotly(
   marker_size = 7,
   recomb_col = "blue",
   eqtl_gene = NULL,
-  eqtl_beta = NULL,
+  beta = NULL,
   add_hover = NULL
 )
 }
@@ -58,7 +58,9 @@ recombination rate data.}
 
 \item{eqtl_gene}{Column name in \code{loc$data} for eQTL genes.}
 
-\item{eqtl_beta}{Optional column name for eQTL beta coefficient.}
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only).}
 
 \item{add_hover}{Optional vector of column names in \code{loc$data} to add to the
 plotly hover text for scatter points.}

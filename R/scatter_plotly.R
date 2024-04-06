@@ -25,7 +25,9 @@
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
 #' @param eqtl_gene Column name in `loc$data` for eQTL genes.
-#' @param eqtl_beta Optional column name for eQTL beta coefficient.
+#' @param beta Optional column name for beta coefficient to display upward
+#'   triangles for positive beta and downward triangles for negative beta
+#'   (significant SNPs only).
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
 #' @return A `plotly` scatter plot.
@@ -48,7 +50,7 @@ scatter_plotly <- function(loc,
                            marker_size = 7,
                            recomb_col = "blue",
                            eqtl_gene = NULL,
-                           eqtl_beta = NULL,
+                           beta = NULL,
                            add_hover = NULL) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
@@ -87,10 +89,10 @@ scatter_plotly <- function(loc,
       LD_scheme <- scheme
     }
   }
-  if (!is.null(eqtl_beta)) {
+  if (!is.null(beta)) {
     # beta symbols
-    data[, eqtl_beta] <- signif(data[, eqtl_beta], 3)
-    symbol <- as.character(sign(data[, eqtl_beta]))
+    data[, beta] <- signif(data[, beta], 3)
+    symbol <- as.character(sign(data[, beta]))
     ind <- data[, loc$p] > pcutoff
     symbol[ind] <- "ns"
     data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
@@ -128,7 +130,7 @@ scatter_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
-  add_hover <- c(eqtl_beta, eqtl_gene, add_hover)
+  add_hover <- c(beta, eqtl_gene, add_hover)
   if (!is.null(add_hover)) {
     for (i in add_hover) {
       hovertext <- paste0(hovertext, "<br>", i, ": ", data[, i])
@@ -142,7 +144,7 @@ scatter_plotly <- function(loc,
   showlegend <- (showLD & hasLD) | !is.null(pcutoff)
   
   if (!recomb) {
-    if (is.null(eqtl_beta)) {
+    if (is.null(beta)) {
       # standard plotly
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                    color = data$bg, colors = LD_scheme,
@@ -154,7 +156,7 @@ scatter_plotly <- function(loc,
                    source = "plotly_locus",
                    type = "scattergl", mode = "markers")
     } else {
-      # eqtl shapes
+      # beta shapes
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                    color = data$bg, colors = LD_scheme,
                    symbol = data$symbol, symbols = symbols,

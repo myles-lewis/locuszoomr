@@ -25,7 +25,7 @@ scatter_plot(
   label_x = 4,
   label_y = 4,
   eqtl_gene = NULL,
-  eqtl_beta = NULL,
+  beta = NULL,
   add = FALSE,
   align = TRUE,
   ...
@@ -87,6 +87,10 @@ scale.}
 
 \item{eqtl_gene}{Column name in \code{loc$data} for colouring eQTL genes.}
 
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only).}
+
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}
 
@@ -94,10 +98,6 @@ new plot.}
 
 \item{...}{Other arguments passed to \code{\link[=plot]{plot()}} to control the scatter plot
 e.g. \code{main}, \code{ylim} etc.}
-
-\item{beta}{Optional column name for beta coefficient to display upward
-triangles for positive beta and downward triangles for negative beta
-(significant SNPs only).}
 }
 \value{
 No return value. Produces a scatter plot using base graphics.
