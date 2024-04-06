@@ -40,7 +40,9 @@
 #' @param label_y Value or vector for position of label as percentage of y axis
 #'   scale.
 #' @param eqtl_gene Column name in `loc$data` for colouring eQTL genes.
-#' @param eqtl_beta Optional column name for eQTL beta coefficient.
+#' @param beta Optional column name for beta coefficient to display upward
+#'   triangles for positive beta and downward triangles for negative beta
+#'   (significant SNPs only).
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -78,7 +80,7 @@ scatter_plot <- function(loc,
                          labels = NULL,
                          label_x = 4, label_y = 4,
                          eqtl_gene = NULL,
-                         eqtl_beta = NULL,
+                         beta = NULL,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -145,9 +147,9 @@ scatter_plot <- function(loc,
   # shapes
   pch <- rep(21L, nrow(data))
   pch[data[, loc$labs] %in% index_snp] <- 23L
-  if (!is.null(eqtl_beta)) {
+  if (!is.null(beta)) {
     sig <- data[, loc$p] < pcutoff
-    pch[sig] <- 24 + (1 - sign(data[sig, eqtl_beta])) / 2
+    pch[sig] <- 24 + (1 - sign(data[sig, beta])) / 2
   }
   if ("pch" %in% colnames(data)) pch <- data$pch
   col <- "black"
@@ -208,14 +210,14 @@ scatter_plot <- function(loc,
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
-    if (!is.null(eqtl_gene) | !is.null(eqtl_beta)) {
+    if (!is.null(eqtl_gene) | !is.null(beta)) {
       leg <- pt.bg <- pch <- NULL
       if (!is.null(eqtl_gene)) {
         leg <- levels(bg)[-1]
         pt.bg <- scheme[-1]
         pch <- c(rep(21, length(scheme) -1))
       }
-      if (!is.null(eqtl_beta)) {
+      if (!is.null(beta)) {
         leg <- c(leg, "up", "down")
         pch <- c(pch, 2, 6)
         pt.bg <- c(pt.bg, NA)

@@ -32,6 +32,9 @@
 #'   value "index" selects the highest point or index SNP as defined when
 #'   [locus()] is called. Set to `NULL` to remove all labels.
 #' @param eqtl_gene Optional column name in `loc$data` for colouring eQTL genes.
+#' @param beta Optional column name for beta coefficient to display upward
+#'   triangles for positive beta and downward triangles for negative beta
+#'   (significant SNPs only).
 #' @param ... Optional arguments passed to `geom_text_repel()` to configure
 #'   label drawing.
 #' @return Returns a ggplot2 plot.
@@ -78,7 +81,8 @@ gg_scatter <- function(loc,
                        recomb_col = "blue",
                        legend_pos = 'topleft',
                        labels = NULL,
-                       eqtl_gene = NULL, ...) {
+                       eqtl_gene = NULL,
+                       beta = NULL, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   data <- loc$data
@@ -119,6 +123,16 @@ gg_scatter <- function(loc,
   data$col <- as.factor(data$col)
   # if (!"pch" %in% colnames(data)) data$pch <- 21
   # data$pch <- as.factor(data$pch)
+  # shapes
+  if (!is.null(beta)) {
+    # beta symbols
+    data[, beta] <- signif(data[, beta], 3)
+    symbol <- as.character(sign(data[, beta]))
+    ind <- data[, loc$p] > pcutoff
+    symbol[ind] <- "ns"
+    data$.beta <- factor(symbol, levels = c("ns", "1", "-1"),
+                          labels = c("ns", "up", "down"))
+  }
   
   legend.justification <- NULL
   legend_labels <- legend_title <- NULL
@@ -174,19 +188,35 @@ gg_scatter <- function(loc,
   ind <- data[, loc$labs] %in% index_snp
 
   if (!recomb) {
-    # standard plot
-    p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
-                                  color = .data$col, fill = .data$bg)) +
-      (if (loc$yvar == "logP" & !is.null(pcutoff) &
-           ycut >= yrange[1] & ycut <= yrange[2]) {
-        geom_hline(yintercept = ycut,
-                   colour = "grey", linetype = "dashed")
-      }) +
-      geom_point(shape = 21, size = size) +
-      geom_point(data = data[ind, ], shape = 23, size = size,
-                 show.legend = FALSE) +  # index SNP
+    if (is.null(beta)) {
+      # standard plot
+      p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+                                    color = .data$col, fill = .data$bg)) +
+        (if (loc$yvar == "logP" & !is.null(pcutoff) &
+             ycut >= yrange[1] & ycut <= yrange[2]) {
+          geom_hline(yintercept = ycut,
+                     colour = "grey", linetype = "dashed")
+        }) +
+        geom_point(shape = 21, size = size) +
+        geom_point(data = data[ind, ], shape = 23, size = size,
+                   show.legend = FALSE)  # index SNP
+    } else {
+      # beta triangles
+      p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
+                            color = .data$col, fill = .data$bg,
+                            shape = .data$.beta)) +
+        (if (loc$yvar == "logP" & !is.null(pcutoff) &
+             ycut >= yrange[1] & ycut <= yrange[2]) {
+          geom_hline(yintercept = ycut,
+                     colour = "grey", linetype = "dashed")
+        }) +
+        geom_point(size = size) +
+        scale_shape_manual(values = c(21, 24, 25), name = NULL) +
+        guides(fill = guide_legend(override.aes = list(shape = 21)))
+    }
+    p <- p +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
-                        guide = guide_legend(reverse = TRUE),
+                        guide = guide_legend(reverse = showLD & hasLD),
                         labels = legend_labels, name = legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
@@ -244,7 +274,7 @@ gg_scatter <- function(loc,
       if (!xticks) theme(axis.text.x=element_blank(),
                          axis.ticks.x=element_blank())
   }
-
+  
   if (!is.null(labels)) {
     p <- p +
       geom_text_repel(data = data[text_label_ind, ],

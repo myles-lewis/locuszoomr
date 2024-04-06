@@ -23,6 +23,7 @@ gg_scatter(
   legend_pos = "topleft",
   labels = NULL,
   eqtl_gene = NULL,
+  beta = NULL,
   ...
 )
 }
@@ -73,6 +74,10 @@ value "index" selects the highest point or index SNP as defined when
 \code{\link[=locus]{locus()}} is called. Set to \code{NULL} to remove all labels.}
 
 \item{eqtl_gene}{Optional column name in \code{loc$data} for colouring eQTL genes.}
+
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only).}
 
 \item{...}{Optional arguments passed to \code{geom_text_repel()} to configure
 label drawing.}
