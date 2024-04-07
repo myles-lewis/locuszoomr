@@ -97,6 +97,7 @@ scatter_plotly <- function(loc,
     symbol[ind] <- "ns"
     data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
                           labels = c(" ", "up", "down"))
+    # labels = c(" ", "&#946; > 0", "&#946; < 0")
     symbols <- c(21L, 24L, 25L)
     data$size <- 1L
     data$size[!ind] <- 2L
