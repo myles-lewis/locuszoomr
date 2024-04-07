@@ -54,6 +54,8 @@ scatter_plotly <- function(loc,
                            add_hover = NULL) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
+  
+  .call <- match.call()
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
@@ -67,7 +69,7 @@ scatter_plotly <- function(loc,
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] %in% index_snp] <- 7L
       data <- data[order(data$bg), ]
-      LD_scheme <- rep_len(LD_scheme, 7 - is.null(index_snp))
+      scheme <- rep_len(LD_scheme, 7 - is.null(index_snp))
       data$bg <- factor(data$bg, levels = 1:7,
                         labels = c("unknown", "0.0 - 0.2", "0.2 - 0.4",
                                    "0.4 - 0.6", "0.6 - 0.8", "0.8 - 1.0",
@@ -77,7 +79,7 @@ scatter_plotly <- function(loc,
       bg <- data[, eqtl_gene]
       bg[data[, loc$p] > pcutoff] <- "ns"
       data$bg <- relevel(factor(bg, levels = unique(bg)), "ns")
-      LD_scheme <- eqtl_scheme(nlevels(data$bg))
+      if (is.null(.call$scheme)) scheme <- eqtl_scheme(nlevels(data$bg))
     } else {
       # default colours
       showLD <- FALSE
@@ -86,7 +88,6 @@ scatter_plotly <- function(loc,
       data$bg[data[, loc$labs] %in% index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme,
                         labels = c("ns", paste("P <", pcutoff), "index"))
-      LD_scheme <- scheme
     }
   }
   if (!is.null(beta)) {
@@ -107,7 +108,7 @@ scatter_plotly <- function(loc,
     if (is.null(eqtl_gene)) {
       # default plot
       data$symbol <- data$bg
-      symbols <- c(rep("circle", length(LD_scheme) -1), "diamond")
+      symbols <- c(rep("circle", length(scheme) -1), "diamond")
     } else {
       # eqtl gene only
       data$symbol <- 1L
@@ -148,7 +149,7 @@ scatter_plotly <- function(loc,
     if (is.null(beta)) {
       # standard plotly
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                   color = data$bg, colors = LD_scheme,
+                   color = data$bg, colors = scheme,
                    symbol = data$symbol, symbols = symbols,
                    marker = list(size = marker_size, opacity = 0.8,
                                  line = list(width = 1, color = marker_outline)),
@@ -159,7 +160,7 @@ scatter_plotly <- function(loc,
     } else {
       # beta shapes
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                   color = data$bg, colors = LD_scheme,
+                   color = data$bg, colors = scheme,
                    symbol = data$symbol, symbols = symbols,
                    size = data$size, sizes = sizes,
                    marker = list(opacity = 0.8,
@@ -186,7 +187,7 @@ scatter_plotly <- function(loc,
     p <- plot_ly(source = "plotly_locus") %>%
       # recombination line
       add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                hoverinfo = "none", colors = LD_scheme,  # colors must go here
+                hoverinfo = "none", colors = scheme,  # colors must go here
                 symbols = symbols,
                 name = "recombination", yaxis = "y2",
                 line = list(color = recomb_col),

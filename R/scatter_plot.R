@@ -85,6 +85,8 @@ scatter_plot <- function(loc,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
+  
+  .call <- match.call()
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
@@ -104,7 +106,7 @@ scatter_plot <- function(loc,
       bg <- data[, eqtl_gene]
       bg[data[, loc$p] > pcutoff] <- "ns"
       bg <- relevel(factor(bg, levels = unique(bg)), "ns")
-      scheme <- eqtl_scheme(nlevels(bg))
+      if (is.null(.call$scheme)) scheme <- eqtl_scheme(nlevels(bg))
       data$bg <- scheme[bg]
     } else {
       # default colours
