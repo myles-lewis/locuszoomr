@@ -218,7 +218,7 @@ scatter_plot <- function(loc,
         pch <- c(rep(21, length(scheme) -1))
       }
       if (!is.null(beta)) {
-        leg <- c(leg, "up", "down")
+        leg <- c(leg, expression({beta > 0}), expression({beta < 0}))
         pch <- c(pch, 2, 6)
         pt.bg <- c(pt.bg, NA)
       }
