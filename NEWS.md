@@ -2,13 +2,17 @@ News
 =====
 
 # locuszoomr 0.2.2
-###### 23/03/2024
+###### 08/04/2024
 
 * Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
 (suggested by Luke Pilling).
 * Altered default colour scheme.
 * Multiple improvements to plotly version.
-* Added option to use the faster `LDproxy` in `link_LD()`
+* Added option to use the much faster `LDproxy` in `link_LD()`.
+* Added support for plotting loci with eQTL data to show multiple genes in 
+different colours.
+* Added ability to overlay up/down pointing triangles to show sign of beta 
+coefficient for significant SNPs.
 
 # locuszoomr 0.2.1
 ###### 17/02/2024
