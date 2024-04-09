@@ -140,7 +140,7 @@ scatter_plotly <- function(loc,
   }
   
   hline <- list(type = "line",
-                line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
+                line = list(width = 1, color = '#999999', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
   showlegend <- (showLD & hasLD) | !is.null(pcutoff)
