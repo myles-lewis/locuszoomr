@@ -126,6 +126,7 @@ genetrack_ly <- function(locus,
     })
   }
   
+  ok <- !is.na(TX$gene_name2)
   hovertext <- paste0(TX$gene_name,
                       TX$fullname,
                       "<br>Gene ID: ", TX$gene_id,
@@ -138,7 +139,7 @@ genetrack_ly <- function(locus,
                  color = I(gene_col),
                  text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
-    add_text(x = ~tx, y = ~ty, text = ~gene_name2,
+    add_text(x = TX$tx[ok], y = TX$ty[ok], text = TX$gene_name2[ok],
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
