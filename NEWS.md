@@ -2,7 +2,7 @@ News
 =====
 
 # locuszoomr 0.2.2
-###### 08/04/2024
+###### 10/04/2024
 
 * Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
 (suggested by Luke Pilling).
@@ -13,6 +13,8 @@ News
 different colours.
 * Added ability to overlay up/down pointing triangles to show sign of beta 
 coefficient for significant SNPs.
+* Enable use of downloadable recombination rate track files from UCSC in 
+`link_recomb()`.
 
 # locuszoomr 0.2.1
 ###### 17/02/2024

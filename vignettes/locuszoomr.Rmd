@@ -226,8 +226,8 @@ follows.
 
 ```{r eval=FALSE}
 library(rtracklayer)
-recomb1000G <- import.bw("recomb1000GAvg.bw")
-loc3 <- link_recomb(loc3, recomb = recomb1000G)
+recomb.hg19 <- import.bw("hapMapRelease24CombinedRecombMap.bw")
+loc3 <- link_recomb(loc3, recomb = recomb.hg19)
 locus_plot(loc3)
 ```
 
