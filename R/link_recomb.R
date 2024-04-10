@@ -36,7 +36,7 @@
 #' 
 #' @returns A list object of class 'locus'. Recombination data is added as list
 #'   element `recomb`.
-#' @importFrom GenomeInfoDb genome<-
+#' @importFrom GenomeInfoDb genome<- seqnames
 #' @importFrom GenomicRanges GRanges
 #' @importFrom IRanges IRanges
 #' @importFrom rtracklayer browserSession ucscTableQuery getTable
