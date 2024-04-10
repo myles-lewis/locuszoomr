@@ -186,23 +186,47 @@ scatter_plotly <- function(loc,
   } else {
     # double y axis with recombination
     ylim2 <- c(-2, 102)
-    p <- plot_ly(source = "plotly_locus") %>%
-      # recombination line
-      add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                hoverinfo = "none", colors = scheme,  # colors must go here
-                symbols = symbols,
-                name = "recombination", yaxis = "y2",
-                line = list(color = recomb_col),
-                mode = "lines", type = "scattergl", showlegend = FALSE) %>%
-      # scatter plot
-      add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                color = data$bg,
-                symbol = data$symbol,
-                marker = list(size = marker_size, opacity = 0.8,
-                              line = list(width = 1, color = marker_outline)),
-                text = hovertext, hoverinfo = 'text',
-                showlegend = showlegend,
-                type = "scattergl", mode = "markers") %>%
+    if (is.null(beta)) {
+      # standard plotly
+      p <- plot_ly(source = "plotly_locus") %>%
+        # recombination line
+        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                  hoverinfo = "none", colors = scheme,  # colors must go here
+                  symbols = symbols,
+                  name = "recombination", yaxis = "y2",
+                  line = list(color = recomb_col),
+                  mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+        # scatter plot
+        add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+                  color = data$bg,
+                  symbol = data$symbol,
+                  size = data$size, sizes = sizes,
+                  marker = list(opacity = 0.8,
+                                line = list(width = 1, color = marker_outline)),
+                  text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
+                  showlegend = showlegend,
+                  type = "scattergl", mode = "markers")
+    } else {
+      # beta shapes
+      p <- plot_ly(source = "plotly_locus") %>%
+        # recombination line
+        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                  hoverinfo = "none", colors = scheme,  # colors must go here
+                  symbols = symbols,
+                  name = "recombination", yaxis = "y2",
+                  line = list(color = recomb_col),
+                  mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+        # scatter plot
+        add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
+                  color = data$bg,
+                  symbol = data$symbol,
+                  marker = list(size = marker_size, opacity = 0.8,
+                                line = list(width = 1, color = marker_outline)),
+                  text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
+                  showlegend = showlegend,
+                  type = "scattergl", mode = "markers")
+    }
+    p <- p %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
                                   zeroline = FALSE,
