@@ -7,15 +7,25 @@
 #' @param genome Either `"hg38"` or `"hg19"`
 #' @param table Optional character value specifying which recombination table to
 #'   use.
+#' @param recomb Optional `GRanges` class object of recombination data.
 #' @details
 #' Uses the `rtracklayer` package to query UCSC genome browser for recombination
 #' rate data.
 #' 
 #' Possible options for `table` for hg19 are `"hapMapRelease24YRIRecombMap"`,
 #' `"hapMapRelease24CEURecombMap"`, `"hapMapRelease24CombinedRecombMap"` (the
+#' default). The only option for `table` for hg38 is `"recomb1000GAvg"` (the
 #' default).
 #' 
-#' The only option for `table` for hg38 is `"recomb1000GAvg"` (the default).
+#' If you are doing many queries, it may be much faster to download the entire 
+#' recombination track data (around 30 MB for hg38) from the Recombination Rate 
+#' Tracks page at
+#' [UCSC genome browser](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2).
+#' The link to the hg38 download folder is 
+#' <http://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/> and for hg19 is 
+#' <http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/>. These .bw files can be
+#' converted to useable `GRanges` objects using `rtracklayer::import.bw()` (see
+#' the vignette).
 #' 
 #' Sometimes `rtracklayer` generates intermittent API errors or warnings: try
 #' calling `link_recomb()` again. If warnings persist restart your R session.
@@ -33,8 +43,19 @@
 #' @importFrom memoise drop_cache
 #' @export
 #'
-link_recomb <- function(loc, genome = "hg38", table = NULL) {
+link_recomb <- function(loc, genome = "hg38", table = NULL, 
+                        recomb = NULL) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
+  if (!is.null(recomb)) {
+    seqname <- loc$seqname
+    if (!grepl("chr", seqname)) seqname <- paste0("chr", seqname)
+    rec <- recomb[seqnames(recomb) == seqname, ]
+    rec <- rec[end(rec) > loc$xrange[1] & start(rec) < loc$xrange[2], ]
+    rec <- as.data.frame(rec)[, c("start", "end", "score")]
+    colnames(rec)[3] <- "value"
+    loc$recomb <- rec
+    return(loc)
+  }
   loc$recomb <- get_recomb(genome, loc$xrange, loc$seqname, table)
   loc
 }
