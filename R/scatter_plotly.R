@@ -194,7 +194,7 @@ scatter_plotly <- function(loc,
                   hoverinfo = "none", colors = scheme,  # colors must go here
                   symbols = symbols,
                   name = "recombination", yaxis = "y2",
-                  line = list(color = recomb_col),
+                  line = list(color = recomb_col, width = 1.5),
                   mode = "lines", type = "scattergl", showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
@@ -213,7 +213,7 @@ scatter_plotly <- function(loc,
                   hoverinfo = "none", colors = scheme,  # colors must go here
                   symbols = symbols, sizes = sizes,
                   name = "recombination", yaxis = "y2",
-                  line = list(color = recomb_col),
+                  line = list(color = recomb_col, width = 1.5),
                   mode = "lines", type = "scattergl", showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
@@ -240,7 +240,7 @@ scatter_plotly <- function(loc,
                                    showline = TRUE,
                                    zeroline = FALSE, range = ylim2),
                      shapes = hline,
-                     legend = c(leg, x = 1.1, y = 1))
+                     legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
   p <- p %>%
     plotly::config(displaylogo = FALSE,
