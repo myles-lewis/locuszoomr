@@ -217,14 +217,15 @@ locus_plot(loc3)
 ```
 
 If you are performing multiple UCSC queries, it is much faster to download the
-whole recombination rate track data file from UCSC genome browser (documented
-[here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)). The download
-site can be accessed at http://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/.
-For hg38, download `recomb1000GAvg.bw`. For hg19, the link is
-http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the default track used by
-`link_recomb()` via the API is `hapMapRelease24CombinedRecombMap.bw`. These can
-then be loaded into R as a `GRanges` object using `import.bw()`, and then used
-directly by `link_recomb()` as follows.
+whole recombination rate track data file (around 30 MB) from UCSC genome browser
+(documented [here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)).
+The download site can be accessed at
+http://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/. For hg38, download
+`recomb1000GAvg.bw`. For hg19, the link is
+http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the default track we use is
+`hapMapRelease24CombinedRecombMap.bw`. The file can then be loaded into R as a
+`GRanges` object using `import.bw()`, and then used directly by `link_recomb()`
+as follows.
 
 ```{r eval=FALSE}
 library(rtracklayer)
