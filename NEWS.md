@@ -14,7 +14,7 @@ different colours.
 * Added ability to overlay up/down pointing triangles to show sign of beta 
 coefficient for significant SNPs.
 * Enable use of downloadable recombination rate track files from UCSC in 
-`link_recomb()`.
+`link_recomb()`, which is much faster when plotting multiple loci.
 
 # locuszoomr 0.2.1
 ###### 17/02/2024
