@@ -62,6 +62,10 @@ disequilibrium (LD) across SNPs. In order to make use of this API function you
 will need a personal access token (see the `LDlinkR` vignette), available from
 the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
 
+We recommend that users who want to add recombination rate lines to multiple
+plots download the recombination rate track from UCSC and use it as described in
+the section [Add recombination rate](#add-recombination-rate).
+
 # Example locus plot
 
 The quick example below uses a small subset (3 loci) of a GWAS dataset
