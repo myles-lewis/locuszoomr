@@ -62,9 +62,6 @@ disequilibrium (LD) across SNPs. In order to make use of this API function you
 will need a personal access token (see the `LDlinkR` vignette), available from
 the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
 
-Requests to LDlink are cached using the `memoise` package, to reduce API 
-requests. This is helpful when modifying plots for aesthetic reasons.
-
 # Example locus plot
 
 The quick example below uses a small subset (3 loci) of a GWAS dataset
@@ -170,7 +167,8 @@ Once an API personal access token has been obtained, the
 `link_LD()` to retrieve LD (linkage disequilibrium) information at the locus
 which is overlaid on the locus plot. This is shown as a colour overlay showing
 the level of $r^2$ between SNPs and the index SNP which defaults to the SNP with
-the lowest p-value (or the SNP can be specified manually).
+the lowest p-value (or the SNP can be specified manually). Requests to LDlink
+are cached using the `memoise` package, to reduce API requests.
 
 ```{r eval = FALSE}
 # Locus plot using SLE GWAS data from Bentham et al 2015
@@ -215,18 +213,18 @@ locus_plot(loc3)
 ```
 
 If you are performing multiple UCSC queries, it is much faster to download the
-whole recombination rate track data file from UCSC genome browser as documented
-[here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2). The download
+whole recombination rate track data file from UCSC genome browser (documented
+[here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)). The download
 site can be accessed at http://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/.
-For hg38 download `recomb1000GAvg.bw`. For hg19 the link is
+For hg38, download `recomb1000GAvg.bw`. For hg19, the link is
 http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the default track used by
 `link_recomb()` via the API is `hapMapRelease24CombinedRecombMap.bw`. These can
-then be converted to a `GRanges` object and used directly by `link_recomb()` as
-follows.
+then be loaded into R as a `GRanges` object using `import.bw()`, and then used
+directly by `link_recomb()` as follows.
 
 ```{r eval=FALSE}
 library(rtracklayer)
-recomb.hg19 <- import.bw("hapMapRelease24CombinedRecombMap.bw")
+recomb.hg19 <- import.bw("/../hapMapRelease24CombinedRecombMap.bw")
 loc3 <- link_recomb(loc3, recomb = recomb.hg19)
 locus_plot(loc3)
 ```
