@@ -59,8 +59,8 @@ devtools::install_github("myles-lewis/locuszoomr")
 
 `locuszoomr` can access the `LDlinkR` package to query 1000 Genomes for linkage
 disequilibrium (LD) across SNPs. In order to make use of this API function you
-will need a personal access token (see the `LDlinkR` vignette), available from
-the LDlink website https://ldlink.nih.gov/?tab=apiaccess.
+will need a personal access token, available from the
+[LDlink website](https://ldlink.nih.gov/?tab=apiaccess).
 
 We recommend that users who want to add recombination rate lines to multiple
 plots download the recombination rate track from UCSC and use it as described in
@@ -219,13 +219,16 @@ locus_plot(loc3)
 If you are performing multiple UCSC queries, it is much faster to download the
 whole recombination rate track data file (around 30 MB) from UCSC genome browser
 (documented [here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)).
+
 The download site can be accessed at
 http://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/. For hg38, download
-`recomb1000GAvg.bw`. For hg19, the link is
-http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the default track we use is
-`hapMapRelease24CombinedRecombMap.bw`. The file can then be loaded into R as a
-`GRanges` object using `import.bw()`, and then used directly by `link_recomb()`
-as follows.
+`recomb1000GAvg.bw`.
+
+For hg19, the link is http://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the
+default track we use is `hapMapRelease24CombinedRecombMap.bw`.
+
+The .bw track file can then be loaded into R as a `GRanges` object using
+`import.bw()`, and then used directly by `link_recomb()` as follows:
 
 ```{r eval=FALSE}
 library(rtracklayer)

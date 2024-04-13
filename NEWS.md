@@ -8,7 +8,8 @@ News
 (suggested by Luke Pilling).
 * Altered default colour scheme.
 * Multiple improvements to plotly version.
-* Added option to use the much faster `LDproxy` in `link_LD()`.
+* Added option to use the much faster `LDproxy` in `link_LD()`. This is now the
+default option.
 * Added support for plotting loci with eQTL data to show multiple genes in 
 different colours.
 * Added ability to overlay up/down pointing triangles to show sign of beta 

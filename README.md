@@ -39,12 +39,12 @@ devtools::install_github("myles-lewis/locuszoomr")
 
 `locuszoomr` can leverage the `LDlinkR` package to query the 1000 Genomes
 Project for linkage disequilibrium (LD) across SNPs. In order to make use of
-this API function you will need a personal access token (see the `LDlinkR`
-vignette), available from the LDlink website
-https://ldlink.nih.gov/?tab=apiaccess.
+this API function you will need a personal access token, available from the 
+[LDlink website](https://ldlink.nih.gov/?tab=apiaccess).
 
-Requests to LDlink are cached using the `memoise` package, to reduce API 
-requests. This is helpful when modifying plots for aesthetic reasons.
+We recommend that users who want to add recombination rate lines to multiple
+plots download the recombination rate track from UCSC and use it as described in
+the 'Add recombination rate' section in the vignette.
 
 # Example locus plot
 
@@ -52,7 +52,7 @@ requests. This is helpful when modifying plots for aesthetic reasons.
 # Locus plot using SLE GWAS data from Bentham et al 2015
 # Using subset of data embedded in the package
 library(locuszoomr)
-data(SLE_gwas_sub)  ## limited subset of data from SLE GWAS
+data(SLE_gwas_sub)
 
 library(EnsDb.Hsapiens.v75)
 loc <- locus(gene = 'UBE2L3', SLE_gwas_sub, flank = 1e5)
