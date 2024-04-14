@@ -87,7 +87,7 @@ scatter_plotly <- function(loc,
       if (loc$yvar == "logP") data$bg[data[, loc$p] < pcutoff] <- scheme[2]
       data$bg[data[, loc$labs] %in% index_snp] <- scheme[3]
       data$bg <- factor(data$bg, levels = scheme,
-                        labels = c("ns", paste("P <", pcutoff), "index"))
+                        labels = c("ns", paste("P <", signif(pcutoff, 3)), "index"))
     }
   }
   if (!is.null(beta)) {
