@@ -98,8 +98,8 @@ genetracks <- function(locus,
   if (is.null(TX$exon_col)) TX$exon_col <- exon_col
   if (is.null(TX$exon_border)) TX$exon_border <- exon_border
   w <- match(highlight, TX$gene_name)
+  w <- w[!is.na(w)]
   if (length(w) > 0) {
-    w <- w[!is.na(w)]
     TX$gene_col[w] <- highlight_col
     TX$exon_col[w] <- highlight_col
     TX$exon_border[w] <- highlight_col
