@@ -19,10 +19,12 @@ locus_plot(
   maxrows = 7,
   xticks = "bottom",
   border = FALSE,
-  gene_col = "blue4",
+  gene_col = ifelse(showExons, "blue4", "skyblue"),
   exon_col = "blue4",
   exon_border = "blue4",
   text_pos = "top",
+  highlight = NULL,
+  highlight_col = "red",
   blanks = "fill",
   recomb_col = "blue",
   ...
@@ -74,6 +76,11 @@ lower plots.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{highlight}{Vector of genes to highlight.}
+
+\item{highlight_col}{Single colour or vector of colours for highlighted
+genes.}
 
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are

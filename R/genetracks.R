@@ -29,6 +29,9 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -72,6 +75,8 @@ genetracks <- function(locus,
                        text_pos = 'top',
                        xticks = TRUE,
                        xlab = NULL,
+                       highlight = NULL,
+                       highlight_col = "red",
                        blanks = c("fill", "hide"),
                        showRecomb = TRUE,
                        align = TRUE) {
@@ -87,6 +92,18 @@ genetracks <- function(locus,
     TX <- TX[TX$gene_biotype %in% filter_gene_biotype, ]
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
+  
+  # gene colours
+  if (is.null(TX$gene_col)) TX$gene_col <- gene_col
+  if (is.null(TX$exon_col)) TX$exon_col <- exon_col
+  if (is.null(TX$exon_border)) TX$exon_border <- exon_border
+  w <- match(highlight, TX$gene_name)
+  if (length(w) > 0) {
+    w <- w[!is.na(w)]
+    TX$gene_col[w] <- highlight_col
+    TX$exon_col[w] <- highlight_col
+    TX$exon_border[w] <- highlight_col
+  }
   
   recomb <- !is.null(locus$recomb) & showRecomb
   if (align) {
@@ -128,17 +145,18 @@ genetracks <- function(locus,
   if (showExons) {
     for (i in seq_len(nrow(TX))) {
       lines(TX[i, c('start', 'end')], rep(-TX[i, 'row'], 2),
-            col = gene_col, lwd = 1.5, lend = 1)
+            col = TX$gene_col[i], lwd = 1.5, lend = 1)
       e <- EX[EX$gene_id == TX$gene_id[i], ]
       exstart <- start(e)
       exend <- end(e)
       rect(exstart, -TX[i, 'row'] - exheight, exend, -TX[i, 'row'] + exheight,
-           col = exon_col, border = exon_border, lwd = 0.5, lend = 2, ljoin = 1)
+           col = TX$exon_col[i], border = TX$exon_border[i],
+           lwd = 0.5, lend = 2, ljoin = 1)
     }
   } else {
     rect(TX[, 'start'], -TX[, 'row'] - exheight,
          TX[, 'end'], -TX[, 'row'] + exheight,
-         col = gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
+         col = TX$gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
   }
   
   if (text_pos == "top") {

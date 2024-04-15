@@ -43,6 +43,9 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -82,10 +85,12 @@ locus_plot <- function(loc,
                        maxrows = 7,
                        xticks = 'bottom',
                        border = FALSE,
-                       gene_col = 'blue4',
+                       gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                        exon_col = 'blue4',
                        exon_border = 'blue4',
                        text_pos = 'top',
+                       highlight = NULL,
+                       highlight_col = "red",
                        blanks = 'fill',
                        recomb_col = "blue", ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -100,8 +105,9 @@ locus_plot <- function(loc,
   genetracks(loc, filter_gene_name, filter_gene_biotype,
              border, cex.axis, cex.lab, cex.text, gene_col, exon_col, exon_border,
              showExons, maxrows, text_pos, xticks = (xticks == 'bottom'),
-             xlab = if (xticks == 'bottom') xlab else "", blanks = blanks,
-             showRecomb = !is.na(recomb_col))
+             xlab = if (xticks == 'bottom') xlab else "",
+             highlight = highlight, highlight_col = highlight_col,
+             blanks = blanks, showRecomb = !is.na(recomb_col))
   
   # upper panel plot points
   scatter_plot(loc, xticks = (xticks == 'top'),
