@@ -87,9 +87,16 @@ No return value.
 Plot gene annotation tracks from \code{ensembldb} data.
 }
 \details{
-This function is called by \code{\link[=locus_plot]{locus_plot()}}. It can be used to plot
-the gene annotation tracks on their own. It uses base graphics, so
-\code{\link[=layout]{layout()}} can be used to position adjacent plots above or below.
+This function is called by \code{\link[=locus_plot]{locus_plot()}}. It can be used to plot the gene
+annotation tracks on their own. It uses base graphics, so \code{\link[=layout]{layout()}} can be
+used to position adjacent plots above or below.
+
+\code{gene_col}, \code{exon_col} and \code{exon_border} set colours for all genes, while
+\code{highlight} and \code{highlight_col} can optionally be used together to highlight
+specific genes of interest. For full control over every single gene, users
+can add columns \code{gene_col}, \code{exon_col} and \code{exon_border} to the \code{TX} object
+within the 'locus' object. Columns added to \code{TX} override their equivalent
+arguments.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {
