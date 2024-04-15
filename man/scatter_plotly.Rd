@@ -19,7 +19,8 @@ scatter_plotly(
   recomb_col = "blue",
   eqtl_gene = NULL,
   beta = NULL,
-  add_hover = NULL
+  add_hover = NULL,
+  showlegend = TRUE
 )
 }
 \arguments{
@@ -64,6 +65,8 @@ triangles for positive beta and downward triangles for negative beta
 
 \item{add_hover}{Optional vector of column names in \code{loc$data} to add to the
 plotly hover text for scatter points.}
+
+\item{showlegend}{Logical whether to show a legend for the scatter points.}
 }
 \value{
 A \code{plotly} scatter plot.

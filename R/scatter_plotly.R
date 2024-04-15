@@ -30,6 +30,7 @@
 #'   (significant SNPs only).
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
+#' @param showlegend Logical whether to show a legend for the scatter points.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
 #' @importFrom plotly add_trace plotly_build
@@ -51,7 +52,8 @@ scatter_plotly <- function(loc,
                            recomb_col = "blue",
                            eqtl_gene = NULL,
                            beta = NULL,
-                           add_hover = NULL) {
+                           add_hover = NULL,
+                           showlegend = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
   
@@ -143,7 +145,6 @@ scatter_plotly <- function(loc,
                 line = list(width = 1, color = '#999999', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
-  showlegend <- (showLD & hasLD) | !is.null(pcutoff)
   
   if (!recomb) {
     if (is.null(beta)) {
