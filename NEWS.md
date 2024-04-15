@@ -1,7 +1,7 @@
 News
 =====
 
-# locuszoomr 0.2.2
+# locuszoomr 0.3.0
 ###### 10/04/2024
 
 * Allow `index_snp` to be a vector to highlight more than 1 SNP per region 
