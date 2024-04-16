@@ -294,7 +294,7 @@ plots](#layering-plots) below.
 
 ```{r, fig.dim=c(7, 3.5)}
 if (require(EnsDb.Hsapiens.v75)) {
-genetracks(loc)
+genetracks(loc, highlight = "UBE2L3")
 }
 ```
 
