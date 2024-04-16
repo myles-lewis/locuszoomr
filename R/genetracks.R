@@ -153,6 +153,7 @@ genetracks <- function(locus,
            lwd = 0.5, lend = 2, ljoin = 1)
     }
   } else {
+    # without exons
     rect(TX[, 'start'], -TX[, 'row'] - exheight,
          TX[, 'end'], -TX[, 'row'] + exheight,
          col = TX$gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)

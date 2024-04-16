@@ -28,6 +28,9 @@
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
 #'   `locus`.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -41,8 +44,6 @@
 #' gg_genetracks(loc)
 #' }
 #' @importFrom ggplot2 xlab
-#' @importFrom grid viewport linesGrob rectGrob textGrob xaxisGrob gList gTree
-#'   gpar
 #' @importFrom gggrid grid_panel
 #' @export
 
@@ -61,6 +62,8 @@ gg_genetracks <- function(loc,
                           text_pos = 'top',
                           xticks = TRUE,
                           xlab = NULL,
+                          highlight = NULL,
+                          highlight_col = "red",
                           blanks = c("fill", "hide")) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   blanks <- match.arg(blanks)
@@ -75,6 +78,7 @@ gg_genetracks <- function(loc,
                        showExons,
                        maxrows,
                        text_pos,
+                       highlight, highlight_col,
                        blanks)
   if (is.null(xlab) & xticks) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   

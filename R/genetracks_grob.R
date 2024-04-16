@@ -24,6 +24,9 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -37,8 +40,8 @@
 #' grid::grid.newpage()
 #' grid::grid.draw(g)
 #' }
-#' @importFrom grid viewport linesGrob rectGrob textGrob xaxisGrob gList gTree
-#'   gpar
+#' @importFrom grid viewport rectGrob textGrob xaxisGrob gList gTree gpar
+#'   polylineGrob
 #' @export
 
 genetracks_grob <- function(locus,
@@ -52,6 +55,8 @@ genetracks_grob <- function(locus,
                             showExons = TRUE,
                             maxrows = NULL,
                             text_pos = 'top',
+                            highlight = NULL,
+                            highlight_col = "red",
                             blanks = c("fill", "hide")) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   blanks <- match.arg(blanks)
@@ -68,6 +73,9 @@ genetracks_grob <- function(locus,
     message('No genes to plot')
     return(invisible(NULL))
   }
+  
+  TX <- gene_colours(TX, gene_col, exon_col, exon_border,
+                     highlight, highlight_col)
   
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
                blanks = blanks)
@@ -110,43 +118,47 @@ genetrack.vp <- function(xrange, ylim) {
 exonGrob <- function(TX, EX, showExons, gene_col, exon_col, exon_border,
                      exheight) {
   if (showExons) {
-    LX <- cbind(TX[, c('start', 'end')], rep(NA, nrow(TX)))
-    LX <- unlist(t(LX))
-    LY <- cbind(-TX[, 'row'], -TX[, 'row'], rep(NA, nrow(TX)))
+    LX <- unlist(t(TX[, c('start', 'end')]))
+    LY <- cbind(-TX[, 'row'], -TX[, 'row'])
     LY <- unlist(t(LY))
+    line_id <- rep(seq_len(nrow(TX)), each = 2)
     
     EXset <- lapply(seq_len(nrow(TX)), function(i) {
       e <- EX[EX$gene_id == TX$gene_id[i], ]
       exstart <- start(e) / 1e6
       exwidth <- end(e) / 1e6 - exstart
-      cbind(x = exstart,
+      data.frame(x = exstart,
             y = -TX[i, 'row'] - exheight,
             width = exwidth,
-            height = 2 * exheight)
+            height = 2 * exheight,
+            exon_col = TX$exon_col[i],
+            exon_border = TX$exon_border[i])
     })
     EXset <- do.call("rbind", EXset)
     
     gList(
-      linesGrob(unit(LX, "native"),
-                unit(LY, "native"),
-                gp = gpar(col = gene_col, lwd = 1.5, lineend = "butt"),
-                vp = "genetrack"),
+      polylineGrob(unit(LX, "native"),
+                   unit(LY, "native"),
+                   id = line_id,
+                   gp = gpar(col = TX$gene_col, lwd = 1.5, lineend = "butt"),
+                   vp = "genetrack"),
       rectGrob(x = unit(EXset[, "x"], "native"),
                y = unit(EXset[, "y"], "native"),
                width = unit(EXset[, "width"], "native"),
                height = unit(EXset[, "height"], "native"),
                just = c("left", "bottom"),
-               gp = gpar(fill = exon_col, col = exon_border,
+               gp = gpar(fill = EXset$exon_col, col = EXset$exon_border,
                          lwd = 0.5, lineend = "square", linejoin = "mitre"),
                vp = "genetrack")
     )
   } else {
+    # without exons
     rectGrob(x = unit(TX$start, "native"),
              y = unit(-TX[, 'row'] - exheight, "native"),
              width = unit(TX$end - TX$start, "native"),
              height = unit(exheight*2, "native"),
              just = c("left", "bottom"),
-             gp = gpar(fill = gene_col, col = exon_border,
+             gp = gpar(fill = TX$gene_col, col = exon_border,
                        lineend = "square", linejoin = "mitre"),
              vp = "genetrack")
   }
