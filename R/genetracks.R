@@ -102,17 +102,8 @@ genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
-  # gene colours
-  if (is.null(TX$gene_col)) TX$gene_col <- gene_col
-  if (is.null(TX$exon_col)) TX$exon_col <- exon_col
-  if (is.null(TX$exon_border)) TX$exon_border <- exon_border
-  w <- match(highlight, TX$gene_name)
-  w <- w[!is.na(w)]
-  if (length(w) > 0) {
-    TX$gene_col[w] <- highlight_col
-    TX$exon_col[w] <- highlight_col
-    TX$exon_border[w] <- highlight_col
-  }
+  TX <- gene_colours(TX, gene_col, exon_col, exon_border,
+                     highlight, highlight_col)
   
   recomb <- !is.null(locus$recomb) & showRecomb
   if (align) {
@@ -234,6 +225,23 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
       }
     }
     j <- j + 1
+  }
+  TX
+}
+
+
+# highlight selected genes
+gene_colours <- function(TX, gene_col, exon_col, exon_border,
+                         highlight, highlight_col) {
+  if (is.null(TX$gene_col)) TX$gene_col <- gene_col
+  if (is.null(TX$exon_col)) TX$exon_col <- exon_col
+  if (is.null(TX$exon_border)) TX$exon_border <- exon_border
+  w <- match(highlight, TX$gene_name)
+  w <- w[!is.na(w)]
+  if (length(w) > 0) {
+    TX$gene_col[w] <- highlight_col
+    TX$exon_col[w] <- highlight_col
+    TX$exon_border[w] <- highlight_col
   }
   TX
 }
