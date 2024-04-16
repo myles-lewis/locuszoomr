@@ -128,11 +128,11 @@ exonGrob <- function(TX, EX, showExons, gene_col, exon_col, exon_border,
       exstart <- start(e) / 1e6
       exwidth <- end(e) / 1e6 - exstart
       data.frame(x = exstart,
-            y = -TX[i, 'row'] - exheight,
-            width = exwidth,
-            height = 2 * exheight,
-            exon_col = TX$exon_col[i],
-            exon_border = TX$exon_border[i])
+                 y = -TX[i, 'row'] - exheight,
+                 width = exwidth,
+                 height = 2 * exheight,
+                 exon_col = TX$exon_col[i],
+                 exon_border = TX$exon_border[i])
     })
     EXset <- do.call("rbind", EXset)
     
