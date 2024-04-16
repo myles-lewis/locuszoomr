@@ -68,8 +68,8 @@ Plot gene annotation tracks from \code{ensembldb} data using the grid package to
 create a grob.
 }
 \details{
-This function is called by \code{\link[=locus_ggplot]{locus_ggplot()}}. It can be used to plot
-the gene annotation tracks on their own.
+This function is called by \code{\link[=gg_genetracks]{gg_genetracks()}}. It can be used to
+generate a grob of the gene annotation tracks on their own.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {

@@ -77,18 +77,28 @@ missing gene symbols.}
 A ggplot2 object.
 }
 \description{
-Plot gene annotation tracks from \code{ensembldb} data using ggplot2.
+Plot gene annotation tracks from \code{ensembldb} data using ggplot2 and grid.
 }
 \details{
-This function is called by \code{\link[=locus_ggplot]{locus_ggplot()}}. It can be used to plot
-the gene annotation tracks on their own.
+This function is called by \code{\link[=locus_ggplot]{locus_ggplot()}}, and in turn it calls
+\code{\link[=genetracks_grob]{genetracks_grob()}}. It can be used to plot the gene annotation tracks on
+their own as a ggplot2 object.
+
+\code{gene_col}, \code{exon_col} and \code{exon_border} set colours for all genes, while
+\code{highlight} and \code{highlight_col} can optionally be used together to highlight
+specific genes of interest. For full control over every single gene, users
+can add columns \code{gene_col}, \code{exon_col} and \code{exon_border} to the \code{TX} object
+within the 'locus' object. Columns added to \code{TX} override their equivalent
+arguments.
 }
 \examples{
 if(require(EnsDb.Hsapiens.v75)) {
 data(SLE_gwas_sub)
 loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
              ens_db = "EnsDb.Hsapiens.v75")
-grid::grid.newpage()
 gg_genetracks(loc)
 }
+}
+\seealso{
+\code{\link[=locus_ggplot]{locus_ggplot()}} \code{\link[=genetracks_grob]{genetracks_grob()}}
 }
