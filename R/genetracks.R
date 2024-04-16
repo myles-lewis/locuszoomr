@@ -110,7 +110,7 @@ genetracks <- function(locus,
   }
   
   if (nrow(TX) != 0) {
-    TX <- gene_colours(TX, gene_col, exon_col, exon_border,
+    TX <- gene_colours(TX, gene_col, exon_col, exon_border, showExons,
                        highlight, highlight_col)
     TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
                  blanks = blanks)
@@ -231,7 +231,7 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
 
 
 # highlight selected genes
-gene_colours <- function(TX, gene_col, exon_col, exon_border,
+gene_colours <- function(TX, gene_col, exon_col, exon_border, showExons,
                          highlight, highlight_col) {
   if (is.null(TX$gene_col)) TX$gene_col <- gene_col
   if (is.null(TX$exon_col)) TX$exon_col <- exon_col
@@ -240,8 +240,10 @@ gene_colours <- function(TX, gene_col, exon_col, exon_border,
   w <- w[!is.na(w)]
   if (length(w) > 0) {
     TX$gene_col[w] <- highlight_col
-    TX$exon_col[w] <- highlight_col
-    TX$exon_border[w] <- highlight_col
+    if (showExons) {
+      TX$exon_col[w] <- highlight_col
+      TX$exon_border[w] <- highlight_col
+    }
   }
   TX
 }

@@ -74,7 +74,7 @@ genetracks_grob <- function(locus,
     return(invisible(NULL))
   }
   
-  TX <- gene_colours(TX, gene_col, exon_col, exon_border,
+  TX <- gene_colours(TX, gene_col, exon_col, exon_border, showExons,
                      highlight, highlight_col)
   
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
@@ -94,7 +94,7 @@ genetracks_grob <- function(locus,
     childrenvp = genetrack.vp(xrange, ylim),
     children = gList(
       if (border) rectGrob(gp = gpar(lwd = 1.5), vp = "genetrack"),
-      exonGrob(TX, EX, showExons, gene_col, exon_col, exon_border, exheight),
+      exonGrob(TX, EX, showExons, exheight),
       genetextGrob(text_pos, TX, xrange, cex.text)),
     gp = gpar()
   )
@@ -115,8 +115,7 @@ genetrack.vp <- function(xrange, ylim) {
 }
 
 
-exonGrob <- function(TX, EX, showExons, gene_col, exon_col, exon_border,
-                     exheight) {
+exonGrob <- function(TX, EX, showExons, exheight) {
   if (showExons) {
     LX <- unlist(t(TX[, c('start', 'end')]))
     LY <- cbind(-TX[, 'row'], -TX[, 'row'])
@@ -158,7 +157,7 @@ exonGrob <- function(TX, EX, showExons, gene_col, exon_col, exon_border,
              width = unit(TX$end - TX$start, "native"),
              height = unit(exheight*2, "native"),
              just = c("left", "bottom"),
-             gp = gpar(fill = TX$gene_col, col = exon_border,
+             gp = gpar(fill = TX$gene_col, col = TX$exon_border,
                        lineend = "square", linejoin = "mitre"),
              vp = "genetrack")
   }
