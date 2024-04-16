@@ -102,9 +102,6 @@ genetracks <- function(locus,
   }
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
   
-  TX <- gene_colours(TX, gene_col, exon_col, exon_border,
-                     highlight, highlight_col)
-  
   recomb <- !is.null(locus$recomb) & showRecomb
   if (align) {
     op <- par(mar = c(ifelse(xticks, 3.5, 1), 3.5, 0.25,
@@ -113,6 +110,8 @@ genetracks <- function(locus,
   }
   
   if (nrow(TX) != 0) {
+    TX <- gene_colours(TX, gene_col, exon_col, exon_border,
+                       highlight, highlight_col)
     TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
                  blanks = blanks)
     maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
