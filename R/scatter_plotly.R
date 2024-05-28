@@ -31,6 +31,7 @@
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
 #' @param showlegend Logical whether to show a legend for the scatter points.
+#' @param webGL Logical whether to use webGL or SVG for scatter plot.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
 #' @importFrom plotly add_trace plotly_build
@@ -53,7 +54,8 @@ scatter_plotly <- function(loc,
                            eqtl_gene = NULL,
                            beta = NULL,
                            add_hover = NULL,
-                           showlegend = TRUE) {
+                           showlegend = TRUE,
+                           webGL = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
   
@@ -105,6 +107,7 @@ scatter_plotly <- function(loc,
     data$size <- 1L
     data$size[!ind] <- 2L
     sizes <- if (sum(!ind) == 0) c(50, 50) else c(50, 100)
+    if (!webGL) sizes <- sizes/2
     leg <- list(traceorder = "reversed")
   } else {
     if (is.null(eqtl_gene)) {
@@ -145,6 +148,7 @@ scatter_plotly <- function(loc,
                 line = list(width = 1, color = '#999999', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
+  type <- if (webGL) "scattergl" else "scatter"
   
   if (!recomb) {
     if (is.null(beta)) {
@@ -158,7 +162,7 @@ scatter_plotly <- function(loc,
                    key = data[, loc$labs],
                    showlegend = showlegend,
                    source = "plotly_locus",
-                   type = "scattergl", mode = "markers")
+                   type = type, mode = "markers")
     } else {
       # beta shapes
       p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
@@ -171,7 +175,7 @@ scatter_plotly <- function(loc,
                    key = data[, loc$labs],
                    showlegend = showlegend,
                    source = "plotly_locus",
-                   type = "scattergl", mode = "markers")
+                   type = type, mode = "markers")
     }
     p <- p %>%
       plotly::layout(xaxis = list(title = xlab,
@@ -196,7 +200,7 @@ scatter_plotly <- function(loc,
                   symbols = symbols,
                   name = "recombination", yaxis = "y2",
                   line = list(color = recomb_col, width = 1.5),
-                  mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+                  mode = "lines", type = type, showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                   color = data$bg,
@@ -205,7 +209,7 @@ scatter_plotly <- function(loc,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
                   showlegend = showlegend,
-                  type = "scattergl", mode = "markers")
+                  type = type, mode = "markers")
     } else {
       # beta shapes
       p <- plot_ly(source = "plotly_locus") %>%
@@ -215,7 +219,7 @@ scatter_plotly <- function(loc,
                   symbols = symbols, sizes = sizes,
                   name = "recombination", yaxis = "y2",
                   line = list(color = recomb_col, width = 1.5),
-                  mode = "lines", type = "scattergl", showlegend = FALSE) %>%
+                  mode = "lines", type = type, showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                   color = data$bg,
@@ -225,7 +229,7 @@ scatter_plotly <- function(loc,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
                   showlegend = showlegend,
-                  type = "scattergl", mode = "markers")
+                  type = type, mode = "markers")
     }
     p <- p %>%
       plotly::layout(xaxis = list(title = xlab,

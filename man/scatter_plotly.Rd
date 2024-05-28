@@ -20,7 +20,8 @@ scatter_plotly(
   eqtl_gene = NULL,
   beta = NULL,
   add_hover = NULL,
-  showlegend = TRUE
+  showlegend = TRUE,
+  webGL = TRUE
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ triangles for positive beta and downward triangles for negative beta
 plotly hover text for scatter points.}
 
 \item{showlegend}{Logical whether to show a legend for the scatter points.}
+
+\item{webGL}{Logical whether to use webGL or SVG for scatter plot.}
 }
 \value{
 A \code{plotly} scatter plot.

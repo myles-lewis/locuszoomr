@@ -72,7 +72,7 @@ genetrack_ly <- function(locus,
   if (nrow(TX) == 0 & plot) {
     message('No genes to plot')
     # blank gene tracks
-    p <- plot_ly(data.frame(NA), mode = "markers", type = "scattergl",
+    p <- plot_ly(data.frame(NA), mode = "markers", type = "scatter",
                  source = "plotly_locus") %>%
       plotly::layout(xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
                                   color = 'black', ticklen = 5,

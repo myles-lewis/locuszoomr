@@ -1,6 +1,11 @@
 News
 =====
 
+# locuszoomr 0.3.1
+###### 28/05/2024
+
+* Add toggle for using webGL in `scatter_plotly()`.
+
 # locuszoomr 0.3.0
 ###### 16/04/2024
 
