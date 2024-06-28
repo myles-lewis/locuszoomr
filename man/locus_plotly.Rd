@@ -24,7 +24,9 @@ locus_plotly(
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
 
-\item{heights}{Vector controlling relative height of each panel on 0-1 scale.}
+\item{heights}{Vector controlling relative height of each panel on 0-1 scale.
+Alternatively a vector of length 2 of height in pixels passed to
+\code{scatter_plotly()} and \code{genetrack_ly()}.}
 
 \item{filter_gene_name}{Vector of gene names to display.}
 

@@ -26,6 +26,7 @@
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
 #'   which are missing gene symbols. `"show"` shows gene lines but no label
 #'   (hovertext is still available).
+#' @param height Height in pixels (optional, defaults to automatic sizing).
 #' @param plot Logical whether to produce plotly object or return plot
 #'   coordinates.
 #' @return Either a 'plotly' plotting object showing gene tracks, or if 
@@ -53,6 +54,7 @@ genetrack_ly <- function(locus,
                          width = 600,
                          xlab = NULL,
                          blanks = c("fill", "hide", "show"),
+                         height = NULL,
                          plot = TRUE) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   blanks <- match.arg(blanks)
@@ -133,7 +135,7 @@ genetrack_ly <- function(locus,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  plot_ly(TX, source = "plotly_locus") %>%
+  plot_ly(TX, source = "plotly_locus", height = height) %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),

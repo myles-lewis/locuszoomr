@@ -11,7 +11,9 @@
 #' more information.
 #' 
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
-#' @param heights Vector controlling relative height of each panel on 0-1 scale. 
+#' @param heights Vector controlling relative height of each panel on 0-1 scale.
+#'   Alternatively a vector of length 2 of height in pixels passed to
+#'   `scatter_plotly()` and `genetrack_ly()`.
 #' @param filter_gene_name Vector of gene names to display.
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
@@ -60,10 +62,17 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          xlab = NULL,
                          blanks = "show",
                          ...) {
+  pheights <- NULL
+  if (any(heights > 1)) {
+    pheights <- heights
+    pheights[2] <- sum(heights)
+    heights <- heights / sum(heights)
+  }
+  
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     gene_col, exon_col, exon_border, showExons, maxrows, width, 
-                    xlab, blanks)
-  p <- scatter_plotly(loc, xlab = xlab, ...)
+                    xlab, blanks, height = pheights[2])
+  p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                   titleY = TRUE)

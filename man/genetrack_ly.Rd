@@ -17,6 +17,7 @@ genetrack_ly(
   width = 600,
   xlab = NULL,
   blanks = c("fill", "hide", "show"),
+  height = NULL,
   plot = TRUE
 )
 }
@@ -55,6 +56,8 @@ in \code{locus}.}
 blank gene symbols with ensembl gene ids. \code{"hide"} completely hides genes
 which are missing gene symbols. \code{"show"} shows gene lines but no label
 (hovertext is still available).}
+
+\item{height}{Height in pixels (optional, defaults to automatic sizing).}
 
 \item{plot}{Logical whether to produce plotly object or return plot
 coordinates.}

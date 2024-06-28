@@ -21,6 +21,7 @@ scatter_plotly(
   beta = NULL,
   add_hover = NULL,
   showlegend = TRUE,
+  height = NULL,
   webGL = TRUE
 )
 }
@@ -68,6 +69,8 @@ triangles for positive beta and downward triangles for negative beta
 plotly hover text for scatter points.}
 
 \item{showlegend}{Logical whether to show a legend for the scatter points.}
+
+\item{height}{Height in pixels (optional, defaults to automatic sizing).}
 
 \item{webGL}{Logical whether to use webGL or SVG for scatter plot.}
 }

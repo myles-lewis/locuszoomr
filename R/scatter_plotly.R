@@ -31,6 +31,7 @@
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
 #' @param showlegend Logical whether to show a legend for the scatter points.
+#' @param height Height in pixels (optional, defaults to automatic sizing).
 #' @param webGL Logical whether to use webGL or SVG for scatter plot.
 #' @return A `plotly` scatter plot.
 #' @seealso [locus()] [locus_plotly()]
@@ -55,6 +56,7 @@ scatter_plotly <- function(loc,
                            beta = NULL,
                            add_hover = NULL,
                            showlegend = TRUE,
+                           height = NULL,
                            webGL = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
@@ -161,7 +163,7 @@ scatter_plotly <- function(loc,
                    text = hovertext, hoverinfo = 'text',
                    key = data[, loc$labs],
                    showlegend = showlegend,
-                   source = "plotly_locus",
+                   source = "plotly_locus", height = height,
                    type = type, mode = "markers")
     } else {
       # beta shapes
@@ -174,7 +176,7 @@ scatter_plotly <- function(loc,
                    text = hovertext, hoverinfo = 'text',
                    key = data[, loc$labs],
                    showlegend = showlegend,
-                   source = "plotly_locus",
+                   source = "plotly_locus", height = height,
                    type = type, mode = "markers")
     }
     p <- p %>%
@@ -193,7 +195,7 @@ scatter_plotly <- function(loc,
     ylim2 <- c(-2, 102)
     if (is.null(beta)) {
       # standard plotly
-      p <- plot_ly(source = "plotly_locus") %>%
+      p <- plot_ly(source = "plotly_locus", height = height) %>%
         # recombination line
         add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
                   hoverinfo = "none", colors = scheme,  # colors must go here
@@ -212,7 +214,7 @@ scatter_plotly <- function(loc,
                   type = type, mode = "markers")
     } else {
       # beta shapes
-      p <- plot_ly(source = "plotly_locus") %>%
+      p <- plot_ly(source = "plotly_locus", height = height) %>%
         # recombination line
         add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
                   hoverinfo = "none", colors = scheme,  # colors must go here
