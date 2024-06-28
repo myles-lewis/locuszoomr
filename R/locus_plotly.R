@@ -75,5 +75,5 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
   p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
-                  titleY = TRUE)
+                  titleY = TRUE, margin = 0)
 }
