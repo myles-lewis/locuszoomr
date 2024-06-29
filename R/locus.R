@@ -260,7 +260,11 @@ detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
     }
   }
   if (is.null(labs)) {
-    w <- grep("rs?id|SNP", colnames(data), ignore.case = TRUE)
+    w <- grep("rs?id", colnames(data), ignore.case = TRUE)
+    if (length(w) > 1) stop("unable to autodetect SNP id column")
+    if (length(w) == 0) {
+      w <- grep("SNP", colnames(data), ignore.case = TRUE)
+    }
     if (length(w) == 1) {
       labs <- colnames(data)[w]
     } else stop("unable to autodetect SNP id column")
