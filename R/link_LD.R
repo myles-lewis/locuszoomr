@@ -47,6 +47,7 @@ link_LD <- function(loc,
   start <- Sys.time()
   labs <- loc$labs
   index_snp <- loc$index_snp
+  snp_col <- if (grepl("rs", index_snp)) "RS_Number" else "Coord"
   rslist <- loc$data[, labs]
   if (length(rslist) > 1000) {
     rslist <- rslist[order(loc$data$logP, decreasing = TRUE)]
@@ -56,7 +57,7 @@ link_LD <- function(loc,
   if (method == "proxy") {
     ldp <- try(mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token, ...))
     if (!inherits(ldp, "try-error")) {
-      loc$data$ld <- ldp[match(loc$data[, labs], ldp$RS_Number), "R2"]
+      loc$data$ld <- ldp[match(loc$data[, labs], ldp[, snp_col]), "R2"]
     }
   } else {
     message("Obtaining LD on ", length(rslist), " SNPs. ", appendLF = FALSE)
