@@ -1,6 +1,12 @@
 News
 =====
 
+# locuszoomr 0.3.2
+###### 13/07/2024
+
+* Fix for SNPs with chromosome coordinate format in `link_LD()` (only works with 
+`LDproxy` method).
+
 # locuszoomr 0.3.1
 ###### 28/06/2024
 

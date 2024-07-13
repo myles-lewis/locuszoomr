@@ -46,9 +46,10 @@ data. \code{LDmatrix()} is slower but usually more complete for small queries
 (<1000 SNPs). However, it has a limit of 1000 SNPs which can be queried.
 \code{LDproxy()} is faster but data on some SNPs may be absent.
 
-Note SNPs have to be correctly formatted as required by LDlinkR, either as
-rsID or chromosome coordinate e.g. "chr7:24966446". Default genome build is
-\code{grch37}, see \code{LDproxy()} or \code{LDmatrix()}.
+Note, SNPs have to be correctly formatted as required by LDlinkR, either as
+rsID (works with either method) or chromosome coordinate e.g. "chr7:24966446"
+(works with LDproxy only). Default genome build is \code{grch37}, see \code{LDproxy()}
+or \code{LDmatrix()}.
 }
 \seealso{
 \code{\link[=locus]{locus()}}
