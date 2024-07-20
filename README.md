@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
-[![Downloads](http://cranlogs.r-pkg.org/badges/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
+[![Downloads](https://cranlogs.r-pkg.org/badges/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
 <!-- badges: end -->
 
 This is a pure R implementation of locuszoom for plotting genetic data at
