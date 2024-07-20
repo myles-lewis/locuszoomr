@@ -1,7 +1,9 @@
 # locuszoomr
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/locuszoomr)](https://cran.r-project.org/package=locuszoomr)
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
 [![Downloads](http://cranlogs.r-pkg.org/badges/locuszoomr)](https://CRAN.R-project.org/package=locuszoomr)
+<!-- badges: end -->
 
 This is a pure R implementation of locuszoom for plotting genetic data at
 genomic loci accompanied by gene annotations. Plots can be produced in base
