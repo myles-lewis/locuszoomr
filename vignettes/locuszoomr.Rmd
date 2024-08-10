@@ -265,8 +265,10 @@ as a single value or a vector of values.
 Advanced users familiar with base graphics can customise every single point
 on the scatter plot, by adding columns named `bg`, `col`, `pch` or `cex`
 directly to the dataframe stored in `$data` element of the `locus` object.
-Setting these will overrule any default settings. These columns refer to
-their respective base graphics arguments, see `?points`.
+Setting these will overrule any default settings. These columns refer to their
+respective base graphics arguments: `bg` sets the fill colour for points, `col`
+sets the outline colour, `pch` sets the symbols (see `?points` for a list of
+these) and `cex` sets the size of points (default is 1).
 
 ```{r eval=FALSE}
 # add column typed as a factor which is 1 for typed, 0 for imputed
