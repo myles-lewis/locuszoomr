@@ -3,4 +3,4 @@
 0 errors | 0 warnings | 0 note
 
 This release includes:
-* Improvements to controls for the plotly version
+* Bugfix for chromosome coordinates with LDlinkR
