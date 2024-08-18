@@ -47,7 +47,10 @@
 #' \item{seqname}{chromosome value}
 #' \item{xrange}{vector of genomic position range}
 #' \item{gene}{gene name}
-#' \item{ens_db}{Ensembl or AnnotationHub database version}
+#' \item{ens_db}{Ensembl or AnnotationHub database}
+#' \item{ens_version}{Ensembl database version}
+#' \item{ens_organism}{Ensembl database organism}
+#' \item{ens_genome}{Ensembl data genome build}
 #' \item{chrom}{column name in `data` containing chromosome information}
 #' \item{pos}{column name in `data` containing position}
 #' \item{p}{column name in `data` containing p-value}
@@ -73,12 +76,12 @@
 #'               ens_db = "EnsDb.Hsapiens.v75")
 #' locus_plot(loc2)
 #' }
-#' @importFrom ensembldb genes exons
+#' @importFrom ensembldb genes exons ensemblVersion organism
 #' @importFrom BiocGenerics start end
 #' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
 #' SeqNameFilter GeneIdFilter TxStartFilter TxEndFilter ExonStartFilter 
 #' ExonEndFilter
-#' @importFrom GenomeInfoDb seqlengths
+#' @importFrom GenomeInfoDb seqlengths genome
 #' @importFrom memoise memoise
 #' @export
 
@@ -109,7 +112,8 @@ locus <- function(gene = NULL,
       SeqNameFilter(c(1:22, 'X', 'Y'))
     ))
     
-    if(length(locus) > 1) {
+    if (length(locus) == 0) stop("gene not found")
+    if (length(locus) > 1) {
       message(sprintf('Identified %d genes matching name \'%s\', taking first',
                       length(locus), gene))
       locus <- locus[1]
@@ -186,7 +190,7 @@ locus <- function(gene = NULL,
     SeqNameFilter(seqname),
     TxStartFilter(xrange[2], condition = "<"),
     TxEndFilter(xrange[1], condition = ">"),
-    GeneIdFilter("ENSG", "startsWith")))
+    GeneIdFilter("ENS", "startsWith")))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
   TX <- TX[!duplicated(TX$gene_id), ]
@@ -198,13 +202,16 @@ locus <- function(gene = NULL,
       SeqNameFilter(seqname),
       ExonStartFilter(xrange[2], condition = "<"),
       ExonEndFilter(xrange[1], condition = ">"),
-      GeneIdFilter("ENSG", "startsWith")))
+      GeneIdFilter("ENS", "startsWith")))
   } else {
     EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   }
 
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
+              ens_version = ensemblVersion(edb),
+              ens_organism = organism(edb),
+              ens_genome = unname(genome(edb)[1]),
               chrom = chrom, pos = pos, p = p, yvar = yvar, labs = labs,
               index_snp = index_snp,
               data = data, TX = TX, EX = EX)
@@ -230,6 +237,11 @@ summary.locus <- function(object, ...) {
   if (nrow(object$TX) > 0) {
     tb <- sort(c(table(object$TX$gene_biotype)), decreasing = TRUE)
     cat(paste(tb, names(tb), collapse = ", "), "\n")
+  }
+  if (!is.null(object$ens_version)) {
+    cat("Ensembl version:", object$ens_version, "\n")
+    cat("Organism:", object$ens_organism, "\n")
+    cat("Genome build:", object$ens_genome, "\n")
   }
 }
 
