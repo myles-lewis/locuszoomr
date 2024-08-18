@@ -512,7 +512,7 @@ locp2 <- locus(dat, gene = 'UBE2L3', flank = 1e5, yvar = "p2",
 
 oldpar <- set_layers(1)
 scatter_plot(locp, xticks = FALSE, pcutoff = NULL, ylim = c(0, 16))
-scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, chromCol = "orange",
+scatter_plot(locp2, xticks = FALSE, pcutoff = NULL, scheme = "orange",
              pch = 22, add = TRUE)
 genetracks(loc)
 par(oldpar)
@@ -676,7 +676,9 @@ head(top_snps)
 ```
 
 We can now plot locus plots for all the GWAS peaks as a single pdf, as specified
-by the vector of top SNPs.
+by the vector of top SNPs. The `link_recomb()` line below can be sped up by
+downloading the recombination track file from UCSC - see example code in 
+[Add recombination rate](#add-recombination-rate).
 
 ```{r eval=FALSE}
 all_loci <- lapply(top_snps, function(i) {
