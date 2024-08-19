@@ -77,8 +77,10 @@ eqtl_plot <- function(loc,
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   
   # scatter plot
+  recomb <- !is.null(loc$recomb)
   if (align) {
-    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2, 1.5))
+    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2,
+                      ifelse(recomb, 3.5, 1.5)))
     on.exit(par(op))
   }
   
