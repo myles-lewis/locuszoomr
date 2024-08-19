@@ -70,7 +70,8 @@ specifying \code{gene}, or \code{seqname} and \code{xrange}.}
 LD information.}
 }
 \value{
-Returns an object of class 'locus' ready for plotting, containing:
+Returns a list object of class 'locus' ready for plotting,
+containing:
 \item{seqname}{chromosome value}
 \item{xrange}{vector of genomic position range}
 \item{gene}{gene name}

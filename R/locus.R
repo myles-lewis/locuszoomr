@@ -43,7 +43,8 @@
 #'   specifying `gene`, or `seqname` and `xrange`.
 #' @param LD Optional character value to specify which column in `data` contains
 #'   LD information.
-#' @return Returns an object of class 'locus' ready for plotting, containing:
+#' @return Returns a list object of class 'locus' ready for plotting,
+#'   containing:
 #' \item{seqname}{chromosome value}
 #' \item{xrange}{vector of genomic position range}
 #' \item{gene}{gene name}
