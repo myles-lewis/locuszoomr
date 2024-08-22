@@ -10,6 +10,7 @@ link_LD(
   r2d = "r2",
   token = "",
   method = c("proxy", "matrix"),
+  genome_build = "grch37",
   ...
 )
 }
@@ -28,8 +29,13 @@ LDlink API. See \code{LDlinkR} package documentation.}
 \item{method}{Either \code{"proxy"} or \code{"matrix"}. Controls whether to use
 \code{LDproxy()} or \code{LDmatrix()} to obtain LD data.}
 
-\item{...}{Optional arguments such as \code{genome_build} which are passed on to
-\code{LDlinkR::LDmatrix()} or \code{LDlinkR::LDproxy()}}
+\item{genome_build}{Choose between one of the three options: 'grch37' for
+genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
+'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
+data sets. Default is GRCh37 (hg19).}
+
+\item{...}{Optional arguments which are passed on to \code{LDlinkR::LDmatrix()} or
+\code{LDlinkR::LDproxy()}}
 }
 \value{
 Returns a list object of class 'locus'. LD information is added as a

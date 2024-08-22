@@ -50,8 +50,8 @@
 #' \item{gene}{gene name}
 #' \item{ens_db}{Ensembl or AnnotationHub database}
 #' \item{ens_version}{Ensembl database version}
-#' \item{ens_organism}{Ensembl database organism}
-#' \item{ens_genome}{Ensembl data genome build}
+#' \item{organism}{Ensembl database organism}
+#' \item{genome}{Ensembl data genome build}
 #' \item{chrom}{column name in `data` containing chromosome information}
 #' \item{pos}{column name in `data` containing position}
 #' \item{p}{column name in `data` containing p-value}
@@ -211,8 +211,8 @@ locus <- function(gene = NULL,
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
               ens_version = ensemblVersion(edb),
-              ens_organism = organism(edb),
-              ens_genome = unname(genome(edb)[1]),
+              organism = organism(edb),
+              genome = unname(genome(edb)[1]),
               chrom = chrom, pos = pos, p = p, yvar = yvar, labs = labs,
               index_snp = index_snp,
               data = data, TX = TX, EX = EX)
@@ -241,8 +241,8 @@ summary.locus <- function(object, ...) {
   }
   if (!is.null(object$ens_version)) {
     cat("Ensembl version:", object$ens_version, "\n")
-    cat("Organism:", object$ens_organism, "\n")
-    cat("Genome build:", object$ens_genome, "\n")
+    cat("Organism:", object$organism, "\n")
+    cat("Genome build:", object$genome, "\n")
   }
 }
 

@@ -77,8 +77,8 @@ containing:
 \item{gene}{gene name}
 \item{ens_db}{Ensembl or AnnotationHub database}
 \item{ens_version}{Ensembl database version}
-\item{ens_organism}{Ensembl database organism}
-\item{ens_genome}{Ensembl data genome build}
+\item{organism}{Ensembl database organism}
+\item{genome}{Ensembl data genome build}
 \item{chrom}{column name in \code{data} containing chromosome information}
 \item{pos}{column name in \code{data} containing position}
 \item{p}{column name in \code{data} containing p-value}

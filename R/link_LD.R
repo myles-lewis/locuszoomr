@@ -14,8 +14,12 @@
 #' LDlink API. See `LDlinkR` package documentation.
 #' @param method Either `"proxy"` or `"matrix"`. Controls whether to use
 #'    `LDproxy()` or `LDmatrix()` to obtain LD data.
-#' @param ... Optional arguments such as `genome_build` which are passed on to
-#'   `LDlinkR::LDmatrix()` or `LDlinkR::LDproxy()`
+#' @param genome_build Choose between one of the three options: 'grch37' for
+#'   genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
+#'   'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
+#'   data sets. Default is GRCh37 (hg19).
+#' @param ... Optional arguments which are passed on to `LDlinkR::LDmatrix()` or
+#'   `LDlinkR::LDproxy()`
 #' @return Returns a list object of class 'locus'. LD information is added as a
 #'   column `ld` in list element `data`.
 #' @seealso [locus()]
@@ -37,7 +41,8 @@ link_LD <- function(loc,
                     pop = "CEU",
                     r2d = "r2",
                     token = "",
-                    method = c("proxy", "matrix"), ...) {
+                    method = c("proxy", "matrix"),
+                    genome_build = "grch37", ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -55,14 +60,19 @@ link_LD <- function(loc,
     rslist <- unique(c(index_snp, rslist))[seq_len(1000)]
   }
   method <- match.arg(method)
+  if (!grepl(loc$genome, genome_build, ignore.case = TRUE)) {
+    warning("mismatched genome build")
+  }
   if (method == "proxy") {
-    ldp <- try(mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token, ...))
+    ldp <- try(mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token,
+                           genome_build = genome_build, ...))
     if (!inherits(ldp, "try-error")) {
       loc$data$ld <- ldp[match(loc$data[, labs], ldp[, snp_col]), "R2"]
     }
   } else {
     message("Obtaining LD on ", length(rslist), " SNPs. ", appendLF = FALSE)
-    ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token, ...)
+    ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token,
+                        genome_build = genome_build, ...)
     if (index_snp %in% colnames(ldm)) {
       ld <- ldm[, index_snp]
       loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]

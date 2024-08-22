@@ -47,6 +47,9 @@ link_recomb <- function(loc, genome = "hg38", table = NULL,
                         recomb = NULL) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!is.null(recomb)) {
+    if (!inherits(recomb, "GRanges")) {
+      warning("`recomb` is not a 'GRanges' class object")
+    }
     seqname <- loc$seqname
     if (!grepl("chr", seqname)) seqname <- paste0("chr", seqname)
     rec <- recomb[seqnames(recomb) == seqname, ]
@@ -56,6 +59,9 @@ link_recomb <- function(loc, genome = "hg38", table = NULL,
     loc$recomb <- rec
     return(loc)
   }
+  loc_genome <- switch(loc$genome, "GRCh37" = "hg19", "GRCh38" = "hg38",
+                       loc$genome)
+  if (loc_genome != genome) warning("mismatched genome build")
   loc$recomb <- get_recomb(genome, loc$xrange, loc$seqname, table)
   loc
 }
