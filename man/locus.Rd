@@ -18,7 +18,8 @@ locus(
   yvar = NULL,
   labs = NULL,
   index_snp = NULL,
-  LD = NULL
+  LD = NULL,
+  std_filter = TRUE
 )
 }
 \arguments{
@@ -68,6 +69,11 @@ specifying \code{gene}, or \code{seqname} and \code{xrange}.}
 
 \item{LD}{Optional character value to specify which column in \code{data} contains
 LD information.}
+
+\item{std_filter}{Logical, whether standard filters on chromosomes 1-22, X &
+Y, and filtering of genes to only those whose transcript ids start with
+"ENS" are applied. For users with novel genome assemblies, this probably
+needs to be set to \code{FALSE}.}
 }
 \value{
 Returns a list object of class 'locus' ready for plotting,

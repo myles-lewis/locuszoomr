@@ -43,6 +43,10 @@
 #'   specifying `gene`, or `seqname` and `xrange`.
 #' @param LD Optional character value to specify which column in `data` contains
 #'   LD information.
+#' @param std_filter Logical, whether standard filters on chromosomes 1-22, X &
+#'   Y, and filtering of genes to only those whose transcript ids start with
+#'   "ENS" are applied. For users with novel genome assemblies, this probably
+#'   needs to be set to `FALSE`.
 #' @return Returns a list object of class 'locus' ready for plotting,
 #'   containing:
 #' \item{seqname}{chromosome value}
@@ -94,7 +98,8 @@ locus <- function(gene = NULL,
                   chrom = NULL, pos = NULL, p = NULL, yvar = NULL,
                   labs = NULL,
                   index_snp = NULL,
-                  LD = NULL) {
+                  LD = NULL,
+                  std_filter = TRUE) {
   if (is.character(ens_db)) {
     if (!ens_db %in% (.packages())) {
       stop("Ensembl database not loaded. Try: library(", ens_db, ")",
@@ -106,12 +111,12 @@ locus <- function(gene = NULL,
     stop("both `flank` and `fix_window` cannot be specified at the same time")
   if (is.null(flank)) flank <- 1e5
   flank <- rep_len(flank, 2)
+  seqfilt <- if (std_filter) SeqNameFilter(c(1:22, 'X', 'Y')) else NULL
+  genefilt <- if (std_filter) GeneIdFilter("ENS", "startsWith") else NULL
   
   if (!is.null(gene)) {
     locus <- genes(edb, filter = AnnotationFilterList(
-      GeneNameFilter(gene),
-      SeqNameFilter(c(1:22, 'X', 'Y'))
-    ))
+      GeneNameFilter(gene), seqfilt))
     
     if (length(locus) == 0) stop("gene not found")
     if (length(locus) > 1) {
@@ -190,8 +195,7 @@ locus <- function(gene = NULL,
   TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
     SeqNameFilter(seqname),
     TxStartFilter(xrange[2], condition = "<"),
-    TxEndFilter(xrange[1], condition = ">"),
-    GeneIdFilter("ENS", "startsWith")))
+    TxEndFilter(xrange[1], condition = ">"), genefilt))
   TX <- data.frame(TX)
   TX <- TX[! is.na(TX$start), ]
   TX <- TX[!duplicated(TX$gene_id), ]
@@ -202,8 +206,7 @@ locus <- function(gene = NULL,
     EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
       SeqNameFilter(seqname),
       ExonStartFilter(xrange[2], condition = "<"),
-      ExonEndFilter(xrange[1], condition = ">"),
-      GeneIdFilter("ENS", "startsWith")))
+      ExonEndFilter(xrange[1], condition = ">"), genefilt))
   } else {
     EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
   }
