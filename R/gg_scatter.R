@@ -214,6 +214,7 @@ gg_scatter <- function(loc,
         }) +
         geom_point(size = size) +
         scale_shape_manual(values = c(21, 24, 25), name = NULL,
+                           breaks = c("ns", "up", "down"),
                            labels = c("ns", expression({beta > 0}),
                                       expression({beta < 0}))) +
         guides(fill = guide_legend(override.aes = list(shape = 21)))
