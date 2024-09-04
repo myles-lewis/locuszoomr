@@ -212,27 +212,26 @@ scatter_plot <- function(loc,
     axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
   }
   if (!is.null(legend_pos)) {
-    if (!is.null(eqtl_gene) | !is.null(beta)) {
-      leg <- pt.bg <- pch <- NULL
-      if (!is.null(eqtl_gene)) {
-        leg <- levels(bg)[-1]
-        pt.bg <- scheme[-1]
-        pch <- c(rep(21, length(scheme) -1))
-      }
-      if (!is.null(beta)) {
-        leg <- c(leg, expression({beta > 0}), expression({beta < 0}))
-        pch <- c(pch, 2, 6)
-        pt.bg <- c(pt.bg, NA)
-      }
-      legend(legend_pos, legend = leg, y.intersp = 0.96,
-             pch = pch, pt.bg = pt.bg, col = 'black', bty = 'n', cex = 0.8)
+    leg <- pt.bg <- pch <- title <- NULL
+    if (!is.null(eqtl_gene)) {
+      leg <- levels(bg)[-1]
+      pt.bg <- scheme[-1]
+      pch <- c(rep(21, length(scheme) -1))
     } else if (showLD & hasLD) {
-      legend(legend_pos,
-             legend = c("0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
-                        "0.0 - 0.2"),
-             title = expression({r^2}), y.intersp = 0.96,
-             pch = 21, col = 'black', pt.bg = rev(LD_scheme[-c(1, 7)]), 
-             bty = 'n', cex = 0.8)
+      leg <- c("0.8 - 1.0", "0.6 - 0.8", "0.4 - 0.6", "0.2 - 0.4",
+               "0.0 - 0.2")
+      title <- expression({r^2})
+      pch <- rep(21, 5)
+      pt.bg <- rev(LD_scheme[-c(1, 7)])
+    }
+    if (!is.null(beta)) {
+      leg <- c(leg, expression({beta > 0}), expression({beta < 0}))
+      pch <- c(pch, 2, 6)
+      pt.bg <- c(pt.bg, NA, NA)
+    }
+    if (!is.null(leg)) {
+      legend(legend_pos, legend = leg, y.intersp = 0.96, title = title,
+             pch = pch, pt.bg = pt.bg, col = 'black', bty = 'n', cex = 0.8)
     }
   }
 }
