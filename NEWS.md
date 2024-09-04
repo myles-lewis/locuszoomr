@@ -6,6 +6,7 @@ News
 
 * Fix for alignment of `eqtl_plot()` with locus plots with recombination rate.
 * Bugfix for recombination rate axis title font size.
+* Bugfix beta symbols in `gg_scatter()`.
 
 # locuszoomr 0.3.2
 ###### 18/08/2024
