@@ -201,10 +201,12 @@ gg_scatter <- function(loc,
         }) +
         geom_point(shape = 21, size = size) +
         # index SNP
-        geom_point(data = data[ind, ],
-                   aes(y = .data[[loc$yvar]], color = .data$col,
-                       fill = .data$bg),
-                   shape = 23, size = size)
+        (if (any(ind)) {
+          geom_point(data = data[ind, ],
+                     aes(y = .data[[loc$yvar]], color = .data$col,
+                         fill = .data$bg),
+                     shape = 23, size = size)
+        })
     } else {
       # beta triangles
       p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
@@ -257,9 +259,11 @@ gg_scatter <- function(loc,
         geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
                        fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
         # index SNP
-        geom_point(data = data[ind, ],
-                   aes(y = .data[[loc$yvar]], color = .data$col,
-                       fill = .data$bg), shape = 23, size = size, na.rm = TRUE)
+        (if (any(ind)) {
+          geom_point(data = data[ind, ],
+                     aes(y = .data[[loc$yvar]], color = .data$col,
+                         fill = .data$bg), shape = 23, size = size, na.rm = TRUE)
+        })
     } else {
       # beta triangles
       p <- ggplot(data, aes(x = .data[[loc$pos]])) +
