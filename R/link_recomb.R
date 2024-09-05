@@ -44,7 +44,7 @@
 #' @export
 #'
 link_recomb <- function(loc,
-                        genome = if (loc$genome=="GRCh37") "hg19" else "hg38",
+                        genome = loc$genome,
                         table = NULL,
                         recomb = NULL) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
@@ -61,6 +61,7 @@ link_recomb <- function(loc,
     loc$recomb <- rec
     return(loc)
   }
+  genome <- switch(genome, "GRCh37" = "hg19", "GRCh38" = "hg38", genome)
   loc_genome <- switch(loc$genome, "GRCh37" = "hg19", "GRCh38" = "hg38",
                        loc$genome)
   if (loc_genome != genome) warning("mismatched genome build")
