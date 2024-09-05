@@ -200,8 +200,11 @@ gg_scatter <- function(loc,
                      colour = "grey", linetype = "dashed")
         }) +
         geom_point(shape = 21, size = size) +
-        geom_point(data = data[ind, ], shape = 23, size = size,
-                   show.legend = FALSE)  # index SNP
+        # index SNP
+        geom_point(data = data[ind, ],
+                   aes(y = .data[[loc$yvar]], color = .data$col,
+                       fill = .data$bg),
+                   shape = 23, size = size)
     } else {
       # beta triangles
       p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
@@ -217,11 +220,12 @@ gg_scatter <- function(loc,
                            breaks = c("ns", "up", "down"),
                            labels = c("ns", expression({beta > 0}),
                                       expression({beta < 0}))) +
-        guides(fill = guide_legend(override.aes = list(shape = 21)))
+        guides(fill = guide_legend(override.aes = list(shape = 21),
+                                   reverse = TRUE, order = 1))
     }
     p <- p +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
-                        guide = guide_legend(reverse = showLD & hasLD),
+                        guide = guide_legend(reverse = TRUE),
                         labels = legend_labels, name = legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
@@ -242,22 +246,41 @@ gg_scatter <- function(loc,
   } else {
     # recombination plot with dual y axis
     ymult <- 100 / diff(yrange)
-    p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]])) +
-      (if (loc$yvar == "logP" & !is.null(pcutoff) &
-           ycut >= yrange[1] & ycut <= yrange[2]) {
-        geom_hline(yintercept = ycut,
-                   colour = "grey", linetype = "dashed")
-      }) +
-      geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
-                     fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
-      # index SNP
-      geom_point(data = data[ind, ],
-                 aes(y = .data[[loc$yvar]], color = .data$col,
-                     fill = .data$bg), shape = 23, size = size, na.rm = TRUE,
-                 show.legend = FALSE) +
+    if (is.null(beta)) {
+      # standard plot
+      p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]])) +
+        (if (loc$yvar == "logP" & !is.null(pcutoff) &
+             ycut >= yrange[1] & ycut <= yrange[2]) {
+          geom_hline(yintercept = ycut,
+                     colour = "grey", linetype = "dashed")
+        }) +
+        geom_point(aes(y = .data[[loc$yvar]], color = .data$col,
+                       fill = .data$bg), shape = 21, size = size, na.rm = TRUE) +
+        # index SNP
+        geom_point(data = data[ind, ],
+                   aes(y = .data[[loc$yvar]], color = .data$col,
+                       fill = .data$bg), shape = 23, size = size, na.rm = TRUE)
+    } else {
+      # beta triangles
+      p <- ggplot(data, aes(x = .data[[loc$pos]])) +
+        (if (loc$yvar == "logP" & !is.null(pcutoff) &
+             ycut >= yrange[1] & ycut <= yrange[2]) {
+          geom_hline(yintercept = ycut,
+                     colour = "grey", linetype = "dashed")
+        }) +
+        geom_point(aes(y = .data[[loc$yvar]], color = .data$col, fill = .data$bg,
+                       shape = .data$.beta), size = size, na.rm = TRUE) +
+        scale_shape_manual(values = c(21, 24, 25), name = NULL,
+                           breaks = c("ns", "up", "down"),
+                           labels = c("ns", expression({beta > 0}),
+                                      expression({beta < 0}))) +
+        guides(fill = guide_legend(override.aes = list(shape = 21),
+                                   reverse = TRUE, order = 1))
+    }
+    p <- p +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
                         guide = guide_legend(reverse = TRUE),
-                        labels = legend_labels, name =legend_title) +
+                        labels = legend_labels, name = legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
       geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
