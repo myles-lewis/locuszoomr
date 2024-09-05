@@ -211,7 +211,7 @@ cached using `memoise` to reduce API requests.
 if (require(EnsDb.Hsapiens.v75)) {
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
-loc3 <- link_recomb(loc3, genome = "hg19")
+loc3 <- link_recomb(loc3)
 locus_plot(loc3)
 }
 ```
@@ -684,7 +684,7 @@ downloading the recombination track file from UCSC - see example code in
 all_loci <- lapply(top_snps, function(i) {
   loc <- locus(data = SLE_gwas, index_snp = i, fix_window = 1e6,
         ens_db = "EnsDb.Hsapiens.v75")
-  link_recomb(loc, genome = "hg19")
+  link_recomb(loc)
 })
 
 pdf("sle_loci.pdf")
