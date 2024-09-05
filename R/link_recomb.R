@@ -43,7 +43,9 @@
 #' @importFrom memoise drop_cache
 #' @export
 #'
-link_recomb <- function(loc, genome = "hg38", table = NULL, 
+link_recomb <- function(loc,
+                        genome = if (loc$genome=="GRCh37") "hg19" else "hg38",
+                        table = NULL,
                         recomb = NULL) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!is.null(recomb)) {

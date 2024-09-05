@@ -42,7 +42,7 @@ link_LD <- function(loc,
                     r2d = "r2",
                     token = "",
                     method = c("proxy", "matrix"),
-                    genome_build = "grch37", ...) {
+                    genome_build = loc$genome, ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -60,6 +60,7 @@ link_LD <- function(loc,
     rslist <- unique(c(index_snp, rslist))[seq_len(1000)]
   }
   method <- match.arg(method)
+  genome_build <- tolower(genome_build)
   if (!grepl(loc$genome, genome_build, ignore.case = TRUE)) {
     warning("mismatched genome build")
   }

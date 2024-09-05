@@ -10,7 +10,7 @@ link_LD(
   r2d = "r2",
   token = "",
   method = c("proxy", "matrix"),
-  genome_build = "grch37",
+  genome_build = loc$genome,
   ...
 )
 }
