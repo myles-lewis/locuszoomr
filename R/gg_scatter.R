@@ -138,6 +138,7 @@ gg_scatter <- function(loc,
   
   legend.justification <- NULL
   legend_labels <- legend_title <- NULL
+  legend.position <- "none"
   if (!is.null(legend_pos)) {
     if (legend_pos == "topleft") {
       legend.justification <- c(0, 1)
@@ -155,8 +156,9 @@ gg_scatter <- function(loc,
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else if (!is.null(eqtl_gene)) {
       legend_labels <- levels(bg)
-    } else legend.position <- "none"
-  } else legend.position <- "none"
+    } else if (is.null(beta)) legend.position <- "none"
+  }
+  
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
@@ -222,8 +224,12 @@ gg_scatter <- function(loc,
                            breaks = c("ns", "up", "down"),
                            labels = c("ns", expression({beta > 0}),
                                       expression({beta < 0}))) +
-        guides(fill = guide_legend(override.aes = list(shape = 21),
-                                   reverse = TRUE, order = 1))
+        (if (showLD & hasLD) {
+          guides(fill = guide_legend(override.aes = list(shape = 21),
+                                     reverse = TRUE, order = 1))
+        } else {
+          guides(fill = "none")
+        })
     }
     p <- p +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
@@ -278,8 +284,12 @@ gg_scatter <- function(loc,
                            breaks = c("ns", "up", "down"),
                            labels = c("ns", expression({beta > 0}),
                                       expression({beta < 0}))) +
-        guides(fill = guide_legend(override.aes = list(shape = 21),
-                                   reverse = TRUE, order = 1))
+        (if (showLD & hasLD) {
+          guides(fill = guide_legend(override.aes = list(shape = 21),
+                                     reverse = TRUE, order = 1))
+        } else {
+          guides(fill = "none")
+        })
     }
     p <- p +
       scale_fill_manual(breaks = levels(data$bg), values = scheme,
