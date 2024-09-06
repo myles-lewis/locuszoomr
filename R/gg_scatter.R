@@ -35,6 +35,12 @@
 #' @param beta Optional column name for beta coefficient to display upward
 #'   triangles for positive beta and downward triangles for negative beta
 #'   (significant SNPs only).
+#' @param shape Optional column name in `loc$data` for controlling shapes.
+#'   `beta` and `shape` cannot both be set. This column is expected to be a factor.
+#' @param shape_values Vector of shape values which match levels of the column
+#'   specified by `shape`. This vector is passed to
+#'   `ggplot2::scale_shape_manual()` as the argument `values`. See [points()]
+#'   for a list of shapes and the numbers they map to.
 #' @param ... Optional arguments passed to `geom_text_repel()` to configure
 #'   label drawing.
 #' @return Returns a ggplot2 plot.
@@ -82,7 +88,9 @@ gg_scatter <- function(loc,
                        legend_pos = 'topleft',
                        labels = NULL,
                        eqtl_gene = NULL,
-                       beta = NULL, ...) {
+                       beta = NULL,
+                       shape = NULL,
+                       shape_values = c(21, 24, 25), ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   if (is.null(loc$data)) stop("No data points, only gene tracks")
   
@@ -123,9 +131,13 @@ gg_scatter <- function(loc,
   # scatter plot
   if (!"col" %in% colnames(data)) data$col <- "black"
   data$col <- as.factor(data$col)
-  # if (!"pch" %in% colnames(data)) data$pch <- 21
-  # data$pch <- as.factor(data$pch)
+  
   # shapes
+  if (!is.null(shape)) {
+    if (!is.null(beta)) stop("cannot set both `shape` and `beta`")
+    if (!shape %in% colnames(data)) stop("incorrect column name for `shape`")
+    shape_breaks <- shape_labels <- levels(data[, shape])
+  }
   if (!is.null(beta)) {
     # beta symbols
     data[, beta] <- signif(data[, beta], 3)
@@ -133,9 +145,13 @@ gg_scatter <- function(loc,
     ind <- data[, loc$p] > pcutoff
     symbol[ind] <- "ns"
     data$.beta <- factor(symbol, levels = c("ns", "1", "-1"),
-                          labels = c("ns", "up", "down"))
+                         labels = c("ns", "up", "down"))
+    shape <- ".beta"
+    shape_breaks <- c("ns", "up", "down")
+    shape_labels <- c("ns", expression({beta > 0}), expression({beta < 0}))
   }
   
+  # legend
   legend.justification <- NULL
   legend_labels <- legend_title <- NULL
   legend.position <- "none"
@@ -156,12 +172,14 @@ gg_scatter <- function(loc,
       if (is.null(index_snp)) legend_labels <- legend_labels[1:6]
     } else if (!is.null(eqtl_gene)) {
       legend_labels <- levels(bg)
-    } else if (is.null(beta)) legend.position <- "none"
+    } else if (is.null(beta) & is.null(shape)) legend.position <- "none"
   }
   
   yrange <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
+  
+  # recombination line
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   if (recomb) {
     df <- loc$recomb[, c("start", "value")]
@@ -192,7 +210,7 @@ gg_scatter <- function(loc,
   ind <- data[, loc$labs] %in% index_snp
 
   if (!recomb) {
-    if (is.null(beta)) {
+    if (is.null(shape)) {
       # standard plot
       p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
                                     color = .data$col, fill = .data$bg)) +
@@ -210,20 +228,19 @@ gg_scatter <- function(loc,
                      shape = 23, size = size)
         })
     } else {
-      # beta triangles
+      # shapes or beta triangles
       p <- ggplot(data, aes(x = .data[[loc$pos]], y = .data[[loc$yvar]],
                             color = .data$col, fill = .data$bg,
-                            shape = .data$.beta)) +
+                            shape = .data[[shape]])) +
         (if (loc$yvar == "logP" & !is.null(pcutoff) &
              ycut >= yrange[1] & ycut <= yrange[2]) {
           geom_hline(yintercept = ycut,
                      colour = "grey", linetype = "dashed")
         }) +
         geom_point(size = size) +
-        scale_shape_manual(values = c(21, 24, 25), name = NULL,
-                           breaks = c("ns", "up", "down"),
-                           labels = c("ns", expression({beta > 0}),
-                                      expression({beta < 0}))) +
+        scale_shape_manual(values = shape_values, name = NULL,
+                           breaks = shape_breaks,
+                           labels = shape_labels) +
         (if (showLD & hasLD) {
           guides(fill = guide_legend(override.aes = list(shape = 21),
                                      reverse = TRUE, order = 1))
@@ -254,7 +271,7 @@ gg_scatter <- function(loc,
   } else {
     # recombination plot with dual y axis
     ymult <- 100 / diff(yrange)
-    if (is.null(beta)) {
+    if (is.null(shape)) {
       # standard plot
       p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]])) +
         (if (loc$yvar == "logP" & !is.null(pcutoff) &
@@ -271,7 +288,7 @@ gg_scatter <- function(loc,
                          fill = .data$bg), shape = 23, size = size, na.rm = TRUE)
         })
     } else {
-      # beta triangles
+      # shapes or beta triangles
       p <- ggplot(data, aes(x = .data[[loc$pos]])) +
         (if (loc$yvar == "logP" & !is.null(pcutoff) &
              ycut >= yrange[1] & ycut <= yrange[2]) {
@@ -279,11 +296,10 @@ gg_scatter <- function(loc,
                      colour = "grey", linetype = "dashed")
         }) +
         geom_point(aes(y = .data[[loc$yvar]], color = .data$col, fill = .data$bg,
-                       shape = .data$.beta), size = size, na.rm = TRUE) +
-        scale_shape_manual(values = c(21, 24, 25), name = NULL,
-                           breaks = c("ns", "up", "down"),
-                           labels = c("ns", expression({beta > 0}),
-                                      expression({beta < 0}))) +
+                       shape = .data[[shape]]), size = size, na.rm = TRUE) +
+        scale_shape_manual(values = shape_values, name = NULL,
+                           breaks = shape_breaks,
+                           labels = shape_labels) +
         (if (showLD & hasLD) {
           guides(fill = guide_legend(override.aes = list(shape = 21),
                                      reverse = TRUE, order = 1))

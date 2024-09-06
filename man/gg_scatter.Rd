@@ -24,6 +24,8 @@ gg_scatter(
   labels = NULL,
   eqtl_gene = NULL,
   beta = NULL,
+  shape = NULL,
+  shape_values = c(21, 24, 25),
   ...
 )
 }
@@ -78,6 +80,14 @@ value "index" selects the highest point or index SNP as defined when
 \item{beta}{Optional column name for beta coefficient to display upward
 triangles for positive beta and downward triangles for negative beta
 (significant SNPs only).}
+
+\item{shape}{Optional column name in \code{loc$data} for controlling shapes.
+\code{beta} and \code{shape} cannot both be set. This column is expected to be a factor.}
+
+\item{shape_values}{Vector of shape values which match levels of the column
+specified by \code{shape}. This vector is passed to
+\code{ggplot2::scale_shape_manual()} as the argument \code{values}. See \code{\link[=points]{points()}}
+for a list of shapes and the numbers they map to.}
 
 \item{...}{Optional arguments passed to \code{geom_text_repel()} to configure
 label drawing.}
