@@ -4,3 +4,4 @@
 
 This release includes:
 * Multiple small bugfixes for plotting functions
+* Additional feature to enable different symbols on scatter plots
