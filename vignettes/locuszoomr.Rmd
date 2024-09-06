@@ -262,6 +262,8 @@ which allows you to hover over points and see their rsid or feature label.
 `label_x` and `label_y` control the position of the labels and can be specified
 as a single value or a vector of values.
 
+## Point shapes
+
 Advanced users familiar with base graphics can customise every single point
 on the scatter plot, by adding columns named `bg`, `col`, `pch` or `cex`
 directly to the dataframe stored in `$data` element of the `locus` object.
@@ -271,7 +273,7 @@ sets the outline colour, `pch` sets the symbols (see `?points` for a list of
 these) and `cex` sets the size of points (default is 1).
 
 ```{r eval=FALSE}
-# add column typed as a factor which is 1 for typed, 0 for imputed
+# add column 'typed' as a factor which is 1 for typed, 0 for imputed
 loc$data$typed <- factor(rbinom(n = nrow(loc$data), 1, 0.3))
 # convert column to shapes by adding a column called 'pch'
 loc$data$pch <- c(21, 24)[loc$data$typed]
@@ -583,6 +585,25 @@ plot that has been previously created and customised.
 ```{r, eval=FALSE}
 gg_addgenes(p, loc)
 ```
+
+## Shapes
+
+Shapes can be overlaid in the scatter plot by setting either `beta` or `shape`
+to a column name in the dataset. Setting `beta` shows up-triangles for positive
+beta values and down-triangles for negative beta values. If `shape` is set, for
+example to show imputed vs typed SNPs, the column needs to be a factor (to make
+the legend nice). `shape_values` is then set as a vector of shapes to which the
+levels of the factor are mapped on the scatter plot.
+
+```{r eval=FALSE}
+locus_ggplot(loc, beta = "beta")
+
+# add column 'typed' as a factor with levels "typed", "imputed"
+loc$data$typed <- factor(rbinom(n = nrow(loc$data), 1, 0.3), labels = c("imputed", "typed"))
+locus_ggplot(loc, shape = "typed")
+```
+
+## Layering plots
 
 Plots can be layered above gene tracks, using `cowplot::plot_grid()` or using
 the `patchwork` package.
