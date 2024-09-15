@@ -12,7 +12,6 @@ vignette: >
   %\VignetteIndexEntry{locuszoomr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{EnsDb.Hsapiens.v75}
 ---
 
 ```{r, include = FALSE}
@@ -207,13 +206,15 @@ secondary *y* axis using the `link_recomb()` function to retrieve recombination
 rate data from [UCSC genome browser](https://genome.ucsc.edu). Calls to UCSC are 
 cached using `memoise` to reduce API requests.
 
-```{r, fig.dim=c(7, 6)}
-if (require(EnsDb.Hsapiens.v75)) {
+```{r eval=FALSE}
 loc3 <- locus(SLE_gwas_sub, gene = 'STAT4', flank = 1e5, LD = "r2",
               ens_db = "EnsDb.Hsapiens.v75")
 loc3 <- link_recomb(loc3)
 locus_plot(loc3)
-}
+```
+
+```{r, out.width='80%', echo=FALSE}
+knitr::include_graphics("recomb.png")
 ```
 
 If you are performing multiple UCSC queries, it is much faster to download the
