@@ -1,6 +1,10 @@
 News
 =====
 
+# locuszoomr 0.3.5
+###### 15/09/2024
+* Fixed vignette issues causing CRAN check errors.
+
 # locuszoomr 0.3.4
 ###### 06/09/2024
 
