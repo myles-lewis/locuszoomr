@@ -57,7 +57,8 @@ library(locuszoomr)
 data(SLE_gwas_sub)
 
 library(EnsDb.Hsapiens.v75)
-loc <- locus(gene = 'UBE2L3', SLE_gwas_sub, flank = 1e5)
+loc <- locus(gene = 'UBE2L3', SLE_gwas_sub, flank = 1e5,
+             ens_db = "EnsDb.Hsapiens.v75")
 summary(loc)
 locus_plot(loc)
 
