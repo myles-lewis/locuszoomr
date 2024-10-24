@@ -67,6 +67,7 @@ locus_plot(loc)
 library(data.table)
 SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 
-loc <- locus(gene = 'UBE2L3', SLE_gwas, flank = 1e5)
+loc <- locus(gene = 'UBE2L3', SLE_gwas, flank = 1e5,
+             ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc)
 ```
