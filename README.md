@@ -71,3 +71,32 @@ loc <- locus(gene = 'UBE2L3', SLE_gwas, flank = 1e5,
              ens_db = "EnsDb.Hsapiens.v75")
 locus_plot(loc)
 ```
+
+# Example layered plot shown in the paper
+
+```
+library(locuszoomr)
+library(EnsDb.Hsapiens.v75)
+
+data(SLE_gwas_sub)
+loc <- locus(data = SLE_gwas_sub, gene = 'IRF5', flank = c(1e5, 2e5),
+             ens_db = "EnsDb.Hsapiens.v75")
+
+# add recombination rate
+loc <- link_recomb(loc, genome = "hg19")
+
+# add LD and eQTL data
+# users must obtain an API token from https://ldlink.nih.gov/?tab=apiaccess
+loc <- link_LD(loc, token = "your_API_token")
+loc <- link_eqtl(loc, token = "your_API_token")
+
+# set up layered plot with 2 plots & a gene track
+pdf("locuszoomr_demo.pdf", width = 4.5, height = 7)
+oldpar <- set_layers(2)
+scatter_plot(loc, xticks = FALSE, labels = c("index", "rs113708239"),
+             label_x = c(-4, 4))
+eqtl_plot(loc, xlab = "")
+genetracks(loc, highlight = "IRF5")
+par(oldpar)
+dev.off()
+```
