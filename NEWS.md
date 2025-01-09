@@ -1,6 +1,10 @@
 News
 =====
 
+# locuszoomr 0.3.6
+###### 09/01/2025
+* Add option to show gene names in italics (base graphics version).
+
 # locuszoomr 0.3.5
 ###### 15/09/2024
 * Fixed vignette issues causing CRAN check errors.
