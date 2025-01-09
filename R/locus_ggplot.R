@@ -29,6 +29,7 @@
 #'   panel.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param italics Logical whether gene text is in italics.
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
 #'   `locus`.
@@ -66,6 +67,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                          showExons = TRUE,
                          maxrows = 12,
                          text_pos = 'top',
+                         italics = FALSE,
                          xticks = "top",
                          xlab = NULL,
                          highlight = NULL,
@@ -86,7 +88,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                      cex.axis, cex.lab, cex.text,
                      gene_col, exon_col, exon_border,
                      showExons,
-                     maxrows, text_pos,
+                     maxrows, text_pos, italics,
                      xticks = (xticks != "top"), xlab,
                      highlight, highlight_col,
                      blanks)

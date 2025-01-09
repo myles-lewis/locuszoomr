@@ -78,6 +78,8 @@ lower plots.}
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
 
+\item{italics}{Logical whether gene text is in italics.}
+
 \item{highlight}{Vector of genes to highlight.}
 
 \item{highlight_col}{Single colour or vector of colours for highlighted

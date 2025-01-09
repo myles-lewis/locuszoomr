@@ -23,6 +23,7 @@
 #'   panel.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param italics Logical whether gene text is in italics.
 #' @param xticks Logical whether x axis ticks and numbers are plotted.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
 #'   `locus`.
@@ -69,6 +70,7 @@ gg_genetracks <- function(loc,
                           showExons = TRUE,
                           maxrows = NULL,
                           text_pos = 'top',
+                          italics = FALSE,
                           xticks = TRUE,
                           xlab = NULL,
                           highlight = NULL,
@@ -87,6 +89,7 @@ gg_genetracks <- function(loc,
                        showExons,
                        maxrows,
                        text_pos,
+                       italics,
                        highlight, highlight_col,
                        blanks)
   if (is.null(xlab) & xticks) xlab <- paste("Chromosome", loc$seqname, "(Mb)")

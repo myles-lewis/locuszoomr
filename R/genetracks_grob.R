@@ -24,6 +24,7 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying 
 #' placement of gene name labels.
+#' @param italics Logical whether gene text is in italics.
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
@@ -55,6 +56,7 @@ genetracks_grob <- function(locus,
                             showExons = TRUE,
                             maxrows = NULL,
                             text_pos = 'top',
+                            italics = FALSE,
                             highlight = NULL,
                             highlight_col = "red",
                             blanks = c("fill", "hide")) {
@@ -95,7 +97,7 @@ genetracks_grob <- function(locus,
     children = gList(
       if (border) rectGrob(gp = gpar(lwd = 1.5), vp = "genetrack"),
       exonGrob(TX, EX, showExons, exheight),
-      genetextGrob(text_pos, TX, xrange, cex.text)),
+      genetextGrob(text_pos, TX, xrange, cex.text, italics)),
     gp = gpar()
   )
   
@@ -164,16 +166,12 @@ exonGrob <- function(TX, EX, showExons, exheight) {
 }
 
 
-genetextGrob <- function(text_pos, TX, xrange, cex.text) {
+genetextGrob <- function(text_pos, TX, xrange, cex.text, italics) {
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
     tg <- lapply(tfilter, function(i) {
-      textGrob(label = if (TX$strand[i] == "+") {
-        bquote(.(TX$gene_name[i]) * symbol("\256"))
-      } else {     
-        bquote(symbol("\254") * .(TX$gene_name[i]))
-      },
+      textGrob(label = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
       x = unit(TX$mean[i], "native"),
       y = unit(-TX$row[i] + 0.45, "native"),
       gp = gpar(cex = cex.text), vp = "genetrack")
@@ -181,11 +179,7 @@ genetextGrob <- function(text_pos, TX, xrange, cex.text) {
   } else if (text_pos == "left") {
     tfilter <- which(TX$tmin > xrange[1])
     tg <- lapply(tfilter, function(i) {
-      textGrob(label = if (TX$strand[i] == "+") {
-        bquote(.(TX$gene_name[i]) * symbol("\256"))
-      } else {     
-        bquote(symbol("\254") * .(TX$gene_name[i]))
-      },
+      textGrob(label = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
       x = unit(pmax(TX$start[i],
                     xrange[1] - diff(xrange) * 0.04) - diff(xrange) * 0.01,
                "native"),

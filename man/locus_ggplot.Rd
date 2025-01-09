@@ -19,6 +19,7 @@ locus_ggplot(
   showExons = TRUE,
   maxrows = 12,
   text_pos = "top",
+  italics = FALSE,
   xticks = "top",
   xlab = NULL,
   highlight = NULL,
@@ -62,6 +63,8 @@ panel.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{italics}{Logical whether gene text is in italics.}
 
 \item{xticks}{Logical whether x axis ticks and numbers are plotted.}
 

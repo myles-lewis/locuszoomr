@@ -16,6 +16,7 @@ genetracks_grob(
   showExons = TRUE,
   maxrows = NULL,
   text_pos = "top",
+  italics = FALSE,
   highlight = NULL,
   highlight_col = "red",
   blanks = c("fill", "hide")
@@ -50,6 +51,8 @@ annotation panel.}
 
 \item{text_pos}{Character value of either 'top' or 'left' specifying
 placement of gene name labels.}
+
+\item{italics}{Logical whether gene text is in italics.}
 
 \item{highlight}{Vector of genes to highlight.}
 
