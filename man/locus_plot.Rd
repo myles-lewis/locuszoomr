@@ -23,6 +23,7 @@ locus_plot(
   exon_col = "blue4",
   exon_border = "blue4",
   text_pos = "top",
+  italics = FALSE,
   highlight = NULL,
   highlight_col = "red",
   blanks = "fill",

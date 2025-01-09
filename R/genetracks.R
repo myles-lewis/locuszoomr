@@ -26,6 +26,7 @@
 #'   `showExons` is `FALSE`). Set to `NA` for no border.
 #' @param text_pos Character value of either 'top' or 'left' specifying
 #'   placement of gene name labels.
+#' @param italics Logical whether gene text is in italics.
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
@@ -82,6 +83,7 @@ genetracks <- function(locus,
                        showExons = TRUE,
                        maxrows = NULL,
                        text_pos = 'top',
+                       italics = FALSE,
                        xticks = TRUE,
                        xlab = NULL,
                        highlight = NULL,
@@ -159,16 +161,14 @@ genetracks <- function(locus,
          col = TX$gene_col, lwd = 1, lend = 2, ljoin = 1, border = exon_border)
   }
   
+  font <- if (italics) 3 else NULL
   if (text_pos == "top") {
     tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
                        (TX$tmax < xrange[2] + diff(xrange) * 0.04))
     for (i in tfilter) {
       text(TX$mean[i], -TX[i, 'row'] + 0.45,
-           labels = if (TX$strand[i] == "+") {
-             bquote(.(TX$gene_name[i]) * symbol("\256"))
-           } else {     
-             bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = cex.text, xpd = NA)
+           labels = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
+           cex = cex.text, xpd = NA)
     }
   } else if (text_pos == "left") {
     tfilter <- if (border) {
@@ -176,16 +176,22 @@ genetracks <- function(locus,
     } else seq_len(nrow(TX))
     for (i in tfilter) {
       text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],
-           labels = if (TX$strand[i] == "+") {
-             bquote(.(TX$gene_name[i]) * symbol("\256"))
-           } else {     
-             bquote(symbol("\254") * .(TX$gene_name[i]))
-           }, cex = cex.text, pos = 2, xpd = NA)
+           labels = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
+           cex = cex.text, pos = 2, xpd = NA)
     }
   }
   
 }
 
+bquote_gene <- function(gene, strand, italics) {
+  if (strand == "+") {
+    if (!italics) {bquote(.(gene) * symbol("\256"))
+    } else bquote(italic(.(gene)) * symbol("\256"))
+  } else {
+    if (!italics) {bquote(symbol("\254") * .(gene))
+    } else bquote(symbol("\254") * italic(.(gene)))
+  }
+}
 
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
