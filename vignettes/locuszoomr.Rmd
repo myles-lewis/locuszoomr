@@ -288,7 +288,8 @@ See the help pages at `?locus_plot` and `?scatter_plot` for more details.
 # Customise gene tracks
 
 The gene tracks can be also customised with colours and gene label text
-position. See the help page at `?genetracks` and `?locus_plot` for more details.
+position. Gene names can be italicised by setting the argument `italics = TRUE`.
+See the help page at `?genetracks` and `?locus_plot` for more details.
 
 ```{r eval = FALSE}
 # Filter by gene biotype
@@ -584,6 +585,18 @@ Finally, `gg_addgenes()` can be used to add gene tracks to an existing ggplot2
 plot that has been previously created and customised.
 
 ```{r, eval=FALSE}
+gg_addgenes(p, loc)
+```
+
+If you are using ggplot2, the easiest way to edit the scatter plot and change
+legend and other details, is to use `gg_scatter()` and modify the plot using the
+ggplot2 `+` notation. For example, to increase the font size of the legend you
+could do the following:
+
+```{r, eval=FALSE}
+p <- gg_scatter(loc) +
+  theme(legend.text = element_text(size = 14),
+        legend.title = element_text(size = 14))
 gg_addgenes(p, loc)
 ```
 
