@@ -19,6 +19,7 @@
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param cex.text Font size for gene text.
+#' @param italics Logical whether gene text is in italics.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons (or genes if
@@ -53,6 +54,7 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          filter_gene_name = NULL,
                          filter_gene_biotype = NULL,
                          cex.text = 0.7,
+                         italics = FALSE,
                          gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                          exon_col = 'blue4',
                          exon_border = 'blue4',
@@ -70,8 +72,8 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
   }
   
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
-                    gene_col, exon_col, exon_border, showExons, maxrows, width, 
-                    xlab, blanks, height = pheights[2])
+                    italics, gene_col, exon_col, exon_border, showExons, 
+                    maxrows, width, xlab, blanks, height = pheights[2])
   p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,

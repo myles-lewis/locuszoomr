@@ -9,6 +9,7 @@
 #' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
 #' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param cex.text Font size for gene text.
+#' @param italics Logical whether gene text is in italics.
 #' @param gene_col Colour for gene lines.
 #' @param exon_col Fill colour for exons.
 #' @param exon_border Border line colour outlining exons (or genes if
@@ -46,6 +47,7 @@ genetrack_ly <- function(locus,
                          filter_gene_name = NULL,
                          filter_gene_biotype = NULL,
                          cex.text = 0.7,
+                         italics = FALSE,
                          gene_col = ifelse(showExons, 'blue4', 'skyblue'),
                          exon_col = 'blue4',
                          exon_border = 'blue4',
@@ -106,8 +108,9 @@ genetrack_ly <- function(locus,
              (TX$tmax < xrange[2] + diff(xrange) * 0.005) &
              TX$gene_name != ""
   pos <- TX$strand == "+"
-  TX$gene_name2[pos] <- paste0(TX$gene_name[pos], "&#8594;")
-  TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name[!pos])
+  TX$gene_name2 <- if (italics) paste0("<i>", TX$gene_name, "</i>") else TX$gene_name
+  TX$gene_name2[pos] <- paste0(TX$gene_name2[pos], "&#8594;")
+  TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name2[!pos])
   TX$gene_name2[!tfilter] <- NA
   
   if (!plot) return(list(TX = TX, EX = EX))

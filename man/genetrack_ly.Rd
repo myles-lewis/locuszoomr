@@ -9,6 +9,7 @@ genetrack_ly(
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
   cex.text = 0.7,
+  italics = FALSE,
   gene_col = ifelse(showExons, "blue4", "skyblue"),
   exon_col = "blue4",
   exon_border = "blue4",
@@ -31,6 +32,8 @@ genetrack_ly(
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
 
 \item{cex.text}{Font size for gene text.}
+
+\item{italics}{Logical whether gene text is in italics.}
 
 \item{gene_col}{Colour for gene lines.}
 
