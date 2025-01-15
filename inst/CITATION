@@ -1,0 +1,12 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "locuszoomr: an R package for visualising publication-ready regional gene locus plots",
+  author   = c(person(c("Myles", "J."), "Lewis"),
+               person("Susan", "Wang")),
+  journal  = "Bioinformatics Advances",
+  year     = "2025",
+  volume   = ,
+  number   = ,
+  pages    = ,
+  doi      =
+)
