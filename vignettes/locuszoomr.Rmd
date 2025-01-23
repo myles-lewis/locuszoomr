@@ -746,6 +746,14 @@ For Manhattan plots, log p-value QQ plot and easy labelling of volcano plots or
 other scatter plots with draggable labels, check out our sister package
 `easylabel` on CRAN at https://cran.r-project.org/package=easylabel.
 
+# Citation
+
+If you use this package please cite as:
+
+Lewis MJ, Wang S. (2025) locuszoomr: an R package for visualising
+publication-ready regional gene locus plots. *Bioinformatics Advances* 2025;
+vbaf006, [doi:10.1093/bioadv/vbaf006](https://doi.org/10.1093/bioadv/vbaf006)
+
 # References
 
 Pruim RJ, Welch RP, Sanna S, Teslovich TM, Chines PS, Gliedt TP, Boehnke M,

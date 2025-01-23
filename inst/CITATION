@@ -5,8 +5,8 @@ bibentry(
                person("Susan", "Wang")),
   journal  = "Bioinformatics Advances",
   year     = "2025",
-  volume   = ,
-  number   = ,
-  pages    = ,
-  doi      =
+  volume   = "",
+  number   = "",
+  pages    = "vbaf006",
+  doi      = "10.1093/bioadv/vbaf006"
 )
