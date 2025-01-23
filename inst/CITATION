@@ -7,6 +7,6 @@ bibentry(
   year     = "2025",
   volume   = ,
   number   = ,
-  pages    = ,
-  doi      =
+  pages    = "vbaf006",
+  doi      = "10.1093/bioadv/vbaf006"
 )
