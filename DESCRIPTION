@@ -8,7 +8,7 @@ Authors@R:
     comment = c(ORCID = "0000-0001-9365-5345")))
 BugReports: https://github.com/myles-lewis/locuszoomr/issues
 URL: https://github.com/myles-lewis/locuszoomr
-Description: Publication-ready regional gene locus plots similar to those produced by the web interface 'LocusZoom' <https://my.locuszoom.org>, but running locally in R. Genetic or genomic data with gene annotation tracks are plotted via R base graphics, 'ggplot2' or 'plotly', allowing flexibility and easy customisation including laying out multiple locus plots on the same page. It uses the 'LDlink' API <https://ldlink.nih.gov/?tab=apiaccess> to query linkage disequilibrium data from the 1000 Genomes Project and can overlay this on plots.
+Description: Publication-ready regional gene locus plots similar to those produced by the web interface 'LocusZoom' <https://my.locuszoom.org>, but running locally in R. Genetic or genomic data with gene annotation tracks are plotted via R base graphics, 'ggplot2' or 'plotly', allowing flexibility and easy customisation including laying out multiple locus plots on the same page. It uses the 'LDlink' API <https://ldlink.nih.gov/?tab=apiaccess> to query linkage disequilibrium data from the 1000 Genomes Project and can overlay this on plots <doi:10.1093/bioadv/vbaf006>.
 Language: en-gb
 License: GPL (>= 3)
 Encoding: UTF-8
