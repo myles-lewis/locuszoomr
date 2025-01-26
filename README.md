@@ -100,3 +100,11 @@ genetracks(loc, highlight = "IRF5")
 par(oldpar)
 dev.off()
 ```
+
+# Citation
+
+If you use this package please cite as:
+
+Lewis MJ, Wang S. (2025) locuszoomr: an R package for visualising
+publication-ready regional gene locus plots. *Bioinformatics Advances* 2025;
+vbaf006, [doi:10.1093/bioadv/vbaf006](https://doi.org/10.1093/bioadv/vbaf006)
