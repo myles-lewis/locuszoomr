@@ -53,8 +53,9 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
-#' @param ... Other arguments passed to [scatter_plot()] e.g. `recomb_offset`,
-#'   and [plot()] e.g. `ylab`, `main`, etc to control the scatter plot.
+#' @param ... Other arguments passed to [scatter_plot()] e.g. `index_snp`,
+#'   `pcutoff`, `scheme`, `recomb_offset`, etc, and arguments for [plot()] e.g.
+#'   `ylab`, `main`, etc to control the scatter plot.
 #' @return No return value.
 #' @seealso [locus()] [scatter_plot()] [genetracks()]
 #' @examples

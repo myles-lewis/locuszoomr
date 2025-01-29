@@ -93,8 +93,9 @@ missing gene symbols.}
 data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
 
-\item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} e.g. \code{recomb_offset},
-and \code{\link[=plot]{plot()}} e.g. \code{ylab}, \code{main}, etc to control the scatter plot.}
+\item{...}{Other arguments passed to \code{\link[=scatter_plot]{scatter_plot()}} e.g. \code{index_snp},
+\code{pcutoff}, \code{scheme}, \code{recomb_offset}, etc, and arguments for \code{\link[=plot]{plot()}} e.g.
+\code{ylab}, \code{main}, etc to control the scatter plot.}
 }
 \value{
 No return value.
