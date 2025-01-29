@@ -30,6 +30,8 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
+#' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
+#'   recombination line plot down. Recommended value 0.1.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
@@ -76,6 +78,7 @@ scatter_plot <- function(loc,
                          LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                        'orange', 'red', 'purple'),
                          recomb_col = "blue",
+                         recomb_offset = 0,
                          legend_pos = 'topleft',
                          labels = NULL,
                          label_x = 4, label_y = 4,
@@ -131,14 +134,16 @@ scatter_plot <- function(loc,
   if (!is.null(labels) & (border | recomb)) {
     ylim[2] <- ylim[2] + diff(ylim) * 0.08
   }
+  yd <- diff(ylim)
+  if (recomb && recomb_offset != 0) ylim[1] <- ylim[1] - yd * recomb_offset
   panel.first <- quote({
     if (loc$yvar == "logP" & !is.null(pcutoff)) {
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
     }
     if (recomb) {
-      ry <- loc$recomb$value * diff(ylim) / 100 + ylim[1]
+      ry <- loc$recomb$value * yd / 100 + ylim[1]
       lines(loc$recomb$start, ry, col = recomb_col)
-      at <- 0:5 * (diff(ylim) / 5) + ylim[1]
+      at <- 0:5 * (yd / 5) + ylim[1]
       axis(4, at = at, labels = 0:5 * 20,
            las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
            cex.axis = cex.axis)
