@@ -1,9 +1,16 @@
 News
 =====
 
+# locuszoomr 0.3.7
+###### 29/01/2025
+* Add `recomb_offset` argument to `scatter_plot()` to enable y offset to shift 
+scatter points up slightly away from the recombination line (works with 
+`locus_plot()` too). 
+
 # locuszoomr 0.3.6
 ###### 09/01/2025
 * Add option to show gene names in italics.
+* Added citation.
 
 # locuszoomr 0.3.5
 ###### 15/09/2024
