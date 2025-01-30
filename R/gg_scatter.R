@@ -27,6 +27,8 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to NA to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
+#' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
+#'   recombination line plot down. Recommended value 0.05.
 #' @param legend_pos Position of legend. Set to `NULL` to hide legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
 #'   value "index" selects the highest point or index SNP as defined when
@@ -85,6 +87,7 @@ gg_scatter <- function(loc,
                        LD_scheme = c('grey', 'royalblue', 'cyan2', 'green3', 
                                      'orange', 'red', 'purple'),
                        recomb_col = "blue",
+                       recomb_offset = 0,
                        legend_pos = 'topleft',
                        labels = NULL,
                        eqtl_gene = NULL,
@@ -187,6 +190,8 @@ gg_scatter <- function(loc,
     data <- dplyr::bind_rows(data, df)
     data <- data[order(data[, loc$pos]), ]
     data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
+    ymult <- 100 / diff(yrange)
+    yrange[1] <- yrange[1] - diff(yrange) * recomb_offset
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
 
@@ -270,7 +275,6 @@ gg_scatter <- function(loc,
                          axis.ticks.x=element_blank())
   } else {
     # recombination plot with dual y axis
-    ymult <- 100 / diff(yrange)
     if (is.null(shape)) {
       # standard plot
       p <- ggplot(data[!ind, ], aes(x = .data[[loc$pos]])) +
@@ -316,6 +320,7 @@ gg_scatter <- function(loc,
       geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
                 na.rm = TRUE) +
       scale_y_continuous(name = ylab,
+                         limits = yrange,
                          sec.axis = sec_axis(~(. - yrange[1]) * ymult,
                                              name = "Recombination rate (%)")) +
       xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) +

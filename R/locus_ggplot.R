@@ -40,7 +40,7 @@
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
 #' @param ... Additional arguments passed to [gg_scatter()] to control
-#'   the scatter plot.
+#'   the scatter plot, e.g. `pcutoff`, `scheme`, `recomb_offset` etc.
 #' @return Returns a ggplot2 plot containing a scatter plot with genetracks
 #'   underneath.
 #' @seealso [gg_scatter()] [gg_genetracks()]
