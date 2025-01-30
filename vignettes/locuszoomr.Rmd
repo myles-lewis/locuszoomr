@@ -217,6 +217,9 @@ locus_plot(loc3)
 knitr::include_graphics("recomb.png")
 ```
 
+The recombination line can be offset from the scatter points to make it more 
+visible by setting `recomb_offset = 0.1`.
+
 If you are performing multiple UCSC queries, it is much faster to download the
 whole recombination rate track data file (around 30 MB) from UCSC genome browser
 (documented [here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)).
