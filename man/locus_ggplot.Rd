@@ -81,7 +81,7 @@ blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
 missing gene symbols.}
 
 \item{...}{Additional arguments passed to \code{\link[=gg_scatter]{gg_scatter()}} to control
-the scatter plot.}
+the scatter plot, e.g. \code{pcutoff}, \code{scheme}, \code{recomb_offset} etc.}
 }
 \value{
 Returns a ggplot2 plot containing a scatter plot with genetracks

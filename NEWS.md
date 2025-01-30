@@ -2,10 +2,10 @@ News
 =====
 
 # locuszoomr 0.3.7
-###### 29/01/2025
-* Add `recomb_offset` argument to `scatter_plot()` to enable y offset to shift 
-scatter points up slightly away from the recombination line (works with 
-`locus_plot()` too). 
+###### 30/01/2025
+* Add `recomb_offset` argument to enable y offset to shift scatter points up 
+slightly away from the recombination line to reduce the overlap. Works with both 
+`locus_plot()` and `locus_ggplot()`.
 
 # locuszoomr 0.3.6
 ###### 09/01/2025

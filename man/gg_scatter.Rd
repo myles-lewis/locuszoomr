@@ -20,6 +20,7 @@ gg_scatter(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   recomb_col = "blue",
+  recomb_offset = 0,
   legend_pos = "topleft",
   labels = NULL,
   eqtl_gene = NULL,
@@ -68,6 +69,9 @@ SNP.}
 \item{recomb_col}{Colour for recombination rate line if recombination rate
 data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
+
+\item{recomb_offset}{Offset from 0-1 which shifts the scatter plot up and
+recombination line plot down. Recommended value 0.05.}
 
 \item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
 
