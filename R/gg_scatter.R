@@ -16,6 +16,7 @@
 #' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
+#' @param ylim y axis limits (y1, y2).
 #' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around the plot.
@@ -80,6 +81,7 @@ gg_scatter <- function(loc,
                        cex.lab = 1,
                        xlab = NULL,
                        ylab = NULL,
+                       ylim = NULL,
                        yzero = (loc$yvar == "logP"),
                        xticks = TRUE,
                        border = FALSE,
@@ -178,8 +180,8 @@ gg_scatter <- function(loc,
     } else if (is.null(beta) & is.null(shape)) legend.position <- "none"
   }
   
-  yrange <- range(data[, loc$yvar], na.rm = TRUE)
-  if (yzero) yrange[1] <- min(c(0, yrange[1]))
+  yrange <- ylim %||% range(data[, loc$yvar], na.rm = TRUE)
+  if (is.null(ylim) && yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
   
   # recombination line
@@ -260,7 +262,7 @@ gg_scatter <- function(loc,
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
       # scale_shape_manual(breaks = levels(data$pch), values = levels(data$pch)) +
-      xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) + ylim(yrange[1], NA) +
+      xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) + ylim(yrange) +
       labs(x = xlab, y = ylab) +
       theme_classic() +
       theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
