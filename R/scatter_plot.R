@@ -18,6 +18,7 @@
 #' @param cex.lab Specifies font size for axis titles.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
+#' @param ylim y axis limits (y1, y2).
 #' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
@@ -71,6 +72,7 @@ scatter_plot <- function(loc,
                          cex.lab = 1,
                          xlab = NULL,
                          ylab = NULL,
+                         ylim = NULL,
                          yzero = (loc$yvar == "logP"),
                          xticks = TRUE,
                          border = FALSE,
@@ -129,11 +131,12 @@ scatter_plot <- function(loc,
     on.exit(par(op))
   }
   
-  new.args <- list(...)
-  ylim <- new.args$ylim %||% range(data[, loc$yvar], na.rm = TRUE)
-  if (yzero) ylim[1] <- min(c(0, ylim[1]))
-  if (!is.null(labels) & (border | recomb)) {
-    ylim[2] <- ylim[2] + diff(ylim) * 0.08
+  if (is.null(ylim)) {
+    ylim <- range(data[, loc$yvar], na.rm = TRUE)
+    if (yzero & is.null(ylim)) ylim[1] <- min(c(0, ylim[1]))
+    if (!is.null(labels) & (border | recomb)) {
+      ylim[2] <- ylim[2] + diff(ylim) * 0.08
+    }
   }
   yd <- diff(ylim)
   if (recomb && recomb_offset != 0) ylim[1] <- ylim[1] - yd * recomb_offset
@@ -164,6 +167,7 @@ scatter_plot <- function(loc,
   if ("col" %in% colnames(data)) col <- data$col
   if ("cex" %in% colnames(data)) cex <- data$cex
   
+  new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                       pch = pch, bg = data$bg, cex = cex)

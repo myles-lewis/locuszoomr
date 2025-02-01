@@ -14,6 +14,7 @@ scatter_plot(
   cex.lab = 1,
   xlab = NULL,
   ylab = NULL,
+  ylim = NULL,
   yzero = (loc$yvar == "logP"),
   xticks = TRUE,
   border = FALSE,
@@ -54,6 +55,8 @@ to \code{NULL} to disable.}
 \item{xlab}{x axis title.}
 
 \item{ylab}{y axis title.}
+
+\item{ylim}{y axis limits (y1, y2).}
 
 \item{yzero}{Logical whether to force y axis limit to include y=0.}
 
