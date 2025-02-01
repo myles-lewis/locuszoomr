@@ -19,6 +19,7 @@
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param ylim y axis limits (y1, y2).
+#' @param ylim2 Secondary y axis limits for recombination line, if present.
 #' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around upper and
@@ -73,6 +74,7 @@ scatter_plot <- function(loc,
                          xlab = NULL,
                          ylab = NULL,
                          ylim = NULL,
+                         ylim2 = c(0, 100),
                          yzero = (loc$yvar == "logP"),
                          xticks = TRUE,
                          border = FALSE,
@@ -145,10 +147,13 @@ scatter_plot <- function(loc,
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
     }
     if (recomb) {
-      ry <- loc$recomb$value * yd / 100 + ylim[1]
+      yd2 <- diff(ylim2)
+      fy2 <- function(yy) (yy - ylim2[1]) / yd2 * yd + ylim[1]
+      ry <- fy2(loc$recomb$value)
       lines(loc$recomb$start, ry, col = recomb_col)
-      at <- 0:5 * (yd / 5) + ylim[1]
-      axis(4, at = at, labels = 0:5 * 20,
+      labs2 <- pretty(ylim2)
+      at <- fy2(labs2)
+      axis(4, at = at, labels = labs2,
            las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
            cex.axis = cex.axis)
       mtext("Recombination rate (%)", 4, cex = cex.lab * par("cex"), line = 1.7)

@@ -15,6 +15,7 @@ scatter_plot(
   xlab = NULL,
   ylab = NULL,
   ylim = NULL,
+  ylim2 = c(0, 100),
   yzero = (loc$yvar == "logP"),
   xticks = TRUE,
   border = FALSE,
@@ -57,6 +58,8 @@ to \code{NULL} to disable.}
 \item{ylab}{y axis title.}
 
 \item{ylim}{y axis limits (y1, y2).}
+
+\item{ylim2}{Secondary y axis limits for recombination line, if present.}
 
 \item{yzero}{Logical whether to force y axis limit to include y=0.}
 
