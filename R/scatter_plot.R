@@ -129,7 +129,8 @@ scatter_plot <- function(loc,
     on.exit(par(op))
   }
   
-  ylim <- range(data[, loc$yvar], na.rm = TRUE)
+  new.args <- list(...)
+  ylim <- new.args$ylim %||% range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) ylim[1] <- min(c(0, ylim[1]))
   if (!is.null(labels) & (border | recomb)) {
     ylim[2] <- ylim[2] + diff(ylim) * 0.08
@@ -163,7 +164,6 @@ scatter_plot <- function(loc,
   if ("col" %in% colnames(data)) col <- data$col
   if ("cex" %in% colnames(data)) cex <- data$cex
   
-  new.args <- list(...)
   if (add) {
     plot.args <- list(x = data[, loc$pos], y = data[, loc$yvar],
                       pch = pch, bg = data$bg, cex = cex)
