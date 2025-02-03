@@ -29,7 +29,7 @@
 #'   data is present. Set to NA to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
 #' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
-#'   recombination line plot down. Recommended value 0.05.
+#'   recombination line plot down. Recommended value 0.1.
 #' @param legend_pos Position of legend. Set to `NULL` to hide legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
 #'   value "index" selects the highest point or index SNP as defined when

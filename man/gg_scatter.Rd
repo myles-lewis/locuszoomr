@@ -74,7 +74,7 @@ data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_
 recombination rate data.}
 
 \item{recomb_offset}{Offset from 0-1 which shifts the scatter plot up and
-recombination line plot down. Recommended value 0.05.}
+recombination line plot down. Recommended value 0.1.}
 
 \item{legend_pos}{Position of legend. Set to \code{NULL} to hide legend.}
 
