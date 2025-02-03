@@ -193,7 +193,9 @@ gg_scatter <- function(loc,
     data <- data[order(data[, loc$pos]), ]
     data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
     ymult <- 100 / diff(yrange)
-    yrange[1] <- yrange[1] - diff(yrange) * recomb_offset
+    yd <- diff(yrange)
+    yrange0 <- yrange
+    yrange[1] <- yrange[1] - yd * recomb_offset
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
 
@@ -322,9 +324,10 @@ gg_scatter <- function(loc,
       geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
                 na.rm = TRUE) +
       scale_y_continuous(name = ylab,
-                         limits = yrange,
+                         limits = yrange, breaks = pretty(yrange0),
                          sec.axis = sec_axis(~(. - yrange[1]) * ymult,
-                                             name = "Recombination rate (%)")) +
+                                             name = "Recombination rate (%)",
+                                             breaks = 0:5 *20)) +
       xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) +
       xlab(xlab) +
       theme_classic() +
