@@ -140,8 +140,10 @@ scatter_plot <- function(loc,
       ylim[2] <- ylim[2] + diff(ylim) * 0.08
     }
   }
+  # offset y1
   yd <- diff(ylim)
   if (recomb && recomb_offset != 0) ylim[1] <- ylim[1] - yd * recomb_offset
+  
   panel.first <- quote({
     if (loc$yvar == "logP" & !is.null(pcutoff)) {
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
@@ -200,7 +202,7 @@ scatter_plot <- function(loc,
   
   # offset y1 axis ticks
   if (recomb_offset != 0) {
-    ypretty <- pretty(data[, loc$yvar])
+    ypretty <- pretty(c(min(data[, loc$yvar], na.rm = TRUE), ylim[2]))
     axis(2, at = ypretty, las = 1, mgp = c(1.7, 0.5, 0), cex.axis = cex.axis,
          tcl = -0.3)
   }
