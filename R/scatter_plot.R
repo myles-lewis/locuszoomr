@@ -194,8 +194,16 @@ scatter_plot <- function(loc,
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
                panel.first = panel.first)
+  if (recomb_offset != 0) plot.args <- c(plot.args, yaxt = 'n')
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
+  
+  # offset y1 axis ticks
+  if (recomb_offset != 0) {
+    ypretty <- pretty(data[, loc$yvar])
+    axis(2, at = ypretty, las = 1, mgp = c(1.7, 0.5, 0), cex.axis = cex.axis,
+         tcl = -0.3)
+  }
   
   # add labels
   if (!is.null(labels)) {
