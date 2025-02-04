@@ -9,8 +9,16 @@ News
 slightly away from the recombination line to reduce the overlap. Works with both 
 `locus_plot()` and `locus_ggplot()`.
 
+### Important change
+* Changed the order of `data` and `gene` arguments in `locus()` since most users 
+specify the data object first.
+
 ### Fixes
-* Fixed `ylim` issue affecting secondary y axis with recombination line.
+* Fixed `ylim` issue affecting secondary y axis with recombination line in 
+`scatter_plot()` and `locus_plot()` and added argument `ylim2` to allow full 
+control over 2nd y axis limits.
+* Added `ylim` argument to `gg_scatter()` to make it easier to set y axis limits 
+in `locus_ggplot()`.
 
 # locuszoomr 0.3.6
 ###### 09/01/2025

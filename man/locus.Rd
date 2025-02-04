@@ -5,8 +5,8 @@
 \title{Create locus object for plotting}
 \usage{
 locus(
-  gene = NULL,
   data = NULL,
+  gene = NULL,
   xrange = NULL,
   seqname = NULL,
   flank = NULL,
@@ -23,11 +23,11 @@ locus(
 )
 }
 \arguments{
-\item{gene}{Optional character value specifying which gene to view. Either
-\code{gene}, or \code{xrange} plus \code{seqname}, or \code{index_snp} must be specified.}
-
 \item{data}{Dataset (data.frame or data.table) to use for plot. If
 unspecified or \code{NULL}, gene track information alone is returned.}
+
+\item{gene}{Optional character value specifying which gene to view. Either
+\code{gene}, or \code{xrange} plus \code{seqname}, or \code{index_snp} must be specified.}
 
 \item{xrange}{Optional vector of genomic position range for the x axis.}
 
