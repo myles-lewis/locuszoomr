@@ -2,11 +2,14 @@ News
 =====
 
 # locuszoomr 0.3.7
-###### 30/01/2025
+###### 05/02/2025
 
 ### New feature
 * Added `recomb_offset` argument to enable y offset to shift scatter points up 
 slightly away from the recombination line to reduce the overlap. Works with both 
+`locus_plot()` and `locus_ggplot()`.
+* Added `ylim` and `ylim2` arguments to `scatter_plot()` and `gg_scatter()` to 
+make it easier to set y axis and secondary y axis (recombination line) limits in 
 `locus_plot()` and `locus_ggplot()`.
 
 ### Important change
@@ -14,11 +17,7 @@ slightly away from the recombination line to reduce the overlap. Works with both
 specify the data object first.
 
 ### Fixes
-* Fixed `ylim` issue affecting secondary y axis with recombination line in 
-`scatter_plot()` and `locus_plot()` and added argument `ylim2` to allow full 
-control over 2nd y axis limits.
-* Added `ylim` argument to `gg_scatter()` to make it easier to set y axis limits 
-in `locus_ggplot()`.
+* Fixed `ylim` issue affecting secondary y axis with recombination line.
 
 # locuszoomr 0.3.6
 ###### 09/01/2025
