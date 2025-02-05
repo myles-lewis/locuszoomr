@@ -17,6 +17,7 @@
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param ylim y axis limits (y1, y2).
+#' @param ylim2 Secondary y axis limits for recombination line.
 #' @param yzero Logical whether to force y axis limit to include y=0.
 #' @param xticks Logical whether x axis numbers and axis title are plotted.
 #' @param border Logical whether a bounding box is plotted around the plot.
@@ -82,6 +83,7 @@ gg_scatter <- function(loc,
                        xlab = NULL,
                        ylab = NULL,
                        ylim = NULL,
+                       ylim2 = c(0, 100),
                        yzero = (loc$yvar == "logP"),
                        xticks = TRUE,
                        border = FALSE,
@@ -194,8 +196,11 @@ gg_scatter <- function(loc,
     data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
     ymult <- 100 / diff(yrange)
     yd <- diff(yrange)
+    yd2 <- diff(ylim2)
     yrange0 <- yrange
     yrange[1] <- yrange[1] - yd * recomb_offset
+    fy2 <- function(yy) (yy - ylim2[1]) / yd2 * yd + yrange[1]
+    inv_fy2 <- function(yy) (yy - yrange[1]) / yd * yd2 + ylim2[1]
   }
   data[, loc$pos] <- data[, loc$pos] / 1e6
 
@@ -321,13 +326,13 @@ gg_scatter <- function(loc,
                         labels = legend_labels, name = legend_title) +
       scale_color_manual(breaks = levels(data$col), values = levels(data$col),
                          guide = "none") +
-      geom_line(aes(y = .data$recomb / ymult + yrange[1]), color = recomb_col,
+      geom_line(aes(y = fy2(.data$recomb)), color = recomb_col,
                 na.rm = TRUE) +
       scale_y_continuous(name = ylab,
                          limits = yrange, breaks = pretty(yrange0),
-                         sec.axis = sec_axis(~(. - yrange[1]) * ymult,
+                         sec.axis = sec_axis(inv_fy2,
                                              name = "Recombination rate (%)",
-                                             breaks = 0:5 *20)) +
+                                             breaks = pretty(ylim2))) +
       xlim(loc$xrange[1] / 1e6, loc$xrange[2] / 1e6) +
       xlab(xlab) +
       theme_classic() +
