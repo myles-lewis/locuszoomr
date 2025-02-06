@@ -199,9 +199,15 @@ gg_scatter <- function(loc,
     yd2 <- diff(ylim2)
     yrange0 <- yrange
     yrange[1] <- yrange[1] - yd * recomb_offset
+    outside <- df$recomb < ylim2[1] | df$recomb > (ylim2[2] + yd2 * recomb_offset)
+    if (any(outside))
+      nmessage(sum(outside), " recombination value(s) outside scale range (`ylim2`)")
     fy2 <- function(yy) (yy - ylim2[1]) / yd2 * yd + yrange[1]
     inv_fy2 <- function(yy) (yy - yrange[1]) / yd * yd2 + ylim2[1]
   }
+  outside <- loc$data[, loc$yvar] < yrange[1] | loc$data[, loc$yvar] > yrange[2]
+  if (any(outside))
+    nmessage(sum(outside), " value(s) outside scale range (`ylim`)")
   data[, loc$pos] <- data[, loc$pos] / 1e6
 
   # add labels
@@ -362,3 +368,13 @@ gg_scatter <- function(loc,
   p
 }
 
+
+nmessage <- function(...) {
+  argList <- list(...)
+  n_arg <- which(sapply(argList, class) %in% c("numeric", "integer"))
+  n <- argList[[n_arg]]
+  if (n == 0) return()
+  msg <- paste0(argList)
+  msg <- if (n == 1) gsub("\\(s\\)", "", msg) else gsub("\\(s\\)", "s", msg)
+  message(msg)
+}
