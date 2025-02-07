@@ -344,6 +344,8 @@ gg_scatter <- function(loc,
       theme_classic() +
       theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
             axis.title = element_text(size = 10 * cex.lab),
+            axis.title.y.left = element_text(hjust = 0.5 + recomb_offset / 3),
+            axis.title.y.right = element_text(hjust = 0.5 + recomb_offset / 2),
             legend.justification = legend.justification,
             legend.position = legend.position,
             legend.title.align = 0.5,
