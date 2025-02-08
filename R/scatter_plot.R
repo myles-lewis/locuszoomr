@@ -198,7 +198,7 @@ scatter_plot <- function(loc,
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
                panel.first = panel.first)
-  if (recomb_offset != 0) {
+  if (recomb && recomb_offset != 0) {
     plot.args$ylab <- ""
     plot.args <- c(plot.args, yaxt = 'n')
   }
@@ -206,7 +206,7 @@ scatter_plot <- function(loc,
   do.call("plot", plot.args)
   
   # offset y1 axis ticks
-  if (recomb_offset != 0) {
+  if (recomb && recomb_offset != 0) {
     ypretty <- pretty(c(min(data[, loc$yvar], na.rm = TRUE), ylim[2]))
     axis(2, at = ypretty, las = 1, mgp = plot.args$mgp, cex.axis = cex.axis,
          tcl = plot.args$tcl)
