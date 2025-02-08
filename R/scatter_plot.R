@@ -160,7 +160,7 @@ scatter_plot <- function(loc,
            cex.axis = cex.axis)
       mtext("Recombination rate (%)", 4, cex = cex.lab * par("cex"),
             line = plot.args$mgp[1],
-            adj = pmax(0.5 - recomb_offset / 2, 0))
+            adj = max(c(0.5 - recomb_offset / 2, 0)))
     }
   })
   
@@ -211,7 +211,7 @@ scatter_plot <- function(loc,
     axis(2, at = ypretty, las = 1, mgp = plot.args$mgp, cex.axis = cex.axis,
          tcl = plot.args$tcl)
     mtext(ylab, 2, cex = cex.lab * par("cex"), line = plot.args$mgp[1],
-          adj = pmin(0.5 + recomb_offset / 2.7, 1))
+          adj = min(c(0.5 + recomb_offset / 2.7, 1)))
   }
   
   # add labels
