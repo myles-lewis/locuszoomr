@@ -156,9 +156,11 @@ scatter_plot <- function(loc,
       labs2 <- pretty(ylim2)
       at <- fy2(labs2)
       axis(4, at = at, labels = labs2,
-           las = 1, tcl = -0.3, mgp = c(1.7, 0.5, 0),
+           las = 1, tcl = plot.args$tcl, mgp = plot.args$mgp,
            cex.axis = cex.axis)
-      mtext("Recombination rate (%)", 4, cex = cex.lab * par("cex"), line = 1.7)
+      mtext("Recombination rate (%)", 4, cex = cex.lab * par("cex"),
+            line = plot.args$mgp[1],
+            adj = pmax(0.5 - recomb_offset / 2, 0))
     }
   })
   
@@ -196,15 +198,20 @@ scatter_plot <- function(loc,
                tcl = -0.3, 
                mgp = c(1.7, 0.5, 0),
                panel.first = panel.first)
-  if (recomb_offset != 0) plot.args <- c(plot.args, yaxt = 'n')
+  if (recomb_offset != 0) {
+    plot.args$ylab <- ""
+    plot.args <- c(plot.args, yaxt = 'n')
+  }
   if (length(new.args)) plot.args[names(new.args)] <- new.args
   do.call("plot", plot.args)
   
   # offset y1 axis ticks
   if (recomb_offset != 0) {
     ypretty <- pretty(c(min(data[, loc$yvar], na.rm = TRUE), ylim[2]))
-    axis(2, at = ypretty, las = 1, mgp = c(1.7, 0.5, 0), cex.axis = cex.axis,
-         tcl = -0.3)
+    axis(2, at = ypretty, las = 1, mgp = plot.args$mgp, cex.axis = cex.axis,
+         tcl = plot.args$tcl)
+    mtext(ylab, 2, cex = cex.lab * par("cex"), line = plot.args$mgp[1],
+          adj = pmin(0.5 + recomb_offset / 2.7, 1))
   }
   
   # add labels
@@ -231,9 +238,9 @@ scatter_plot <- function(loc,
   
   if (xticks) {
     axis(1, at = axTicks(1), labels = axTicks(1) / 1e6, cex.axis = cex.axis,
-         mgp = c(1.7, 0.4, 0), tcl = -0.3)
+         mgp = c(1.7, 0.4, 0), tcl = plot.args$tcl)
   } else if (!border) {
-    axis(1, at = axTicks(1), labels = FALSE, tcl = -0.3)
+    axis(1, at = axTicks(1), labels = FALSE, tcl = plot.args$tcl)
   }
   if (!is.null(legend_pos)) {
     leg <- pt.bg <- pch <- title <- NULL
