@@ -61,7 +61,7 @@
 #' their respective base graphics arguments, see [graphics::points()].
 #' 
 #' @seealso [locus()] [set_layers()]
-#' @importFrom graphics par legend
+#' @importFrom graphics par legend mtext
 #' @export
 #' 
 scatter_plot <- function(loc,
