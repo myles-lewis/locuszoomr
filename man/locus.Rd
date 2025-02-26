@@ -23,8 +23,9 @@ locus(
 )
 }
 \arguments{
-\item{data}{Dataset (data.frame or data.table) to use for plot. If
-unspecified or \code{NULL}, gene track information alone is returned.}
+\item{data}{Dataset (data.frame or data.table) to use for plot. We recommend
+that tibbles are converted to a normal data.frame. If unspecified or
+\code{NULL}, gene track information alone is returned.}
 
 \item{gene}{Optional character value specifying which gene to view. Either
 \code{gene}, or \code{xrange} plus \code{seqname}, or \code{index_snp} must be specified.}

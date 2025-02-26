@@ -1,6 +1,10 @@
 News
 =====
 
+# locuszoomr 0.3.8
+###### 26/02/2025
+* Fixed handling of tibbles.
+
 # locuszoomr 0.3.7
 ###### 05/02/2025
 

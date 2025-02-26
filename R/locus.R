@@ -10,8 +10,9 @@
 #' databases using the `ensembldb` Bioconductor package framework for annotating
 #' genes and exons in the locus.
 #' 
-#' @param data Dataset (data.frame or data.table) to use for plot. If
-#'   unspecified or `NULL`, gene track information alone is returned.
+#' @param data Dataset (data.frame or data.table) to use for plot. We recommend
+#'   that tibbles are converted to a normal data.frame. If unspecified or
+#'   `NULL`, gene track information alone is returned.
 #' @param gene Optional character value specifying which gene to view. Either
 #'   `gene`, or `xrange` plus `seqname`, or `index_snp` must be specified.
 #' @param xrange Optional vector of genomic position range for the x axis.
@@ -135,6 +136,8 @@ locus <- function(data = NULL,
   }
   
   if (!is.null(data)) {
+    if (inherits(data, "tbl_df")) data <- as.data.frame(data)
+    
     # autodetect headings
     dc <- detect_cols(data, chrom, pos, p, labs, yvar)
     chrom <- dc$chrom

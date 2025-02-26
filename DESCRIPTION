@@ -1,6 +1,6 @@
 Package: locuszoomr
 Title: Gene Locus Plot with Gene Annotations
-Version: 0.3.7
+Version: 0.3.8
 Authors@R:
     c(person(given = "Myles",family = "Lewis",
     role = c("aut", "cre"),
