@@ -182,7 +182,7 @@ gg_scatter <- function(loc,
     } else if (is.null(beta) & is.null(shape)) legend.position <- "none"
   }
   
-  yrange <- ylim %||% range(data[, loc$yvar], na.rm = TRUE)
+  yrange <- if (is.null(ylim)) range(data[, loc$yvar], na.rm = TRUE) else ylim
   if (is.null(ylim) && yzero) yrange[1] <- min(c(0, yrange[1]))
   ycut <- -log10(pcutoff)
   
