@@ -4,4 +4,5 @@
 
 This release includes:
 * Fixed CRAN checks NOTE by removing %||% for back compatibility.
-* Fixed handling of tibbles. 
+* Fixed handling of tibbles.
+* Improved the vignette.
