@@ -344,16 +344,18 @@ gg_scatter <- function(loc,
       theme_classic() +
       theme(axis.text = element_text(colour = "black", size = 10 * cex.axis),
             axis.title = element_text(size = 10 * cex.lab),
-            axis.title.y.left = element_text(
-              hjust = min(c(0.5 + recomb_offset /3, 0.9))),
-            axis.title.y.right = element_text(
-              hjust = min(c(0.5 + recomb_offset /2, 1))),
             legend.justification = legend.justification,
             legend.position = legend.position,
             legend.title.align = 0.5,
             legend.text.align = 0,
             legend.key.size = unit(0.9, 'lines'),
             legend.spacing.y = unit(0, 'lines')) +
+      (if (recomb_offset != 0) {
+        theme(axis.title.y.left = element_text(
+                hjust = min(c(0.5 + recomb_offset /3, 0.9))),
+              axis.title.y.right = element_text(
+                hjust = min(c(0.5 + recomb_offset /2, 1))))
+      }) +
       if (!xticks) theme(axis.text.x=element_blank(),
                          axis.ticks.x=element_blank())
   }
