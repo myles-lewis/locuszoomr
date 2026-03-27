@@ -5,6 +5,7 @@ News
 ###### 27/03/2026
 * Added `prioritise` argument to allow users to place important genes first in 
 the gene tracks.
+* Protein-coding genes are prioritised in the gene tracks.
 
 # locuszoomr 0.3.8
 ###### 26/02/2025
