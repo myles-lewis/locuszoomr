@@ -18,6 +18,7 @@ locus_plotly(
   maxrows = 8,
   width = 600,
   xlab = NULL,
+  prioritise = NULL,
   blanks = "show",
   ...
 )
@@ -58,6 +59,8 @@ overlapping text for gene names.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
+
+\item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} completely hides genes

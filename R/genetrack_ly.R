@@ -23,6 +23,7 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
 #'   which are missing gene symbols. `"show"` shows gene lines but no label
@@ -55,6 +56,7 @@ genetrack_ly <- function(locus,
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         prioritise = NULL,
                          blanks = c("fill", "hide", "show"),
                          height = NULL,
                          plot = TRUE) {
@@ -88,7 +90,8 @@ genetrack_ly <- function(locus,
   }
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
-  TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks)
+  TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks,
+               prioritise = prioritise)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]

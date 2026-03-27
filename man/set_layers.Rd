@@ -16,13 +16,13 @@ a gene track on the bottom}
 top}
 }
 \value{
-Sets \code{\link[=layout]{layout()}} to enable multiple plots aligned in a column. The
+Sets \code{\link[graphics:layout]{graphics::layout()}} to enable multiple plots aligned in a column. The
 gene track is assumed to be positioned on the bottom. Returns \code{par()}
 invisibly so that layout can be reset to default at the end of plotting.
 }
 \description{
-Uses \code{\link[=layout]{layout()}} to set up multiple locus plots aligned in a column.
+Uses \code{\link[graphics:layout]{graphics::layout()}} to set up multiple locus plots aligned in a column.
 }
 \seealso{
-\code{\link[=layout]{layout()}}
+\code{\link[graphics:layout]{graphics::layout()}}
 }

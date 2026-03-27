@@ -19,6 +19,7 @@ genetracks_grob(
   italics = FALSE,
   highlight = NULL,
   highlight_col = "red",
+  prioritise = highlight,
   blanks = c("fill", "hide")
 )
 }
@@ -58,6 +59,8 @@ placement of gene name labels.}
 
 \item{highlight_col}{Single colour or vector of colours for highlighted
 genes.}
+
+\item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are

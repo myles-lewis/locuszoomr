@@ -30,6 +30,7 @@
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -38,8 +39,8 @@
 #' @param align Logical whether to set [par()] to align the plot.
 #' @details
 #' This function is called by [locus_plot()]. It can be used to plot the gene
-#' annotation tracks on their own. It uses base graphics, so [layout()] can be
-#' used to position adjacent plots above or below.
+#' annotation tracks on their own. It uses base graphics, so
+#' [graphics::layout()] can be used to position adjacent plots above or below.
 #' 
 #' `gene_col`, `exon_col` and `exon_border` set colours for all genes, while
 #' `highlight` and `highlight_col` can optionally be used together to highlight
@@ -88,6 +89,7 @@ genetracks <- function(locus,
                        xlab = NULL,
                        highlight = NULL,
                        highlight_col = "red",
+                       prioritise = highlight,
                        blanks = c("fill", "hide"),
                        showRecomb = TRUE,
                        align = TRUE) {
@@ -115,7 +117,7 @@ genetracks <- function(locus,
     TX <- gene_colours(TX, gene_col, exon_col, exon_border, showExons,
                        highlight, highlight_col)
     TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
-                 blanks = blanks)
+                 blanks = blanks, prioritise = prioritise)
     maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
     if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
     TX <- TX[TX$row <= maxrows, ]
@@ -196,7 +198,7 @@ bquote_gene <- function(gene, strand, italics) {
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
-                   text_pos = 'top', blanks = "fill") {
+                   text_pos = 'top', blanks = "fill", prioritise = NULL) {
   blank <- TX$gene_name == ""
   if (any(blank)) {
     if (blanks == "fill") {
@@ -205,6 +207,13 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
       TX <- TX[!blank, ]
     }
   }
+  w <- match(prioritise, TX$gene_name)
+  w <- w[!is.na(w)]
+  nprot <- TX$gene_biotype != "protein_coding"
+  o <- order(nprot)
+  o <- o[!o %in% w]
+  TX <- TX[c(w, o), ]
+  
   gw <- strwidth(paste0("--", TX$gene_name), units = "inch", 
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])

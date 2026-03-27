@@ -33,6 +33,7 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
 #'   which are missing gene symbols. `"show"` shows gene lines but no label
@@ -62,6 +63,7 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         prioritise = NULL,
                          blanks = "show",
                          ...) {
   pheights <- NULL
@@ -73,7 +75,8 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
   
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     italics, gene_col, exon_col, exon_border, showExons, 
-                    maxrows, width, xlab, blanks, height = pheights[2])
+                    maxrows, width, xlab, prioritise, blanks,
+                    height = pheights[2])
   p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,

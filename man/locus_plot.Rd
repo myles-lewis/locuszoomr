@@ -26,6 +26,7 @@ locus_plot(
   italics = FALSE,
   highlight = NULL,
   highlight_col = "red",
+  prioritise = highlight,
   blanks = "fill",
   recomb_col = "blue",
   ...
@@ -54,7 +55,7 @@ locus_plot(
 \code{TRUE} is for a standard single plot. Set to \code{FALSE} if a more complex
 layout with multiple plots is required e.g. using \code{\link[=multi_layout]{multi_layout()}}.}
 
-\item{heights}{Ratio of top to bottom plot. See \link{layout}.}
+\item{heights}{Ratio of top to bottom plot. See \link[graphics:layout]{graphics::layout}.}
 
 \item{showExons}{Logical whether to show exons or simply show whole gene as a
 rectangle}
@@ -84,6 +85,8 @@ placement of gene name labels.}
 
 \item{highlight_col}{Single colour or vector of colours for highlighted
 genes.}
+
+\item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are

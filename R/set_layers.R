@@ -1,17 +1,17 @@
 
 #' Set up a column of multiple plots
 #'
-#' Uses [layout()] to set up multiple locus plots aligned in a column.
+#' Uses [graphics::layout()] to set up multiple locus plots aligned in a column.
 #'
 #' @param n Number of plots (not including gene tracks on bottom)
 #' @param heights Vector of length `nrow + 1` specifying height for plots with
 #'   a gene track on the bottom
 #' @param rev Logical whether to reverse plotting order and plot from bottom to 
 #'   top
-#' @return Sets [layout()] to enable multiple plots aligned in a column. The
+#' @return Sets [graphics::layout()] to enable multiple plots aligned in a column. The
 #'   gene track is assumed to be positioned on the bottom. Returns `par()`
 #'   invisibly so that layout can be reset to default at the end of plotting.
-#' @seealso [layout()]
+#' @seealso [graphics::layout()]
 #' @export
 
 set_layers <- function(n = 1,

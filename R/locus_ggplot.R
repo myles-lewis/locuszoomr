@@ -36,6 +36,7 @@
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -72,6 +73,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                          xlab = NULL,
                          highlight = NULL,
                          highlight_col = "red",
+                         prioritise = highlight,
                          blanks = "fill",
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -90,7 +92,7 @@ locus_ggplot <- function(loc, heights = c(3, 2),
                      showExons,
                      maxrows, text_pos, italics,
                      xticks = (xticks != "top"), xlab,
-                     highlight, highlight_col,
+                     highlight, highlight_col, prioritise,
                      blanks)
 
   plot_grid(p, g, nrow = 2, rel_heights = heights, align = "v")

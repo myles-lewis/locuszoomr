@@ -28,6 +28,7 @@
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -59,6 +60,7 @@ genetracks_grob <- function(locus,
                             italics = FALSE,
                             highlight = NULL,
                             highlight_col = "red",
+                            prioritise = highlight,
                             blanks = c("fill", "hide")) {
   if (!inherits(locus, "locus")) stop("Object of class 'locus' required")
   blanks <- match.arg(blanks)
@@ -80,7 +82,7 @@ genetracks_grob <- function(locus,
                      highlight, highlight_col)
   
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.text, text_pos = text_pos,
-               blanks = blanks)
+               blanks = blanks, prioritise = prioritise)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]

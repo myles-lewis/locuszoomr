@@ -23,6 +23,7 @@ genetracks(
   xlab = NULL,
   highlight = NULL,
   highlight_col = "red",
+  prioritise = highlight,
   blanks = c("fill", "hide"),
   showRecomb = TRUE,
   align = TRUE
@@ -74,6 +75,8 @@ in \code{locus}.}
 \item{highlight_col}{Single colour or vector of colours for highlighted
 genes.}
 
+\item{prioritise}{Vector of genes to be placed first in the gene tracks.}
+
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} hides genes which are
 missing gene symbols.}
@@ -91,8 +94,8 @@ Plot gene annotation tracks from \code{ensembldb} data.
 }
 \details{
 This function is called by \code{\link[=locus_plot]{locus_plot()}}. It can be used to plot the gene
-annotation tracks on their own. It uses base graphics, so \code{\link[=layout]{layout()}} can be
-used to position adjacent plots above or below.
+annotation tracks on their own. It uses base graphics, so
+\code{\link[graphics:layout]{graphics::layout()}} can be used to position adjacent plots above or below.
 
 \code{gene_col}, \code{exon_col} and \code{exon_border} set colours for all genes, while
 \code{highlight} and \code{highlight_col} can optionally be used together to highlight

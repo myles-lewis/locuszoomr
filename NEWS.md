@@ -1,6 +1,11 @@
 News
 =====
 
+# locuszoomr 0.3.9
+###### 27/03/2026
+* Added `prioritise` argument to allow users to place important genes first in 
+the gene tracks.
+
 # locuszoomr 0.3.8
 ###### 26/02/2025
 * Fixed handling of tibbles.

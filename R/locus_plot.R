@@ -28,7 +28,7 @@
 #' @param use_layout Logical whether `graphics::layout` is called. Default
 #'   `TRUE` is for a standard single plot. Set to `FALSE` if a more complex
 #'   layout with multiple plots is required e.g. using [multi_layout()].
-#' @param heights Ratio of top to bottom plot. See [layout].
+#' @param heights Ratio of top to bottom plot. See [graphics::layout].
 #' @param showExons Logical whether to show exons or simply show whole gene as a
 #'   rectangle
 #' @param maxrows Specifies maximum number of rows to display in gene 
@@ -47,6 +47,7 @@
 #' @param highlight Vector of genes to highlight.
 #' @param highlight_col Single colour or vector of colours for highlighted
 #'   genes.
+#' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` hides genes which are
 #'   missing gene symbols.
@@ -94,6 +95,7 @@ locus_plot <- function(loc,
                        italics = FALSE,
                        highlight = NULL,
                        highlight_col = "red",
+                       prioritise = highlight,
                        blanks = 'fill',
                        recomb_col = "blue", ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -111,6 +113,7 @@ locus_plot <- function(loc,
              xticks = (xticks == 'bottom'),
              xlab = if (xticks == 'bottom') xlab else "",
              highlight = highlight, highlight_col = highlight_col,
+             prioritise = prioritise,
              blanks = blanks, showRecomb = !is.na(recomb_col))
   
   # upper panel plot points
