@@ -42,8 +42,7 @@
 #' grid::grid.newpage()
 #' grid::grid.draw(g)
 #' }
-#' @importFrom grid viewport rectGrob textGrob xaxisGrob gList gTree gpar
-#'   polylineGrob
+#' @importFrom grid viewport rectGrob textGrob xaxisGrob gList gTree gpar polylineGrob
 #' @export
 
 genetracks_grob <- function(locus,

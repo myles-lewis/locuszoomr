@@ -84,9 +84,7 @@
 #' }
 #' @importFrom ensembldb genes exons ensemblVersion organism
 #' @importFrom BiocGenerics start end
-#' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList 
-#' SeqNameFilter GeneIdFilter TxStartFilter TxEndFilter ExonStartFilter 
-#' ExonEndFilter
+#' @importFrom AnnotationFilter GeneNameFilter AnnotationFilterList SeqNameFilter GeneIdFilter TxStartFilter TxEndFilter ExonStartFilter ExonEndFilter
 #' @importFrom GenomeInfoDb seqlengths genome
 #' @importFrom memoise memoise
 #' @export

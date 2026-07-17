@@ -29,7 +29,7 @@ genetrack_ly(
 \item{filter_gene_name}{Vector of gene names to display.}
 
 \item{filter_gene_biotype}{Vector of gene biotypes to be filtered. Use
-\code{\link[ensembldb:EnsDb-class]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
+\code{\link[ensembldb:listGenebiotypes]{ensembldb::listGenebiotypes()}} to display possible biotypes. For example,
 \code{ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)}}
 
 \item{cex.text}{Font size for gene text.}

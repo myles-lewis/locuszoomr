@@ -30,7 +30,7 @@ eqtl_plot(
 \item{eqtl_gene}{Gene showing eQTL effect}
 
 \item{scheme}{Character string specifying palette for effect size showing
-up/downregulation eQTL using \link[grDevices:palettes]{grDevices::hcl.colors}. Alternatively a
+up/downregulation eQTL using \link[grDevices:hcl.colors]{grDevices::hcl.colors}. Alternatively a
 vector of 6 colours.}
 
 \item{col}{Outline point colour. \code{NA} for no outlines.}

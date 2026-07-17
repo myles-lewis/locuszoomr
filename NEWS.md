@@ -1,6 +1,10 @@
 News
 =====
 
+# locuszoomr 0.3.10
+###### 17/07/2026
+* Fix edge gene labels (fix for issue #43)
+
 # locuszoomr 0.3.9
 ###### 27/03/2026
 * Added `prioritise` argument to allow users to place important genes first in 

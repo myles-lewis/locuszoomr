@@ -63,10 +63,8 @@
 #'              ens_db = "EnsDb.Hsapiens.v75")
 #' gg_scatter(loc)
 #' }
-#' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme
-#'  scale_fill_manual scale_color_manual aes guide_legend element_text
-#'  element_blank element_rect unit geom_hline scale_y_continuous sec_axis
-#'  geom_line scale_shape_manual guides
+#' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme scale_fill_manual scale_color_manual aes guide_legend element_text
+#' @importFrom ggplot2 element_blank element_rect unit geom_hline scale_y_continuous sec_axis geom_line scale_shape_manual guides
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
