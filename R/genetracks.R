@@ -165,8 +165,8 @@ genetracks <- function(locus,
   
   font <- if (italics) 3 else NULL
   if (text_pos == "top") {
-    tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
-                       (TX$tmax < xrange[2] + diff(xrange) * 0.04))
+    tfilter <- which(TX$tmin >= (xrange[1] - diff(xrange) * 0.04) & 
+                       (TX$tmax <= xrange[2] + diff(xrange) * 0.04))
     for (i in tfilter) {
       text(TX$mean[i], -TX[i, 'row'] + 0.45,
            labels = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
@@ -218,6 +218,18 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
+    xd <- diff(xlim) * 0.04
+    xlim2 <- xlim + c(-xd, xd)
+    # left edge
+    fix_left <- (TX$mean - gw / 2) < xlim2[1] & (xlim2[1] + gw) < TX$end
+    if (any(fix_left)) {
+      TX$mean[fix_left] <- xlim2[1] + gw[fix_left] / 2
+    }
+    # right edge
+    fix_right <- (TX$mean + gw / 2) > xlim2[2] & (xlim2[2] - gw) > TX$start
+    if (any(fix_right)) {
+      TX$mean[fix_right] <- xlim2[2] - gw[fix_right] / 2
+    }
     TX$tmin <- TX$mean - gw / 2
     TX$tmax <- TX$mean + gw / 2
   } else if (text_pos == 'left') {
