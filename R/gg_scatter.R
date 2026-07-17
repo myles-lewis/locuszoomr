@@ -28,6 +28,7 @@
 #' @param recomb_col Colour for recombination rate line if recombination rate
 #'   data is present. Set to NA to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
+#' @param recomb_linewidth Line width for recombination rate line.
 #' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
 #'   recombination line plot down. Recommended value 0.1.
 #' @param legend_pos Position of legend. Set to `NULL` to hide legend.

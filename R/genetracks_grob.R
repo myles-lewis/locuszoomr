@@ -169,8 +169,8 @@ exonGrob <- function(TX, EX, showExons, exheight) {
 
 genetextGrob <- function(text_pos, TX, xrange, cex.text, italics) {
   if (text_pos == "top") {
-    tfilter <- which(TX$tmin > (xrange[1] - diff(xrange) * 0.04) & 
-                       (TX$tmax < xrange[2] + diff(xrange) * 0.04))
+    tfilter <- which(TX$tmin >= (xrange[1] - diff(xrange) * 0.04) & 
+                       (TX$tmax <= xrange[2] + diff(xrange) * 0.04))
     tg <- lapply(tfilter, function(i) {
       textGrob(label = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
       x = unit(TX$mean[i], "native"),
@@ -178,7 +178,7 @@ genetextGrob <- function(text_pos, TX, xrange, cex.text, italics) {
       gp = gpar(cex = cex.text), vp = "genetrack")
     })
   } else if (text_pos == "left") {
-    tfilter <- which(TX$tmin > xrange[1])
+    tfilter <- which(TX$tmin >= xrange[1])
     tg <- lapply(tfilter, function(i) {
       textGrob(label = bquote_gene(TX$gene_name[i], TX$strand[i], italics),
       x = unit(pmax(TX$start[i],

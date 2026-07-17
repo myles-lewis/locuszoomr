@@ -174,7 +174,7 @@ genetracks <- function(locus,
     }
   } else if (text_pos == "left") {
     tfilter <- if (border) {
-      which(TX$tmin > xrange[1])
+      which(TX$tmin >= xrange[1])
     } else seq_len(nrow(TX))
     for (i in tfilter) {
       text(max(c(TX$start[i], xrange[1] - diff(xrange) * 0.04)), -TX[i, 'row'],

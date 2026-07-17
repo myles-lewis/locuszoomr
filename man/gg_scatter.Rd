@@ -22,6 +22,7 @@ gg_scatter(
   showLD = TRUE,
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   recomb_col = "blue",
+  recomb_linewidth = 0.35,
   recomb_offset = 0,
   legend_pos = "topleft",
   labels = NULL,
@@ -76,6 +77,8 @@ SNP.}
 data is present. Set to NA to hide the line. See \code{\link[=link_recomb]{link_recomb()}} to add
 recombination rate data.}
 
+\item{recomb_linewidth}{Line width for recombination rate line.}
+
 \item{recomb_offset}{Offset from 0-1 which shifts the scatter plot up and
 recombination line plot down. Recommended value 0.1.}
 
@@ -116,11 +119,13 @@ points, but this is not possible with ggplot2 as the secondary y axis data
 must be plotted on top of the primary scatter point data.
 }
 \examples{
-if(require(EnsDb.Hsapiens.v75)) {
-data(SLE_gwas_sub)
-loc <- locus(SLE_gwas_sub, gene = 'IRF5', flank = c(7e4, 2e5), LD = "r2",
-             ens_db = "EnsDb.Hsapiens.v75")
-gg_scatter(loc)
+if (require(EnsDb.Hsapiens.v75)) {
+    data(SLE_gwas_sub)
+    loc <- locus(SLE_gwas_sub,
+        gene = "IRF5", flank = c(7e4, 2e5), LD = "r2",
+        ens_db = "EnsDb.Hsapiens.v75"
+    )
+    gg_scatter(loc)
 }
 }
 \seealso{
