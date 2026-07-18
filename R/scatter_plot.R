@@ -102,6 +102,7 @@ scatter_plot <- function(loc,
   hasLD <- "ld" %in% colnames(data)
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
+      data$ld[data$ld == 0] <- 1e-6
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] %in% index_snp] <- 7L
