@@ -261,7 +261,7 @@ gg_scatter <- function(loc,
                         colour = "grey", linetype = "dashed"
                     )
                 }) +
-                geom_point(shape = 21, size = size) +
+                geom_point(shape = 21, size = size, show.legend = TRUE) +
                 # index SNP
                 (if (any(ind)) {
                     geom_point(
@@ -306,6 +306,7 @@ gg_scatter <- function(loc,
             scale_fill_manual(
                 breaks = levels(data$bg), values = scheme,
                 guide = guide_legend(reverse = TRUE),
+                drop = FALSE,
                 labels = legend_labels, name = legend_title
             ) +
             scale_color_manual(
