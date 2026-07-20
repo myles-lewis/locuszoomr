@@ -113,8 +113,8 @@ gg_scatter <- function(loc,
     hasLD <- "ld" %in% colnames(data)
     if (!"bg" %in% colnames(data)) {
         if (showLD & hasLD) {
-            data$ld[data$ld == 0] <- 1e-6
             data$bg <- cut(data$ld, -1:6 / 5, labels = FALSE)
+            data$bg[data$ld == 0] <- 2L
             data$bg[is.na(data$bg)] <- 1L
             data$bg[data[, loc$labs] %in% index_snp] <- 7L
             data$bg <- factor(data$bg, levels = 1:7)
