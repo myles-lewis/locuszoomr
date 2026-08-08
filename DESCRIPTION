@@ -1,6 +1,6 @@
 Package: locuszoomr
 Title: Gene Locus Plot with Gene Annotations
-Version: 0.3.10
+Version: 0.3.11
 Authors@R:
     c(person(given = "Myles",family = "Lewis",
     role = c("aut", "cre"),
@@ -28,6 +28,7 @@ Imports:
     graphics,
     grDevices,
     grid,
+    htmlwidgets,
     IRanges,
     LDlinkR,
     memoise,
@@ -39,6 +40,7 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     AnnotationHub,
     EnsDb.Hsapiens.v75,
+    jsonlite,
     knitr,
     rmarkdown
 VignetteBuilder: knitr

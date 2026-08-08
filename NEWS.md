@@ -1,6 +1,30 @@
 News
 =====
 
+# locuszoomr 0.3.11
+
+### New features
+* Gene tracks in `locus_plotly()` and `genetrack_ly()` now re-pack their rows
+dynamically as you zoom or pan. Set `dynamic = FALSE` to restore static
+behaviour, e.g. for image export.
+* Genes hidden by the `maxrows` cap can reappear when zooming into a less
+crowded sub-region, with an on-plot annotation showing how many genes remain
+hidden.
+* Added a `scrollZoom` argument to `locus_plotly()` and `genetrack_ly()` to
+zoom with the mouse wheel. Off by default. Only the x axis is affected.
+
+### Fixes
+* Gene labels near the edge of a dynamic gene track no longer disappear when
+zooming or panning; the label anchor is pulled inside the visible window when
+the gene is wide enough to hold it.
+
+### Changes
+* The gene track panel's y axis is now pinned to a fixed range based on the
+resolved number of rows, slightly changing vertical padding in static plots
+and image exports. The row count is resolved from the `width` argument
+rather than the widget's rendered width, so a narrower render (e.g. a narrow
+RStudio Viewer pane) may re-pack to more rows on the first zoom or pan.
+
 # locuszoomr 0.3.10
 ###### 18/07/2026
 * Add edge gene labels if they fit (issue #43)

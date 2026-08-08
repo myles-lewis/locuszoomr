@@ -240,20 +240,33 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   }
   TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
   TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
-  TX$row <- 0
-  j <- 1
-  while (any(TX$row == 0)) {
-    xset <- which(TX$row == 0)
-    for (i in xset) {
-      # overlap detection
-      if (!any(TX$min[i] < TX$max[TX$row == j] &
-               TX$max[i] > TX$min[TX$row == j])) {
-        TX$row[i] <- j
-      }
-    }
-    j <- j + 1
-  }
+  TX$row <- pack_rows(TX$min, TX$max)
   TX
+}
+
+
+#' Greedy first-fit interval packing
+#'
+#' Assigns each interval to the lowest-numbered row containing no interval it
+#' overlaps. Input order is the priority order: earlier intervals get first
+#' refusal on lower rows.
+#'
+#' @param mn,mx Numeric vectors of interval starts and ends.
+#' @return Integer vector of 1-based row numbers, same length and order as `mn`.
+#' @noRd
+pack_rows <- function(mn, mx) {
+  n <- length(mn)
+  if (n == 0L) return(integer(0))
+  row <- integer(n)
+  j <- 1L
+  while (any(row == 0L)) {
+    for (i in which(row == 0L)) {
+      inrow <- row == j
+      if (!any(mn[i] < mx[inrow] & mx[i] > mn[inrow])) row[i] <- j
+    }
+    j <- j + 1L
+  }
+  row
 }
 
 

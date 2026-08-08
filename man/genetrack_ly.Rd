@@ -20,7 +20,9 @@ genetrack_ly(
   prioritise = NULL,
   blanks = c("fill", "hide", "show"),
   height = NULL,
-  plot = TRUE
+  plot = TRUE,
+  dynamic = TRUE,
+  scrollZoom = FALSE
 )
 }
 \arguments{
@@ -67,11 +69,29 @@ which are missing gene symbols. \code{"show"} shows gene lines but no label
 
 \item{plot}{Logical whether to produce plotly object or return plot
 coordinates.}
+
+\item{dynamic}{Logical whether to re-pack the gene tracks in the browser as
+the user zooms or pans. Requires JavaScript, so set to \code{FALSE} when
+exporting to a static image. Has no effect when \code{plot = FALSE}, since no
+plotly object is built in that case. Note that \code{plotly::subplot()} drops
+\code{onRender} hooks from its inputs, so composing the result of
+\code{genetrack_ly()} into your own \code{subplot()} call will silently lose the
+dynamic behaviour even when \code{dynamic = TRUE}; use \code{\link[=locus_plotly]{locus_plotly()}}
+instead, which re-attaches it after building its own subplot.}
+
+\item{scrollZoom}{Logical whether the mouse wheel zooms the plot. Defaults to
+\code{FALSE}, matching plotly's own default for cartesian plots, because an
+enabled plot captures the wheel and prevents the reader scrolling past it
+in a vignette or R Markdown document. Only the x axis is affected, since
+the y axis is fixed. Combines with \code{dynamic}: scrolling re-packs the gene
+tracks just as dragging does.}
 }
 \value{
 Either a 'plotly' plotting object showing gene tracks, or if
 \code{plot = FALSE} a list containing \code{TX}, a dataframe of coordinates for
-gene transcripts, and \code{EX}, a dataframe of coordinates for exons.
+gene transcripts, and \code{EX}, a dataframe of coordinates for exons. When
+\code{dynamic = TRUE} (the default), the returned plotly object has already
+been passed through \code{plotly::plotly_build()}.
 }
 \description{
 Plot gene annotation tracks from \code{ensembldb} data using \code{plotly}.
