@@ -28,14 +28,15 @@
 #'   significant points, 3rd = index SNP(s).
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param eqtl_gene Determines which column in 'data' contains eQTL genes 
+#' @param eqtl_gene Determines which column in `data` contains eQTL genes.
 #' @param eqtl_beta Optional column name for beta coefficient to display upward
 #'   triangles for positive beta and downward triangles for negative beta
 #'   (significant SNPs only).
+#' @param eqtl_scheme Colour scheme for eQTL genes.
 #' @param add_hover Optional vector of column names in 'data' to add to the
 #'   plotly hover text for scatter points.
 #' @param mh_points Number of points to display in manhattan plot. Default is
-#'   `1e5`
+#'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
 #' @param AnnotationDb An `AnnotationDb` gene annotation database, specified
 #'   either as a character string or as an `AnnotationDb` class object, used to
@@ -47,10 +48,10 @@
 #' @importFrom shiny fluidPage tabsetPanel tabPanel fluidRow column actionButton 
 #' @importFrom shiny icon uiOutput checkboxInput textOutput splitLayout req
 #' @importFrom shiny textInput conditionalPanel h5 runApp debounce isolate
-#' @importFrom shiny renderUI reactiveValues reactive observe observeEvent
+#' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
-#' @importFrom shinyWidgets pickerInput pickerOptions 
+#' @importFrom shinyWidgets pickerInput pickerOptions dropdown
 #' @importFrom shinycssloaders withSpinner
 #' @importFrom htmltools tags br
 #' @importFrom DT datatable formatSignif
@@ -64,6 +65,8 @@ zoom <- function(data, ens_db,
                  pcutoff = 5e-8,
                  eqtl_gene = NULL,
                  eqtl_beta = NULL,
+                 eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00",
+                                 "#0000FF", "#80DD00", "#8000FF", "#009900", "#FF00FF"),
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
@@ -104,10 +107,7 @@ zoom <- function(data, ens_db,
     dat2 <- data[data[, p] < pcutoff, ]
     dat2 <- dat2[order(dat2[, chrom], dat2[, pos]), ]
     eqtl_set <- unique(dat2[, eqtl_gene])
-    # colours <- c("#FF0000", "#FF8000", "#FFFF00", "#00DD00", "#00FFFF",
-    #              "#0080FF", "#0000FF", "#8000FF", "#FF00FF")
-    colours <- c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00","#0000FF",
-                 "#80DD00", "#8000FF", "#009900", "#FF00FF")
+    colours <- eqtl_scheme
     eqtl_colour <- rep_len(colours, length(eqtl_set))
     names(eqtl_colour) <- eqtl_set
     message(length(eqtl_set), " eQTL genes")
@@ -158,11 +158,6 @@ zoom <- function(data, ens_db,
                fluidRow(
                  column(3,
                         checkboxInput("show_chrom", "show chromosome")
-                 ),
-                 column(4,
-                        if (!is.null(recomb)) {
-                          checkboxInput("recomb", "show recombination rate")
-                        } else NULL
                  )
                ),
                fluidRow(
@@ -184,23 +179,28 @@ zoom <- function(data, ens_db,
                           actionButton("text_go", NULL, icon = icon("magnifying-glass"),
                                        class = "btn-success"),
                           cellWidths = c("75%", "25%")
-                        ))
-                 ),
-                 fluidRow(
-                 column(12,
-                        withSpinner(
-                          plotlyOutput("locus", width = "95vw", height = 600),
-                          type=8, size=0.7),
-                        conditionalPanel("output.coords_ok",
+                        )),
+                 column(1,
+                        dropdown(
+                          (if (!is.null(recomb)) {
+                            checkboxInput("recomb", "show recombination rate", value = TRUE)
+                          } else NULL),
                           pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
                                       options = pickerOptions(actionsBox = TRUE,
-                                                              selectedTextFormat = 'count > 1'))
-                        )
-                        # verbatimTextOutput("print")
+                                                              selectedTextFormat = 'count > 1')),
+                          uiOutput("ui_genes"),
+                          right = TRUE, icon = icon("gear")
+                        ))
+                 ),
+                 fluidRow(
+                   column(12,
+                          plotlyOutput("locus", width = "95vw", height = 600),
+                          br(), br()
+                          # verbatimTextOutput("print")
+                   )
                  )
-               )
       ),
       tabPanel("Table",
                fluidRow(
@@ -342,6 +342,7 @@ zoom <- function(data, ens_db,
     
     loc <- reactiveValues(i = NULL)
     ntrace <- reactiveVal()
+    genes <- reactiveValues(x = NULL)
     
     output$locus <- renderPlotly({
       req(coords$chr %in% chr_set, coords$xrange)
@@ -349,6 +350,7 @@ zoom <- function(data, ens_db,
                      seqname = coords$chr, ens_db = ens_db,
                      chrom = chrom, pos = pos, p = p, labs = labs)
       validate(need(loc1$data, "Locus contains no SNPs/datapoints"))
+      validate(need(nrow(loc1$data) < 1.5e5, "Too many datapoints. Zoom in."))
       if (!is.null(recomb) && input$recomb) {
         loc1 <- link_recomb(loc1, recomb = recomb)
       }
@@ -358,18 +360,21 @@ zoom <- function(data, ens_db,
       # req(nrow(loc1$data) > 0)
       if (is.null(eqtl_gene) & is.null(eqtl_beta)) {
         nt <- (sum(loc1$data[, p] < pcutoff) > 1) + 2L
-      } else if (!is.null(eqtl_gene) & is.null(eqtl_beta)) {
-        # eqtl genes only
-        eqtls <- loc1$data[loc1$data[, p] < pcutoff, eqtl_gene]
-        ngene <- length(unique(eqtls))
-        nt <- ngene + 1L
-      } else if (!is.null(eqtl_gene) & !is.null(eqtl_beta)) {
-        # eqtl + beta
+      } else {
+        # eqtl
         ind <- loc1$data[, p] < pcutoff
         eqtls <- loc1$data[ind, eqtl_gene]
-        sgn <- sign(loc1$data[ind, eqtl_beta])
-        eb <- paste0(eqtls, sgn)
-        nt <- length(unique(eb)) + 1L
+        genes$x <- unique(eqtls)
+        if (!is.null(eqtl_gene) & is.null(eqtl_beta)) {
+          # eqtl genes only
+          ngene <- length(unique(eqtls))
+          nt <- ngene + 1L
+        } else if (!is.null(eqtl_gene) & !is.null(eqtl_beta)) {
+          # eqtl + beta
+          sgn <- sign(loc1$data[ind, eqtl_beta])
+          eb <- paste0(eqtls, sgn)
+          nt <- length(unique(eb)) + 1L
+        }
       }
       nt <- nt + (!is.null(recomb) && input$recomb)
       ntrace(nt)
@@ -377,6 +382,13 @@ zoom <- function(data, ens_db,
       if (!is.null(eqtl_gene)) {
         genes1 <- unique(eqtls)
         locscheme <- unname(c('grey', eqtl_colour[genes1]))
+        if (!is.null(input$select_gene) && input$select_gene != "all") {
+          # filter gene
+          req(input$select_gene %in% unique(eqtls))  # stops double plot
+          ok <- !ind | loc1$data[, eqtl_gene] == input$select_gene
+          loc1$data <- loc1$data[ok, ]
+          locscheme <- unname(c('grey', eqtl_colour[input$select_gene]))
+        }
       } else locscheme <- c('grey', 'dodgerblue', 'red')
       
       isolate(width <- loc_width())
@@ -385,6 +397,19 @@ zoom <- function(data, ens_db,
                    width = width, eqtl_gene = eqtl_gene, beta = eqtl_beta,
                    add_hover = add_hover, scheme = locscheme)
     })
+    
+    output$ui_genes <- renderUI({
+      # req(length(genes$x) > 1)
+      g <- c("all", genes$x)
+      isolate(ig <- input$select_gene)
+      if (length(ig) == 0 || !ig %in% genes$x) ig <- "all"
+      conditionalPanel("output.coords_ok",
+                       radioButtons("select_gene", h5("eQTL genes"), 
+                                    choices = g, selected = ig)
+      )
+    })
+    
+    outputOptions(output, "ui_genes", suspendWhenHidden = FALSE)
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
@@ -629,23 +654,6 @@ manhattan <- function(data,
 }
 
 
-# plot.manhattan <- function(x, y, ...,
-#                            scheme = c('royalblue', 'skyblue', 'red')) {
-#   dx <- x$data$genome_pos
-#   dy <- x$data$logP
-#   plot(dx, dy,
-#        col = scheme[x$data$col],
-#        mgp = c(1.8, 0.5, 0), tcl = -0.3,
-#        cex = 0.6, cex.axis = 0.8,
-#        pch = 16, las = 1, bty = "l", xaxt = "n", xaxs = "i", yaxs = "i",
-#        xlim = range(dx) + diff(range(dx)) * c(-0.01, 0.01),
-#        ylim = range(dy) + diff(range(dy)) * c(-0.02, 0.02),
-#        ylab = expression("-log"[10] ~ "P"),
-#        xlab = "Chromosome position")
-#   axis(1, x$xticks$at, x$xticks$labels,
-#        mgp = c(1.6, 0.5, 0), tcl = -0.3, cex.axis = 0.8)
-# }
-
 plotly_manhattan <- function(obj,
                              labs,
                              scheme = c('royalblue', 'skyblue', 'red'),
@@ -707,7 +715,7 @@ unique_snps <- function(data, labs, append) {
   dups <- which(duplicated(snps))
   if (length(dups) > 0) {
     message("Duplicated SNPs found")
-    snps[dups] <- paste(snps[dups], data[dups, append], sep = ".")
+    snps[dups] <- make.unique(paste(snps[dups], data[dups, append], sep = "."))
   }
   snps
 }

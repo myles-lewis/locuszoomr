@@ -15,6 +15,8 @@ zoom(
   pcutoff = 5e-08,
   eqtl_gene = NULL,
   eqtl_beta = NULL,
+  eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00", "#0000FF",
+    "#80DD00", "#8000FF", "#009900", "#FF00FF"),
   add_hover = NULL,
   mh_points = 1e+05,
   recomb = NULL,
@@ -50,17 +52,19 @@ significant points, 3rd = index SNP(s).}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{eqtl_gene}{Determines which column in 'data' contains eQTL genes}
+\item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.}
 
 \item{eqtl_beta}{Optional column name for beta coefficient to display upward
 triangles for positive beta and downward triangles for negative beta
 (significant SNPs only).}
 
+\item{eqtl_scheme}{Colour scheme for eQTL genes.}
+
 \item{add_hover}{Optional vector of column names in 'data' to add to the
 plotly hover text for scatter points.}
 
 \item{mh_points}{Number of points to display in manhattan plot. Default is
-\code{1e5}}
+\code{1e5}.}
 
 \item{recomb}{Optional \code{GRanges} class object of recombination data.}
 
