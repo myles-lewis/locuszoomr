@@ -19,6 +19,7 @@ Imports:
     BiocGenerics,
     cowplot,
     dplyr,
+    DT,
     ensembldb,
     GenomeInfoDb,
     GenomicRanges,
@@ -28,18 +29,26 @@ Imports:
     graphics,
     grDevices,
     grid,
+    gtools,
+    htmltools,
     IRanges,
     LDlinkR,
     memoise,
     plotly,
     rlang,
     rtracklayer,
+    shiny,
+    shinycssloaders,
+    shinyFeedback,
+    shinyWidgets,
     zoo
 Roxygen: list(markdown = TRUE)
 Suggests:
+    AnnotationDbi,
     AnnotationHub,
     EnsDb.Hsapiens.v75,
     knitr,
+    org.Hs.eg.db,
     rmarkdown
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
