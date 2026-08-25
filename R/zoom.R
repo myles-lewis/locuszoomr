@@ -128,7 +128,6 @@ zoom <- function(data, ens_db,
     # 3 plotly scattergl figures gives error "too many active WebGL contexts"
     # see https://plotly.com/python/webgl-vs-svg/
     tags$script(src = "https://unpkg.com/virtual-webgl@1.0.6/src/virtual-webgl.js"),
-    # includeScript(path = "/users/myles/dropbox/R scripts/locuszoomr/www/virtual-webgl.js"),
     useShinyFeedback(),
     tabsetPanel(
       tabPanel("Plot",
@@ -194,7 +193,6 @@ zoom <- function(data, ens_db,
                    column(12,
                           plotlyOutput("locus", width = "95vw", height = 600),
                           br(), br()
-                          # verbatimTextOutput("print")
                    )
                  )
       ),
@@ -574,17 +572,6 @@ zoom <- function(data, ens_db,
                                  xref = "x", yref = "paper", layer = "below")
                           )))
     })
-    
-    # output$print <- renderPrint({
-    #   loc_width()
-    # })
-    
-    # output$print <- renderPrint({
-    #   req(coords$chr %in% chr_set, coords$xrange)
-    #   s <- event_data("plotly_relayout", source = "plotly_locus")
-    #   if (is.null(s)) return("Relayout events")
-    #   str(s)
-    # })
     
   }
   
