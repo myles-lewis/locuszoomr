@@ -533,8 +533,10 @@ zoom <- function(data, ens_db,
     # redo gene tracks only
     observeEvent(c(loc_width(), input_biotype()), {
       req(loc$i)
+      maxrows <- if (input$alltracks) NULL else 8
       gt <- genetrack_ly(loc$i, filter_gene_biotype = input_biotype(),
-                         width = loc_width(), blanks = "show", plot = FALSE)
+                         width = loc_width(), blanks = "show", plot = FALSE,
+                         maxrows = maxrows)
       req(nrow(gt$TX) != 0)
       TX <- gt$TX
       EX <- gt$EX
