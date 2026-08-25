@@ -4,18 +4,10 @@ author: "Myles Lewis"
 output:
   html_document:
 vignette: >
-  %\VignetteIndexEntry{locuszoomr}
+  %\VignetteIndexEntry{Zoom browser}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE
-)
-library(locuszoomr)
-ensdb_eval <- requireNamespace("EnsDb.Hsapiens.v75", quietly = TRUE)
-```
 
 Here we demonstrate how to use the zoom browser to interactively browse whole
 genome GWAS or eQTL data.
@@ -24,7 +16,7 @@ genome GWAS or eQTL data.
 
 Example whole genome summary statistics from an SLE GWAS study can be downloaded
 from EBI [here](https://www.ebi.ac.uk/gwas/studies/GCST003156) and loaded as follows.
-The other vignette shows how this data is formatted.
+The main locuszoomr vignette shows how this data is formatted.
 
 ```{r eval=FALSE}
 # FTP download full summary statistics (308 MB) from SLE GWAS from
@@ -35,15 +27,18 @@ SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
 
 The zoom browser is started using `zoom()`. Like the `locus()` function,
 `zoom()` tries to autodetect the columns for SNP id, chromosome, position and
-p-value. If you have more complex column names, then the arguments `chrom`,
-`pos`, `p` and `labs` can be used to specify the appropriate columns in your
-dataset.
+p-value. If you have complex or ambiguous column names, then the arguments
+`chrom`, `pos`, `p` and `labs` can be used to specify the appropriate columns in
+your dataset.
 
 An appropriate hg19 or hg38 (or other species) ensembl database of
 genome information must be specified. In the example below, the GWAS data is
 hg19.
 
 ```{r eval=FALSE}
+library(locuszoomr)
+library(EnsDb.Hsapiens.v75)
+
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
 ```
 
@@ -79,10 +74,17 @@ zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19)
 
 Click on points in the whole genome or individual chromosome manhattan plots to
 explore a particular locus. Alternatively, enter a gene name or SNP id or
-chromosome position and location into the input text box. The locus plot can be
-navigated by zooming in/out, or moving left/right using the navigation icons.
-Dragging the locus plot will move the locus window. Also, the plotly selection
-tool (magnifying glass icon) can be used to select a specific region.
+chromosome position and location into the 
+`r shiny::icon("magnifying-glass", style = "background-color: #00CD00")` input 
+text box. The locus plot can be navigated by zooming in/out, or moving
+left/right using the navigation icons. Dragging the locus plot will move the
+locus window. Also, the plotly `r shiny::icon("magnifying-glass")` selection
+tool can be used to select a specific region.
+
+The `r shiny::icon("gear")` icon allows users to toggle options such as showing
+the recombination rate (only if recomb data has been provided via `recomb`
+argument), expanding the gene tracks to show all genes, or selecting individual
+genes in eQTL data (if the `eqtl_gene` argument has been set).
 
 ### Citation
 
