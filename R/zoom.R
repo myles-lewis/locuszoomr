@@ -103,15 +103,8 @@ zoom <- function(data, ens_db,
   fullnames <- fullGeneNames(edb, AnnotationDb)
    
   if (!is.null(eqtl_gene)) {
-    message("Setting eQTL colours")
-    dat2 <- data[data[, p] < pcutoff, ]
-    dat2 <- dat2[order(dat2[, chrom], dat2[, pos]), ]
-    eqtl_set <- unique(dat2[, eqtl_gene])
-    colours <- eqtl_scheme
-    eqtl_colour <- rep_len(colours, length(eqtl_set))
-    names(eqtl_colour) <- eqtl_set
-    message(length(eqtl_set), " eQTL genes")
-    rm(dat2, eqtl_set)
+    eqtl_colour <- eqtl_colours(data[data[, p] < pcutoff, ], chrom, pos,
+                                eqtl_gene, eqtl_scheme)
   }
   
   # apply min_p_snp to data for manhat?
@@ -122,8 +115,8 @@ zoom <- function(data, ens_db,
   yrange <- range(manhat$data$logP, na.rm = TRUE)
   ymax <- yrange[2] + diff(yrange) * 0.05
   
-  js <- '$(document).on("keydown", function(e) {
-          if(e.keyCode == 13) {
+  js <- '$(document).on("keyup", function(e) {
+          if(e.key === "Enter") {
             Shiny.onInputChange("enter", Math.random());
           }
         });'
@@ -190,7 +183,9 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          uiOutput("ui_genes"),
+                          (if (!is.null(eqtl_gene)) {
+                            uiOutput("ui_genes")
+                          } else NULL),
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
@@ -756,3 +751,11 @@ expandGenes <- function(TX, fullnames) {
   out
 }
 
+
+eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
+  message("Setting eQTL colours")
+  sigdat <- sigdat[order(sigdat[, chrom], sigdat[, pos]), ]
+  eqtl_set <- unique(sigdat[, eqtl_gene])
+  message(length(eqtl_set), " eQTL genes")
+  setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
+}
