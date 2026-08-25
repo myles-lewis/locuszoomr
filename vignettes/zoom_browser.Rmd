@@ -1,0 +1,84 @@
+---
+title: "Zoom browser"
+author: "Myles Lewis"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    toc_depth: 2
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{locuszoomr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE
+)
+library(locuszoomr)
+ensdb_eval <- requireNamespace("EnsDb.Hsapiens.v75", quietly = TRUE)
+```
+
+Here we demonstrate how to use the zoom browser to interactively browse whole
+genome GWAS or eQTL data.
+
+# Example GWAS data
+
+Example whole genome summary statistics from an SLE GWAS study can be downloaded
+from [EBI](https://www.ebi.ac.uk/gwas/studies/GCST003156) and loaded as follows.
+
+```{r eval=FALSE}
+# FTP download full summary statistics (308 MB) from SLE GWAS from
+# https://www.ebi.ac.uk/gwas/studies/GCST003156
+library(data.table)
+SLE_gwas <- fread('../bentham_2015_26502338_sle_efo0002690_1_gwas.sumstats.tsv')
+```
+
+The zoom browser is started using `zoom()`. Like the `locus()` function,
+`zoom()` tries to autodetect the columns for SNP id, chromosome, position and
+p-value. If you have more complex column names, then the arguments `chrom`,
+`pos`, `p` and `labs` can be used to specify the appropriate columns in your
+dataset.
+
+An appropriate hg19 or hg38 (or other species) ensembl database of
+genome information must be specified. In the example below, the GWAS data is
+hg19.
+
+```{r eval=FALSE}
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
+```
+
+# Add recombination rate
+
+Recombination rate can be shown on a secondary *y* axis. Whole recombination
+rate track data file (around 30 MB) should be downloaded from UCSC genome
+browser (documented
+[here](https://genome.ucsc.edu/cgi-bin/hgTrackUi?g=recombRate2)).
+
+The download site can be accessed at
+https://hgdownload.soe.ucsc.edu/gbdb/hg38/recombRate/. For hg38, download
+`recomb1000GAvg.bw`.
+
+For hg19, the link is https://hgdownload.soe.ucsc.edu/gbdb/hg19/decode/ and the
+default track we use is `hapMapRelease24CombinedRecombMap.bw`.
+
+The .bw track file can then be loaded into R as a `GRanges` object using
+`import.bw()`, and then used directly by `zoom()`.
+
+```{r eval=FALSE}
+library(rtracklayer)
+recomb.hg19 <- import.bw("/../hapMapRelease24CombinedRecombMap.bw")
+
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19)
+```
+
+# Citation
+
+If you use this package please cite as:
+
+Lewis MJ, Wang S. (2025) locuszoomr: an R package for visualising
+publication-ready regional gene locus plots. *Bioinformatics Advances* 2025;
+vbaf006, [doi:10.1093/bioadv/vbaf006](https://doi.org/10.1093/bioadv/vbaf006)

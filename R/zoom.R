@@ -728,7 +728,7 @@ unique_snps <- function(data, labs, append) {
 #' @importFrom ensembldb listColumns
 fullGeneNames <- function(edb, AnnotationDb) {
   # check ens_db cols for 'description' first
-  if (!"description" %in% listColumns(edb) | is.null(AnnotationDb)) return(NULL)
+  if ("description" %in% listColumns(edb) | is.null(AnnotationDb)) return(NULL)
   
   if (!requireNamespace(AnnotationDb)) {
     stop("Gene annotation database '", AnnotationDb, "' is not installed")
