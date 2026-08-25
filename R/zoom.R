@@ -178,6 +178,7 @@ zoom <- function(data, ens_db,
                           (if (!is.null(recomb)) {
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
+                          checkboxInput("alltracks", "show all gene tracks"),
                           pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
@@ -388,9 +389,20 @@ zoom <- function(data, ens_db,
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
-      locus_plotly(loc1, filter_gene_biotype = biotype, pcutoff = pcutoff,
+      h <- c(0.6, 0.4)
+      maxrows <- 8
+      if (input$alltracks) {
+        cex.width <- 0.7 * par("pin")[1] * 80 / (width - 250)
+        tryTX <- mapRow(loc1$TX, xlim = loc1$xrange, cex.text = cex.width,
+                        blanks = "show")
+        needrow <- pmax(max(tryTX$row, na.rm = TRUE), 8)
+        h <- c(360, 20 * needrow + 80)
+        maxrows <- NULL
+      }
+      hideFeedback("tex")
+      locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
                    width = width, eqtl_gene = eqtl_gene, beta = eqtl_beta,
-                   add_hover = add_hover, scheme = locscheme)
+                   add_hover = add_hover, scheme = locscheme, maxrows = maxrows)
     })
     
     output$ui_genes <- renderUI({
