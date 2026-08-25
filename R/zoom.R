@@ -56,7 +56,7 @@
 #' @importFrom htmltools tags br
 #' @importFrom DT datatable formatSignif
 #' @importFrom gtools mixedsort
-#' @importFrom stats as.formula
+#' @importFrom stats as.formula setNames
 #' @export
 
 zoom <- function(data, ens_db,
