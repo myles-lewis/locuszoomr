@@ -1,6 +1,14 @@
 News
 =====
 
+# locuszoomr 1.0.0
+###### 25/08/2026
+
+## Major update
+* Added `zoom()` interactive GWAS and eQTL browser. Shiny/plotly interface 
+allows users to browse whole GWAS or eQTL data, search for individual genes, 
+zoom in/out of regions, and navigate peaks via a whole genome manhattan plot.
+
 # locuszoomr 0.3.10
 ###### 18/07/2026
 * Add edge gene labels if they fit (issue #43)
