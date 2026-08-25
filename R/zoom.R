@@ -147,7 +147,20 @@ zoom <- function(data, ens_db,
                  )),
                fluidRow(
                  column(12,
-                        uiOutput("ui_chrom")
+                        conditionalPanel('input.show_chrom & output.coords_ok',
+                                         fluidRow(
+                                           column(11,
+                                                  withSpinner(
+                                                    plotlyOutput("chrom", width = "85vw", height = "220px"),
+                                                    type = 8, size = 0.7)
+                                           ),
+                                           column(1,
+                                                  br(),
+                                                  actionButton("chr_zoomin", NULL, icon = icon("magnifying-glass-plus")),
+                                                  actionButton("chr_zoomout", NULL, icon = icon("magnifying-glass-minus"))
+                                           )
+                                         )
+                        )
                  )
                ),
                fluidRow(
@@ -210,22 +223,6 @@ zoom <- function(data, ens_db,
     output$manhattan <- renderPlotly({
       plotly_manhattan(manhat, labs, pcutline = NULL) %>%
         config(displayModeBar = FALSE)
-    })
-    
-    output$ui_chrom <- renderUI({
-      req(input$show_chrom, coords$chr)
-      fluidRow(
-        column(11,
-               withSpinner(
-                 plotlyOutput("chrom", width = "85vw", height = "220px"),
-                 type = 8, size = 0.7)
-        ),
-        column(1,
-               br(),
-               actionButton("chr_zoomin", NULL, icon = icon("magnifying-glass-plus")),
-               actionButton("chr_zoomout", NULL, icon = icon("magnifying-glass-minus"))
-        )
-      )
     })
     
     output$chrom <- renderPlotly({
