@@ -20,6 +20,7 @@ zoom(
   add_hover = NULL,
   mh_points = 1e+05,
   recomb = NULL,
+  seq_filter = c(1:22, "X", "Y"),
   AnnotationDb = "org.Hs.eg.db"
 )
 }
@@ -67,6 +68,9 @@ plotly hover text for scatter points.}
 \code{1e5}.}
 
 \item{recomb}{Optional \code{GRanges} class object of recombination data.}
+
+\item{seq_filter}{Vector of acceptable chromosomes. Used to restrict queries
+to standard chromosome assembly.}
 
 \item{AnnotationDb}{An \code{AnnotationDb} gene annotation database, specified
 either as a character string or as an \code{AnnotationDb} class object, used to

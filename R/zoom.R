@@ -38,6 +38,8 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
+#' @param seq_filter Vector of acceptable chromosomes. Used to restrict queries
+#'   to standard chromosome assembly.
 #' @param AnnotationDb An `AnnotationDb` gene annotation database, specified
 #'   either as a character string or as an `AnnotationDb` class object, used to
 #'   obtain expanded gene names. The ensembl database specified in `ens_db` is
@@ -70,6 +72,7 @@ zoom <- function(data, ens_db,
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
+                 seq_filter = c(1:22, 'X', 'Y'),
                  AnnotationDb = "org.Hs.eg.db") {
   data <- data.frame(data)
   # autodetect headings
@@ -95,7 +98,7 @@ zoom <- function(data, ens_db,
   } else edb <- ens_db
   
   gene_db <- genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(c(1:22, 'X', 'Y'))))
+    SeqNameFilter(seq_filter)))
   gene_set <- unique(gene_db$gene_name)
   biotypes <- sort(unique(gene_db$gene_biotype))
   
@@ -476,7 +479,7 @@ zoom <- function(data, ens_db,
         if (input$tex != gene) updateTextInput(session, "tex", value = gene)
         loc <- genes(edb, filter = AnnotationFilterList(
           GeneNameFilter(gene),
-          SeqNameFilter(c(1:22, 'X', 'Y'))))
+          SeqNameFilter(seq_filter)))
         if (length(loc) > 1) loc <- loc[1]
         chr <- names(seqlengths(loc))
         m <- mean(c(start(loc), end(loc)))
