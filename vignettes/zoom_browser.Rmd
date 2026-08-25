@@ -3,11 +3,6 @@ title: "Zoom browser"
 author: "Myles Lewis"
 output:
   html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-    toc_depth: 2
-    number_sections: true
 vignette: >
   %\VignetteIndexEntry{locuszoomr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -25,10 +20,11 @@ ensdb_eval <- requireNamespace("EnsDb.Hsapiens.v75", quietly = TRUE)
 Here we demonstrate how to use the zoom browser to interactively browse whole
 genome GWAS or eQTL data.
 
-# Example GWAS data
+### Example GWAS data
 
 Example whole genome summary statistics from an SLE GWAS study can be downloaded
-from [EBI](https://www.ebi.ac.uk/gwas/studies/GCST003156) and loaded as follows.
+from EBI [here](https://www.ebi.ac.uk/gwas/studies/GCST003156) and loaded as follows.
+The other vignette shows how this data is formatted.
 
 ```{r eval=FALSE}
 # FTP download full summary statistics (308 MB) from SLE GWAS from
@@ -51,7 +47,11 @@ hg19.
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
 ```
 
-# Add recombination rate
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("zoom1.png")
+```
+
+### Add recombination rate
 
 Recombination rate can be shown on a secondary *y* axis. Whole recombination
 rate track data file (around 30 MB) should be downloaded from UCSC genome
@@ -75,7 +75,16 @@ recomb.hg19 <- import.bw("/../hapMapRelease24CombinedRecombMap.bw")
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19)
 ```
 
-# Citation
+### Navigation
+
+Click on points in the whole genome or individual chromosome manhattan plots to
+explore a particular locus. Alternatively, enter a gene name or SNP id or
+chromosome position and location into the input text box. The locus plot can be
+navigated by zooming in/out, or moving left/right using the navigation icons.
+Dragging the locus plot will move the locus window. Also, the plotly selection
+tool (magnifying glass icon) can be used to select a specific region.
+
+### Citation
 
 If you use this package please cite as:
 
