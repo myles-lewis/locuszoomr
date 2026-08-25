@@ -454,17 +454,20 @@ zoom <- function(data, ens_db,
     
     # parse text box
     observeEvent(c(input$text_go, input$enter), {
+      hideFeedback("tex")
       req(input$tex)
       chr <- NULL
       tex <- input$tex
-      tex <- gsub(" |chr", "", tex, ignore.case = TRUE)
+      tex <- gsub(" ", "", tex)
       if (grepl(":", tex) && grepl("-", tex)) {
         # chr & range
+        tex <- gsub("chr", "", tex, ignore.case = TRUE)
         ss <- strsplit(tex, ":")[[1]]
         chr <- ss[1]
         xr <- as.integer(strsplit(ss[2], "-")[[1]])
       } else if (grepl(":", tex)) {
         # single position
+        tex <- gsub("chr", "", tex, ignore.case = TRUE)
         ss <- strsplit(tex, ":")[[1]]
         chr <- ss[1]
         xr <- as.integer(ss[2]) + c(-5e5, 5e5)
@@ -478,20 +481,27 @@ zoom <- function(data, ens_db,
         chr <- names(seqlengths(loc))
         m <- mean(c(start(loc), end(loc)))
         xr <- as.integer(c(m - 5e5, m + 5e5))
-      } else if (grepl("rs", input$tex)) {
+      } else if (grepl("^rs", input$tex)) {
         w <- which(data[, labs] == input$tex)
         if (length(w) > 0) {
           chr <- data[w[1], chrom]
           xr <- data[w[1], pos] + c(-5e5, 5e5)
         } else {
-          showFeedback("tex", "not found")
+          showFeedback("tex", "SNP not found")
           return()
         }
-      } else return()
+      } else {
+        if (nchar(tex) > 1) showFeedback("tex", "not found")
+        return()
+      }
       xr <- as.integer(pmax(xr, 0))
       
       if (chr %in% chr_set) {
         coords$chr <- chr
+        if (any(is.na(xr))) {
+          showFeedback("tex", "invalid entry")
+          return()
+        }
         coords$xrange <- xr
         hideFeedback("tex")
       } else {
