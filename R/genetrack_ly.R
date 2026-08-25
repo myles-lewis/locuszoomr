@@ -91,7 +91,7 @@ genetrack_ly <- function(locus,
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks,
-               prioritise = prioritise)
+               prioritise = prioritise, xnudge = 0.005)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
   if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
   TX <- TX[TX$row <= maxrows, ]
@@ -103,12 +103,12 @@ genetrack_ly <- function(locus,
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
-  TX$tx <- rowMeans(TX[, c('start', 'end')])
+  TX$tx <- TX$mean
   TX$ty <- -TX$row + 0.35
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.005) & 
-             (TX$tmax < xrange[2] + diff(xrange) * 0.005) &
+  tfilter <- TX$tmin >= (xrange[1] - diff(xrange) * 0.005) & 
+             (TX$tmax <= xrange[2] + diff(xrange) * 0.005) &
              TX$gene_name != ""
   pos <- TX$strand == "+"
   TX$gene_name2 <- if (italics) paste0("<i>", TX$gene_name, "</i>") else TX$gene_name

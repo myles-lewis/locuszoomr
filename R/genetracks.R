@@ -198,7 +198,8 @@ bquote_gene <- function(gene, strand, italics) {
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
-                   text_pos = 'top', blanks = "fill", prioritise = NULL) {
+                   text_pos = 'top', blanks = "fill", prioritise = NULL,
+                   xnudge = 0.04) {
   blank <- TX$gene_name == ""
   if (any(blank)) {
     if (blanks == "fill") {
@@ -218,7 +219,7 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
-    xd <- diff(xlim) * 0.04
+    xd <- diff(xlim) * xnudge
     xlim2 <- xlim + c(-xd, xd)
     # left edge
     fix_left <- (TX$mean - gw / 2) < xlim2[1] & (xlim2[1] + gw) < TX$end
