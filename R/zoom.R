@@ -38,12 +38,16 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
+#' @param token Personal access token for accessing 1000 Genomes LD data via 
+#' LDlink API. See `LDlinkR` package documentation and [link_LD()]. LD
+#' information can only be requested if `eqtl_gene` is left as `NULL`.
 #' @param seq_filter Vector of acceptable chromosomes. Used to restrict queries
 #'   to standard chromosome assembly.
 #' @param AnnotationDb An `AnnotationDb` gene annotation database, specified
 #'   either as a character string or as an `AnnotationDb` class object, used to
 #'   obtain expanded gene names. The ensembl database specified in `ens_db` is
 #'   queried first. Set to `NULL` to disable this feature.
+#' @param ... Optional arguments such as `pop` passed to [link_LD()].
 #' @returns No return value. Opens an interactive shiny window.
 #' @importFrom plotly plotlyOutput renderPlotly event_data config plotlyProxy
 #' @importFrom plotly plotlyProxyInvoke layout
@@ -72,8 +76,10 @@ zoom <- function(data, ens_db,
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
+                 token = NULL,
                  seq_filter = c(1:22, 'X', 'Y'),
-                 AnnotationDb = "org.Hs.eg.db") {
+                 AnnotationDb = "org.Hs.eg.db",
+                 ...) {
   data <- data.frame(data)
   # autodetect headings
   dc <- detect_cols(data, chrom, pos, p, labs)
@@ -109,6 +115,8 @@ zoom <- function(data, ens_db,
     eqtl_colour <- eqtl_colours(data[data[, p] < pcutoff, ], chrom, pos,
                                 eqtl_gene, eqtl_scheme)
   }
+  
+  ld_ok <- !is.null(token) & is.null(eqtl_gene) & is.null(eqtl_beta)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -194,6 +202,15 @@ zoom <- function(data, ens_db,
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
                           checkboxInput("alltracks", "show all gene tracks"),
+                          (if (ld_ok) {
+                            fluidRow(
+                              column(12,
+                                     h5("Linkage disequilibrium"),
+                                     actionButton("get_ld", "Get LD", icon = icon("circle-nodes"),
+                                                  class = "btn-primary"),
+                                     actionButton("clear_ld", "Clear")
+                              ))
+                          } else NULL),
                           pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
@@ -345,13 +362,11 @@ zoom <- function(data, ens_db,
                      chrom = chrom, pos = pos, p = p, labs = labs)
       validate(need(loc1$data, "Locus contains no SNPs/datapoints"))
       validate(need(nrow(loc1$data) < 1.5e5, "Too many datapoints. Zoom in."))
+      loc1$TX$fullname <- expandGenes(loc1$TX, fullnames)
       if (!is.null(recomb) && input$recomb) {
         loc1 <- link_recomb(loc1, recomb = recomb)
       }
-      loc1$TX$fullname <- expandGenes(loc1$TX, fullnames)
-      loc$i <- loc1
       
-      # req(nrow(loc1$data) > 0)
       if (is.null(eqtl_gene) & is.null(eqtl_beta)) {
         nt <- (sum(loc1$data[, p] < pcutoff) > 1) + 2L
       } else {
@@ -370,8 +385,21 @@ zoom <- function(data, ens_db,
           nt <- length(unique(eb)) + 1L
         }
       }
+      
+      if (get_ld()) {
+        loc2 <- try(link_LD(loc1, token = token, ...), silent = TRUE)
+        if (!inherits(loc2, "try-error")) {
+          loc1 <- loc2
+          nt <- ntrace_ld(loc1$data$ld)
+        } else {
+          showNotification(h5("LD link error"), type = "message", duration = 8)
+          isolate(get_ld(FALSE))
+        }
+      }
+      
       nt <- nt + (!is.null(recomb) && input$recomb)
       ntrace(nt)
+      loc$i <- loc1
       
       if (!is.null(eqtl_gene)) {
         genes1 <- unique(eqtls)
@@ -585,6 +613,22 @@ zoom <- function(data, ens_db,
                           )))
     })
     
+    get_ld <- reactiveVal(FALSE)
+    
+    # retrieve LD
+    observeEvent(input$get_ld, {
+      get_ld(TRUE)
+    })
+    
+    # clear LD
+    observeEvent(input$clear_ld, {
+      get_ld(FALSE)
+    })
+    
+    observeEvent(c(coords$chr, coords$xrange), {
+      isolate(get_ld(FALSE))
+    })
+    
   }
   
   runApp(list(ui = ui, server = server))
@@ -769,4 +813,12 @@ eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
   eqtl_set <- unique(sigdat[, eqtl_gene])
   message(length(eqtl_set), " eQTL genes")
   setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
+}
+
+
+ntrace_ld <- function(ld) {
+  bg <- cut(ld, -1:6/5, labels = FALSE)
+  bg[ld == 0] <- 2L
+  bg[is.na(bg)] <- 1L
+  length(unique(bg)) +1L
 }

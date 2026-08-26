@@ -20,8 +20,10 @@ zoom(
   add_hover = NULL,
   mh_points = 1e+05,
   recomb = NULL,
+  token = NULL,
   seq_filter = c(1:22, "X", "Y"),
-  AnnotationDb = "org.Hs.eg.db"
+  AnnotationDb = "org.Hs.eg.db",
+  ...
 )
 }
 \arguments{
@@ -69,6 +71,10 @@ plotly hover text for scatter points.}
 
 \item{recomb}{Optional \code{GRanges} class object of recombination data.}
 
+\item{token}{Personal access token for accessing 1000 Genomes LD data via
+LDlink API. See \code{LDlinkR} package documentation and \code{\link[=link_LD]{link_LD()}}. LD
+information can only be requested if \code{eqtl_gene} is left as \code{NULL}.}
+
 \item{seq_filter}{Vector of acceptable chromosomes. Used to restrict queries
 to standard chromosome assembly.}
 
@@ -76,6 +82,8 @@ to standard chromosome assembly.}
 either as a character string or as an \code{AnnotationDb} class object, used to
 obtain expanded gene names. The ensembl database specified in \code{ens_db} is
 queried first. Set to \code{NULL} to disable this feature.}
+
+\item{...}{Optional arguments such as \code{pop} passed to \code{\link[=link_LD]{link_LD()}}.}
 }
 \value{
 No return value. Opens an interactive shiny window.
