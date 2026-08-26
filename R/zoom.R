@@ -7,7 +7,12 @@
 #' @details 
 #' This launches a shiny app to explore the GWAS/eQTL results through visualising 
 #' the Manhattan plot and exploring regional Manhattan plots of gene loci 
-#' through selecting points or searching SNPs/genes. 
+#' through selecting points or searching SNPs/genes.
+#' 
+#' Linkage disequilibrium data can be pulled from LDlink API within the app
+#' using the 'Get LD' button in the Settings dropdown. These buttons only appear
+#' once a user provides a LDlink API token via the `token` argument. Each
+#' API request takes around 5-10 secs.
 #' @param data Dataframe of GWAS results with columns for chromosome, position,
 #'   p value and SNP rs IDs. Data.tables are coerced to dataframe.
 #' @param ens_db Either a character string which specifies which Ensembl
