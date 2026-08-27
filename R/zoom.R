@@ -11,8 +11,11 @@
 #' 
 #' Linkage disequilibrium data can be pulled from LDlink API within the app
 #' using the 'Get LD' button in the Settings dropdown. These buttons only appear
-#' once a user provides a LDlink API token via the `token` argument. Each
-#' API request takes around 5-10 secs.
+#' once a user provides a LDlink API token via the `ld_token` argument. Each API
+#' request takes around 5-10 secs. 'Get LD' pins the current index SNP as the
+#' reference variant and colours points by r^2 with it. The reference stays
+#' pinned while you pan and zoom, so the colouring keeps its meaning and repeat
+#' queries are served from the `memoise` cache rather than the API.
 #' @param data Dataframe of GWAS results with columns for chromosome, position,
 #'   p value and SNP rs IDs. Data.tables are coerced to dataframe.
 #' @param ens_db Either a character string which specifies which Ensembl
@@ -43,16 +46,19 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
-#' @param token Personal access token for accessing 1000 Genomes LD data via 
-#' LDlink API. See `LDlinkR` package documentation and [link_LD()]. LD
-#' information can only be requested if `eqtl_gene` is left as `NULL`.
+#' @param ld_token Personal access token for the LDlink API, available from
+#'   <https://ldlink.nih.gov/?tab=apiaccess>. See `LDlinkR` package
+#'   documentation and [link_LD()]. When empty the LD controls are hidden. LD
+#'   information can only be requested if `eqtl_gene` is left as `NULL`. LD is
+#'   fetched on demand, not automatically, by pressing the "Get LD" button.
+#' @param ld_pop 1000 Genomes population used for LD. Defaults to `"EUR"`. See
+#'   `LDlinkR::LDproxy()` for the available codes.
 #' @param seq_filter Vector of acceptable chromosomes. Used to restrict queries
 #'   to standard chromosome assembly.
 #' @param AnnotationDb An `AnnotationDb` gene annotation database, specified
 #'   either as a character string or as an `AnnotationDb` class object, used to
 #'   obtain expanded gene names. The ensembl database specified in `ens_db` is
 #'   queried first. Set to `NULL` to disable this feature.
-#' @param ... Optional arguments such as `pop` passed to [link_LD()].
 #' @returns No return value. Opens an interactive shiny window.
 #' @importFrom plotly plotlyOutput renderPlotly event_data config plotlyProxy
 #' @importFrom plotly plotlyProxyInvoke layout
@@ -61,6 +67,7 @@
 #' @importFrom shiny textInput conditionalPanel h5 runApp debounce isolate
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
+#' @importFrom shiny showNotification removeNotification
 #' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
 #' @importFrom shinyWidgets pickerInput pickerOptions dropdown
 #' @importFrom shinycssloaders withSpinner
@@ -81,10 +88,10 @@ zoom <- function(data, ens_db,
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
-                 token = NULL,
+                 ld_token = Sys.getenv("LDLINK_TOKEN"),
+                 ld_pop = "EUR",
                  seq_filter = c(1:22, 'X', 'Y'),
-                 AnnotationDb = "org.Hs.eg.db",
-                 ...) {
+                 AnnotationDb = "org.Hs.eg.db") {
   data <- data.frame(data)
   # autodetect headings
   dc <- detect_cols(data, chrom, pos, p, labs)
@@ -121,7 +128,7 @@ zoom <- function(data, ens_db,
                                 eqtl_gene, eqtl_scheme)
   }
   
-  ld_ok <- !is.null(token) & is.null(eqtl_gene) & is.null(eqtl_beta)
+  show_ld <- nzchar(ld_token) && is.null(eqtl_gene)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -192,6 +199,7 @@ zoom <- function(data, ens_db,
                         ),
                  column(3,
                         textOutput("pos"),
+                        textOutput("ld_status"),
                         align = "centre", style='margin-top:7px;'),
                  column(4,
                         splitLayout(
@@ -207,13 +215,14 @@ zoom <- function(data, ens_db,
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
                           checkboxInput("alltracks", "show all gene tracks"),
-                          (if (ld_ok) {
+                          (if (show_ld) {
                             fluidRow(
                               column(12,
                                      h5("Linkage disequilibrium"),
-                                     actionButton("get_ld", "Get LD", icon = icon("circle-nodes"),
-                                                  class = "btn-primary"),
-                                     actionButton("clear_ld", "Clear")
+                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
+                                                  class = "btn-primary btn-sm"),
+                                     actionButton("ld_clear", "Clear",
+                                                  class = "btn-default btn-sm")
                               ))
                           } else NULL),
                           pickerInput("biotype", h5("Select gene biotypes"),
@@ -286,7 +295,9 @@ zoom <- function(data, ens_db,
       w <- which(data[, labs] == s$key)
       if (length(w) > 0) {
         coords$chr <- data[w[1], chrom]
-        coords$xrange <- data[w[1], pos] + c(-5e5, 5e5)
+        xr <- data[w[1], pos] + c(-5e5, 5e5)
+        if (xr[1] < 0) xr <- c(0, 1e6)
+        coords$xrange <- xr
       }
     })
     
@@ -296,7 +307,9 @@ zoom <- function(data, ens_db,
       w <- which(data[, labs] == s$key)
       if (length(w) > 0) {
         coords$chr <- data[w[1], chrom]
-        coords$xrange <- data[w[1], pos] + c(-5e5, 5e5)
+        xr <- data[w[1], pos] + c(-5e5, 5e5)
+        if (xr[1] < 0) xr <- c(0, 1e6)
+        coords$xrange <- xr
       }
     })
     
@@ -359,9 +372,13 @@ zoom <- function(data, ens_db,
     loc <- reactiveValues(i = NULL)
     ntrace <- reactiveVal()
     genes <- reactiveValues(x = NULL)
+    ld_snp <- reactiveVal(NULL)
+    cur_index <- reactiveVal(NULL)
     
     output$locus <- renderPlotly({
       req(coords$chr %in% chr_set, coords$xrange)
+      # temporary fix for plotly minallowed not working 
+      req(coords$xrange[1] >= 0)
       loc1 <- locus(data = data, xrange = coords$xrange,
                      seqname = coords$chr, ens_db = ens_db,
                      chrom = chrom, pos = pos, p = p, labs = labs)
@@ -391,14 +408,16 @@ zoom <- function(data, ens_db,
         }
       }
       
-      if (get_ld()) {
-        loc2 <- try(link_LD(loc1, token = token, ...), silent = TRUE)
-        if (!inherits(loc2, "try-error")) {
-          loc1 <- loc2
-          nt <- ntrace_ld(loc1$data$ld)
-        } else {
-          showNotification(h5("LD link error"), type = "message", duration = 8)
-          isolate(get_ld(FALSE))
+      isolate(cur_index(loc1$index_snp))
+      pin <- ld_snp()
+      if (!is.null(pin)) {
+        loc1$index_snp <- pin
+        loc1 <- suppressMessages(
+          link_LD(loc1, token = ld_token, pop = ld_pop))
+        removeNotification("ld_busy")
+        if (!"ld" %in% colnames(loc1$data)) {
+          showNotification(paste0("LD lookup failed for ", pin),
+                           type = "error", duration = 6)
         }
       }
       
@@ -479,6 +498,13 @@ zoom <- function(data, ens_db,
       coords$xrange <- pmax(coords$xrange + c(-dif, dif), 0)
     })
     
+    # temporary fix for R/plotly layout.xaxis.minallowed not working
+    observeEvent(coords$xrange, {
+      if (coords$xrange[1] < 0) {
+        coords$xrange <- signif(coords$xrange - coords$xrange[1], 3)
+      }
+    })
+    
     output$pos <- renderText({
       req(coords$chr %in% chr_set, coords$xrange)
       paste0("chr ", coords$chr, ": ", coords$xrange[1], " - ",
@@ -554,6 +580,8 @@ zoom <- function(data, ens_db,
       s <- event_data("plotly_relayout", source = "plotly_locus")
       req(c("xaxis.range[0]", "xaxis.range[1]") %in% names(s))
       xr <- c(s$`xaxis.range[0]`, s$`xaxis.range[1]`)
+      xd <- diff(xr) * (1 - 1/1.02) / 2
+      xr <- xr + c(xd, -xd)
       coords$xrange <- as.integer(xr * 1e6)
     })
     
@@ -621,17 +649,39 @@ zoom <- function(data, ens_db,
     get_ld <- reactiveVal(FALSE)
     
     # retrieve LD
-    observeEvent(input$get_ld, {
-      get_ld(TRUE)
+    observeEvent(input$ld_get, {
+      snp <- cur_index()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification(paste0("Fetching LD for ", snp, " (", ld_pop, ")"),
+                       id = "ld_busy", duration = NULL)
+      ld_snp(snp)
     })
     
-    # clear LD
-    observeEvent(input$clear_ld, {
-      get_ld(FALSE)
+    observeEvent(input$ld_clear, {
+      ld_snp(NULL)
+      removeNotification("ld_busy")
     })
     
-    observeEvent(c(coords$chr, coords$xrange), {
-      isolate(get_ld(FALSE))
+    observe({
+      s <- event_data("plotly_click", source = "plotly_locus")
+      req(s, !is.null(s$key))
+      cur <- isolate(ld_snp())
+      req(!is.null(cur))
+      snp <- as.character(s$key)[1]
+      req(!is.na(snp), nzchar(snp))
+      if (identical(snp, cur)) return()
+      showNotification(paste0("Fetching LD for ", snp, " (", ld_pop, ")"),
+                       id = "ld_busy", duration = NULL)
+      ld_snp(snp)
+    })
+    
+    output$ld_status <- renderText({
+      snp <- ld_snp()
+      if (is.null(snp)) return("")
+      paste0("LD: ", snp, " (", ld_pop, ") - click a point to re-base")
     })
     
   }
