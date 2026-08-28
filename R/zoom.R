@@ -410,17 +410,27 @@ zoom <- function(data, ens_db,
       
       isolate(cur_index(loc1$index_snp))
       pin <- ld_snp()
-      if (!is.null(pin)) {
+      ld_msg <- NULL
+      if (!is.null(pin) && pin %in% loc1$data[, labs]) {
         loc1$index_snp <- pin
-        loc1 <- suppressMessages(
-          link_LD(loc1, token = ld_token, pop = ld_pop))
+        loc2 <- withCallingHandlers(
+          try(link_LD(loc1, token = ld_token, pop = ld_pop)),
+          message = function(m) {
+            txt <- conditionMessage(m)
+            ld_msg <<- trimws(txt)
+          })
+        if (inherits(loc2, "try-error")) {
+          ld_msg <- attr(loc2, "condition")$message
+        } else loc1 <- loc2
         removeNotification("ld_busy")
         if (!"ld" %in% colnames(loc1$data)) {
-          showNotification(paste0("LD lookup failed for ", pin),
-                           type = "error", duration = 6)
+          showNotification(
+            paste0("LD failed for ", pin,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "error", duration = 10)
         }
       }
-      
+      if ("ld" %in% colnames(loc1$data)) nt <- ntrace_ld(loc1$data$ld)
       nt <- nt + (!is.null(recomb) && input$recomb)
       ntrace(nt)
       loc$i <- loc1
@@ -655,7 +665,7 @@ zoom <- function(data, ens_db,
         showNotification("No index SNP in view", type = "warning")
         return()
       }
-      showNotification(paste0("Fetching LD for ", snp, " (", ld_pop, ")"),
+      showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
       ld_snp(snp)
     })
@@ -673,15 +683,14 @@ zoom <- function(data, ens_db,
       snp <- as.character(s$key)[1]
       req(!is.na(snp), nzchar(snp))
       if (identical(snp, cur)) return()
-      showNotification(paste0("Fetching LD for ", snp, " (", ld_pop, ")"),
+      showNotification(paste0("Fetching LD for ", snp),
                        id = "ld_busy", duration = NULL)
       ld_snp(snp)
     })
     
     output$ld_status <- renderText({
-      snp <- ld_snp()
-      if (is.null(snp)) return("")
-      paste0("LD: ", snp, " (", ld_pop, ") - click a point to re-base")
+      req(ld_snp() %in% loc$i$data[, labs])
+      paste0("LD: ", ld_snp(), " (", ld_pop, ")")
     })
     
   }

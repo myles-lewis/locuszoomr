@@ -64,11 +64,16 @@ link_LD <- function(loc,
   if (!grepl(loc$genome, genome_build, ignore.case = TRUE)) {
     warning("mismatched genome build")
   }
+  emsg <- NULL
   if (method == "proxy") {
-    ldp <- try(mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token,
-                           genome_build = genome_build, ...))
-    if (!inherits(ldp, "try-error")) {
+    message("LDproxy ", index_snp)
+    ldp <- suppressMessages(
+      mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token,
+                  genome_build = genome_build, ...))
+    if (ld_response_ok(ldp, c(snp_col, "R2"))) {
       loc$data$ld <- ldp[match(loc$data[, labs], ldp[, snp_col]), "R2"]
+    } else {
+      emsg <- ld_response_error(ldp)
     }
   } else {
     message("Obtaining LD on ", length(rslist), " SNPs. ", appendLF = FALSE)
@@ -77,11 +82,16 @@ link_LD <- function(loc,
     if (index_snp %in% colnames(ldm)) {
       ld <- ldm[, index_snp]
       loc$data$ld <- ld[match(loc$data[, labs], ldm$RS_number)]
-    } else message("Index SNP not found in LDlink data")
+    } else emsg <- "Index SNP not found in LDlink data"
   }
-  end <- Sys.time()
-  m <- sum(!is.na(loc$data$ld))
-  message("Matched ", m, " SNPs (", format(end - start, digits = 3),")")
+  
+  if (is.null(emsg)) {
+    end <- Sys.time()
+    m <- sum(!is.na(loc$data$ld))
+    message("Matched ", m, " SNPs (", format(end - start, digits = 3),")")
+  } else {
+    message(if (is.na(emsg)) "Unexpected LDproxy response" else emsg)
+  }
   
   loc
 }
@@ -92,3 +102,18 @@ mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
 
 mem_LDproxy <- memoise(LDlinkR::LDproxy)
 
+
+ld_response_ok <- function(x, cols) {
+  is.data.frame(x) && nrow(x) > 0L && all(cols %in% colnames(x))
+}
+
+ld_response_error <- function(x) {
+  if (!is.data.frame(x) || nrow(x) == 0 || ncol(x) == 0) return(NA)
+  trimws(as.character(x[1, 1]))
+}
+
+try_link_LD <- function(loc, ...) {
+  loc1 <- try(link_LD(loc, ...))
+  if (inherits(loc1, "try-error")) return(loc)
+  loc1
+}
