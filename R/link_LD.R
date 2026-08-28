@@ -102,7 +102,6 @@ mem_LDmatrix <- memoise(LDlinkR::LDmatrix)
 
 mem_LDproxy <- memoise(LDlinkR::LDproxy)
 
-
 ld_response_ok <- function(x, cols) {
   is.data.frame(x) && nrow(x) > 0L && all(cols %in% colnames(x))
 }
@@ -110,10 +109,4 @@ ld_response_ok <- function(x, cols) {
 ld_response_error <- function(x) {
   if (!is.data.frame(x) || nrow(x) == 0 || ncol(x) == 0) return(NA)
   trimws(as.character(x[1, 1]))
-}
-
-try_link_LD <- function(loc, ...) {
-  loc1 <- try(link_LD(loc, ...))
-  if (inherits(loc1, "try-error")) return(loc)
-  loc1
 }
