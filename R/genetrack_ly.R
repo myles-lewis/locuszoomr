@@ -75,18 +75,32 @@ genetrack_ly <- function(locus,
   xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
-  if (nrow(TX) == 0 & plot) {
+  if (nrow(TX) == 0) {
     message('No genes to plot')
-    # blank gene tracks
-    p <- plot_ly(data.frame(NA), mode = "markers", type = "scatter",
-                 source = "plotly_locus") %>%
-      plotly::layout(xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
-                                  color = 'black', ticklen = 5,
-                                  range = as.list(xlim)),
-                     yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
-                                  showticklabels = FALSE)) %>%
-      plotly::config(displaylogo = FALSE)
-    return(p)
+    if (plot) {
+      # blank gene tracks
+      p <- plot_ly(data.frame(NA),
+                   x = NULL, y = NULL, text = NULL,
+                   mode = "markers", type = "scatter",
+                   source = "plotly_locus") %>%
+        plotly::layout(xaxis = list(title = list(text = xlab, standoff = 10),
+                                    showgrid = FALSE, showline = TRUE,
+                                    zeroline = FALSE,
+                                    color = 'black', ticklen = 5,
+                                    range = as.list(xlim)),
+                       yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
+                                    fixedrange = TRUE,
+                                    showticklabels = FALSE),
+                       margin = list(b = 60),
+                       showlegend = TRUE, dragmode = "pan") %>%
+        plotly::config(displaylogo = FALSE,
+                       modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                  "autoScale2d", "resetScale2d",
+                                                  "hoverClosest", "hoverCompare"))
+      return(p)
+    } else {
+      return(list(TX = TX, EX = EX[FALSE, ]))
+    }
   }
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)

@@ -587,7 +587,20 @@ zoom <- function(data, ens_db,
       gt <- genetrack_ly(loc$i, filter_gene_biotype = input_biotype(),
                          width = loc_width(), blanks = "show", plot = FALSE,
                          maxrows = maxrows)
-      req(nrow(gt$TX) != 0)
+      if (nrow(gt$TX) == 0) {
+        # blank gene tracks
+        p <- plotlyProxy("locus", session) %>%
+          plotlyProxyInvoke("restyle",
+                            list(x = list(NULL), y = list(NULL), text = list(NULL),
+                                 hoverinfo = "text"),
+                            list(ntrace())) %>%
+          plotlyProxyInvoke("update",
+                            list(x = list(NULL), y = list(NULL),
+                                 text = list(NULL), hoverinfo = "none"),
+                            list(shapes = NULL),
+                            list(ntrace() + 1L))
+        return(p)
+      }
       TX <- gt$TX
       EX <- gt$EX
       lx <- seg2line(TX$start, TX$end)
