@@ -91,6 +91,9 @@ genetrack_ly <- function(locus,
                        yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
                                     fixedrange = TRUE,
                                     showticklabels = FALSE),
+                       annotations = list(x = 0, y = 0.02, text = "No gene tracks",
+                                          xref = "paper", yref = "paper",
+                                          showarrow = FALSE),
                        margin = list(b = 60),
                        showlegend = TRUE, dragmode = "pan") %>%
         plotly::config(displaylogo = FALSE,
@@ -128,7 +131,7 @@ genetrack_ly <- function(locus,
   TX$gene_name2 <- if (italics) paste0("<i>", TX$gene_name, "</i>") else TX$gene_name
   TX$gene_name2[pos] <- paste0(TX$gene_name2[pos], "&#8594;")
   TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name2[!pos])
-  TX$gene_name2[!tfilter] <- NA
+  TX$gene_name2[!tfilter] <- ""
   
   if (!plot) return(list(TX = TX, EX = EX))
   
