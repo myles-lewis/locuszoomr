@@ -389,25 +389,6 @@ zoom <- function(data, ens_db,
         loc1 <- link_recomb(loc1, recomb = recomb)
       }
       
-      if (is.null(eqtl_gene) & is.null(eqtl_beta)) {
-        nt <- (sum(loc1$data[, p] < pcutoff) > 1) + 2L
-      } else {
-        # eqtl
-        ind <- loc1$data[, p] < pcutoff
-        eqtls <- loc1$data[ind, eqtl_gene]
-        genes$x <- unique(eqtls)
-        if (!is.null(eqtl_gene) & is.null(eqtl_beta)) {
-          # eqtl genes only
-          ngene <- length(unique(eqtls))
-          nt <- ngene + 1L
-        } else if (!is.null(eqtl_gene) & !is.null(eqtl_beta)) {
-          # eqtl + beta
-          sgn <- sign(loc1$data[ind, eqtl_beta])
-          eb <- paste0(eqtls, sgn)
-          nt <- length(unique(eb)) + 1L
-        }
-      }
-      
       isolate(cur_index(loc1$index_snp))
       pin <- ld_snp()
       ld_msg <- NULL
@@ -430,9 +411,6 @@ zoom <- function(data, ens_db,
             type = "error", duration = 10)
         }
       }
-      if ("ld" %in% colnames(loc1$data)) nt <- ntrace_ld(loc1$data$ld)
-      nt <- nt + (!is.null(recomb) && input$recomb)
-      ntrace(nt)
       loc$i <- loc1
       
       if (!is.null(eqtl_gene)) {
@@ -460,9 +438,11 @@ zoom <- function(data, ens_db,
         maxrows <- NULL
       }
       hideFeedback("tex")
-      locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
+      p <- locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
                    width = width, eqtl_gene = eqtl_gene, beta = eqtl_beta,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows)
+      ntrace(length(p$x$data) -2)
+      p
     })
     
     output$ui_genes <- renderUI({
