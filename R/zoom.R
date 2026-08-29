@@ -238,8 +238,7 @@ zoom <- function(data, ens_db,
                  ),
                  fluidRow(
                    column(12,
-                          plotlyOutput("locus", width = "95vw", height = 600),
-                          br(), br()
+                          plotlyOutput("locus", width = "95vw", height = 624)
                    )
                  )
       ),

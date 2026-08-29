@@ -158,6 +158,7 @@ genetrack_ly <- function(locus,
                    yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
                                 fixedrange = TRUE,
                                 showticklabels = FALSE),
+                   margin = list(b = 70),
                    showlegend = TRUE, dragmode = "pan") %>%
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",
