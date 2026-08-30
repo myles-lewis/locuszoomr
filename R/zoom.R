@@ -600,7 +600,7 @@ zoom <- function(data, ens_db,
                             list(shapes = NULL),
                             list(ntrace() + 1L)) %>%
           plotlyProxyInvoke("relayout",
-                            list(annotations = list(list(x = 0, y = 0.01,
+                            list(annotations = list(list(x = 0, y = 0.008,
                                                     text = "No gene tracks",
                                                     xref = "paper", yref = "paper",
                                                     showarrow = FALSE))))

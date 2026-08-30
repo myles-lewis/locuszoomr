@@ -241,20 +241,26 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   }
   TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
   TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
-  TX$row <- 0
-  j <- 1
-  while (any(TX$row == 0)) {
-    xset <- which(TX$row == 0)
+  TX$row <- pack_rows(TX$min, TX$max)
+  TX
+}
+
+
+# overlap detection
+pack_rows <- function(txmin, txmax) {
+  txrow <- integer(length(txmin))
+  j <- 1L
+  while (any(txrow == 0L)) {
+    xset <- which(txrow == 0L)
     for (i in xset) {
-      # overlap detection
-      if (!any(TX$min[i] < TX$max[TX$row == j] &
-               TX$max[i] > TX$min[TX$row == j])) {
-        TX$row[i] <- j
+      if (!any(txmin[i] < txmax[txrow == j] &
+               txmax[i] > txmin[txrow == j])) {
+        txrow[i] <- j
       }
     }
-    j <- j + 1
+    j <- j + 1L
   }
-  TX
+  txrow
 }
 
 
