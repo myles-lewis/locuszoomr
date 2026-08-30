@@ -598,7 +598,12 @@ zoom <- function(data, ens_db,
                             list(x = list(NULL), y = list(NULL),
                                  text = list(NULL), hoverinfo = "none"),
                             list(shapes = NULL),
-                            list(ntrace() + 1L))
+                            list(ntrace() + 1L)) %>%
+          plotlyProxyInvoke("relayout",
+                            list(annotations = list(list(x = 0, y = 0.01,
+                                                    text = "No gene tracks",
+                                                    xref = "paper", yref = "paper",
+                                                    showarrow = FALSE))))
         return(p)
       }
       TX <- gt$TX
@@ -631,7 +636,9 @@ zoom <- function(data, ens_db,
                           list(x = list(TX$tx[ok]), y = list(TX$ty[ok]),
                                text = list(TX$gene_name2[ok]), hoverinfo = "none"),
                           list(shapes = shapes),
-                          list(ntrace() + 1L))
+                          list(ntrace() + 1L)) %>%
+        plotlyProxyInvoke("relayout",
+                          list(annotations = list(NULL)))
     })
     
     # chrom highlight

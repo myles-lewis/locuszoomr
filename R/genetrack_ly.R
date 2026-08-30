@@ -79,10 +79,14 @@ genetrack_ly <- function(locus,
     message('No genes to plot')
     if (plot) {
       # blank gene tracks
-      p <- plot_ly(data.frame(NA),
-                   x = NULL, y = NULL, text = NULL,
-                   mode = "markers", type = "scatter",
-                   source = "plotly_locus") %>%
+      p <- plot_ly(TX, source = "plotly_locus", height = height) %>%
+        add_segments(x = ~start, y = 0,
+                     xend = ~end, yend = 0,
+                     color = I(gene_col),
+                     showlegend = FALSE) %>%
+        add_text(x = 0, y = 0, text = "",
+                 textfont = list(size = 14 * cex.text),
+                 showlegend = FALSE) %>%
         plotly::layout(xaxis = list(title = list(text = xlab, standoff = 10),
                                     showgrid = FALSE, showline = TRUE,
                                     zeroline = FALSE,
