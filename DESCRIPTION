@@ -38,6 +38,7 @@ Imports:
     LDlinkR,
     memoise,
     plotly,
+    Rcpp,
     rlang,
     rtracklayer,
     shiny,
@@ -45,6 +46,7 @@ Imports:
     shinyFeedback,
     shinyWidgets,
     zoo
+LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
     AnnotationDbi,

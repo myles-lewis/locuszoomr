@@ -239,29 +239,29 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   } else if (text_pos == 'none') {
     TX$tmax <- TX$tmin <- TX$mean
   }
-  TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
-  TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
-  TX$row <- pack_rows(TX$min, TX$max)
+  TX$min <- as.integer(pmin(TX$start, TX$end, TX$tmin) - gap / 2)
+  TX$max <- as.integer(pmax(TX$start, TX$end, TX$tmax) + gap / 2)
+  TX$row <- packrows_cpp(TX$min, TX$max)
   TX
 }
 
 
 # overlap detection
-pack_rows <- function(txmin, txmax) {
-  txrow <- integer(length(txmin))
-  j <- 1L
-  while (any(txrow == 0L)) {
-    xset <- which(txrow == 0L)
-    for (i in xset) {
-      if (!any(txmin[i] < txmax[txrow == j] &
-               txmax[i] > txmin[txrow == j])) {
-        txrow[i] <- j
-      }
-    }
-    j <- j + 1L
-  }
-  txrow
-}
+# pack_rows <- function(txmin, txmax) {
+#   txrow <- integer(length(txmin))
+#   j <- 1L
+#   while (any(txrow == 0L)) {
+#     xset <- which(txrow == 0L)
+#     for (i in xset) {
+#       if (!any(txmin[i] < txmax[txrow == j] &
+#                txmax[i] > txmin[txrow == j])) {
+#         txrow[i] <- j
+#       }
+#     }
+#     j <- j + 1L
+#   }
+#   txrow
+# }
 
 
 # highlight selected genes

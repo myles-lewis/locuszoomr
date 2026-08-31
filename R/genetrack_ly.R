@@ -135,7 +135,7 @@ genetrack_ly <- function(locus,
   TX$gene_name2 <- if (italics) paste0("<i>", TX$gene_name, "</i>") else TX$gene_name
   TX$gene_name2[pos] <- paste0(TX$gene_name2[pos], "&#8594;")
   TX$gene_name2[!pos] <- paste0("&#8592;", TX$gene_name2[!pos])
-  TX$gene_name2[!tfilter] <- ""
+  TX$gene_name2[!tfilter] <- NA
   
   if (!plot) return(list(TX = TX, EX = EX))
   
@@ -156,6 +156,15 @@ genetrack_ly <- function(locus,
   }
   
   ok <- !is.na(TX$gene_name2)
+  if (sum(ok) > 0) {
+    xtex <- TX$tx[ok]
+    ytex <- TX$ty[ok]
+    ttext <- TX$gene_name2[ok]
+  } else {
+    xtex <- ytex <- 0
+    ttext <- ""
+  }
+  
   hovertext <- paste0(TX$gene_name,
                       TX$fullname,
                       "<br>Gene ID: ", TX$gene_id,
@@ -168,7 +177,7 @@ genetrack_ly <- function(locus,
                  color = I(gene_col),
                  text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
-    add_text(x = TX$tx[ok], y = TX$ty[ok], text = TX$gene_name2[ok],
+    add_text(x = xtex, y = ytex, text = ttext,
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,

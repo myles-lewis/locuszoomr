@@ -413,7 +413,9 @@ zoom <- function(data, ens_db,
       loc$i <- loc1
       
       if (!is.null(eqtl_gene)) {
-        genes1 <- unique(eqtls)
+        ind <- loc1$data[, p] < pcutoff
+        eqtls <- loc1$data[ind, eqtl_gene]
+        genes$x <- genes1 <- unique(eqtls)
         locscheme <- unname(c('grey', eqtl_colour[genes1]))
         if (!is.null(input$select_gene) && input$select_gene != "all") {
           # filter gene
@@ -626,6 +628,14 @@ zoom <- function(data, ens_db,
              y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = yref)
       })
       ok <- !is.na(TX$gene_name2)
+      if (sum(ok) > 0) {
+        xtex <- TX$tx[ok]
+        ytex <- TX$ty[ok]
+        ttext <- TX$gene_name2[ok]
+      } else {
+        xtex <- ytex <- 0
+        ttext <- ""
+      }
       
       plotlyProxy("locus", session) %>%
         plotlyProxyInvoke("restyle",
@@ -633,8 +643,8 @@ zoom <- function(data, ens_db,
                                hoverinfo = "text"),
                           list(ntrace())) %>%
         plotlyProxyInvoke("update",
-                          list(x = list(TX$tx[ok]), y = list(TX$ty[ok]),
-                               text = list(TX$gene_name2[ok]), hoverinfo = "none"),
+                          list(x = list(xtex), y = list(ytex),
+                               text = list(ttext), hoverinfo = "none"),
                           list(shapes = shapes),
                           list(ntrace() + 1L)) %>%
         plotlyProxyInvoke("relayout",
