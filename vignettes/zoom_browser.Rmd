@@ -46,6 +46,22 @@ zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
 knitr::include_graphics("zoom1.png")
 ```
 
+### Navigation
+
+Click on points in the whole genome or individual chromosome manhattan plots to
+explore a particular locus. Alternatively, enter a gene name or SNP id or
+chromosome position and location into the 
+`r shiny::icon("magnifying-glass", style = "background-color: #00CD00")` input 
+text box. The locus plot can be navigated by zooming in/out, or moving
+left/right using the navigation icons. Dragging the locus plot will move the
+locus window. Also, the plotly `r shiny::icon("magnifying-glass")` selection
+tool can be used to select a specific region.
+
+The `r shiny::icon("gear")` icon allows users to toggle options such as showing
+the recombination rate (only if recomb data has been provided via `recomb`
+argument), expanding the gene tracks to show all genes, or selecting individual
+genes in eQTL data (if the `eqtl_gene` argument has been set).
+
 ### Add recombination rate
 
 Recombination rate can be shown on a secondary *y* axis. Whole recombination
@@ -70,21 +86,26 @@ recomb.hg19 <- import.bw("/../hapMapRelease24CombinedRecombMap.bw")
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19)
 ```
 
-### Navigation
+### Add LD via LDlink
 
-Click on points in the whole genome or individual chromosome manhattan plots to
-explore a particular locus. Alternatively, enter a gene name or SNP id or
-chromosome position and location into the 
-`r shiny::icon("magnifying-glass", style = "background-color: #00CD00")` input 
-text box. The locus plot can be navigated by zooming in/out, or moving
-left/right using the navigation icons. Dragging the locus plot will move the
-locus window. Also, the plotly `r shiny::icon("magnifying-glass")` selection
-tool can be used to select a specific region.
+The LDlink API can be queried from within the zoom browser. This requires an
+LDlink API access token, which can be obtained from the
+[LDlink](https://ldlink.nih.gov/?tab=home) website. The token is then supplied
+via the `ld_token` argument when calling `zoom()`.
 
-The `r shiny::icon("gear")` icon allows users to toggle options such as showing
-the recombination rate (only if recomb data has been provided via `recomb`
-argument), expanding the gene tracks to show all genes, or selecting individual
-genes in eQTL data (if the `eqtl_gene` argument has been set).
+```{r eval=FALSE}
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19, ld_token = "my_token")
+```
+
+This enables extra buttons for `Get LD` in the `r shiny::icon("gear")` settings
+dropdown menu. LD API requests are cached and retained during an R session, so
+subsequent requests for the same SNP are much faster. At each locus, the SNP
+with the lowest p-value is presumed to the index SNP for LD requests. But
+clicking on other points can re-base the LD to alternative SNPs.
+
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("zoom2.png")
+```
 
 ### Citation
 
