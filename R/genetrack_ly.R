@@ -114,7 +114,16 @@ genetrack_ly <- function(locus,
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks,
                prioritise = prioritise, xnudge = 0.005)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
+  annot <- NULL
+  if (max(TX$row) > maxrows) {
+    message(max(TX$row), " tracks needed to show all genes")
+    annot <- list(x = 1, y = -0.018,
+                  text = paste0("[", max(TX$row), " rows]"),
+                  font = list(size = 14 * cex.text),
+                  bgcolor = "rgba(255, 255, 255, 0.9)",
+                  xref = "paper", yref = "paper",
+                  showarrow = FALSE)
+  }
   TX <- TX[TX$row <= maxrows, ]
   EX <- EX[EX$gene_id %in% TX$gene_id, ]
   
@@ -189,6 +198,7 @@ genetrack_ly <- function(locus,
                    yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
                                 fixedrange = TRUE,
                                 showticklabels = FALSE),
+                   annotations = annot,
                    margin = list(b = 60),
                    showlegend = TRUE, dragmode = "pan") %>%
     plotly::config(displaylogo = FALSE,
