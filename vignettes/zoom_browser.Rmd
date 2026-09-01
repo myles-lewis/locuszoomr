@@ -10,7 +10,9 @@ vignette: >
 ---
 
 Here we demonstrate how to use the zoom browser to interactively browse whole
-genome GWAS or eQTL data.
+genome GWAS or eQTL data within an R session. Via a shiny/plotly interface,
+users can click on peaks in a whole genome manhattan plot to zoom in and out of
+regions and pan left or right using the interactive browser.
 
 ### Example GWAS data
 

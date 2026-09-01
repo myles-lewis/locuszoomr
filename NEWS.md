@@ -9,6 +9,10 @@ News
 allows users to browse whole GWAS or eQTL data, search for individual genes, 
 zoom in/out of regions, and navigate peaks via a whole genome manhattan plot.
 
+### Other changes
+* Rewrote row packing algorithm in C++ for speed.
+* Improved handling of no gene tracks in `locus_plotly`.
+
 # locuszoomr 0.3.10
 ###### 18/07/2026
 * Add edge gene labels if they fit (issue #43)
