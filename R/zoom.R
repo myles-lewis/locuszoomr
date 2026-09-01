@@ -621,11 +621,13 @@ zoom <- function(data, ens_db,
       ht <- seg2line(hovertext, hovertext)
       exon_col <- exon_border <- "#00008B"
       yref <- if (is.null(recomb) || !input$recomb) "y2" else "y3"
+      y0 <- -EX$row - 0.15
+      y1 <- -EX$row + 0.15
       shapes <- lapply(seq_len(nrow(EX)), function(i) {
         list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
                                                               width = 0.5),
              x0 = EX$start[i], x1 = EX$end[i], xref = "x",
-             y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = yref)
+             y0 = y0[i], y1 = y1[i], yref = yref)
       })
       ok <- !is.na(TX$gene_name2)
       if (sum(ok) > 0) {
