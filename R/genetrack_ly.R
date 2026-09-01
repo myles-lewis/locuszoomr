@@ -149,11 +149,13 @@ genetrack_ly <- function(locus,
   if (!plot) return(list(TX = TX, EX = EX))
   
   if (showExons) {
+    y0 <- -EX$row - 0.15
+    y1 <- -EX$row + 0.15
     shapes <- lapply(seq_len(nrow(EX)), function(i) {
       list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
                                                             width = 0.5),
            x0 = EX$start[i], x1 = EX$end[i], xref = "x",
-           y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
+           y0 = y0[i], y1 = y1[i], yref = "y")
     })
   } else {
     shapes <- lapply(seq_len(nrow(TX)), function(i) {
