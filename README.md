@@ -102,6 +102,22 @@ par(oldpar)
 dev.off()
 ```
 
+# Zoom browser
+
+The zoom browser allows users to interactively browse whole genome GWAS or eQTL
+data within an R session. Via a shiny/plotly interface, users can click on peaks
+in a whole genome manhattan plot to zoom in/out of regions and pan left/right
+using the interactive browser. The accompanying vignette shows how to add
+recombination rate and LD data.
+
+```
+# simple browser
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
+
+# use LDlink API - requires an access token
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", ld_token = "my_API_token")
+```
+
 # Citation
 
 If you use this package please cite as:

@@ -1,11 +1,14 @@
 Package: locuszoomr
 Title: Gene Locus Plot with Gene Annotations
-Version: 0.3.10
+Version: 1.0.0
 Authors@R:
     c(person(given = "Myles",family = "Lewis",
     role = c("aut", "cre"),
     email = "myles.lewis@qmul.ac.uk",
-    comment = c(ORCID = "0000-0001-9365-5345")))
+    comment = c(ORCID = "0000-0001-9365-5345")),
+    person(given = "Tom",family = "Willis",
+    role = c("ctb"))
+    )
 BugReports: https://github.com/myles-lewis/locuszoomr/issues
 URL: https://github.com/myles-lewis/locuszoomr
 Description: Publication-ready regional gene locus plots similar to those produced by the web interface 'LocusZoom' <https://my.locuszoom.org>, but running locally in R. Genetic or genomic data with gene annotation tracks are plotted via R base graphics, 'ggplot2' or 'plotly', allowing flexibility and easy customisation including laying out multiple locus plots on the same page. It uses the 'LDlink' API <https://ldlink.nih.gov/?tab=apiaccess> to query linkage disequilibrium data from the 1000 Genomes Project and can overlay this on plots <doi:10.1093/bioadv/vbaf006>.
@@ -19,6 +22,7 @@ Imports:
     BiocGenerics,
     cowplot,
     dplyr,
+    DT,
     ensembldb,
     GenomeInfoDb,
     GenomicRanges,
@@ -28,18 +32,28 @@ Imports:
     graphics,
     grDevices,
     grid,
+    gtools,
+    htmltools,
     IRanges,
     LDlinkR,
     memoise,
     plotly,
+    Rcpp,
     rlang,
     rtracklayer,
+    shiny,
+    shinycssloaders,
+    shinyFeedback,
+    shinyWidgets,
     zoo
+LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
+    AnnotationDbi,
     AnnotationHub,
     EnsDb.Hsapiens.v75,
     knitr,
+    org.Hs.eg.db,
     rmarkdown
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0

@@ -198,7 +198,8 @@ bquote_gene <- function(gene, strand, italics) {
 # map genes into rows without overlap
 mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7, 
                    xlim = range(TX[, c('start', 'end')]),
-                   text_pos = 'top', blanks = "fill", prioritise = NULL) {
+                   text_pos = 'top', blanks = "fill", prioritise = NULL,
+                   xnudge = 0.04) {
   blank <- TX$gene_name == ""
   if (any(blank)) {
     if (blanks == "fill") {
@@ -218,7 +219,7 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
                  cex = cex.text) * diff(xlim) / par("pin")[1]
   TX$mean <- rowMeans(TX[, c('start', 'end')])
   if (text_pos == 'top') {
-    xd <- diff(xlim) * 0.04
+    xd <- diff(xlim) * xnudge
     xlim2 <- xlim + c(-xd, xd)
     # left edge
     fix_left <- (TX$mean - gw / 2) < xlim2[1] & (xlim2[1] + gw) < TX$end
@@ -238,23 +239,29 @@ mapRow <- function(TX, gap = diff(xlim) * 0.02, cex.text = 0.7,
   } else if (text_pos == 'none') {
     TX$tmax <- TX$tmin <- TX$mean
   }
-  TX$min <- pmin(TX$start, TX$end, TX$tmin) - gap / 2
-  TX$max <- pmax(TX$start, TX$end, TX$tmax) + gap / 2
-  TX$row <- 0
-  j <- 1
-  while (any(TX$row == 0)) {
-    xset <- which(TX$row == 0)
-    for (i in xset) {
-      # overlap detection
-      if (!any(TX$min[i] < TX$max[TX$row == j] &
-               TX$max[i] > TX$min[TX$row == j])) {
-        TX$row[i] <- j
-      }
-    }
-    j <- j + 1
-  }
+  TX$min <- as.integer(pmin(TX$start, TX$end, TX$tmin) - gap / 2)
+  TX$max <- as.integer(pmax(TX$start, TX$end, TX$tmax) + gap / 2)
+  TX$row <- packrows_cpp(TX$min, TX$max)
   TX
 }
+
+
+# overlap detection
+# pack_rows <- function(txmin, txmax) {
+#   txrow <- integer(length(txmin))
+#   j <- 1L
+#   while (any(txrow == 0L)) {
+#     xset <- which(txrow == 0L)
+#     for (i in xset) {
+#       if (!any(txmin[i] < txmax[txrow == j] &
+#                txmax[i] > txmin[txrow == j])) {
+#         txrow[i] <- j
+#       }
+#     }
+#     j <- j + 1L
+#   }
+#   txrow
+# }
 
 
 # highlight selected genes

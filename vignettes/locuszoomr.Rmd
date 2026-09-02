@@ -9,7 +9,7 @@ output:
     toc_depth: 2
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{locuszoomr}
+  %\VignetteIndexEntry{locuszoomr guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

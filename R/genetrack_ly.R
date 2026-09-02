@@ -75,25 +75,55 @@ genetrack_ly <- function(locus,
   xext <- diff(xlim) * 0.01
   xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", locus$seqname, "(Mb)")
-  if (nrow(TX) == 0 & plot) {
+  if (nrow(TX) == 0) {
     message('No genes to plot')
-    # blank gene tracks
-    p <- plot_ly(data.frame(NA), mode = "markers", type = "scatter",
-                 source = "plotly_locus") %>%
-      plotly::layout(xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
-                                  color = 'black', ticklen = 5,
-                                  range = as.list(xlim)),
-                     yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
-                                  showticklabels = FALSE)) %>%
-      plotly::config(displaylogo = FALSE)
-    return(p)
+    if (plot) {
+      # blank gene tracks
+      p <- plot_ly(TX, source = "plotly_locus", height = height) %>%
+        add_segments(x = ~start, y = 0,
+                     xend = ~end, yend = 0,
+                     color = I(gene_col),
+                     showlegend = FALSE) %>%
+        add_text(x = 0, y = 0, text = "",
+                 textfont = list(size = 14 * cex.text),
+                 showlegend = FALSE) %>%
+        plotly::layout(xaxis = list(title = list(text = xlab, standoff = 10),
+                                    showgrid = FALSE, showline = TRUE,
+                                    zeroline = FALSE,
+                                    color = 'black', ticklen = 5,
+                                    range = as.list(xlim)),
+                       yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
+                                    fixedrange = TRUE,
+                                    showticklabels = FALSE),
+                       annotations = list(x = 0, y = 0.02, text = "No gene tracks",
+                                          xref = "paper", yref = "paper",
+                                          showarrow = FALSE),
+                       margin = list(b = 60),
+                       showlegend = TRUE, dragmode = "pan") %>%
+        plotly::config(displaylogo = FALSE,
+                       modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                  "autoScale2d", "resetScale2d",
+                                                  "hoverClosest", "hoverCompare"))
+      return(p)
+    } else {
+      return(list(TX = TX, EX = EX[FALSE, ]))
+    }
   }
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks,
-               prioritise = prioritise)
+               prioritise = prioritise, xnudge = 0.005)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
-  if (max(TX$row) > maxrows) message(max(TX$row), " tracks needed to show all genes")
+  annot <- NULL
+  if (max(TX$row) > maxrows) {
+    message(max(TX$row), " tracks needed to show all genes")
+    annot <- list(x = 1, y = -0.018,
+                  text = paste0("[", max(TX$row), " rows]"),
+                  font = list(size = 14 * cex.text),
+                  bgcolor = "rgba(255, 255, 255, 0.9)",
+                  xref = "paper", yref = "paper",
+                  showarrow = FALSE)
+  }
   TX <- TX[TX$row <= maxrows, ]
   EX <- EX[EX$gene_id %in% TX$gene_id, ]
   
@@ -103,12 +133,12 @@ genetrack_ly <- function(locus,
   EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
-  TX$tx <- rowMeans(TX[, c('start', 'end')])
+  TX$tx <- TX$mean
   TX$ty <- -TX$row + 0.35
   TX[, c('start', 'end', 'tx')] <- TX[, c('start', 'end', 'tx')] / 1e6
   
-  tfilter <- TX$tmin > (xrange[1] - diff(xrange) * 0.005) & 
-             (TX$tmax < xrange[2] + diff(xrange) * 0.005) &
+  tfilter <- TX$tmin >= (xrange[1] - diff(xrange) * 0.005) & 
+             (TX$tmax <= xrange[2] + diff(xrange) * 0.005) &
              TX$gene_name != ""
   pos <- TX$strand == "+"
   TX$gene_name2 <- if (italics) paste0("<i>", TX$gene_name, "</i>") else TX$gene_name
@@ -119,11 +149,13 @@ genetrack_ly <- function(locus,
   if (!plot) return(list(TX = TX, EX = EX))
   
   if (showExons) {
+    y0 <- -EX$row - 0.15
+    y1 <- -EX$row + 0.15
     shapes <- lapply(seq_len(nrow(EX)), function(i) {
       list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
                                                             width = 0.5),
            x0 = EX$start[i], x1 = EX$end[i], xref = "x",
-           y0 = -EX$row[i] - 0.15, y1 = -EX$row[i] + 0.15, yref = "y")
+           y0 = y0[i], y1 = y1[i], yref = "y")
     })
   } else {
     shapes <- lapply(seq_len(nrow(TX)), function(i) {
@@ -135,6 +167,15 @@ genetrack_ly <- function(locus,
   }
   
   ok <- !is.na(TX$gene_name2)
+  if (sum(ok) > 0) {
+    xtex <- TX$tx[ok]
+    ytex <- TX$ty[ok]
+    ttext <- TX$gene_name2[ok]
+  } else {
+    xtex <- ytex <- 0
+    ttext <- ""
+  }
+  
   hovertext <- paste0(TX$gene_name,
                       TX$fullname,
                       "<br>Gene ID: ", TX$gene_id,
@@ -147,17 +188,20 @@ genetrack_ly <- function(locus,
                  color = I(gene_col),
                  text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
-    add_text(x = TX$tx[ok], y = TX$ty[ok], text = TX$gene_name2[ok],
+    add_text(x = xtex, y = ytex, text = ttext,
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
-                   xaxis = list(title = xlab, showgrid = FALSE, showline = TRUE,
+                   xaxis = list(title = list(text = xlab, standoff = 10),
+                                showgrid = FALSE, showline = TRUE,
                                 zeroline = FALSE,
                                 color = 'black', ticklen = 5,
                                 range = as.list(xlim)),
                    yaxis = list(title = "", showgrid = FALSE, zeroline = FALSE,
                                 fixedrange = TRUE,
                                 showticklabels = FALSE),
+                   annotations = annot,
+                   margin = list(b = 60),
                    showlegend = TRUE, dragmode = "pan") %>%
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",
