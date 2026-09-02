@@ -102,7 +102,7 @@ zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19, ld_token = "
 This enables extra buttons for `Get LD` in the `r shiny::icon("gear")` settings
 dropdown menu. LD API requests are cached and retained during an R session, so
 subsequent requests for the same SNP are much faster. At each locus, the SNP
-with the lowest p-value is presumed to the index SNP for LD requests. But
+with the lowest p-value is presumed to be the index SNP for LD requests. But
 clicking on other points can re-base the LD to alternative SNPs.
 
 ```{r, out.width='100%', echo=FALSE}
