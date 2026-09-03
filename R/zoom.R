@@ -706,7 +706,8 @@ zoom <- function(data, ens_db,
     
   }
   
-  runApp(list(ui = ui, server = server))
+  runApp(list(ui = ui, server = server)) %>%
+    suppress_warnings("please add `event_register\\(p")
 }
 
 
@@ -888,4 +889,16 @@ eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
   eqtl_set <- unique(sigdat[, eqtl_gene])
   message(length(eqtl_set), " eQTL genes")
   setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
+}
+
+
+suppress_warnings <- function(expr, pattern) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl(pattern, conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
 }
