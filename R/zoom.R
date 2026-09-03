@@ -687,6 +687,7 @@ zoom <- function(data, ens_db,
     })
     
     observe({
+      req(loc$i)
       s <- event_data("plotly_click", source = "plotly_locus")
       req(s, !is.null(s$key))
       cur <- isolate(ld_snp())
@@ -888,12 +889,4 @@ eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
   eqtl_set <- unique(sigdat[, eqtl_gene])
   message(length(eqtl_set), " eQTL genes")
   setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
-}
-
-
-ntrace_ld <- function(ld) {
-  bg <- cut(ld, -1:6/5, labels = FALSE)
-  bg[ld == 0] <- 2L
-  bg[is.na(bg)] <- 1L
-  length(unique(bg)) +1L
 }
