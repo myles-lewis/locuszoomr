@@ -687,7 +687,6 @@ zoom <- function(data, ens_db,
     })
     
     observe({
-      req(loc$i)
       s <- event_data("plotly_click", source = "plotly_locus")
       req(s, !is.null(s$key))
       cur <- isolate(ld_snp())
