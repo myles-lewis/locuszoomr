@@ -35,7 +35,7 @@ Install from CRAN
 install.packages("locuszoomr")
 ```
 
-Install from Github
+Install from Github (C++ compiler required)
 ```
 devtools::install_github("myles-lewis/locuszoomr")
 ```
