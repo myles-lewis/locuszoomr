@@ -455,6 +455,9 @@ zoom <- function(data, ens_db,
                       seqname = coords$chr, ens_db = ens_db,
                       chrom = chrom[2], pos = pos[2], p = p[2], labs = labs[2],
                       tx = FALSE)
+        if (!is.null(recomb) && input$recomb) {
+          loc2 <- link_recomb(loc2, recomb = recomb)
+        }
       }
       
       isolate(cur_index(loc1$index_snp))
@@ -504,7 +507,7 @@ zoom <- function(data, ens_db,
         tryTX <- mapRow(loc1$TX, xlim = loc1$xrange, cex.text = cex.width,
                         blanks = "show")
         needrow <- pmax(max(tryTX$row, na.rm = TRUE), 8)
-        h <- c(364, 24 * needrow + 80)
+        h <- if (!man2) c(364, 24 * needrow + 80) else c(230, 230, 20 * needrow + 40)
         maxrows <- NULL
       }
       hideFeedback("tex")
@@ -602,7 +605,7 @@ zoom <- function(data, ens_db,
         m <- mean(c(start(loc), end(loc)))
         xr <- as.integer(c(m - 5e5, m + 5e5))
       } else if (grepl("^rs", input$tex)) {
-        w <- which(data[, labs] == input$tex)
+        w <- which(data[, labs[1]] == input$tex)
         if (length(w) > 0) {
           chr <- data[w[1], chrom[1]]
           xr <- data[w[1], pos[1]] + c(-5e5, 5e5)

@@ -86,10 +86,31 @@ locus_plotly <- function(loc,
   if (!is.null(loc2)) {
     p2 <- scatter_plotly(loc2, xlab = xlab, height = pheights[2],
                          showlegend = FALSE, ...)
-    return(plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
-                           titleY = TRUE, margin = 0))
+    pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
+                           titleY = TRUE, margin = c(0, 0, 0, 0.02))
+    return(remap_overlaying_yaxes(pp))
   }
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                   titleY = TRUE, margin = 0)
+}
+
+
+# fix double y axis with >1 scatter_plotly
+# from Tom Willis
+remap_overlaying_yaxes <- function(p) {
+  lay <- p$x$layout
+  nms <- grep("^yaxis[0-9]*$", names(lay), value = TRUE)
+  base <- nms[vapply(nms, function(n) is.null(lay[[n]]$overlaying), logical(1))]
+  for (n in setdiff(nms, base)) {
+    dom <- lay[[n]]$domain
+    if (is.null(dom)) next
+    hit <- base[vapply(base,
+                       function(b) isTRUE(all.equal(lay[[b]]$domain, dom)),
+                       logical(1))]
+    if (length(hit) == 1L) {
+      p$x$layout[[n]]$overlaying <- sub("^yaxis", "y", hit)
+    }
+  }
+  p
 }
