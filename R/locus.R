@@ -259,18 +259,19 @@ summary.locus <- function(object, ...) {
 
 detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
   # autodetect headings
-  if (is.null(chrom)) {
+  if (is.null(chrom) || is.na(chrom)) {
     w <- grep("chr", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       chrom <- colnames(data)[w]
     } else stop("unable to autodetect chromosome column")
   }
-  if (is.null(pos)) {
+  if (is.null(pos) || is.na(pos)) {
     w <- grep("pos", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       pos <- colnames(data)[w]
     } else stop("unable to autodetect SNP position column")
   }
+  if (!is.null(p) && is.na(p)) p <- NULL
   if (!is.null(p) && !is.null(yvar)) stop("cannot specify both `p` and `yvar`")
   if (is.null(p) && is.null(yvar)) {
     if ("p" %in% colnames(data)) {
@@ -282,7 +283,7 @@ detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
       } else stop("unable to autodetect p-value column")
     }
   }
-  if (is.null(labs)) {
+  if (is.null(labs) || is.na(labs)) {
     w <- grep("rs?id", colnames(data), ignore.case = TRUE)
     if (length(w) > 1) stop("unable to autodetect SNP id column")
     if (length(w) == 0) {

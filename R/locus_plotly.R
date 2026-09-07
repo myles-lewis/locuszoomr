@@ -51,7 +51,9 @@
 #' }
 #' @export
 
-locus_plotly <- function(loc, heights = c(0.6, 0.4),
+locus_plotly <- function(loc,
+                         loc2 = NULL,
+                         heights = c(0.6, 0.4),
                          filter_gene_name = NULL,
                          filter_gene_biotype = NULL,
                          cex.text = 0.7,
@@ -66,18 +68,27 @@ locus_plotly <- function(loc, heights = c(0.6, 0.4),
                          prioritise = NULL,
                          blanks = "show",
                          ...) {
+  if (!is.null(loc2) && length(heights) == 2) {
+    heights <- c(0.375, 0.375, 0.25)
+  }
   pheights <- NULL
   if (any(heights > 1)) {
     pheights <- heights
-    pheights[2] <- sum(heights)
+    pheights[length(pheights)] <- sum(heights)
     heights <- heights / sum(heights)
   }
   
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     italics, gene_col, exon_col, exon_border, showExons, 
                     maxrows, width, xlab, prioritise, blanks,
-                    height = pheights[2])
+                    height = pheights[length(pheights)])
   p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
+  if (!is.null(loc2)) {
+    p2 <- scatter_plotly(loc2, xlab = xlab, height = pheights[2],
+                         showlegend = FALSE, ...)
+    return(plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
+                           titleY = TRUE, margin = 0))
+  }
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                   titleY = TRUE, margin = 0)
