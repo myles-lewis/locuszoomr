@@ -48,6 +48,7 @@
 #'   Y, and filtering of genes to only those whose transcript ids start with
 #'   "ENS" are applied. For users with novel genome assemblies, this probably
 #'   needs to be set to `FALSE`.
+#' @param tx Logical, whether to include transcript/exon annotations.
 #' @return Returns a list object of class 'locus' ready for plotting,
 #'   containing:
 #' \item{seqname}{chromosome value}
@@ -98,7 +99,8 @@ locus <- function(data = NULL,
                   labs = NULL,
                   index_snp = NULL,
                   LD = NULL,
-                  std_filter = TRUE) {
+                  std_filter = TRUE,
+                  tx = TRUE) {
   if (is.character(ens_db)) {
     if (!ens_db %in% (.packages())) {
       stop("Ensembl database not loaded. Try: library(", ens_db, ")",
@@ -168,8 +170,8 @@ locus <- function(data = NULL,
   message(msg)
   
   if (!is.null(data)) {
-    data <- data[which(data[, chrom] == seqname), ]
-    data <- data[which(data[, pos] > xrange[1] & data[, pos] < xrange[2]), ]
+    data <- data[which(data[, chrom] == seqname & data[, pos] > xrange[1] &
+                         data[, pos] < xrange[2]), ]
     # smallest floating point
     data[data[, p] < 5e-324, p] <- 5e-324
     if (is.null(yvar)) {
@@ -193,25 +195,29 @@ locus <- function(data = NULL,
   seqname <- gsub("chr|[[:punct:]]", "", seqname, ignore.case = TRUE)
   if (!seqname %in% c(1:22, "X", "Y")) 
     warning("`seqname` refers to a non-conventional chromosome")
-  TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(seqname),
-    TxStartFilter(xrange[2], condition = "<"),
-    TxEndFilter(xrange[1], condition = ">"), genefilt))
-  TX <- data.frame(TX)
-  TX <- TX[! is.na(TX$start), ]
-  TX <- TX[!duplicated(TX$gene_id), ]
-  
-  if (nrow(TX) == 0) {
-    message("No gene transcripts")
-    # Creating empty exons object here in suitable format
-    EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+  if (tx) {
+    TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
       SeqNameFilter(seqname),
-      ExonStartFilter(xrange[2], condition = "<"),
-      ExonEndFilter(xrange[1], condition = ">"), genefilt))
+      TxStartFilter(xrange[2], condition = "<"),
+      TxEndFilter(xrange[1], condition = ">"), genefilt))
+    TX <- data.frame(TX)
+    TX <- TX[! is.na(TX$start), ]
+    TX <- TX[!duplicated(TX$gene_id), ]
+    
+    if (nrow(TX) == 0) {
+      message("No gene transcripts")
+      # Creating empty exons object here in suitable format
+      EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+        SeqNameFilter(seqname),
+        ExonStartFilter(xrange[2], condition = "<"),
+        ExonEndFilter(xrange[1], condition = ">"), genefilt))
+    } else {
+      EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+    }
   } else {
-    EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+    TX <- EX <- NULL
   }
-
+  
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
               ens_version = ensemblVersion(edb),
