@@ -59,11 +59,41 @@ scatter_plotly <- function(loc,
                            height = NULL,
                            webGL = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
   
   .call <- match.call()
   data <- loc$data
+  xlim <- loc$xrange / 1e6
+  xext <- diff(xlim) * 0.01
+  xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
+  type <- if (webGL) "scattergl" else "scatter"
+  
+  if (is.null(data)) {
+    data <- data.frame(matrix(nrow = 0, ncol = 5))
+    colnames(data) <- loc[c("chrom", "pos", "p", "yvar", "labs")]
+    # blank plot
+    p <- plot_ly(data,
+                 x = data[, loc$pos], y = data[, loc$yvar],
+                 showlegend = FALSE,
+                 source = "plotly_locus", height = height,
+                 type = type, mode = "markers") %>%
+      plotly::layout(xaxis = list(title = xlab,
+                                  ticks = "outside",
+                                  zeroline = FALSE, showgrid = FALSE,
+                                  range = as.list(xlim)),
+                     yaxis = list(title = "",
+                                  showticklabels = FALSE,
+                                  zeroline = FALSE, showgrid = FALSE),
+                     annotations = list(x = 0.5, y = 0.5, text = "No SNP data",
+                                        xref = "paper", yref = "paper",
+                                        showarrow = FALSE)) %>%
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"))
+    return(p)
+  }
+  
   if (is.null(ylab)) {
     ylab <- if (loc$yvar == "logP") "-log<sub>10</sub> P" else loc$yvar
   }
@@ -127,10 +157,6 @@ scatter_plotly <- function(loc,
   # scatter plotly
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
   
-  xlim <- loc$xrange / 1e6
-  xext <- diff(xlim) * 0.01
-  xlim <- xlim + c(-xext, xext)
-  
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) ylim[1] <- min(c(0, ylim[1]))
   ydiff <- diff(ylim)
@@ -147,11 +173,12 @@ scatter_plotly <- function(loc,
     }
   }
   
+  if (!is.null(loc$data)) {
   hline <- list(type = "line",
                 line = list(width = 1, color = '#999999', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
-  type <- if (webGL) "scattergl" else "scatter"
+  } else hline <- NULL
   
   if (!recomb) {
     if (is.null(beta)) {
@@ -251,6 +278,12 @@ scatter_plotly <- function(loc,
                      shapes = hline,
                      legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
+  if (is.null(loc$data)) {
+    p <- p %>%
+      plotly::layout(yaxis = list(title = "", showticklabels = FALSE,
+                                  zeroline = FALSE, showline = FALSE))
+  }
+  
   p <- p %>%
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",

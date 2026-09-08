@@ -11,6 +11,8 @@
 #' more information.
 #' 
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
+#' @param loc2 Optional 2nd 'locus' object to be layered underneath the 1st
+#'   scatter plot.
 #' @param heights Vector controlling relative height of each panel on 0-1 scale.
 #'   Alternatively a vector of length 2 of height in pixels passed to
 #'   `scatter_plotly()` and `genetrack_ly()`.
@@ -33,6 +35,8 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param ylab Title for y axis, or a vector of 2 titles for each y axis if
+#'   `loc2` is provided.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
@@ -65,6 +69,7 @@ locus_plotly <- function(loc,
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         ylab = NULL,
                          prioritise = NULL,
                          blanks = "show",
                          ...) {
@@ -82,10 +87,10 @@ locus_plotly <- function(loc,
                     italics, gene_col, exon_col, exon_border, showExons, 
                     maxrows, width, xlab, prioritise, blanks,
                     height = pheights[length(pheights)])
-  p <- scatter_plotly(loc, xlab = xlab, height = pheights[1], ...)
+  p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1], ...)
   if (!is.null(loc2)) {
-    p2 <- scatter_plotly(loc2, xlab = xlab, height = pheights[2],
-                         showlegend = FALSE, ...)
+    p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
+                         height = pheights[2], showlegend = FALSE, ...)
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
     return(remap_overlaying_yaxes(pp))
