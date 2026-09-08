@@ -73,7 +73,7 @@
 #' @importFrom shiny textInput conditionalPanel h5 runApp debounce isolate
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
-#' @importFrom shiny showNotification removeNotification
+#' @importFrom shiny showNotification removeNotification HTML
 #' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
 #' @importFrom shinyWidgets pickerInput pickerOptions dropdown
 #' @importFrom shinycssloaders withSpinner
