@@ -951,9 +951,9 @@ zoom <- function(data, ens_db,
         oldpar <- set_layers(2)
         on.exit(par(oldpar))
         scatter_plot(loc$i, xticks = FALSE, bty = "u",
-                     ylab = paste(traits[1], "-log10 P"))
+                     ylab = bquote(.(traits[1]) ~ -log[10] ~ P))
         scatter_plot(locv2$i, xticks = FALSE, bty = "u",
-                     ylab = paste(traits[2], "-log10 P"))
+                     ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
         genetracks(loc$i, blanks = "hide")
       }
       dev.off()
