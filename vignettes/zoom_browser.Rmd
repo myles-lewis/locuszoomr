@@ -109,6 +109,15 @@ clicking on other points can re-base the LD to alternative SNPs.
 knitr::include_graphics("zoom2.png")
 ```
 
+### Saving plots
+
+There are 2 methods for saving plots. The easiest is to click the camera icon 
+`r shiny::icon("camera")` in the plotly modebar. This exports the plotly as an svg.
+
+The 2nd method is to click the `r shiny::icon("floppy-disk")` save icon. This
+exports the current plot to a pdf using base graphics (note: the formatting will
+be different).
+
 ### Citation
 
 If you use this package please cite as:
