@@ -73,6 +73,7 @@ manhattan <- function(data,
 plotly_manhattan <- function(obj,
                              scheme = c('royalblue', 'skyblue', 'red'),
                              xlab = "Chromosome",
+                             ylab = "-log<sub>10</sub> P",
                              pcutline = NULL,
                              source = "plotly_manh") {
   
@@ -113,7 +114,7 @@ plotly_manhattan <- function(obj,
           source = source) %>%
     plotly::layout(xaxis = xlayout,
                    yaxis = list(range = yr,
-                                title = "-log<sub>10</sub> P",
+                                title = ylab,
                                 ticks = "outside",
                                 zeroline = FALSE, showline = TRUE),
                    shapes = hline)

@@ -156,13 +156,15 @@ zoom <- function(data, ens_db,
   data[which(data[, p[1]] < 5e-324), p[1]] <- 5e-324
   manhat <- manhattan(data, chrom[1], pos[1], p[1], labs[1], pcutoff = pcutoff,
                       npoints = mh_points)
-  
+  man_ylab <- "-log<sub>10</sub> P"
+    
   if (man2) {
     message("Generating Manhattan plot 2")
     data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
     data2[which(data2[, p[2]] < 5e-324), p[2]] <- 5e-324
     manhat2 <- manhattan(data2, chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
                          npoints = mh_points)
+    man_ylab <- paste(traits, man_ylab)
   }
   
   js <- '$(document).on("keyup", function(e) {
@@ -292,13 +294,13 @@ zoom <- function(data, ens_db,
   server <- function(input, output, session) {
     
     output$manhattan <- renderPlotly({
-      plotly_manhattan(manhat, pcutline = NULL) %>%
+      plotly_manhattan(manhat, ylab = man_ylab[1], pcutline = NULL) %>%
         config(displayModeBar = FALSE)
     })
     
     output$manhattan2 <- renderPlotly({
       req(man2)
-      plotly_manhattan(manhat2, pcutline = NULL,
+      plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
                        scheme = c("#33a02c", "#b2df8a", "purple"),
                        source = "plotly_manh2") %>%
         config(displayModeBar = FALSE)
@@ -384,7 +386,7 @@ zoom <- function(data, ens_db,
       plotlyProxy("manhattan", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
@@ -396,7 +398,34 @@ zoom <- function(data, ens_db,
       plotlyProxy("manhattan", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
+                                            ticks = "outside",
+                                            zeroline = FALSE, showline = TRUE)))
+    })
+    
+    # zoom manhattan2 y axis
+    m_ylim2 <- reactiveValues(max = manhat2$yrange[2])
+    
+    observeEvent(input$m_zoomin2, {
+      m_ylim2$max <- pmax(m_ylim2$max * 0.88, 5)
+      yr <- c(manhat2$yrange[1], m_ylim2$max)
+      yr <- yr + diff(yr) * c(-0.05, 0.05)
+      plotlyProxy("manhattan2", session) %>%
+        plotlyProxyInvoke("relayout",
+                          list(yaxis = list(range = yr,
+                                            title = man_ylab[2],
+                                            ticks = "outside",
+                                            zeroline = FALSE, showline = TRUE)))
+    })
+    
+    observeEvent(input$m_zoomout2, {
+      m_ylim2$max <- pmin(m_ylim2$max / 0.88, manhat2$yrange[2])
+      yr <- c(manhat2$yrange[1], m_ylim2$max)
+      yr <- yr + diff(yr) * c(-0.05, 0.05)
+      plotlyProxy("manhattan2", session) %>%
+        plotlyProxyInvoke("relayout",
+                          list(yaxis = list(range = yr,
+                                            title = man_ylab[2],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
