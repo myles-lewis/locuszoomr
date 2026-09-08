@@ -329,14 +329,6 @@ zoom <- function(data, ens_db,
         config(displayModeBar = FALSE)
     })
     
-    output$manhattan2 <- renderPlotly({
-      req(man2)
-      plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
-                       scheme = scheme2,
-                       source = "plotly_manh2") %>%
-        config(displayModeBar = FALSE)
-    })
-    
     output$chrom <- renderPlotly({
       req(coords$chr)
       validate(need(coords$chr %in% chr_set[[1]], "No data for this chromosome"))
@@ -367,35 +359,6 @@ zoom <- function(data, ens_db,
     
     coords <- reactiveValues(chr = NULL, xrange = NULL)
     
-    # chromosome plotly 2
-    output$chrom2 <- renderPlotly({
-      req(man2, coords$chr)
-      validate(need(coords$chr %in% chr_set[[2]], "No data for this chromosome"))
-      chr_manhat2 <- manhattan(data2[which(data2[, chrom[2]] == coords$chr), ],
-                              chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
-                              npoints = 1e5)
-      chr <- suppressWarnings(as.numeric(coords$chr))
-      if ((!is.na(chr) && chr %% 2 == 0 || coords$chr == "Y")) {
-        scheme2[1] <- scheme2[2]
-      }
-      yr <- range(chr_manhat2$data$logP, na.rm = TRUE)
-      isolate(chr_y2$range <- yr)
-      isolate(chr_y2$max <- yr[2])
-      isolate(xr <- coords$xrange)
-      
-      plotly_manhattan(chr_manhat2, scheme = scheme2, ylab = man_ylab[2],
-                       source = "plotly_chrom2") %>%
-        layout(margin = list(t = 5),
-               shapes = list(
-                 list(type = "rect",
-                      line = list(width = 1, color = "red"),
-                      x0 = xr[1] / 1e6,
-                      x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                      xref = "x", yref = "paper", layer = "below"))
-        ) %>%
-        config(displayModeBar = FALSE)
-    })
-    
     # hide picker at start
     output$coords_ok <- reactive({!is.null(coords$chr)})
     outputOptions(output, "coords_ok", suspendWhenHidden = FALSE)
@@ -407,19 +370,6 @@ zoom <- function(data, ens_db,
       if (length(w) > 0) {
         coords$chr <- data[w[1], chrom[1]]
         xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
-        if (xr[1] < 0) xr <- c(0, 1e6)
-        coords$xrange <- xr
-      }
-    })
-    
-    # 2nd manhattan click
-    observe({
-      s <- event_data("plotly_click", source = "plotly_manh2")
-      req(s)
-      w <- which(data2[, labs[2]] == s$key)
-      if (length(w) > 0) {
-        coords$chr <- data2[w[1], chrom[2]]
-        xr <- data2[w[1], pos[2]] + c(-5e5, 5e5)
         if (xr[1] < 0) xr <- c(0, 1e6)
         coords$xrange <- xr
       }
@@ -464,33 +414,6 @@ zoom <- function(data, ens_db,
                                             zeroline = FALSE, showline = TRUE)))
     })
     
-    # zoom manhattan2 y axis
-    m_ylim2 <- reactiveValues(max = manhat2$yrange[2])
-    
-    observeEvent(input$m_zoomin2, {
-      m_ylim2$max <- pmax(m_ylim2$max * 0.88, 5)
-      yr <- c(manhat2$yrange[1], m_ylim2$max)
-      yr <- yr + diff(yr) * c(-0.05, 0.05)
-      plotlyProxy("manhattan2", session) %>%
-        plotlyProxyInvoke("relayout",
-                          list(yaxis = list(range = yr,
-                                            title = man_ylab[2],
-                                            ticks = "outside",
-                                            zeroline = FALSE, showline = TRUE)))
-    })
-    
-    observeEvent(input$m_zoomout2, {
-      m_ylim2$max <- pmin(m_ylim2$max / 0.88, manhat2$yrange[2])
-      yr <- c(manhat2$yrange[1], m_ylim2$max)
-      yr <- yr + diff(yr) * c(-0.05, 0.05)
-      plotlyProxy("manhattan2", session) %>%
-        plotlyProxyInvoke("relayout",
-                          list(yaxis = list(range = yr,
-                                            title = man_ylab[2],
-                                            ticks = "outside",
-                                            zeroline = FALSE, showline = TRUE)))
-    })
-    
     # zoom chrom y axis
     chr_y <- reactiveValues(max = 0, range = c(0, 0))
     
@@ -518,32 +441,113 @@ zoom <- function(data, ens_db,
                                             zeroline = FALSE, showline = TRUE)))
     })
     
-    # zoom chrom2 y axis
-    chr_y2 <- reactiveValues(max = 0, range = c(0, 0))
-    
-    observeEvent(input$chr_zoomin2, {
-      chr_y2$max <- pmax(chr_y2$max * 0.88, 5)
-      yr <- c(chr_y2$range[1], chr_y2$max)
-      yr <- yr + diff(yr) * c(-0.05, 0.05)
-      plotlyProxy("chrom2", session) %>%
-        plotlyProxyInvoke("relayout",
-                          list(yaxis = list(range = yr,
-                                            title = man_ylab[2],
-                                            ticks = "outside",
-                                            zeroline = FALSE, showline = TRUE)))
-    })
-    
-    observeEvent(input$chr_zoomout2, {
-      chr_y2$max <- pmin(chr_y2$max / 0.88, chr_y2$range[2])
-      yr <- c(chr_y2$range[1], chr_y2$max)
-      yr <- yr + diff(yr) * c(-0.05, 0.05)
-      plotlyProxy("chrom2", session) %>%
-        plotlyProxyInvoke("relayout",
-                          list(yaxis = list(range = yr,
-                                            title = man_ylab[2],
-                                            ticks = "outside",
-                                            zeroline = FALSE, showline = TRUE)))
-    })
+    # 2nd gwas
+    if (man2) {
+      output$manhattan2 <- renderPlotly({
+        req(man2)
+        plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
+                         scheme = scheme2,
+                         source = "plotly_manh2") %>%
+          config(displayModeBar = FALSE)
+      })
+      
+      # chromosome plotly 2
+      output$chrom2 <- renderPlotly({
+        req(man2, coords$chr)
+        validate(need(coords$chr %in% chr_set[[2]], "No data for this chromosome"))
+        chr_manhat2 <- manhattan(data2[which(data2[, chrom[2]] == coords$chr), ],
+                                 chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
+                                 npoints = 1e5)
+        chr <- suppressWarnings(as.numeric(coords$chr))
+        if ((!is.na(chr) && chr %% 2 == 0 || coords$chr == "Y")) {
+          scheme2[1] <- scheme2[2]
+        }
+        yr <- range(chr_manhat2$data$logP, na.rm = TRUE)
+        isolate(chr_y2$range <- yr)
+        isolate(chr_y2$max <- yr[2])
+        isolate(xr <- coords$xrange)
+        
+        plotly_manhattan(chr_manhat2, scheme = scheme2, ylab = man_ylab[2],
+                         source = "plotly_chrom2") %>%
+          layout(margin = list(t = 5),
+                 shapes = list(
+                   list(type = "rect",
+                        line = list(width = 1, color = "red"),
+                        x0 = xr[1] / 1e6,
+                        x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
+                        xref = "x", yref = "paper", layer = "below"))
+          ) %>%
+          config(displayModeBar = FALSE)
+      })
+      
+      # 2nd manhattan click
+      observe({
+        s <- event_data("plotly_click", source = "plotly_manh2")
+        req(s)
+        w <- which(data2[, labs[2]] == s$key)
+        if (length(w) > 0) {
+          coords$chr <- data2[w[1], chrom[2]]
+          xr <- data2[w[1], pos[2]] + c(-5e5, 5e5)
+          if (xr[1] < 0) xr <- c(0, 1e6)
+          coords$xrange <- xr
+        }
+      })
+      
+      # zoom manhattan2 y axis
+      m_ylim2 <- reactiveValues(max = manhat2$yrange[2])
+      
+      observeEvent(input$m_zoomin2, {
+        m_ylim2$max <- pmax(m_ylim2$max * 0.88, 5)
+        yr <- c(manhat2$yrange[1], m_ylim2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      observeEvent(input$m_zoomout2, {
+        m_ylim2$max <- pmin(m_ylim2$max / 0.88, manhat2$yrange[2])
+        yr <- c(manhat2$yrange[1], m_ylim2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      # zoom chrom2 y axis
+      chr_y2 <- reactiveValues(max = 0, range = c(0, 0))
+      
+      observeEvent(input$chr_zoomin2, {
+        chr_y2$max <- pmax(chr_y2$max * 0.88, 5)
+        yr <- c(chr_y2$range[1], chr_y2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      observeEvent(input$chr_zoomout2, {
+        chr_y2$max <- pmin(chr_y2$max / 0.88, chr_y2$range[2])
+        yr <- c(chr_y2$range[1], chr_y2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+    }  # end of 2nd manhattan section
     
     input_biotype <- reactive({input$biotype}) %>% debounce(2000)
     
@@ -602,7 +606,7 @@ zoom <- function(data, ens_db,
       loc$i <- loc1
       
       if (!is.null(eqtl_gene)) {
-        ind <- loc1$data[, p] < pcutoff
+        ind <- loc1$data[, p[1]] < pcutoff
         eqtls <- loc1$data[ind, eqtl_gene]
         genes$x <- genes1 <- unique(eqtls)
         locscheme <- unname(c('grey', eqtl_colour[genes1]))
@@ -811,7 +815,9 @@ zoom <- function(data, ens_db,
                           "<br>End: ", TX$end * 1e6)
       ht <- seg2line(hovertext, hovertext)
       exon_col <- exon_border <- "#00008B"
-      yref <- if (is.null(recomb) || !input$recomb) "y2" else "y3"
+      rec <- !is.null(recomb) && input$recomb
+      yref <- paste0("y", rec + man2 + rec * man2 +2)
+      
       y0 <- -EX$row - 0.15
       y1 <- -EX$row + 0.15
       shapes <- lapply(seq_len(nrow(EX)), function(i) {
