@@ -55,6 +55,7 @@ importFrom(LDlinkR,
   LDmatrix,
   LDproxy
 )
+importFrom(Rcpp,sourceCpp)
 importFrom(cowplot,plot_grid)
 importFrom(dplyr,bind_rows)
 importFrom(ensembldb,
@@ -122,7 +123,6 @@ importFrom(grid,
   xaxisGrob
 )
 importFrom(gtools,mixedsort)
-importFrom(Rcpp, sourceCpp)
 importFrom(htmltools,
   br,
   tags
