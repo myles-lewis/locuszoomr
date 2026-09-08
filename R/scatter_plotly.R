@@ -90,7 +90,8 @@ scatter_plotly <- function(loc,
       plotly::config(displaylogo = FALSE,
                      modeBarButtonsToRemove = c("select2d", "lasso2d",
                                                 "autoScale2d", "resetScale2d",
-                                                "hoverClosest", "hoverCompare"))
+                                                "hoverClosest", "hoverCompare"),
+                     toImageButtonOptions = list(format = "svg"))
     return(p)
   }
   
@@ -288,7 +289,8 @@ scatter_plotly <- function(loc,
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",
                                               "autoScale2d", "resetScale2d",
-                                              "hoverClosest", "hoverCompare"))
+                                              "hoverClosest", "hoverCompare"),
+                   toImageButtonOptions = list(format = "svg"))
   
   if (hasLD) suppressWarnings(plotly_build(p)) else p
 }
