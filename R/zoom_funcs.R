@@ -117,7 +117,8 @@ plotly_manhattan <- function(obj,
                                 title = ylab,
                                 ticks = "outside",
                                 zeroline = FALSE, showline = TRUE),
-                   shapes = hline)
+                   shapes = hline) %>%
+    config(displayModeBar = FALSE)
 }
 
 

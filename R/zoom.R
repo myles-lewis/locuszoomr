@@ -333,8 +333,7 @@ zoom <- function(data, ens_db,
     
     output$manhattan <- renderPlotly({
       plotly_manhattan(manhat, ylab = man_ylab[1], pcutline = NULL,
-                       scheme = scheme) %>%
-        config(displayModeBar = FALSE)
+                       scheme = scheme)
     })
     
     output$chrom <- renderPlotly({
@@ -360,9 +359,7 @@ zoom <- function(data, ens_db,
                       line = list(width = 1, color = "#00CD00"),
                       x0 = xr[1] / 1e6,
                       x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                      xref = "x", yref = "paper", layer = "below"))
-               ) %>%
-        config(displayModeBar = FALSE)
+                      xref = "x", yref = "paper", layer = "below")))
     })
     
     coords <- reactiveValues(chr = NULL, xrange = NULL)
@@ -455,8 +452,7 @@ zoom <- function(data, ens_db,
         req(man2)
         plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
                          scheme = scheme2,
-                         source = "plotly_manh2") %>%
-          config(displayModeBar = FALSE)
+                         source = "plotly_manh2")
       })
       
       # chromosome plotly 2
@@ -483,9 +479,7 @@ zoom <- function(data, ens_db,
                         line = list(width = 1, color = "red"),
                         x0 = xr[1] / 1e6,
                         x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                        xref = "x", yref = "paper", layer = "below"))
-          ) %>%
-          config(displayModeBar = FALSE)
+                        xref = "x", yref = "paper", layer = "below")))
       })
       
       # 2nd manhattan click
