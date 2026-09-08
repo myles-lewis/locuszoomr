@@ -366,7 +366,7 @@ zoom <- function(data, ens_db,
     observe({
       s <- event_data("plotly_click", source = "plotly_manh")
       req(s)
-      w <- which(data[, labs] == s$key)
+      w <- which(data[, labs[1]] == s$key)
       if (length(w) > 0) {
         coords$chr <- data[w[1], chrom[1]]
         xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
@@ -378,10 +378,10 @@ zoom <- function(data, ens_db,
     observe({
       s <- event_data("plotly_click", source = "plotly_chrom")
       req(s)
-      w <- which(data[, labs] == s$key)
+      w <- which(data[, labs[1]] == s$key)
       if (length(w) > 0) {
         coords$chr <- data[w[1], chrom[1]]
-        xr <- data[w[1], pos] + c(-5e5, 5e5)
+        xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
         if (xr[1] < 0) xr <- c(0, 1e6)
         coords$xrange <- xr
       }
@@ -493,6 +493,19 @@ zoom <- function(data, ens_db,
         }
       })
       
+      # 2nd chrom click
+      observe({
+        s <- event_data("plotly_click", source = "plotly_chrom2")
+        req(s)
+        w <- which(data2[, labs[2]] == s$key)
+        if (length(w) > 0) {
+          coords$chr <- data2[w[1], chrom[2]]
+          xr <- data2[w[1], pos[2]] + c(-5e5, 5e5)
+          if (xr[1] < 0) xr <- c(0, 1e6)
+          coords$xrange <- xr
+        }
+      })
+      
       # zoom manhattan2 y axis
       m_ylim2 <- reactiveValues(max = manhat2$yrange[2])
       
@@ -545,6 +558,20 @@ zoom <- function(data, ens_db,
                                               title = man_ylab[2],
                                               ticks = "outside",
                                               zeroline = FALSE, showline = TRUE)))
+      })
+      
+      # chrom2 highlight
+      observeEvent(coords$xrange, {
+        req(man2, input$show_chrom, coords$chr)
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = list(
+                              list(type = "rect",
+                                   line = list(width = 1, color = "red"),
+                                   x0 = coords$xrange[1] / 1e6,
+                                   x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
+                                   xref = "x", yref = "paper", layer = "below")
+                            )))
       })
       
     }  # end of 2nd manhattan section
