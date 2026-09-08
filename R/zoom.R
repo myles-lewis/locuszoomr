@@ -73,7 +73,7 @@
 #' @importFrom shiny textInput conditionalPanel h5 runApp debounce isolate
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
-#' @importFrom shiny showNotification removeNotification HTML
+#' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
 #' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
 #' @importFrom shinyWidgets pickerInput pickerOptions dropdown
 #' @importFrom shinycssloaders withSpinner
@@ -81,6 +81,7 @@
 #' @importFrom DT datatable formatSignif
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
+#' @importFrom grDevices dev.off pdf
 #' @export
 
 zoom <- function(data, ens_db,
@@ -275,7 +276,7 @@ zoom <- function(data, ens_db,
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
-                        actionButton("save", NULL, icon = icon("floppy-disk"))
+                        uiOutput("save_ui", inline = T)
                         ),
                  column(3,
                         textOutput("pos"),
@@ -586,6 +587,7 @@ zoom <- function(data, ens_db,
     input_biotype <- reactive({input$biotype}) %>% debounce(2000)
     
     loc <- reactiveValues(i = NULL)
+    locv2 <- reactiveValues(i = NULL)
     ntrace <- reactiveVal()
     genes <- reactiveValues(x = NULL)
     ld_snp <- reactiveVal(NULL)
@@ -613,6 +615,7 @@ zoom <- function(data, ens_db,
         if (!is.null(recomb) && input$recomb) {
           loc2 <- link_recomb(loc2, recomb = recomb)
         }
+        locv2$i <- loc2
       }
       
       isolate(cur_index(loc1$index_snp))
@@ -933,6 +936,33 @@ zoom <- function(data, ens_db,
     output$ld_status <- renderText({
       req(ld_snp() %in% loc$i$data[, labs])
       paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+    })
+    
+    # inline conditional UI
+    output$save_ui <- renderUI({
+      req(coords$chr)
+      downloadButton("save", NULL, icon = icon("floppy-disk"))
+    })
+    
+    # save files
+    output$save <- downloadHandler(filename = function() {
+      paste0("loc_", dat_name, "_", coords$chr, "_", coords$xrange[1], ".pdf")
+    },
+    content = function(file) {
+      req(loc$i)
+      pdf(file)
+      if (!man2) {
+        locus_plot(loc$i)
+      } else {
+        oldpar <- set_layers(2)
+        on.exit(par(oldpar))
+        scatter_plot(loc$i, xticks = FALSE, bty = "u",
+                     ylab = paste(traits[1], "-log10 P"))
+        scatter_plot(locv2$i, xticks = FALSE, bty = "u",
+                     ylab = paste(traits[2], "-log10 P"))
+        genetracks(loc$i, blanks = "hide")
+      }
+      dev.off()
     })
     
   }

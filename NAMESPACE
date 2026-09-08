@@ -95,7 +95,9 @@ importFrom(ggrepel,geom_text_repel)
 importFrom(grDevices,
   adjustcolor,
   col2rgb,
+  dev.off,
   hcl.colors,
+  pdf,
   rainbow,
   rgb
 )
@@ -160,6 +162,8 @@ importFrom(shiny,
   column,
   conditionalPanel,
   debounce,
+  downloadButton,
+  downloadHandler,
   fluidPage,
   fluidRow,
   h5,
