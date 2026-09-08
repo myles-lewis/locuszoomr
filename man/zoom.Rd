@@ -62,7 +62,7 @@ datasets.}
 \item{scheme}{Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
 for alternating chromosomes, 3rd colour for significant points.}
 
-\item{scheme2}{Vector of colours for optional 2nd Manhattan plot.}
+\item{scheme2}{Vector of colours for 2nd Manhattan plot.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}

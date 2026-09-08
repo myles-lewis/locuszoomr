@@ -39,7 +39,7 @@
 #'   contains SNP rs IDs. See `chrom`.
 #' @param scheme Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
 #'   for alternating chromosomes, 3rd colour for significant points.
-#' @param scheme2 Vector of colours for optional 2nd Manhattan plot.
+#' @param scheme2 Vector of colours for 2nd Manhattan plot.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param eqtl_gene Determines which column in `data` contains eQTL genes.
@@ -189,6 +189,13 @@ zoom <- function(data, ens_db,
     # 3 plotly scattergl figures gives error "too many active WebGL contexts"
     # see https://plotly.com/python/webgl-vs-svg/
     tags$script(src = "https://unpkg.com/virtual-webgl@1.0.6/src/virtual-webgl.js"),
+    tags$head(
+      tags$style(HTML("
+      .shiny-output-error-validation {
+        display: flex;
+        align-items: center;
+      }"))
+    ),
     useShinyFeedback(),
     tabsetPanel(
       tabPanel("Plot",
