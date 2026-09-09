@@ -795,6 +795,7 @@ zoom <- function(data, ens_db,
     # Table tab
     output$table <- DT::renderDataTable({
       cols <- colnames(data)[sapply(data, class) == "numeric"]
+      cols <- cols[!cols %in% c(chrom[1], pos[1])]
       datatable(data) %>% formatSignif(cols, digits = 3)
     })
     
