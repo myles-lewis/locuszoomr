@@ -311,6 +311,8 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
+                          radioButtons("export", h5("Export"),
+                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           (if (!is.null(eqtl_gene)) {
                             uiOutput("ui_genes")
                           } else NULL),
@@ -586,6 +588,7 @@ zoom <- function(data, ens_db,
     genes <- reactiveValues(x = NULL)
     ld_snp <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
+    save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
       req(coords$chr, coords$xrange)
@@ -669,6 +672,7 @@ zoom <- function(data, ens_db,
                    loc2 = if (man2) loc2 else NULL,
                    ylab = man_ylab)
       ntrace(length(p$x$data) -2)
+      save_plotly$p <- p
       p
     })
     
@@ -940,23 +944,28 @@ zoom <- function(data, ens_db,
     
     # save files
     output$save <- downloadHandler(filename = function() {
-      paste0("loc_", dat_name, "_", coords$chr, "_", coords$xrange[1], ".pdf")
+      paste0("loc_", dat_name, "_", coords$chr, "_", coords$xrange[1], ".",
+             input$export)
     },
     content = function(file) {
       req(loc$i)
-      pdf(file)
-      if (!man2) {
-        locus_plot(loc$i)
+      if (input$export == "pdf") {
+        pdf(file)
+        if (!man2) {
+          locus_plot(loc$i)
+        } else {
+          oldpar <- set_layers(2)
+          on.exit(par(oldpar))
+          scatter_plot(loc$i, xticks = FALSE, bty = "u",
+                       ylab = bquote(.(traits[1]) ~ -log[10] ~ P))
+          scatter_plot(locv2$i, xticks = FALSE, bty = "u",
+                       ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
+          genetracks(loc$i, blanks = "hide")
+        }
+        dev.off()
       } else {
-        oldpar <- set_layers(2)
-        on.exit(par(oldpar))
-        scatter_plot(loc$i, xticks = FALSE, bty = "u",
-                     ylab = bquote(.(traits[1]) ~ -log[10] ~ P))
-        scatter_plot(locv2$i, xticks = FALSE, bty = "u",
-                     ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
-        genetracks(loc$i, blanks = "hide")
+        saveRDS(save_plotly$p, file)
       }
-      dev.off()
     })
     
   }
