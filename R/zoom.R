@@ -166,7 +166,8 @@ zoom <- function(data, ens_db,
   manhat <- manhattan(data, chrom[1], pos[1], p[1], labs[1], pcutoff = pcutoff,
                       npoints = mh_points)
   man_ylab <- "-log<sub>10</sub> P"
-    
+  height <- c(300, 220, 624)
+  
   if (man2) {
     message("Generating Manhattan plot 2")
     data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
@@ -175,6 +176,7 @@ zoom <- function(data, ens_db,
     manhat2 <- manhattan(data2, chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
                          npoints = mh_points)
     man_ylab <- paste(traits, man_ylab)
+    height <- c(220, 180, 824)
   }
   
   js <- '$(document).on("keyup", function(e) {
@@ -203,7 +205,7 @@ zoom <- function(data, ens_db,
                fluidRow(
                  column(11,
                         withSpinner(
-                          plotlyOutput("manhattan", width = "85vw", height = "300px"),
+                          plotlyOutput("manhattan", width = "85vw", height = height[1]),
                           type = 8, size = 0.7)
                  ),
                  column(1,
@@ -215,7 +217,7 @@ zoom <- function(data, ens_db,
                  fluidRow(
                    column(11,
                           withSpinner(
-                            plotlyOutput("manhattan2", width = "85vw", height = "300px"),
+                            plotlyOutput("manhattan2", width = "85vw", height = height[1]),
                             type = 8, size = 0.7)
                    ),
                    column(1,
@@ -231,7 +233,7 @@ zoom <- function(data, ens_db,
                                          fluidRow(
                                            column(11,
                                                   withSpinner(
-                                                    plotlyOutput("chrom", width = "85vw", height = "220px"),
+                                                    plotlyOutput("chrom", width = "85vw", height = height[2]),
                                                     type = 8, size = 0.7)
                                            ),
                                            column(1,
@@ -250,7 +252,7 @@ zoom <- function(data, ens_db,
                                            fluidRow(
                                              column(11,
                                                     withSpinner(
-                                                      plotlyOutput("chrom2", width = "85vw", height = "220px"),
+                                                      plotlyOutput("chrom2", width = "85vw", height = height[2]),
                                                       type = 8, size = 0.7)
                                              ),
                                              column(1,
@@ -321,7 +323,7 @@ zoom <- function(data, ens_db,
                  ),
                  fluidRow(
                    column(12,
-                          plotlyOutput("locus", width = "95vw", height = 624)
+                          plotlyOutput("locus", width = "95vw", height = height[3])
                    )
                  )
       ),
