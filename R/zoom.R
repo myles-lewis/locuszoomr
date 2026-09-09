@@ -664,7 +664,7 @@ zoom <- function(data, ens_db,
         tryTX <- mapRow(loc1$TX, xlim = loc1$xrange, cex.text = cex.width,
                         blanks = "show")
         needrow <- pmax(max(tryTX$row, na.rm = TRUE), 8)
-        h <- if (!man2) c(364, 24 * needrow + 80) else c(230, 230, 20 * needrow + 40)
+        h <- if (!man2) c(364, 24 * needrow + 80) else c(305, 305, 20 * needrow + 40)
         maxrows <- NULL
       }
       hideFeedback("tex")
