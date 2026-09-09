@@ -955,13 +955,16 @@ zoom <- function(data, ens_db,
       if (input$export == "pdf") {
         pdf(file)
         if (!man2) {
-          locus_plot(loc$i)
+          locus_plot(loc$i, eqtl_gene = eqtl_gene, beta = eqtl_beta,
+                     blanks = "hide")
         } else {
           oldpar <- set_layers(2)
           on.exit(par(oldpar))
-          scatter_plot(loc$i, xticks = FALSE, bty = "u",
-                       ylab = bquote(.(traits[1]) ~ -log[10] ~ P))
-          scatter_plot(locv2$i, xticks = FALSE, bty = "u",
+          bty <- if (!is.null(recomb) && input$recomb) "u" else "l" 
+          scatter_plot(loc$i, xticks = FALSE, bty = bty,
+                       ylab = bquote(.(traits[1]) ~ -log[10] ~ P),
+                       eqtl_gene = eqtl_gene, beta = eqtl_beta)
+          scatter_plot(locv2$i, xticks = FALSE, bty = bty,
                        ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
           genetracks(loc$i, blanks = "hide")
         }
