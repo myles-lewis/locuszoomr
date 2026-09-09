@@ -600,8 +600,8 @@ zoom <- function(data, ens_db,
       loc1 <- locus(data = data, xrange = coords$xrange,
                      seqname = coords$chr, ens_db = ens_db,
                      chrom = chrom[1], pos = pos[1], p = p[1], labs = labs[1])
-      # validate(need(loc1$data, "Locus contains no SNPs/datapoints"))
-      validate(need(nrow(loc1$data) < 1.5e5, "Too many datapoints. Zoom in."))
+      validate(need(is.null(loc1$data) || nrow(loc1$data) < 1.5e5,
+                    "Too many datapoints. Zoom in."))
       loc1$TX$fullname <- expandGenes(loc1$TX, fullnames)
       if (!is.null(recomb) && input$recomb) {
         loc1 <- link_recomb(loc1, recomb = recomb)
