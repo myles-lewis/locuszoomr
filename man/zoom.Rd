@@ -67,16 +67,17 @@ for alternating chromosomes, 3rd colour for significant points.}
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.}
+\item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.
+Currently \code{data2} cannot be used to show eQTL colour data.}
 
-\item{eqtl_beta}{Optional column name for beta coefficient to display upward
-triangles for positive beta and downward triangles for negative beta
-(significant SNPs only).}
+\item{eqtl_beta}{Optional column name in \code{data} for beta coefficient to
+display upward triangles for positive beta and downward triangles for
+negative beta (significant SNPs only).}
 
 \item{eqtl_scheme}{Colour scheme for eQTL genes.}
 
-\item{add_hover}{Optional vector of column names in 'data' to add to the
-plotly hover text for scatter points.}
+\item{add_hover}{Optional vector of column names in \code{data} to add to the
+plotly hover text for scatter points. Not available for \code{data2}.}
 
 \item{mh_points}{Number of points to display in manhattan plot. Default is
 \code{1e5}.}

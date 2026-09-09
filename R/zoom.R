@@ -43,12 +43,13 @@
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param eqtl_gene Determines which column in `data` contains eQTL genes.
-#' @param eqtl_beta Optional column name for beta coefficient to display upward
-#'   triangles for positive beta and downward triangles for negative beta
-#'   (significant SNPs only).
+#'   Currently `data2` cannot be used to show eQTL colour data.
+#' @param eqtl_beta Optional column name in `data` for beta coefficient to
+#'   display upward triangles for positive beta and downward triangles for
+#'   negative beta (significant SNPs only).
 #' @param eqtl_scheme Colour scheme for eQTL genes.
-#' @param add_hover Optional vector of column names in 'data' to add to the
-#'   plotly hover text for scatter points.
+#' @param add_hover Optional vector of column names in `data` to add to the
+#'   plotly hover text for scatter points. Not available for `data2`.
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
@@ -154,7 +155,7 @@ zoom <- function(data, ens_db,
   fullnames <- fullGeneNames(edb, AnnotationDb)
    
   if (!is.null(eqtl_gene)) {
-    eqtl_colour <- eqtl_colours(data[data[, p] < pcutoff, ], chrom, pos,
+    eqtl_colour <- eqtl_colours(data[data[, p[1]] < pcutoff, ], chrom[1], pos[1],
                                 eqtl_gene, eqtl_scheme)
   }
   

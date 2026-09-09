@@ -133,7 +133,12 @@ unique_snps <- function(data, labs, append) {
   dups <- which(duplicated(snps))
   if (length(dups) > 0) {
     message("Duplicated SNPs found")
-    snps[dups] <- make.unique(paste(snps[dups], data[dups, append], sep = "."))
+    append_col <- data[dups, append]
+    # only append X, Y, or genes (not pure numbers)
+    ok <- is.na(suppressWarnings(as.numeric(append_col)))
+    snps2 <- snps[dups]
+    snps2[ok] <- paste(snps2[ok], append_col[ok], sep = ".")
+    snps[dups] <- make.unique(snps2)
   }
   snps
 }

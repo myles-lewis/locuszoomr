@@ -90,7 +90,7 @@ locus_plotly <- function(loc,
   p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1], ...)
   if (!is.null(loc2)) {
     p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
-                         height = pheights[2], showlegend = FALSE, ...)
+                         height = pheights[2], showlegend = FALSE)
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
     return(remap_overlaying_yaxes(pp))
