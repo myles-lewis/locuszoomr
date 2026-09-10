@@ -112,7 +112,8 @@ knitr::include_graphics("zoom2.png")
 ### Saving plots
 
 There are 3 methods for saving plots. The easiest is to click the camera icon 
-`r shiny::icon("camera")` in the plotly modebar. This exports the plotly as an svg.
+`r shiny::icon("camera")` in the plotly modebar. This exports the plotly as an
+svg based on the current screen dimensions.
 
 The 2nd method is to click the `r shiny::icon("floppy-disk")` save icon. This
 exports the current plot to a pdf using base graphics (note: the formatting will
@@ -124,7 +125,8 @@ into R, this can be viewed as a standard plotly by calling the object (which
 generates the html). This also allows the plotly to be embedded in markdown
 documents as the plotly object will output html when called. The plotly
 features which don't rely on shiny for updates are preserved, e.g. hover
-information.
+information. However shiny dependent features such as gene track reordering
+based on display width won't function.
 
 ### Citation
 
