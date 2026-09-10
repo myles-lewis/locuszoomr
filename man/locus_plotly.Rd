@@ -22,6 +22,7 @@ locus_plotly(
   ylab = NULL,
   prioritise = NULL,
   blanks = "show",
+  beta = NULL,
   ...
 )
 }
@@ -74,6 +75,12 @@ in \code{locus}.}
 blank gene symbols with ensembl gene ids. \code{"hide"} completely hides genes
 which are missing gene symbols. \code{"show"} shows gene lines but no label
 (hovertext is still available).}
+
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only). If \code{loc2} is supplied, then a vector can be used
+to specify different beta columns in \code{loc} and \code{loc2}; use \code{NA} to indicate
+no \code{beta}.}
 
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}

@@ -17,7 +17,7 @@ zoom(
   scheme2 = c("#33a02c", "#b2df8a", "purple"),
   pcutoff = 5e-08,
   eqtl_gene = NULL,
-  eqtl_beta = NULL,
+  beta = NULL,
   eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00", "#0000FF",
     "#80DD00", "#8000FF", "#009900", "#FF00FF"),
   add_hover = NULL,
@@ -70,9 +70,11 @@ to \code{NULL} to disable.}
 \item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.
 Currently \code{data2} cannot be used to show eQTL colour data.}
 
-\item{eqtl_beta}{Optional column name in \code{data} for beta coefficient to
-display upward triangles for positive beta and downward triangles for
-negative beta (significant SNPs only).}
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only). If \code{data2} is supplied, then a vector can be used
+to specify different beta columns in \code{data} and \code{data2}; use \code{NA} to
+indicate no \code{beta}.}
 
 \item{eqtl_scheme}{Colour scheme for eQTL genes.}
 

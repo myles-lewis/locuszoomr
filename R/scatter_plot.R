@@ -100,6 +100,8 @@ scatter_plot <- function(loc,
     ylab <- if (loc$yvar == "logP") expression("-log"[10] ~ "P") else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
+  if (hasLD) beta <- NULL
+  if (!is.null(beta) && (is.na(beta) || beta == "")) beta <- NULL
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)

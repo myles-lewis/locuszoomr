@@ -44,9 +44,11 @@
 #'   to `NULL` to disable.
 #' @param eqtl_gene Determines which column in `data` contains eQTL genes.
 #'   Currently `data2` cannot be used to show eQTL colour data.
-#' @param eqtl_beta Optional column name in `data` for beta coefficient to
-#'   display upward triangles for positive beta and downward triangles for
-#'   negative beta (significant SNPs only).
+#' @param beta Optional column name for beta coefficient to display upward
+#'   triangles for positive beta and downward triangles for negative beta
+#'   (significant SNPs only). If `data2` is supplied, then a vector can be used
+#'   to specify different beta columns in `data` and `data2`; use `NA` to
+#'   indicate no `beta`.
 #' @param eqtl_scheme Colour scheme for eQTL genes.
 #' @param add_hover Optional vector of column names in `data` to add to the
 #'   plotly hover text for scatter points. Not available for `data2`.
@@ -93,7 +95,7 @@ zoom <- function(data, ens_db,
                  scheme2 = c("#33a02c", "#b2df8a", "purple"),
                  pcutoff = 5e-8,
                  eqtl_gene = NULL,
-                 eqtl_beta = NULL,
+                 beta = NULL,
                  eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00",
                                  "#0000FF", "#80DD00", "#8000FF", "#009900", "#FF00FF"),
                  add_hover = NULL,
@@ -118,6 +120,7 @@ zoom <- function(data, ens_db,
     if (!is.null(pos)) pos <- rep_len(pos, 2)
     if (!is.null(p)) p <- rep_len(p, 2)
     if (!is.null(labs)) labs <- rep_len(labs, 2)
+    if (!is.null(beta)) beta <- rep_len(beta, 2)
     dc2 <- detect_cols(data2, chrom[2], pos[2], p[2], labs[2])
     if (is.null(traits)) traits <- c(dat_name, dat2_name)
     man2 <- TRUE
@@ -670,7 +673,7 @@ zoom <- function(data, ens_db,
       }
       hideFeedback("tex")
       p <- locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
-                   width = width, eqtl_gene = eqtl_gene, beta = eqtl_beta,
+                   width = width, eqtl_gene = eqtl_gene, beta = beta,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
                    loc2 = if (man2) loc2 else NULL,
                    ylab = man_ylab)
@@ -956,7 +959,7 @@ zoom <- function(data, ens_db,
       if (input$export == "pdf") {
         pdf(file)
         if (!man2) {
-          locus_plot(loc$i, eqtl_gene = eqtl_gene, beta = eqtl_beta,
+          locus_plot(loc$i, eqtl_gene = eqtl_gene, beta = beta,
                      blanks = "hide")
         } else {
           oldpar <- set_layers(2)
@@ -964,8 +967,8 @@ zoom <- function(data, ens_db,
           bty <- if (!is.null(recomb) && input$recomb) "u" else "l" 
           scatter_plot(loc$i, xticks = FALSE, bty = bty,
                        ylab = bquote(.(traits[1]) ~ -log[10] ~ P),
-                       eqtl_gene = eqtl_gene, beta = eqtl_beta)
-          scatter_plot(locv2$i, xticks = FALSE, bty = bty,
+                       eqtl_gene = eqtl_gene, beta = beta[1])
+          scatter_plot(locv2$i, xticks = FALSE, bty = bty, beta = beta[2],
                        ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
           genetracks(loc$i, blanks = "hide")
         }

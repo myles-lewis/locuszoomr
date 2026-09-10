@@ -42,6 +42,11 @@
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
 #'   which are missing gene symbols. `"show"` shows gene lines but no label
 #'   (hovertext is still available).
+#' @param beta Optional column name for beta coefficient to display upward
+#'   triangles for positive beta and downward triangles for negative beta
+#'   (significant SNPs only). If `loc2` is supplied, then a vector can be used
+#'   to specify different beta columns in `loc` and `loc2`; use `NA` to indicate
+#'   no `beta`.
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -72,6 +77,7 @@ locus_plotly <- function(loc,
                          ylab = NULL,
                          prioritise = NULL,
                          blanks = "show",
+                         beta = NULL,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -87,10 +93,12 @@ locus_plotly <- function(loc,
                     italics, gene_col, exon_col, exon_border, showExons, 
                     maxrows, width, xlab, prioritise, blanks,
                     height = pheights[length(pheights)])
-  p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1], ...)
+  p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
+                      beta = beta[1], ...)
   if (!is.null(loc2)) {
+    if (!is.null(beta)) beta <- rep_len(beta, 2)
     p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
-                         height = pheights[2], showlegend = FALSE)
+                         height = pheights[2], showlegend = FALSE, beta = beta[2])
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
     return(remap_overlaying_yaxes(pp))

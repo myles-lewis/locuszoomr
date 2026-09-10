@@ -128,8 +128,11 @@ scatter_plotly <- function(loc,
                         labels = c("ns", paste("P <", signif(pcutoff, 3)), "index"))
     }
   }
+  if (hasLD) beta <- NULL
+  if (!is.null(beta) && (is.na(beta) || beta == "")) beta <- NULL
   if (!is.null(beta)) {
     # beta symbols
+    if (!beta %in% colnames(data)) stop("beta column not found in `data`")
     data[, beta] <- signif(data[, beta], 3)
     symbol <- as.character(sign(data[, beta]))
     ind <- data[, loc$p] > pcutoff
