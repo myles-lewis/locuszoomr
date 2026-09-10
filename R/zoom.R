@@ -618,13 +618,14 @@ zoom <- function(data, ens_db,
         if (!is.null(recomb) && input$recomb) {
           loc2 <- link_recomb(loc2, recomb = recomb)
         }
-        locv2$i <- loc2
       }
       
+      # retrieve LD
       isolate(cur_index(loc1$index_snp))
       pin <- ld_snp()
       ld_msg <- NULL
-      if (!is.null(pin) && pin %in% loc1$data[, labs[1]]) {
+      if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
+          (man2 && pin %in% loc2$data[, labs[2]]))) {
         loc1$index_snp <- pin
         loc1b <- withCallingHandlers(
           try(link_LD(loc1, token = ld_token, pop = ld_pop)),
@@ -642,8 +643,15 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
+        if (man2 && !is.null(pin) && "ld" %in% colnames(loc1$data)) {
+          loc2$index_snp <- pin
+          loc2b <- try(link_LD(loc2, token = ld_token, pop = ld_pop))
+          if (!inherits(loc2b, "try-error")) loc2 <- loc2b
+        }
       }
+       
       loc$i <- loc1
+      if (man2) locv2$i <- loc2
       
       if (!is.null(eqtl_gene)) {
         ind <- loc1$data[, p[1]] < pcutoff
@@ -925,6 +933,7 @@ zoom <- function(data, ens_db,
       removeNotification("ld_busy")
     })
     
+    # LD rebase click on locus
     observe({
       s <- event_data("plotly_click", source = "plotly_locus")
       req(s, !is.null(s$key))
@@ -939,7 +948,11 @@ zoom <- function(data, ens_db,
     })
     
     output$ld_status <- renderText({
-      req(ld_snp() %in% loc$i$data[, labs])
+      if (man2) {
+        req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+      } else {
+        req(ld_snp() %in% loc$i$data[, labs])
+      }
       paste0("LD: ", ld_snp(), " (", ld_pop, ")")
     })
     
