@@ -162,7 +162,7 @@ zoom <- function(data, ens_db,
                                 eqtl_gene, eqtl_scheme)
   }
   
-  show_ld <- nzchar(ld_token) && is.null(eqtl_gene)
+  show_ld <- nzchar(ld_token)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point

@@ -101,7 +101,7 @@ scatter_plotly <- function(loc,
   hasLD <- "ld" %in% colnames(data)
   leg <- list()
   if (!"bg" %in% colnames(data)) {
-    if (showLD & hasLD) {
+    if (showLD && hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[data$ld == 0] <- 2L
       data$bg[is.na(data$bg)] <- 1L
@@ -147,7 +147,7 @@ scatter_plotly <- function(loc,
     if (!webGL) sizes <- sizes/2
     leg <- list(traceorder = "reversed")
   } else {
-    if (is.null(eqtl_gene)) {
+    if (is.null(eqtl_gene) || (showLD & hasLD)) {
       # default plot
       data$symbol <- data$bg
       symbols <- c(rep("circle", length(scheme) -1), "diamond")
