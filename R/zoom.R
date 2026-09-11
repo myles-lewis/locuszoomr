@@ -615,6 +615,8 @@ zoom <- function(data, ens_db,
                       seqname = coords$chr, ens_db = ens_db,
                       chrom = chrom[2], pos = pos[2], p = p[2], labs = labs[2],
                       tx = FALSE)
+        validate(need(is.null(loc2$data) || nrow(loc2$data) < 1e5,
+                      "Too many datapoints. Zoom in."))
         if (!is.null(recomb) && input$recomb) {
           loc2 <- link_recomb(loc2, recomb = recomb)
         }
