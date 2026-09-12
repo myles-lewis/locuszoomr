@@ -109,6 +109,19 @@ clicking on other points can re-base the LD to alternative SNPs.
 knitr::include_graphics("zoom2.png")
 ```
 
+### Dual GWAS browsing
+
+Using the `data2` argument, users can browse 2 GWAS at the same time. Shown
+below, eQTL data from synovial tissue is compared to data from a rheumatoid
+arthritis GWAS. The display now has 2 whole genome manhattan plots followed by 2
+optional chromosome plots for the current locus, followed by the dual layered
+locus plot.
+
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("dbl_gwas_manh.png")
+knitr::include_graphics("dbl_loc_eqtl.png")
+```
+
 ### Saving plots
 
 There are 3 methods for saving plots. The easiest is to click the camera icon 

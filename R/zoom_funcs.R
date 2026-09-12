@@ -56,15 +56,20 @@ manhattan <- function(data,
     data$col[data[, p] < pcutoff] <- length(chromCols) + 1
     colScheme <- c(chromCols, sigCol)
   }
+  xticks <- chrom_range <- NULL
   if (length(chrom_list) > 1) {
-    xticks <- list(at = chrom_cumsum + 0.5 * (maxpos - minpos), 
+    chrom_widths <- maxpos - minpos
+    xticks <- list(at = chrom_cumsum + 0.5 * chrom_widths, 
                    labels = levels(data[, chrom]))
-  } else xticks <- NULL
+    chrom_range <- matrix(c(chrom_cumsum, chrom_cumsum + chrom_widths),
+                          ncol = 2, dimnames = list(chrom_list, NULL))
+  }
   
   yrange <- range(data$logP, na.rm = TRUE)
   
-  ret <- list(data = data, xticks = xticks, pcutoff = pcutoff,
-              chrom_list = chrom_list, labs = labs, yrange = yrange)
+  ret <- list(data = data, xticks = xticks, chrom_range = chrom_range,
+              pcutoff = pcutoff, chrom_list = chrom_list, labs = labs,
+              yrange = yrange)
   class(ret) <- "manhattan"
   ret
 }

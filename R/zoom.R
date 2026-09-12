@@ -367,7 +367,7 @@ zoom <- function(data, ens_db,
                       line = list(width = 1, color = "#00CD00"),
                       x0 = xr[1] / 1e6,
                       x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                      xref = "x", yref = "paper", layer = "below")))
+                      xref = "x", yref = "paper", layer = "above")))
     })
     
     coords <- reactiveValues(chr = NULL, xrange = NULL)
@@ -487,7 +487,7 @@ zoom <- function(data, ens_db,
                         line = list(width = 1, color = "red"),
                         x0 = xr[1] / 1e6,
                         x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                        xref = "x", yref = "paper", layer = "below")))
+                        xref = "x", yref = "paper", layer = "above")))
       })
       
       # 2nd manhattan click
@@ -570,6 +570,21 @@ zoom <- function(data, ens_db,
                                               zeroline = FALSE, showline = TRUE)))
       })
       
+      # main manhattan2 highlight
+      observeEvent(coords$chr, {
+        req(coords$chr)
+        chrom_range <- manhat2$chrom_range[coords$chr, ]
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = list(
+                              list(type = "rect",
+                                   line = list(width = 1, color = "red"),
+                                   x0 = chrom_range[1],
+                                   x1 = chrom_range[2], y0 = 0, y1 = 1,
+                                   xref = "x", yref = "paper", layer = "above")
+                            )))
+      })
+      
       # chrom2 highlight
       observeEvent(coords$xrange, {
         req(man2, input$show_chrom, coords$chr)
@@ -580,7 +595,7 @@ zoom <- function(data, ens_db,
                                    line = list(width = 1, color = "red"),
                                    x0 = coords$xrange[1] / 1e6,
                                    x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
-                                   xref = "x", yref = "paper", layer = "below")
+                                   xref = "x", yref = "paper", layer = "above")
                             )))
       })
       
@@ -903,6 +918,21 @@ zoom <- function(data, ens_db,
                           list(annotations = list(NULL)))
     })
     
+    # main manhattan highlight
+    observeEvent(coords$chr, {
+      req(coords$chr)
+      chrom_range <- manhat$chrom_range[coords$chr, ]
+      plotlyProxy("manhattan", session) %>%
+        plotlyProxyInvoke("relayout",
+                          list(shapes = list(
+                            list(type = "rect",
+                                 line = list(width = 1, color = "#00CD00"),
+                                 x0 = chrom_range[1],
+                                 x1 = chrom_range[2], y0 = 0, y1 = 1,
+                                 xref = "x", yref = "paper", layer = "above")
+                          )))
+    })
+    
     # chrom highlight
     observeEvent(coords$xrange, {
       req(input$show_chrom, coords$chr)
@@ -913,7 +943,7 @@ zoom <- function(data, ens_db,
                                  line = list(width = 1, color = "#00CD00"),
                                  x0 = coords$xrange[1] / 1e6,
                                  x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
-                                 xref = "x", yref = "paper", layer = "below")
+                                 xref = "x", yref = "paper", layer = "above")
                           )))
     })
     
