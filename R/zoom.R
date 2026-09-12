@@ -869,6 +869,7 @@ zoom <- function(data, ens_db,
       exon_col <- exon_border <- "#00008B"
       rec <- !is.null(recomb) && input$recomb
       yref <- paste0("y", rec + man2 + rec * man2 +2)
+      # yref <- save_plotly$p$x$data[[ntrace() +2]]$yaxis
       
       y0 <- -EX$row - 0.15
       y1 <- -EX$row + 0.15

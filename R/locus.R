@@ -163,11 +163,10 @@ locus <- function(data = NULL,
   }
   
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  msg <- paste0("chromosome ", seqname, ", position ", xrange[1], " to ",
+  msg <- paste0("chr ", seqname, ": ", xrange[1], " - ",
                 xrange[2])
   if (!is.null(gene)) msg <- paste(gene, msg, sep = ", ")
   if (!is.null(index_snp)) msg <- paste(index_snp, msg, sep = ", ")
-  message(msg)
   
   if (!is.null(data)) {
     data <- data[which(data[, chrom] == seqname & data[, pos] > xrange[1] &
@@ -181,16 +180,16 @@ locus <- function(data = NULL,
     data <- as.data.frame(data)
 
     if (nrow(data) == 0) {
-      message("Locus contains no SNPs/datapoints")
+      message(msg, " - Locus contains no SNPs")
       data <- NULL
     } else {
-      message(nrow(data), " SNPs/datapoints")
+      message(msg, "  [", nrow(data), " SNPs]")
       if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
       if (is.character(LD)) {
         colnames(data)[which(colnames(data) == LD)] <- "ld"
       }
     }
-  }
+  } else message(msg)
   
   seqname <- gsub("chr|[[:punct:]]", "", seqname, ignore.case = TRUE)
   if (!seqname %in% c(1:22, "X", "Y")) 
