@@ -100,8 +100,11 @@ locus_plotly <- function(loc,
     p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
                          height = pheights[2], showlegend = FALSE, beta = beta[2])
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
-                           titleY = TRUE, margin = c(0, 0, 0, 0.02))
-    return(remap_overlaying_yaxes(pp))
+                          titleY = TRUE, margin = c(0, 0, 0, 0.02)) %>%
+      remap_overlaying_yaxes() %>%
+      htmlwidgets::onRender(multihover_js)
+    
+    return(pp)
   }
   
   plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
@@ -127,3 +130,92 @@ remap_overlaying_yaxes <- function(p) {
   }
   p
 }
+
+
+multihover_js <- "function(el, x) {
+  
+  var gd = document.getElementById(el.id);
+  
+  function debounce(func, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+    
+  // Helper: get y-axis name for a trace (e.g., 'y', 'y2', 'y3')
+  function yAxisOfTrace(tr) {
+    if (tr && typeof tr.yaxis === 'string') return tr.yaxis; // 'y', 'y2', 'y3'
+    return 'y';
+  }
+  
+  gd.on('plotly_hover', debounce(function(evt) {
+    
+    if (!evt || !evt.points || !evt.points.length) return;
+    
+    var sourcePoint = evt.points[0];
+    var sourceCurve = sourcePoint.curveNumber;
+    
+    // Key for the hovered point
+    var key = sourcePoint.customdata;
+    
+    var tr = gd.data[sourceCurve]
+    
+    // Skip if no customdata (i.e. genetracks)
+    if (!tr.customdata) return;
+    var currentY = yAxisOfTrace(tr)
+    
+    // Find SNP in other curves
+    var targetCurve = -1;
+    var targetPoint = -1;
+
+    for (var curve = 0; curve < gd.data.length; curve++) {
+
+      var trace = gd.data[curve];
+      // Skip gene tracks
+      if (!trace.customdata) continue;
+      
+      // Skip current y axis curves
+      var traceY = yAxisOfTrace(trace)
+      if (traceY === currentY) continue;
+  
+      for (var point = 0; point < trace.customdata.length; point++) {
+        if (String(trace.customdata[point]) === String(key)) {
+          targetCurve = curve;
+          targetPoint = point;
+          break;
+        }
+      }
+  
+      if (targetCurve >= 0) {
+        break;
+      }
+    }
+    
+    var ya = yAxisOfTrace(trace)
+    
+    var annot = [{
+      xref: 'x',
+      yref: ya,
+      x: trace.x[point],
+      y: trace.y[point],
+      text: key,
+      xanchor: 'left',
+      arrowhead: 0,
+      ax: 10, ay: 0,
+      bgcolor: 'rgba(255,255,255,0.85)',
+      bordercolor: '#333',
+    }];
+    
+    if (targetCurve >= 0 && targetPoint >= 0) {
+      Plotly.relayout(gd, { annotations: annot });
+    }
+  
+  }, 300));
+  
+  // Remove mirrored annot when original hover ends
+  gd.on('plotly_unhover', debounce(function() {
+    Plotly.relayout(gd, { annotations: [] });
+  }, 300));
+}"

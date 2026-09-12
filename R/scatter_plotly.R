@@ -194,6 +194,7 @@ scatter_plotly <- function(loc,
                                  line = list(width = 1, color = marker_outline)),
                    text = hovertext, hoverinfo = 'text',
                    key = data[, loc$labs],
+                   customdata = data[, loc$labs],
                    showlegend = showlegend,
                    source = "plotly_locus", height = height,
                    type = type, mode = "markers")
@@ -207,6 +208,7 @@ scatter_plotly <- function(loc,
                                  line = list(width = 1, color = marker_outline)),
                    text = hovertext, hoverinfo = 'text',
                    key = data[, loc$labs],
+                   customdata = data[, loc$labs],
                    showlegend = showlegend,
                    source = "plotly_locus", height = height,
                    type = type, mode = "markers")
@@ -237,6 +239,7 @@ scatter_plotly <- function(loc,
                   marker = list(size = marker_size, opacity = 0.8,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
+                  customdata = data[, loc$labs],
                   showlegend = showlegend,
                   type = type, mode = "markers") %>%
         # recombination line
@@ -258,6 +261,7 @@ scatter_plotly <- function(loc,
                   marker = list(opacity = 0.8,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
+                  customdata = data[, loc$labs],
                   showlegend = showlegend,
                   type = type, mode = "markers") %>%
         # recombination line
