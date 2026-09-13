@@ -571,21 +571,8 @@ zoom <- function(data, ens_db,
                                               zeroline = FALSE, showline = TRUE)))
       })
       
-      # chrom2 highlight
-      observeEvent(coords$xrange, {
-        req(man2, input$show_chrom, coords$chr)
-        plotlyProxy("chrom2", session) %>%
-          plotlyProxyInvoke("relayout",
-                            list(shapes = list(
-                              list(type = "rect",
-                                   line = list(width = 1, color = "red"),
-                                   x0 = coords$xrange[1] / 1e6,
-                                   x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
-                                   xref = "x", yref = "paper", layer = "above")
-                            )))
-      })
-      
     }  # end of 2nd manhattan section
+    
     #########
     
     input_biotype <- reactive({input$biotype}) %>% debounce(2000)
@@ -957,6 +944,18 @@ zoom <- function(data, ens_db,
                                  x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
                                  xref = "x", yref = "paper", layer = "above")
                           )))
+      # chrom2 highlight
+      if (man2) {
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = list(
+                              list(type = "rect",
+                                   line = list(width = 1, color = "red"),
+                                   x0 = coords$xrange[1] / 1e6,
+                                   x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
+                                   xref = "x", yref = "paper", layer = "above")
+                            )))
+      }
     })
     
     get_ld <- reactiveVal(FALSE)
