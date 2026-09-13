@@ -13,6 +13,12 @@ manhattan <- function(data,
   p <- dc$p
   labs <- dc$labs
   
+  ok <- complete.cases(data[, c(chrom, pos, p)])
+  if (!all(ok)) {
+    message(sum(!ok), " rows with incomplete data")
+    data <- data[which(ok), ]
+  }
+  
   if (!is.na(npoints) & nrow(data) > npoints) {
     index <- order(data[, p])
     if (npoints <= 1e5) {

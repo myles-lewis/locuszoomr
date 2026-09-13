@@ -454,6 +454,7 @@ zoom <- function(data, ens_db,
                                             zeroline = FALSE, showline = TRUE)))
     })
     
+    ###########
     # 2nd gwas
     if (man2) {
       output$manhattan2 <- renderPlotly({
@@ -570,21 +571,6 @@ zoom <- function(data, ens_db,
                                               zeroline = FALSE, showline = TRUE)))
       })
       
-      # main manhattan2 highlight
-      observeEvent(coords$chr, {
-        req(coords$chr)
-        chrom_range <- manhat2$chrom_range[coords$chr, ]
-        plotlyProxy("manhattan2", session) %>%
-          plotlyProxyInvoke("relayout",
-                            list(shapes = list(
-                              list(type = "rect",
-                                   line = list(width = 1, color = "red"),
-                                   x0 = chrom_range[1],
-                                   x1 = chrom_range[2], y0 = 0, y1 = 1,
-                                   xref = "x", yref = "paper", layer = "above")
-                            )))
-      })
-      
       # chrom2 highlight
       observeEvent(coords$xrange, {
         req(man2, input$show_chrom, coords$chr)
@@ -600,6 +586,7 @@ zoom <- function(data, ens_db,
       })
       
     }  # end of 2nd manhattan section
+    #########
     
     input_biotype <- reactive({input$biotype}) %>% debounce(2000)
     
@@ -921,16 +908,41 @@ zoom <- function(data, ens_db,
     # main manhattan highlight
     observeEvent(coords$chr, {
       req(coords$chr)
-      chrom_range <- manhat$chrom_range[coords$chr, ]
+      # manhattan1
+      if (coords$chr %in% chr_set[[1]]) {
+        chrom_range <- manhat$chrom_range[coords$chr, ]
+        shapes <- list(
+          list(type = "rect",
+               line = list(width = 1, color = "#00CD00"),
+               x0 = chrom_range[1],
+               x1 = chrom_range[2], y0 = 0, y1 = 1,
+               xref = "x", yref = "paper", layer = "above")
+        )
+      } else {
+        shapes <- list()
+      }
       plotlyProxy("manhattan", session) %>%
         plotlyProxyInvoke("relayout",
-                          list(shapes = list(
-                            list(type = "rect",
-                                 line = list(width = 1, color = "#00CD00"),
-                                 x0 = chrom_range[1],
-                                 x1 = chrom_range[2], y0 = 0, y1 = 1,
-                                 xref = "x", yref = "paper", layer = "above")
-                          )))
+                          list(shapes = shapes))
+      
+      # manhattan2 highlight
+      if (man2) {
+        if (coords$chr %in% chr_set[[2]]) {
+          chrom_range <- manhat2$chrom_range[coords$chr, ]
+          shapes <- list(
+            list(type = "rect",
+                 line = list(width = 1, color = "red"),
+                 x0 = chrom_range[1],
+                 x1 = chrom_range[2], y0 = 0, y1 = 1,
+                 xref = "x", yref = "paper", layer = "above")
+          )
+        } else {
+          shapes <- list()
+        }
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = shapes))
+      }
     })
     
     # chrom highlight
