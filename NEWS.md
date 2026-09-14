@@ -1,6 +1,13 @@
 News
 =====
 
+# locuszoomr 1.1.0
+###### 14/09/2026
+
+## Major update
+* `zoom()` can now browse and compare two GWAS simultaneously. 
+* Save plot to svg, pdf or plotly object functionality added.
+
 # locuszoomr 1.0.0
 ###### 25/08/2026
 
