@@ -206,6 +206,17 @@ complete_data <- function(data, chrom, pos, p) {
 }
 
 
+# maps curve2loc and loc2yaxis
+parse_curves <- function(p) {
+  yaxis <- vapply(p$x$data, function(i) i$yaxis, character(1))
+  mode <- vapply(p$x$data, function(i) i$mode, character(1))
+  curves <- rep(0L, length(mode))
+  mk <- mode == "markers"
+  curves[mk] <- as.integer(factor(yaxis[mk]))
+  list(curves = curves, yaxis = unique(yaxis[mk]))
+}
+
+
 suppress_warnings <- function(expr, pattern) {
   withCallingHandlers(
     expr,

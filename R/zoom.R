@@ -681,6 +681,7 @@ zoom <- function(data, ens_db,
                    ylab = man_ylab)
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
+      parsed$p <- parse_curves(p)
       p
     })
     
@@ -1000,6 +1001,40 @@ zoom <- function(data, ens_db,
         req(ld_snp() %in% loc$i$data[, labs])
       }
       paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+    })
+    
+    # multi-hover
+    parsed <- reactiveValues(p = NULL)
+    hover <- reactive({
+      event_data("plotly_hover", source = "plotly_locus")
+    })
+    hover_d <- hover %>% debounce(300)
+    
+    observeEvent(hover_d(), {
+      req(nrow(hover_d()) > 0)
+      key <- as.character(hover_d()$key)
+      source_curve <- hover_d()$curveNumber
+      which_loc <- parsed$p$curves[source_curve +1]
+      req(which_loc > 0)
+      check_curve <- setdiff(1L:2L, which_loc)
+      chk_loc <- switch(check_curve, loc$i, locv2$i)
+      m <- which(chk_loc$data[, labs[check_curve]] == key)
+      if (length(m) > 0) {
+        yref <- parsed$p$yaxis[check_curve]
+        y <- chk_loc$data[m, "logP"]
+        annot <- list(
+          list(xref = 'x', yref = yref,
+               x = hover_d()$x, y = y[1],
+               text = key,
+               xanchor= 'left',
+               arrowhead = 0, ax = 10, ay = 0,
+               bgcolor = 'rgba(255,255,255,0.85)', bordercolor = 'red')
+        )
+      } else {
+        annot <- list()
+      }
+      plotlyProxy("locus", session) %>%
+        plotlyProxyInvoke("relayout", list(annotations = annot))
     })
     
     # inline conditional UI
