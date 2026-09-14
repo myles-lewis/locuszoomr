@@ -132,6 +132,8 @@ zoom <- function(data, ens_db,
   labs <- c(dc$labs, dc2$labs)
   
   message("Generating Manhattan plot", (if (man2) " 1"))
+  data <- complete_data(data, chrom[1], pos[1], p[1])
+  
   if (is.null(eqtl_gene)) {
     data[, labs[1]] <- unique_snps(data, labs[1], chrom[1])
   } else {
@@ -174,6 +176,7 @@ zoom <- function(data, ens_db,
   
   if (man2) {
     message("Generating Manhattan plot 2")
+    data2 <- complete_data(data2, chrom[2], pos[2], p[2])
     data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
     data2[which(data2[, p[2]] < 5e-324), p[2]] <- 5e-324
     chr_set[[2]] <- unique(data2[, chrom[2]])
@@ -857,8 +860,7 @@ zoom <- function(data, ens_db,
       ht <- seg2line(hovertext, hovertext)
       exon_col <- exon_border <- "#00008B"
       rec <- !is.null(recomb) && input$recomb
-      yref <- paste0("y", rec + man2 + rec * man2 +2)
-      # yref <- save_plotly$p$x$data[[ntrace() +2]]$yaxis
+      yref <- save_plotly$p$x$data[[ntrace() +2]]$yaxis
       
       y0 <- -EX$row - 0.15
       y1 <- -EX$row + 0.15

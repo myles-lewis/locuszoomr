@@ -13,12 +13,6 @@ manhattan <- function(data,
   p <- dc$p
   labs <- dc$labs
   
-  ok <- complete.cases(data[, c(chrom, pos, p)])
-  if (!all(ok)) {
-    message(sum(!ok), " rows with incomplete data")
-    data <- data[which(ok), ]
-  }
-  
   if (!is.na(npoints) & nrow(data) > npoints) {
     index <- order(data[, p])
     if (npoints <= 1e5) {
@@ -197,6 +191,18 @@ eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
   eqtl_set <- unique(sigdat[, eqtl_gene])
   message(length(eqtl_set), " eQTL genes")
   setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
+}
+
+
+#' @importFrom stats complete.cases
+
+complete_data <- function(data, chrom, pos, p) {
+  ok <- complete.cases(data[, c(chrom, pos, p)])
+  if (!all(ok)) {
+    message(sum(!ok), " rows with incomplete data")
+    data <- data[which(ok), ]
+  }
+  data
 }
 
 
