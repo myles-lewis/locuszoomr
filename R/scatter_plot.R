@@ -91,15 +91,32 @@ scatter_plot <- function(loc,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data)) stop("No data points, only gene tracks")
-  
   .call <- match.call()
+  
+  recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
+  if (align) {
+    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2,
+                      ifelse(recomb, 3.5, 1.5)))
+    on.exit(par(op))
+  }
+  
+  if (is.null(loc$data)) {
+    message("No data points")
+    # blank plot
+    plot(NA, xlim = c(0, 1), ylim = c(0, 1),
+         xaxt = "n", yaxt = "n", bty = "n", xlab = "", ylab = "")
+    text(0.5, 0.5, "No data points", adj = 0.5)
+    return(invisible())
+  }
+  
   data <- loc$data
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   if (is.null(ylab)) {
     ylab <- if (loc$yvar == "logP") expression("-log"[10] ~ "P") else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
+  if (hasLD) beta <- NULL
+  if (!is.null(beta) && (is.na(beta) || beta == "")) beta <- NULL
   if (!"bg" %in% colnames(data)) {
     if (showLD & hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
@@ -127,13 +144,6 @@ scatter_plot <- function(loc,
   }
   
   # scatter plot
-  recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
-  if (align) {
-    op <- par(mar = c(ifelse(xticks, 3, 0.1), 3.5, 2,
-                      ifelse(recomb, 3.5, 1.5)))
-    on.exit(par(op))
-  }
-  
   if (is.null(ylim)) {
     ylim <- range(data[, loc$yvar], na.rm = TRUE)
     if (yzero & is.null(ylim)) ylim[1] <- min(c(0, ylim[1]))

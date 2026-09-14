@@ -48,6 +48,7 @@
 #'   Y, and filtering of genes to only those whose transcript ids start with
 #'   "ENS" are applied. For users with novel genome assemblies, this probably
 #'   needs to be set to `FALSE`.
+#' @param tx Logical, whether to include transcript/exon annotations.
 #' @return Returns a list object of class 'locus' ready for plotting,
 #'   containing:
 #' \item{seqname}{chromosome value}
@@ -98,7 +99,8 @@ locus <- function(data = NULL,
                   labs = NULL,
                   index_snp = NULL,
                   LD = NULL,
-                  std_filter = TRUE) {
+                  std_filter = TRUE,
+                  tx = TRUE) {
   if (is.character(ens_db)) {
     if (!ens_db %in% (.packages())) {
       stop("Ensembl database not loaded. Try: library(", ens_db, ")",
@@ -161,15 +163,14 @@ locus <- function(data = NULL,
   }
   
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
-  msg <- paste0("chromosome ", seqname, ", position ", xrange[1], " to ",
+  msg <- paste0("chr ", seqname, ": ", xrange[1], " - ",
                 xrange[2])
   if (!is.null(gene)) msg <- paste(gene, msg, sep = ", ")
   if (!is.null(index_snp)) msg <- paste(index_snp, msg, sep = ", ")
-  message(msg)
   
   if (!is.null(data)) {
-    data <- data[which(data[, chrom] == seqname), ]
-    data <- data[which(data[, pos] > xrange[1] & data[, pos] < xrange[2]), ]
+    data <- data[which(data[, chrom] == seqname & data[, pos] > xrange[1] &
+                         data[, pos] < xrange[2]), ]
     # smallest floating point
     data[data[, p] < 5e-324, p] <- 5e-324
     if (is.null(yvar)) {
@@ -179,39 +180,43 @@ locus <- function(data = NULL,
     data <- as.data.frame(data)
 
     if (nrow(data) == 0) {
-      message("Locus contains no SNPs/datapoints")
+      message(msg, " - Locus contains no SNPs")
       data <- NULL
     } else {
-      message(nrow(data), " SNPs/datapoints")
+      message(msg, "  [", nrow(data), " SNPs]")
       if (is.null(index_snp)) index_snp <- data[which.max(data[, yvar]), labs]
       if (is.character(LD)) {
         colnames(data)[which(colnames(data) == LD)] <- "ld"
       }
     }
-  }
+  } else message(msg)
   
   seqname <- gsub("chr|[[:punct:]]", "", seqname, ignore.case = TRUE)
   if (!seqname %in% c(1:22, "X", "Y")) 
     warning("`seqname` refers to a non-conventional chromosome")
-  TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
-    SeqNameFilter(seqname),
-    TxStartFilter(xrange[2], condition = "<"),
-    TxEndFilter(xrange[1], condition = ">"), genefilt))
-  TX <- data.frame(TX)
-  TX <- TX[! is.na(TX$start), ]
-  TX <- TX[!duplicated(TX$gene_id), ]
-  
-  if (nrow(TX) == 0) {
-    message("No gene transcripts")
-    # Creating empty exons object here in suitable format
-    EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+  if (tx) {
+    TX <- ensembldb::genes(edb, filter = AnnotationFilterList(
       SeqNameFilter(seqname),
-      ExonStartFilter(xrange[2], condition = "<"),
-      ExonEndFilter(xrange[1], condition = ">"), genefilt))
+      TxStartFilter(xrange[2], condition = "<"),
+      TxEndFilter(xrange[1], condition = ">"), genefilt))
+    TX <- data.frame(TX)
+    TX <- TX[! is.na(TX$start), ]
+    TX <- TX[!duplicated(TX$gene_id), ]
+    
+    if (nrow(TX) == 0) {
+      message("No gene transcripts")
+      # Creating empty exons object here in suitable format
+      EX <- ensembldb::exons(edb, filter = AnnotationFilterList(
+        SeqNameFilter(seqname),
+        ExonStartFilter(xrange[2], condition = "<"),
+        ExonEndFilter(xrange[1], condition = ">"), genefilt))
+    } else {
+      EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+    }
   } else {
-    EX <- ensembldb::exons(edb, filter = GeneIdFilter(TX$gene_id))
+    TX <- EX <- NULL
   }
-
+  
   loc <- list(seqname = seqname, xrange = xrange, gene = gene,
               ens_db = ens_db,
               ens_version = ensemblVersion(edb),
@@ -253,18 +258,19 @@ summary.locus <- function(object, ...) {
 
 detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
   # autodetect headings
-  if (is.null(chrom)) {
+  if (is.null(chrom) || is.na(chrom)) {
     w <- grep("chr", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       chrom <- colnames(data)[w]
     } else stop("unable to autodetect chromosome column")
   }
-  if (is.null(pos)) {
+  if (is.null(pos) || is.na(pos)) {
     w <- grep("pos", colnames(data), ignore.case = TRUE)
     if (length(w) == 1) {
       pos <- colnames(data)[w]
     } else stop("unable to autodetect SNP position column")
   }
+  if (!is.null(p) && is.na(p)) p <- NULL
   if (!is.null(p) && !is.null(yvar)) stop("cannot specify both `p` and `yvar`")
   if (is.null(p) && is.null(yvar)) {
     if ("p" %in% colnames(data)) {
@@ -276,7 +282,7 @@ detect_cols <- function(data, chrom, pos, p, labs = NULL, yvar = NULL) {
       } else stop("unable to autodetect p-value column")
     }
   }
-  if (is.null(labs)) {
+  if (is.null(labs) || is.na(labs)) {
     w <- grep("rs?id", colnames(data), ignore.case = TRUE)
     if (length(w) > 1) stop("unable to autodetect SNP id column")
     if (length(w) == 0) {

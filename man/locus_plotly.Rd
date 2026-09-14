@@ -6,6 +6,7 @@
 \usage{
 locus_plotly(
   loc,
+  loc2 = NULL,
   heights = c(0.6, 0.4),
   filter_gene_name = NULL,
   filter_gene_biotype = NULL,
@@ -18,13 +19,18 @@ locus_plotly(
   maxrows = 8,
   width = 600,
   xlab = NULL,
+  ylab = NULL,
   prioritise = NULL,
   blanks = "show",
+  beta = NULL,
   ...
 )
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \code{\link[=locus]{locus()}}.}
+
+\item{loc2}{Optional 2nd 'locus' object to be layered underneath the 1st
+scatter plot.}
 
 \item{heights}{Vector controlling relative height of each panel on 0-1 scale.
 Alternatively a vector of length 2 of height in pixels passed to
@@ -60,12 +66,21 @@ overlapping text for gene names.}
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
 
+\item{ylab}{Title for y axis, or a vector of 2 titles for each y axis if
+\code{loc2} is provided.}
+
 \item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 
 \item{blanks}{Controls handling of genes with blank names: \code{"fill"} replaces
 blank gene symbols with ensembl gene ids. \code{"hide"} completely hides genes
 which are missing gene symbols. \code{"show"} shows gene lines but no label
 (hovertext is still available).}
+
+\item{beta}{Optional column name for beta coefficient to display upward
+triangles for positive beta and downward triangles for negative beta
+(significant SNPs only). If \code{loc2} is supplied, then a vector can be used
+to specify different beta columns in \code{loc} and \code{loc2}; use \code{NA} to indicate
+no \code{beta}.}
 
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}

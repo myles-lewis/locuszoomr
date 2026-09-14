@@ -109,6 +109,38 @@ clicking on other points can re-base the LD to alternative SNPs.
 knitr::include_graphics("zoom2.png")
 ```
 
+### Dual GWAS browsing
+
+Using the `data2` argument, users can browse 2 GWAS at the same time. Shown
+below, eQTL data from synovial tissue is compared to data from a rheumatoid
+arthritis GWAS. The display now has 2 whole genome manhattan plots followed by 2
+optional chromosome plots for the current locus, followed by the dual layered
+locus plot.
+
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("dbl_gwas_manh.png")
+knitr::include_graphics("dbl_loc_eqtl.png")
+```
+
+### Saving plots
+
+There are 3 methods for saving plots. The easiest is to click the camera icon 
+`r shiny::icon("camera")` in the plotly modebar. This exports the plotly as an
+svg based on the current screen dimensions.
+
+The 2nd method is to click the `r shiny::icon("floppy-disk")` save icon. This
+exports the current plot to a pdf using base graphics (note: the formatting will
+be different).
+
+In the settings dropdown the export filetype can be changed from pdf to plotly.
+This exports the current plotly locus object as an .rds file. Once loaded back
+into R, this can be viewed as a standard plotly by calling the object (which
+generates the html). This also allows the plotly to be embedded in markdown
+documents as the plotly object will output html when called. The plotly
+features which don't rely on shiny for updates are preserved, e.g. hover
+information. However shiny dependent features such as gene track reordering
+based on display width won't function.
+
 ### Citation
 
 If you use this package please cite as:

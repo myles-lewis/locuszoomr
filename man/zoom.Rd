@@ -11,10 +11,13 @@ zoom(
   pos = NULL,
   p = NULL,
   labs = NULL,
+  data2 = NULL,
+  traits = NULL,
   scheme = c("royalblue", "skyblue", "red"),
+  scheme2 = c("#33a02c", "#b2df8a", "purple"),
   pcutoff = 5e-08,
   eqtl_gene = NULL,
-  eqtl_beta = NULL,
+  beta = NULL,
   eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00", "#0000FF",
     "#80DD00", "#8000FF", "#009900", "#FF00FF"),
   add_hover = NULL,
@@ -38,33 +41,45 @@ See the vignette and the \code{AnnotationHub} Bioconductor package for how to
 create this object.}
 
 \item{chrom}{Determines which column in \code{data} contains chromosome
-information If \code{NULL} tries to autodetect the column.}
+information. If \code{NULL} or \code{NA} tries to autodetect the column. If \code{data2}
+is provided, this is a vector where 1st element refers to \code{data} and 2nd
+element refers to \code{data2}.}
 
-\item{pos}{Determines which column in \code{data} contains position information.
-If \code{NULL} tries to autodetect the column.}
+\item{pos}{Determines which column in \code{data} (and optionally \code{data2})
+contains position information. See \code{chrom}.}
 
-\item{p}{Determines which column in \code{data} contains SNP p-values. If \code{NULL}
-tries to autodetect the column.}
+\item{p}{Determines which column in \code{data} (and optionally \code{data2}) contains
+SNP p-values. See \code{chrom}.}
 
-\item{labs}{Determines which column in \code{data} contains SNP rs IDs. If \code{NULL}
-tries to autodetect the column.}
+\item{labs}{Determines which column in \code{data} (and optionally \code{data2})
+contains SNP rs IDs. See \code{chrom}.}
 
-\item{scheme}{Vector of 3 colours: 1st = normal points, 2nd = colour for
-significant points, 3rd = index SNP(s).}
+\item{data2}{Optional 2nd dataframe of GWAS results for comparison.}
+
+\item{traits}{Vector of trait names for identifying \code{data} and \code{data2}
+datasets.}
+
+\item{scheme}{Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
+for alternating chromosomes, 3rd colour for significant points.}
+
+\item{scheme2}{Vector of colours for 2nd Manhattan plot.}
 
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.}
+\item{eqtl_gene}{Determines which column in \code{data} contains eQTL genes.
+Currently \code{data2} cannot be used to show eQTL colour data.}
 
-\item{eqtl_beta}{Optional column name for beta coefficient to display upward
+\item{beta}{Optional column name for beta coefficient to display upward
 triangles for positive beta and downward triangles for negative beta
-(significant SNPs only).}
+(significant SNPs only). If \code{data2} is supplied, then a vector can be used
+to specify different beta columns in \code{data} and \code{data2}; use \code{NA} to
+indicate no \code{beta}.}
 
 \item{eqtl_scheme}{Colour scheme for eQTL genes.}
 
-\item{add_hover}{Optional vector of column names in 'data' to add to the
-plotly hover text for scatter points.}
+\item{add_hover}{Optional vector of column names in \code{data} to add to the
+plotly hover text for scatter points. Not available for \code{data2}.}
 
 \item{mh_points}{Number of points to display in manhattan plot. Default is
 \code{1e5}.}

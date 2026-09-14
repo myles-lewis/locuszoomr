@@ -69,6 +69,8 @@
 #' }
 #' @importFrom BiocGenerics start end
 #' @importFrom graphics axTicks axis lines rect text plot.new strwidth
+#' @useDynLib locuszoomr
+#' @importFrom Rcpp sourceCpp
 #' @export
 
 genetracks <- function(locus,

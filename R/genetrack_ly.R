@@ -206,7 +206,8 @@ genetrack_ly <- function(locus,
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",
                                               "autoScale2d", "resetScale2d",
-                                              "hoverClosest", "hoverCompare"))
+                                              "hoverClosest", "hoverCompare"),
+                   toImageButtonOptions = list(format = "svg"))
 }
 
 

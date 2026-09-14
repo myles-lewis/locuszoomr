@@ -59,18 +59,49 @@ scatter_plotly <- function(loc,
                            height = NULL,
                            webGL = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (is.null(loc$data)) stop("No SNPs/data points", call. = FALSE)
   
   .call <- match.call()
   data <- loc$data
+  xlim <- loc$xrange / 1e6
+  xext <- diff(xlim) * 0.01
+  xlim <- xlim + c(-xext, xext)
   if (is.null(xlab)) xlab <- paste("Chromosome", loc$seqname, "(Mb)")
+  type <- if (webGL) "scattergl" else "scatter"
+  
+  if (is.null(data)) {
+    data <- data.frame(matrix(nrow = 0, ncol = 5))
+    colnames(data) <- loc[c("chrom", "pos", "p", "yvar", "labs")]
+    # blank plot
+    p <- plot_ly(data,
+                 x = data[, loc$pos], y = data[, loc$yvar],
+                 showlegend = FALSE,
+                 source = "plotly_locus", height = height,
+                 type = type, mode = "markers") %>%
+      plotly::layout(xaxis = list(title = xlab,
+                                  ticks = "outside",
+                                  zeroline = FALSE, showgrid = FALSE,
+                                  range = as.list(xlim)),
+                     yaxis = list(title = "",
+                                  showticklabels = FALSE,
+                                  zeroline = FALSE, showgrid = FALSE),
+                     annotations = list(x = 0.5, y = 0.5, text = "No SNP data",
+                                        xref = "paper", yref = "paper",
+                                        showarrow = FALSE)) %>%
+      plotly::config(displaylogo = FALSE,
+                     modeBarButtonsToRemove = c("select2d", "lasso2d",
+                                                "autoScale2d", "resetScale2d",
+                                                "hoverClosest", "hoverCompare"),
+                     toImageButtonOptions = list(format = "svg"))
+    return(p)
+  }
+  
   if (is.null(ylab)) {
     ylab <- if (loc$yvar == "logP") "-log<sub>10</sub> P" else loc$yvar
   }
   hasLD <- "ld" %in% colnames(data)
   leg <- list()
   if (!"bg" %in% colnames(data)) {
-    if (showLD & hasLD) {
+    if (showLD && hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
       data$bg[data$ld == 0] <- 2L
       data$bg[is.na(data$bg)] <- 1L
@@ -97,8 +128,11 @@ scatter_plotly <- function(loc,
                         labels = c("ns", paste("P <", signif(pcutoff, 3)), "index"))
     }
   }
+  if (hasLD) beta <- NULL
+  if (!is.null(beta) && (is.na(beta) || beta == "")) beta <- NULL
   if (!is.null(beta)) {
     # beta symbols
+    if (!beta %in% colnames(data)) stop("beta column not found in `data`")
     data[, beta] <- signif(data[, beta], 3)
     symbol <- as.character(sign(data[, beta]))
     ind <- data[, loc$p] > pcutoff
@@ -113,7 +147,7 @@ scatter_plotly <- function(loc,
     if (!webGL) sizes <- sizes/2
     leg <- list(traceorder = "reversed")
   } else {
-    if (is.null(eqtl_gene)) {
+    if (is.null(eqtl_gene) || (showLD & hasLD)) {
       # default plot
       data$symbol <- data$bg
       symbols <- c(rep("circle", length(scheme) -1), "diamond")
@@ -126,10 +160,6 @@ scatter_plotly <- function(loc,
   
   # scatter plotly
   recomb <- !is.null(loc$recomb) & !is.na(recomb_col)
-  
-  xlim <- loc$xrange / 1e6
-  xext <- diff(xlim) * 0.01
-  xlim <- xlim + c(-xext, xext)
   
   ylim <- range(data[, loc$yvar], na.rm = TRUE)
   if (yzero) ylim[1] <- min(c(0, ylim[1]))
@@ -147,11 +177,12 @@ scatter_plotly <- function(loc,
     }
   }
   
+  if (!is.null(loc$data)) {
   hline <- list(type = "line",
                 line = list(width = 1, color = '#999999', dash = 'dash'),
                 x0 = 0, x1 = 1, y0 = -log10(pcutoff), y1 = -log10(pcutoff),
                 xref = "paper", layer = "below")
-  type <- if (webGL) "scattergl" else "scatter"
+  } else hline <- NULL
   
   if (!recomb) {
     if (is.null(beta)) {
@@ -197,42 +228,44 @@ scatter_plotly <- function(loc,
     if (is.null(beta)) {
       # standard plotly
       p <- plot_ly(source = "plotly_locus", height = height) %>%
-        # recombination line
-        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                  hoverinfo = "none", colors = scheme,  # colors must go here
-                  symbols = symbols,
-                  name = "recombination", yaxis = "y2",
-                  line = list(color = recomb_col, width = 1.5),
-                  mode = "lines", type = type, showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                   color = data$bg,
                   symbol = data$symbol,
+                  colors = scheme,  # colors, symbols must go here
+                  symbols = symbols,
                   marker = list(size = marker_size, opacity = 0.8,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
                   showlegend = showlegend,
-                  type = type, mode = "markers")
+                  type = type, mode = "markers") %>%
+        # recombination line
+        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                  hoverinfo = "none", 
+                  name = "recombination", yaxis = "y2",
+                  line = list(color = recomb_col, width = 1.5),
+                  mode = "lines", type = type, showlegend = FALSE)
     } else {
       # beta shapes
       p <- plot_ly(source = "plotly_locus", height = height) %>%
-        # recombination line
-        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
-                  hoverinfo = "none", colors = scheme,  # colors must go here
-                  symbols = symbols, sizes = sizes,
-                  name = "recombination", yaxis = "y2",
-                  line = list(color = recomb_col, width = 1.5),
-                  mode = "lines", type = type, showlegend = FALSE) %>%
         # scatter plot
         add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
                   color = data$bg,
                   symbol = data$symbol,
                   size = data$size,
+                  colors = scheme,  # colors, symbols, sizes must go here
+                  symbols = symbols, sizes = sizes,
                   marker = list(opacity = 0.8,
                                 line = list(width = 1, color = marker_outline)),
                   text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
                   showlegend = showlegend,
-                  type = type, mode = "markers")
+                  type = type, mode = "markers") %>%
+        # recombination line
+        add_trace(x = loc$recomb$start / 1e6, y = loc$recomb$value,
+                  hoverinfo = "none",
+                  name = "recombination", yaxis = "y2",
+                  line = list(color = recomb_col, width = 1.5),
+                  mode = "lines", type = type, showlegend = FALSE)
     }
     p <- p %>%
       plotly::layout(xaxis = list(title = xlab,
@@ -251,11 +284,18 @@ scatter_plotly <- function(loc,
                      shapes = hline,
                      legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
+  if (is.null(loc$data)) {
+    p <- p %>%
+      plotly::layout(yaxis = list(title = "", showticklabels = FALSE,
+                                  zeroline = FALSE, showline = FALSE))
+  }
+  
   p <- p %>%
     plotly::config(displaylogo = FALSE,
                    modeBarButtonsToRemove = c("select2d", "lasso2d",
                                               "autoScale2d", "resetScale2d",
-                                              "hoverClosest", "hoverCompare"))
+                                              "hoverClosest", "hoverCompare"),
+                   toImageButtonOptions = list(format = "svg"))
   
   if (hasLD) suppressWarnings(plotly_build(p)) else p
 }

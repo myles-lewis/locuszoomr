@@ -19,7 +19,8 @@ locus(
   labs = NULL,
   index_snp = NULL,
   LD = NULL,
-  std_filter = TRUE
+  std_filter = TRUE,
+  tx = TRUE
 )
 }
 \arguments{
@@ -75,6 +76,8 @@ LD information.}
 Y, and filtering of genes to only those whose transcript ids start with
 "ENS" are applied. For users with novel genome assemblies, this probably
 needs to be set to \code{FALSE}.}
+
+\item{tx}{Logical, whether to include transcript/exon annotations.}
 }
 \value{
 Returns a list object of class 'locus' ready for plotting,

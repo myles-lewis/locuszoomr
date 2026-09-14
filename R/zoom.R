@@ -18,6 +18,9 @@
 #' queries are served from the `memoise` cache rather than the API.
 #' @param data Dataframe of GWAS results with columns for chromosome, position,
 #'   p value and SNP rs IDs. Data.tables are coerced to dataframe.
+#' @param data2 Optional 2nd dataframe of GWAS results for comparison.
+#' @param traits Vector of trait names for identifying `data` and `data2`
+#'   datasets.
 #' @param ens_db Either a character string which specifies which Ensembl
 #'   database package (version 86 and earlier for Homo sapiens) to query for
 #'   gene and exon positions (see `ensembldb` Bioconductor package). Or an
@@ -25,24 +28,30 @@
 #'   See the vignette and the `AnnotationHub` Bioconductor package for how to
 #'   create this object.
 #' @param chrom Determines which column in `data` contains chromosome
-#'   information If `NULL` tries to autodetect the column.
-#' @param pos Determines which column in `data` contains position information.
-#'   If `NULL` tries to autodetect the column.
-#' @param p Determines which column in `data` contains SNP p-values. If `NULL`
-#'   tries to autodetect the column.
-#' @param labs Determines which column in `data` contains SNP rs IDs. If `NULL`
-#'   tries to autodetect the column.
-#' @param scheme Vector of 3 colours: 1st = normal points, 2nd = colour for
-#'   significant points, 3rd = index SNP(s).
+#'   information. If `NULL` or `NA` tries to autodetect the column. If `data2`
+#'   is provided, this is a vector where 1st element refers to `data` and 2nd
+#'   element refers to `data2`.
+#' @param pos Determines which column in `data` (and optionally `data2`)
+#'   contains position information. See `chrom`.
+#' @param p Determines which column in `data` (and optionally `data2`) contains
+#'   SNP p-values. See `chrom`.
+#' @param labs Determines which column in `data` (and optionally `data2`)
+#'   contains SNP rs IDs. See `chrom`.
+#' @param scheme Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
+#'   for alternating chromosomes, 3rd colour for significant points.
+#' @param scheme2 Vector of colours for 2nd Manhattan plot.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
 #' @param eqtl_gene Determines which column in `data` contains eQTL genes.
-#' @param eqtl_beta Optional column name for beta coefficient to display upward
+#'   Currently `data2` cannot be used to show eQTL colour data.
+#' @param beta Optional column name for beta coefficient to display upward
 #'   triangles for positive beta and downward triangles for negative beta
-#'   (significant SNPs only).
+#'   (significant SNPs only). If `data2` is supplied, then a vector can be used
+#'   to specify different beta columns in `data` and `data2`; use `NA` to
+#'   indicate no `beta`.
 #' @param eqtl_scheme Colour scheme for eQTL genes.
-#' @param add_hover Optional vector of column names in 'data' to add to the
-#'   plotly hover text for scatter points.
+#' @param add_hover Optional vector of column names in `data` to add to the
+#'   plotly hover text for scatter points. Not available for `data2`.
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
@@ -67,7 +76,7 @@
 #' @importFrom shiny textInput conditionalPanel h5 runApp debounce isolate
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
-#' @importFrom shiny showNotification removeNotification
+#' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
 #' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
 #' @importFrom shinyWidgets pickerInput pickerOptions dropdown
 #' @importFrom shinycssloaders withSpinner
@@ -75,14 +84,18 @@
 #' @importFrom DT datatable formatSignif
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
+#' @importFrom grDevices dev.off pdf
 #' @export
 
 zoom <- function(data, ens_db,
                  chrom = NULL, pos = NULL, p = NULL, labs = NULL,
+                 data2 = NULL,
+                 traits = NULL,
                  scheme = c('royalblue', 'skyblue', 'red'),
+                 scheme2 = c("#33a02c", "#b2df8a", "purple"),
                  pcutoff = 5e-8,
                  eqtl_gene = NULL,
-                 eqtl_beta = NULL,
+                 beta = NULL,
                  eqtl_scheme = c("#FF0000", "#00FFFF", "#FF9000", "#0080FF", "#FFFF00",
                                  "#0000FF", "#80DD00", "#8000FF", "#009900", "#FF00FF"),
                  add_hover = NULL,
@@ -92,21 +105,42 @@ zoom <- function(data, ens_db,
                  ld_pop = "EUR",
                  seq_filter = c(1:22, 'X', 'Y'),
                  AnnotationDb = "org.Hs.eg.db") {
+  dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings
-  dc <- detect_cols(data, chrom, pos, p, labs)
-  chrom <- dc$chrom
-  pos <- dc$pos
-  p <- dc$p
-  labs <- dc$labs
-  if (is.null(eqtl_gene)) {
-    data[, labs] <- unique_snps(data, labs, chrom)
-  } else {
-    data[, labs] <- unique_snps(data, labs, eqtl_gene)
+  dc <- detect_cols(data, chrom[1], pos[1], p[1], labs[1])
+  
+  # autodetect headings gwas2
+  dc2 <- NULL
+  man2 <- FALSE
+  if (!is.null(data2)) {
+    dat2_name <- deparse(substitute(data2))
+    data2 <- data.frame(data2)
+    if (!is.null(chrom)) chrom <- rep_len(chrom, 2)
+    if (!is.null(pos)) pos <- rep_len(pos, 2)
+    if (!is.null(p)) p <- rep_len(p, 2)
+    if (!is.null(labs)) labs <- rep_len(labs, 2)
+    if (!is.null(beta)) beta <- rep_len(beta, 2)
+    dc2 <- detect_cols(data2, chrom[2], pos[2], p[2], labs[2])
+    if (is.null(traits)) traits <- c(dat_name, dat2_name)
+    man2 <- TRUE
   }
   
-  message("Generating Manhattan plot")
-  chr_set <- unique(data[, chrom])
+  chrom <- c(dc$chrom, dc2$chrom)
+  pos <- c(dc$pos, dc2$pos)
+  p <- c(dc$p, dc2$p)
+  labs <- c(dc$labs, dc2$labs)
+  
+  message("Generating Manhattan plot", (if (man2) " 1"))
+  if (is.null(eqtl_gene)) {
+    data[, labs[1]] <- unique_snps(data, labs[1], chrom[1])
+  } else {
+    data[, labs[1]] <- unique_snps(data, labs[1], eqtl_gene)
+  }
+  # currently eqtl_gene can only apply to data1
+  
+  chr_set <- list()
+  chr_set[[1]] <- unique(data[, chrom[1]])
   if (is.character(ens_db)) {
     if (!ens_db %in% (.packages())) {
       stop("Ensembl database not loaded. Try: library(", ens_db, ")",
@@ -124,19 +158,30 @@ zoom <- function(data, ens_db,
   fullnames <- fullGeneNames(edb, AnnotationDb)
    
   if (!is.null(eqtl_gene)) {
-    eqtl_colour <- eqtl_colours(data[data[, p] < pcutoff, ], chrom, pos,
+    eqtl_colour <- eqtl_colours(data[data[, p[1]] < pcutoff, ], chrom[1], pos[1],
                                 eqtl_gene, eqtl_scheme)
   }
   
-  show_ld <- nzchar(ld_token) && is.null(eqtl_gene)
+  show_ld <- nzchar(ld_token)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
-  data[which(data[, p] < 5e-324), p] <- 5e-324
-  manhat <- manhattan(data, chrom, pos, p, labs, pcutoff = pcutoff,
+  data[which(data[, p[1]] < 5e-324), p[1]] <- 5e-324
+  manhat <- manhattan(data, chrom[1], pos[1], p[1], labs[1], pcutoff = pcutoff,
                       npoints = mh_points)
-  yrange <- range(manhat$data$logP, na.rm = TRUE)
-  ymax <- yrange[2] + diff(yrange) * 0.05
+  man_ylab <- "-log<sub>10</sub> P"
+  height <- c(300, 220, 624)
+  
+  if (man2) {
+    message("Generating Manhattan plot 2")
+    data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
+    data2[which(data2[, p[2]] < 5e-324), p[2]] <- 5e-324
+    chr_set[[2]] <- unique(data2[, chrom[2]])
+    manhat2 <- manhattan(data2, chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
+                         npoints = mh_points)
+    man_ylab <- paste(traits, man_ylab)
+    height <- c(220, 180, 824)
+  }
   
   js <- '$(document).on("keyup", function(e) {
           if(e.key === "Enter") {
@@ -151,13 +196,20 @@ zoom <- function(data, ens_db,
     # 3 plotly scattergl figures gives error "too many active WebGL contexts"
     # see https://plotly.com/python/webgl-vs-svg/
     tags$script(src = "https://unpkg.com/virtual-webgl@1.0.6/src/virtual-webgl.js"),
+    tags$head(
+      tags$style(HTML("
+      .shiny-output-error-validation {
+        display: flex;
+        align-items: center;
+      }"))
+    ),
     useShinyFeedback(),
     tabsetPanel(
       tabPanel("Plot",
                fluidRow(
                  column(11,
                         withSpinner(
-                          plotlyOutput("manhattan", width = "85vw", height = "300px"),
+                          plotlyOutput("manhattan", width = "85vw", height = height[1]),
                           type = 8, size = 0.7)
                  ),
                  column(1,
@@ -165,13 +217,27 @@ zoom <- function(data, ens_db,
                         actionButton("m_zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("m_zoomout", NULL, icon = icon("magnifying-glass-minus"))
                  )),
+               (if (man2) {
+                 fluidRow(
+                   column(11,
+                          withSpinner(
+                            plotlyOutput("manhattan2", width = "85vw", height = height[1]),
+                            type = 8, size = 0.7)
+                   ),
+                   column(1,
+                          br(),
+                          actionButton("m_zoomin2", NULL, icon = icon("magnifying-glass-plus")),
+                          actionButton("m_zoomout2", NULL, icon = icon("magnifying-glass-minus"))
+                   )
+                 )
+               }),
                fluidRow(
                  column(12,
                         conditionalPanel('input.show_chrom & output.coords_ok',
                                          fluidRow(
                                            column(11,
                                                   withSpinner(
-                                                    plotlyOutput("chrom", width = "85vw", height = "220px"),
+                                                    plotlyOutput("chrom", width = "85vw", height = height[2]),
                                                     type = 8, size = 0.7)
                                            ),
                                            column(1,
@@ -183,6 +249,26 @@ zoom <- function(data, ens_db,
                         )
                  )
                ),
+               (if (man2) {
+                 fluidRow(
+                   column(12,
+                          conditionalPanel('input.show_chrom & output.coords_ok',
+                                           fluidRow(
+                                             column(11,
+                                                    withSpinner(
+                                                      plotlyOutput("chrom2", width = "85vw", height = height[2]),
+                                                      type = 8, size = 0.7)
+                                             ),
+                                             column(1,
+                                                    br(),
+                                                    actionButton("chr_zoomin2", NULL, icon = icon("magnifying-glass-plus")),
+                                                    actionButton("chr_zoomout2", NULL, icon = icon("magnifying-glass-minus"))
+                                             )
+                                           )
+                          )
+                   )
+                 )
+               }),
                fluidRow(
                  column(3,
                         checkboxInput("show_chrom", "show chromosome")
@@ -195,7 +281,8 @@ zoom <- function(data, ens_db,
                         actionButton("right", NULL, icon = icon("angle-right")),
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
-                        actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus"))
+                        actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
+                        uiOutput("save_ui", inline = T)
                         ),
                  column(3,
                         textOutput("pos"),
@@ -230,6 +317,8 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
+                          radioButtons("export", h5("Export"),
+                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           (if (!is.null(eqtl_gene)) {
                             uiOutput("ui_genes")
                           } else NULL),
@@ -238,7 +327,7 @@ zoom <- function(data, ens_db,
                  ),
                  fluidRow(
                    column(12,
-                          plotlyOutput("locus", width = "95vw", height = 624)
+                          plotlyOutput("locus", width = "95vw", height = height[3])
                    )
                  )
       ),
@@ -251,14 +340,15 @@ zoom <- function(data, ens_db,
   server <- function(input, output, session) {
     
     output$manhattan <- renderPlotly({
-      plotly_manhattan(manhat, labs, pcutline = NULL) %>%
-        config(displayModeBar = FALSE)
+      plotly_manhattan(manhat, ylab = man_ylab[1], pcutline = NULL,
+                       scheme = scheme)
     })
     
     output$chrom <- renderPlotly({
       req(coords$chr)
-      chr_manhat <- manhattan(data[which(data[, chrom] == coords$chr), ],
-                              chrom, pos, p, labs, pcutoff = pcutoff,
+      validate(need(coords$chr %in% chr_set[[1]], "No data for this chromosome"))
+      chr_manhat <- manhattan(data[which(data[, chrom[1]] == coords$chr), ],
+                              chrom[1], pos[1], p[1], labs[1], pcutoff = pcutoff,
                               npoints = 1e5)
       chr <- suppressWarnings(as.numeric(coords$chr))
       if ((!is.na(chr) && chr %% 2 == 0 || coords$chr == "Y")) {
@@ -269,7 +359,7 @@ zoom <- function(data, ens_db,
       isolate(chr_y$max <- yr[2])
       isolate(xr <- coords$xrange)
       
-      plotly_manhattan(chr_manhat, labs, scheme = scheme,
+      plotly_manhattan(chr_manhat, scheme = scheme, ylab = man_ylab[1],
                        source = "plotly_chrom") %>%
         layout(margin = list(t = 5),
                shapes = list(
@@ -277,9 +367,7 @@ zoom <- function(data, ens_db,
                       line = list(width = 1, color = "#00CD00"),
                       x0 = xr[1] / 1e6,
                       x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
-                      xref = "x", yref = "paper", layer = "below"))
-               ) %>%
-        config(displayModeBar = FALSE)
+                      xref = "x", yref = "paper", layer = "above")))
     })
     
     coords <- reactiveValues(chr = NULL, xrange = NULL)
@@ -291,10 +379,10 @@ zoom <- function(data, ens_db,
     observe({
       s <- event_data("plotly_click", source = "plotly_manh")
       req(s)
-      w <- which(data[, labs] == s$key)
+      w <- which(data[, labs[1]] == s$key)
       if (length(w) > 0) {
-        coords$chr <- data[w[1], chrom]
-        xr <- data[w[1], pos] + c(-5e5, 5e5)
+        coords$chr <- data[w[1], chrom[1]]
+        xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
         if (xr[1] < 0) xr <- c(0, 1e6)
         coords$xrange <- xr
       }
@@ -303,38 +391,38 @@ zoom <- function(data, ens_db,
     observe({
       s <- event_data("plotly_click", source = "plotly_chrom")
       req(s)
-      w <- which(data[, labs] == s$key)
+      w <- which(data[, labs[1]] == s$key)
       if (length(w) > 0) {
-        coords$chr <- data[w[1], chrom]
-        xr <- data[w[1], pos] + c(-5e5, 5e5)
+        coords$chr <- data[w[1], chrom[1]]
+        xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
         if (xr[1] < 0) xr <- c(0, 1e6)
         coords$xrange <- xr
       }
     })
     
     # zoom manhattan y axis
-    m_ylim <- reactiveValues(max = yrange[2])
+    m_ylim <- reactiveValues(max = manhat$yrange[2])
     
     observeEvent(input$m_zoomin, {
       m_ylim$max <- pmax(m_ylim$max * 0.88, 5)
-      yr <- c(yrange[1], m_ylim$max)
+      yr <- c(manhat$yrange[1], m_ylim$max)
       yr <- yr + diff(yr) * c(-0.05, 0.05)
       plotlyProxy("manhattan", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
     
     observeEvent(input$m_zoomout, {
-      m_ylim$max <- pmin(m_ylim$max / 0.88, yrange[2])
-      yr <- c(yrange[1], m_ylim$max)
+      m_ylim$max <- pmin(m_ylim$max / 0.88, manhat$yrange[2])
+      yr <- c(manhat$yrange[1], m_ylim$max)
       yr <- yr + diff(yr) * c(-0.05, 0.05)
       plotlyProxy("manhattan", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
@@ -349,7 +437,7 @@ zoom <- function(data, ens_db,
       plotlyProxy("chrom", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
@@ -361,47 +449,184 @@ zoom <- function(data, ens_db,
       plotlyProxy("chrom", session) %>%
         plotlyProxyInvoke("relayout",
                           list(yaxis = list(range = yr,
-                                            title = "-log<sub>10</sub> P",
+                                            title = man_ylab[1],
                                             ticks = "outside",
                                             zeroline = FALSE, showline = TRUE)))
     })
     
+    ###########
+    # 2nd gwas
+    if (man2) {
+      output$manhattan2 <- renderPlotly({
+        req(man2)
+        plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
+                         scheme = scheme2,
+                         source = "plotly_manh2")
+      })
+      
+      # chromosome plotly 2
+      output$chrom2 <- renderPlotly({
+        req(man2, coords$chr)
+        validate(need(coords$chr %in% chr_set[[2]], "No data for this chromosome"))
+        chr_manhat2 <- manhattan(data2[which(data2[, chrom[2]] == coords$chr), ],
+                                 chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
+                                 npoints = 1e5)
+        chr <- suppressWarnings(as.numeric(coords$chr))
+        if ((!is.na(chr) && chr %% 2 == 0 || coords$chr == "Y")) {
+          scheme2[1] <- scheme2[2]
+        }
+        yr <- range(chr_manhat2$data$logP, na.rm = TRUE)
+        isolate(chr_y2$range <- yr)
+        isolate(chr_y2$max <- yr[2])
+        isolate(xr <- coords$xrange)
+        
+        plotly_manhattan(chr_manhat2, scheme = scheme2, ylab = man_ylab[2],
+                         source = "plotly_chrom2") %>%
+          layout(margin = list(t = 5),
+                 shapes = list(
+                   list(type = "rect",
+                        line = list(width = 1, color = "red"),
+                        x0 = xr[1] / 1e6,
+                        x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
+                        xref = "x", yref = "paper", layer = "above")))
+      })
+      
+      # 2nd manhattan click
+      observe({
+        s <- event_data("plotly_click", source = "plotly_manh2")
+        req(s)
+        w <- which(data2[, labs[2]] == s$key)
+        if (length(w) > 0) {
+          coords$chr <- data2[w[1], chrom[2]]
+          xr <- data2[w[1], pos[2]] + c(-5e5, 5e5)
+          if (xr[1] < 0) xr <- c(0, 1e6)
+          coords$xrange <- xr
+        }
+      })
+      
+      # 2nd chrom click
+      observe({
+        s <- event_data("plotly_click", source = "plotly_chrom2")
+        req(s)
+        w <- which(data2[, labs[2]] == s$key)
+        if (length(w) > 0) {
+          coords$chr <- data2[w[1], chrom[2]]
+          xr <- data2[w[1], pos[2]] + c(-5e5, 5e5)
+          if (xr[1] < 0) xr <- c(0, 1e6)
+          coords$xrange <- xr
+        }
+      })
+      
+      # zoom manhattan2 y axis
+      m_ylim2 <- reactiveValues(max = manhat2$yrange[2])
+      
+      observeEvent(input$m_zoomin2, {
+        m_ylim2$max <- pmax(m_ylim2$max * 0.88, 5)
+        yr <- c(manhat2$yrange[1], m_ylim2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      observeEvent(input$m_zoomout2, {
+        m_ylim2$max <- pmin(m_ylim2$max / 0.88, manhat2$yrange[2])
+        yr <- c(manhat2$yrange[1], m_ylim2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      # zoom chrom2 y axis
+      chr_y2 <- reactiveValues(max = 0, range = c(0, 0))
+      
+      observeEvent(input$chr_zoomin2, {
+        chr_y2$max <- pmax(chr_y2$max * 0.88, 5)
+        yr <- c(chr_y2$range[1], chr_y2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+      observeEvent(input$chr_zoomout2, {
+        chr_y2$max <- pmin(chr_y2$max / 0.88, chr_y2$range[2])
+        yr <- c(chr_y2$range[1], chr_y2$max)
+        yr <- yr + diff(yr) * c(-0.05, 0.05)
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(yaxis = list(range = yr,
+                                              title = man_ylab[2],
+                                              ticks = "outside",
+                                              zeroline = FALSE, showline = TRUE)))
+      })
+      
+    }  # end of 2nd manhattan section
+    
+    #########
+    
     input_biotype <- reactive({input$biotype}) %>% debounce(2000)
     
     loc <- reactiveValues(i = NULL)
+    locv2 <- reactiveValues(i = NULL)
     ntrace <- reactiveVal()
     genes <- reactiveValues(x = NULL)
     ld_snp <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
+    save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
-      req(coords$chr %in% chr_set, coords$xrange)
+      req(coords$chr, coords$xrange)
       # temporary fix for plotly minallowed not working 
       req(coords$xrange[1] >= 0)
       loc1 <- locus(data = data, xrange = coords$xrange,
                      seqname = coords$chr, ens_db = ens_db,
-                     chrom = chrom, pos = pos, p = p, labs = labs)
-      validate(need(loc1$data, "Locus contains no SNPs/datapoints"))
-      validate(need(nrow(loc1$data) < 1.5e5, "Too many datapoints. Zoom in."))
+                     chrom = chrom[1], pos = pos[1], p = p[1], labs = labs[1])
+      validate(need(is.null(loc1$data) || nrow(loc1$data) < 1.5e5,
+                    "Too many datapoints. Zoom in."))
       loc1$TX$fullname <- expandGenes(loc1$TX, fullnames)
       if (!is.null(recomb) && input$recomb) {
         loc1 <- link_recomb(loc1, recomb = recomb)
       }
       
+      if (man2) {
+        loc2 <- locus(data = data2, xrange = coords$xrange,
+                      seqname = coords$chr, ens_db = ens_db,
+                      chrom = chrom[2], pos = pos[2], p = p[2], labs = labs[2],
+                      tx = FALSE)
+        validate(need(is.null(loc2$data) || nrow(loc2$data) < 1e5,
+                      "Too many datapoints. Zoom in."))
+        if (!is.null(recomb) && input$recomb) {
+          loc2 <- link_recomb(loc2, recomb = recomb)
+        }
+      }
+      
+      # retrieve LD
       isolate(cur_index(loc1$index_snp))
       pin <- ld_snp()
       ld_msg <- NULL
-      if (!is.null(pin) && pin %in% loc1$data[, labs]) {
+      if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
+          (man2 && pin %in% loc2$data[, labs[2]]))) {
         loc1$index_snp <- pin
-        loc2 <- withCallingHandlers(
+        loc1b <- withCallingHandlers(
           try(link_LD(loc1, token = ld_token, pop = ld_pop)),
           message = function(m) {
             txt <- conditionMessage(m)
             ld_msg <<- trimws(txt)
           })
-        if (inherits(loc2, "try-error")) {
-          ld_msg <- attr(loc2, "condition")$message
-        } else loc1 <- loc2
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
         removeNotification("ld_busy")
         if (!"ld" %in% colnames(loc1$data)) {
           showNotification(
@@ -409,11 +634,18 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
+        if (man2 && !is.null(pin) && "ld" %in% colnames(loc1$data)) {
+          loc2$index_snp <- pin
+          loc2b <- try(link_LD(loc2, token = ld_token, pop = ld_pop))
+          if (!inherits(loc2b, "try-error")) loc2 <- loc2b
+        }
       }
+       
       loc$i <- loc1
+      if (man2) locv2$i <- loc2
       
       if (!is.null(eqtl_gene)) {
-        ind <- loc1$data[, p] < pcutoff
+        ind <- loc1$data[, p[1]] < pcutoff
         eqtls <- loc1$data[ind, eqtl_gene]
         genes$x <- genes1 <- unique(eqtls)
         locscheme <- unname(c('grey', eqtl_colour[genes1]))
@@ -435,14 +667,17 @@ zoom <- function(data, ens_db,
         tryTX <- mapRow(loc1$TX, xlim = loc1$xrange, cex.text = cex.width,
                         blanks = "show")
         needrow <- pmax(max(tryTX$row, na.rm = TRUE), 8)
-        h <- c(364, 24 * needrow + 80)
+        h <- if (!man2) c(364, 24 * needrow + 80) else c(305, 305, 20 * needrow + 40)
         maxrows <- NULL
       }
       hideFeedback("tex")
       p <- locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
-                   width = width, eqtl_gene = eqtl_gene, beta = eqtl_beta,
-                   add_hover = add_hover, scheme = locscheme, maxrows = maxrows)
+                   width = width, eqtl_gene = eqtl_gene, beta = beta,
+                   add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
+                   loc2 = if (man2) loc2 else NULL,
+                   ylab = man_ylab)
       ntrace(length(p$x$data) -2)
+      save_plotly$p <- p
       p
     })
     
@@ -497,7 +732,7 @@ zoom <- function(data, ens_db,
     })
     
     output$pos <- renderText({
-      req(coords$chr %in% chr_set, coords$xrange)
+      req(coords$chr %in% chr_set[[1]], coords$xrange)
       paste0("chr ", coords$chr, ": ", coords$xrange[1], " - ",
              coords$xrange[2])
     })
@@ -532,10 +767,10 @@ zoom <- function(data, ens_db,
         m <- mean(c(start(loc), end(loc)))
         xr <- as.integer(c(m - 5e5, m + 5e5))
       } else if (grepl("^rs", input$tex)) {
-        w <- which(data[, labs] == input$tex)
+        w <- which(data[, labs[1]] == input$tex)
         if (length(w) > 0) {
-          chr <- data[w[1], chrom]
-          xr <- data[w[1], pos] + c(-5e5, 5e5)
+          chr <- data[w[1], chrom[1]]
+          xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
         } else {
           showFeedback("tex", "SNP not found")
           return()
@@ -546,7 +781,7 @@ zoom <- function(data, ens_db,
       }
       xr <- as.integer(pmax(xr, 0))
       
-      if (chr %in% chr_set) {
+      if (chr %in% chr_set[[1]]) {
         coords$chr <- chr
         if (any(is.na(xr))) {
           showFeedback("tex", "invalid entry")
@@ -562,12 +797,13 @@ zoom <- function(data, ens_db,
     # Table tab
     output$table <- DT::renderDataTable({
       cols <- colnames(data)[sapply(data, class) == "numeric"]
+      cols <- cols[!cols %in% c(chrom[1], pos[1])]
       datatable(data) %>% formatSignif(cols, digits = 3)
     })
     
     # detect change to x axis range
     observeEvent(event_data("plotly_relayout", source = "plotly_locus"), {
-      req(coords$chr %in% chr_set, coords$xrange)
+      req(coords$chr %in% chr_set[[1]], coords$xrange)
       s <- event_data("plotly_relayout", source = "plotly_locus")
       req(c("xaxis.range[0]", "xaxis.range[1]") %in% names(s))
       xr <- c(s$`xaxis.range[0]`, s$`xaxis.range[1]`)
@@ -620,7 +856,10 @@ zoom <- function(data, ens_db,
                           "<br>End: ", TX$end * 1e6)
       ht <- seg2line(hovertext, hovertext)
       exon_col <- exon_border <- "#00008B"
-      yref <- if (is.null(recomb) || !input$recomb) "y2" else "y3"
+      rec <- !is.null(recomb) && input$recomb
+      yref <- paste0("y", rec + man2 + rec * man2 +2)
+      # yref <- save_plotly$p$x$data[[ntrace() +2]]$yaxis
+      
       y0 <- -EX$row - 0.15
       y1 <- -EX$row + 0.15
       shapes <- lapply(seq_len(nrow(EX)), function(i) {
@@ -653,6 +892,46 @@ zoom <- function(data, ens_db,
                           list(annotations = list(NULL)))
     })
     
+    # main manhattan highlight
+    observeEvent(coords$chr, {
+      req(coords$chr)
+      # manhattan1
+      if (coords$chr %in% chr_set[[1]]) {
+        chrom_range <- manhat$chrom_range[coords$chr, ]
+        shapes <- list(
+          list(type = "rect",
+               line = list(width = 1, color = "#00CD00"),
+               x0 = chrom_range[1],
+               x1 = chrom_range[2], y0 = 0, y1 = 1,
+               xref = "x", yref = "paper", layer = "above")
+        )
+      } else {
+        shapes <- list()
+      }
+      plotlyProxy("manhattan", session) %>%
+        plotlyProxyInvoke("relayout",
+                          list(shapes = shapes))
+      
+      # manhattan2 highlight
+      if (man2) {
+        if (coords$chr %in% chr_set[[2]]) {
+          chrom_range <- manhat2$chrom_range[coords$chr, ]
+          shapes <- list(
+            list(type = "rect",
+                 line = list(width = 1, color = "red"),
+                 x0 = chrom_range[1],
+                 x1 = chrom_range[2], y0 = 0, y1 = 1,
+                 xref = "x", yref = "paper", layer = "above")
+          )
+        } else {
+          shapes <- list()
+        }
+        plotlyProxy("manhattan2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = shapes))
+      }
+    })
+    
     # chrom highlight
     observeEvent(coords$xrange, {
       req(input$show_chrom, coords$chr)
@@ -663,8 +942,20 @@ zoom <- function(data, ens_db,
                                  line = list(width = 1, color = "#00CD00"),
                                  x0 = coords$xrange[1] / 1e6,
                                  x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
-                                 xref = "x", yref = "paper", layer = "below")
+                                 xref = "x", yref = "paper", layer = "above")
                           )))
+      # chrom2 highlight
+      if (man2) {
+        plotlyProxy("chrom2", session) %>%
+          plotlyProxyInvoke("relayout",
+                            list(shapes = list(
+                              list(type = "rect",
+                                   line = list(width = 1, color = "red"),
+                                   x0 = coords$xrange[1] / 1e6,
+                                   x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
+                                   xref = "x", yref = "paper", layer = "above")
+                            )))
+      }
     })
     
     get_ld <- reactiveVal(FALSE)
@@ -686,6 +977,7 @@ zoom <- function(data, ens_db,
       removeNotification("ld_busy")
     })
     
+    # LD rebase click on locus
     observe({
       s <- event_data("plotly_click", source = "plotly_locus")
       req(s, !is.null(s$key))
@@ -700,205 +992,51 @@ zoom <- function(data, ens_db,
     })
     
     output$ld_status <- renderText({
-      req(ld_snp() %in% loc$i$data[, labs])
+      if (man2) {
+        req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+      } else {
+        req(ld_snp() %in% loc$i$data[, labs])
+      }
       paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+    })
+    
+    # inline conditional UI
+    output$save_ui <- renderUI({
+      req(coords$chr)
+      downloadButton("save", NULL, icon = icon("floppy-disk"))
+    })
+    
+    # save files
+    output$save <- downloadHandler(filename = function() {
+      paste0("loc_", dat_name, "_", coords$chr, "_", coords$xrange[1], ".",
+             input$export)
+    },
+    content = function(file) {
+      req(loc$i)
+      if (input$export == "pdf") {
+        pdf(file)
+        if (!man2) {
+          locus_plot(loc$i, eqtl_gene = eqtl_gene, beta = beta,
+                     blanks = "hide")
+        } else {
+          oldpar <- set_layers(2)
+          on.exit(par(oldpar))
+          bty <- if (!is.null(recomb) && input$recomb) "u" else "l" 
+          scatter_plot(loc$i, xticks = FALSE, bty = bty,
+                       ylab = bquote(.(traits[1]) ~ -log[10] ~ P),
+                       eqtl_gene = eqtl_gene, beta = beta[1])
+          scatter_plot(locv2$i, xticks = FALSE, bty = bty, beta = beta[2],
+                       ylab = bquote(.(traits[2]) ~ -log[10] ~ P))
+          genetracks(loc$i, blanks = "hide")
+        }
+        dev.off()
+      } else {
+        saveRDS(save_plotly$p, file)
+      }
     })
     
   }
   
   runApp(list(ui = ui, server = server)) %>%
     suppress_warnings("please add `event_register\\(p")
-}
-
-
-manhattan <- function(data,
-                      chrom = NULL, pos = NULL, p = NULL, labs = NULL,
-                      pcutoff = 5e-08,
-                      chromGap = NULL,
-                      chromCols = c('royalblue', 'skyblue'),
-                      sigCol = 'red',
-                      npoints = 1e6) {
-  # autodetect headings
-  dc <- detect_cols(data, chrom, pos, p, labs)
-  chrom <- dc$chrom
-  pos <- dc$pos
-  p <- dc$p
-  labs <- dc$labs
-  
-  if (!is.na(npoints) & nrow(data) > npoints) {
-    index <- order(data[, p])
-    if (npoints <= 1e5) {
-      data <- data[index[seq_len(npoints)], ]
-    } else {
-      # thin points near x axis
-      nplotly <- 1e5
-      s1 <- seq_len(nplotly)
-      s2len <- nrow(data) - nplotly
-      s2 <- round(seq_len(npoints - nplotly) * s2len / (npoints - nplotly)) + nplotly
-      data <- data[index[unique(c(s1, s2))], ]
-    }
-  }
-  
-  data$logP <- -log10(data[, p])
-  chrom_list <- mixedsort(unique(data[, chrom]), na.last = NA)
-  chrom_list <- as.character(chrom_list)
-  
-  data[, chrom] <- factor(data[, chrom], levels = chrom_list)
-  if (length(chrom_list) == 1) {
-    data$genome_pos <- data[, pos]  # single chrom
-  } else {
-    maxpos <- tapply(data[, pos], data[, chrom], max, na.rm = TRUE)
-    maxpos <- maxpos[chrom_list]  # reorder
-    minpos <- tapply(data[, pos], data[, chrom], min, na.rm = TRUE)
-    minpos <- minpos[chrom_list]  # reorder
-    # calculate gap
-    if (is.null(chromGap)) {
-      chromGap <- sum(maxpos - minpos) / length(chrom_list) / 4.15
-    }
-    chrom_cumsum <- c(0, cumsum(maxpos - minpos + chromGap))
-    chrom_cumsum2 <- chrom_cumsum - c(minpos, 0)
-    chrom_cumsum <- chrom_cumsum[1:length(maxpos)]
-    chrom_cumsum2 <- chrom_cumsum2[1:length(maxpos)]
-    data$genome_pos <- data[, pos] + chrom_cumsum2[as.numeric(data[, chrom])]
-  }
-  data <- data[order(data$genome_pos), ]
-  data$col <- ((as.numeric(data[, chrom]) - 1) %% length(chromCols)) + 1
-  colScheme <- chromCols
-  if (!is.na(sigCol)) {
-    data$col[data[, p] < pcutoff] <- length(chromCols) + 1
-    colScheme <- c(chromCols, sigCol)
-  }
-  if (length(chrom_list) > 1) {
-    xticks <- list(at = chrom_cumsum + 0.5 * (maxpos - minpos), 
-                   labels = levels(data[, chrom]))
-  } else xticks <- NULL
-  
-  ret <- list(data = data, xticks = xticks, pcutoff = pcutoff,
-              chrom_list = chrom_list)
-  class(ret) <- "manhattan"
-  ret
-}
-
-
-plotly_manhattan <- function(obj,
-                             labs,
-                             scheme = c('royalblue', 'skyblue', 'red'),
-                             xlab = "Chromosome",
-                             pcutline = NULL,
-                             source = "plotly_manh") {
-  
-  df <- obj$data
-  df$col <- as.factor(df$col)
-  scheme <- scheme[as.numeric(levels(df$col))]
-  if (is.null(obj$xticks)) {
-    # single chrom
-    df$genome_pos <- df$genome_pos / 1e6
-    if (xlab == "Chromosome") xlab <- paste(xlab, obj$chrom_list, "(Mb)")
-  }
-  xr <- range(df$genome_pos, na.rm = TRUE)
-  xr <- xr + diff(xr) * c(-0.01, 0.01)
-  yr <- range(df$logP, na.rm = TRUE)
-  yr <- yr + diff(yr) * c(-0.05, 0.05)
-  
-  hline <- if (!is.null(pcutline)) {
-    list(type = "line",
-         line = list(width = 1, color = '#AAAAAA', dash = 'dash'),
-         x0 = 0, x1 = 1, y0 = -log10(pcutline), y1 = -log10(pcutline),
-         xref = "paper", layer = "below")
-  } else NULL
-  xlayout <- list(range = xr, title = xlab, ticks = "outside",
-                  zeroline = FALSE, showline = TRUE, showgrid = FALSE)
-  if (!is.null(obj$xticks)) {
-    xlayout <- c(xlayout, list(tickvals = obj$xticks$at,
-                               ticktext = obj$xticks$labels))
-  }
-  
-  plot_ly(data = df, x = ~genome_pos, y = ~logP,
-          color = ~col, colors = scheme,
-          marker = list(size = 4, opacity = 0.8),
-          text = as.formula(paste0('~', labs)),
-          hoverinfo = 'text', key = as.formula(paste0('~', labs)),
-          showlegend = FALSE,
-          type = "scattergl", mode = "markers",
-          source = source) %>%
-    plotly::layout(xaxis = xlayout,
-                   yaxis = list(range = yr,
-                                title = "-log<sub>10</sub> P",
-                                ticks = "outside",
-                                zeroline = FALSE, showline = TRUE),
-                   shapes = hline)
-}
-
-
-seg2line <- function(x, xend) {
-  m <- rbind(x, xend, NA)
-  as.vector(m)
-}
-
-
-unique_snps <- function(data, labs, append) {
-  snps <- data[, labs]
-  dups <- which(duplicated(snps))
-  if (length(dups) > 0) {
-    message("Duplicated SNPs found")
-    snps[dups] <- make.unique(paste(snps[dups], data[dups, append], sep = "."))
-  }
-  snps
-}
-
-
-#' @importFrom ensembldb listColumns
-fullGeneNames <- function(edb, AnnotationDb) {
-  # check ens_db cols for 'description' first
-  if ("description" %in% listColumns(edb) | is.null(AnnotationDb)) return(NULL)
-  
-  if (!requireNamespace(AnnotationDb)) {
-    stop("Gene annotation database '", AnnotationDb, "' is not installed")
-  }
-  if (is.character(AnnotationDb)) {
-    AnnotationDb <- eval(str2lang(paste0(AnnotationDb, "::", AnnotationDb)))
-  }
-  alias <- AnnotationDbi::keys(AnnotationDb, "ALIAS")
-  suppressMessages(
-    AnnotationDbi::mapIds(AnnotationDb, alias,
-                          "GENENAME", "ALIAS", multiVals = 'first')
-  )
-}
-
-
-# Full genename lookup, returns hovertext
-expandGenes <- function(TX, fullnames) {
-  genelist <- TX$gene_name
-  if ("description" %in% colnames(TX)) {
-    # check ensembldb first
-    out <- gsub(" \\[[^][]*]", "", TX$description)
-  } else {
-    if (is.null(fullnames)) return(genelist)
-    out <- fullnames[genelist]
-  }
-  bad <- is.na(out) | out == "NULL" | out == ""
-  out <- paste0("<br>", out)
-  out[bad] <- ""
-  out
-}
-
-
-eqtl_colours <- function(sigdat, chrom, pos, eqtl_gene, eqtl_scheme) {
-  message("Setting eQTL colours")
-  sigdat <- sigdat[order(sigdat[, chrom], sigdat[, pos]), ]
-  eqtl_set <- unique(sigdat[, eqtl_gene])
-  message(length(eqtl_set), " eQTL genes")
-  setNames(rep_len(eqtl_scheme, length(eqtl_set)), eqtl_set)
-}
-
-
-suppress_warnings <- function(expr, pattern) {
-  withCallingHandlers(
-    expr,
-    warning = function(w) {
-      if (grepl(pattern, conditionMessage(w))) {
-        invokeRestart("muffleWarning")
-      }
-    }
-  )
 }
