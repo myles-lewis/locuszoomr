@@ -94,9 +94,10 @@ plotly_manhattan <- function(obj,
   if (is.null(obj$xticks)) {
     # single chrom
     df$genome_pos <- df$genome_pos / 1e6
+    if (!is.null(xlim)) xlim <- xlim / 1e6
     if (xlab == "Chromosome") xlab <- paste(xlab, obj$chrom_list, "(Mb)")
   }
-  xr <- if (is.null(xlim)) range(df$genome_pos, na.rm = TRUE) else xlim / 1e6
+  xr <- if (is.null(xlim)) range(df$genome_pos, na.rm = TRUE) else xlim
   xr <- xr + diff(xr) * c(-0.01, 0.01)
   yr <- range(df$logP, na.rm = TRUE)
   yr <- yr + diff(yr) * c(-0.05, 0.05)
@@ -216,12 +217,17 @@ align_chrom_lim <- function(x) {
   chr_mins <- lapply(x, function(i) i$chrom_lim[, "min"])
   chr_maxs <- lapply(x, function(i) i$chrom_lim[, "max"])
   full_set <- unique(unlist(lapply(x, function(i) i$chrom_list)))
-  pmin2 <- function(...) pmin(..., na.rm = TRUE)
-  pmax2 <- function(...) pmax(..., na.rm = TRUE)
   t(vapply(full_set, function(i) {
-    c(do.call(pmin2, lapply(chr_mins, function(x) x[i])),
-      do.call(pmax2, lapply(chr_maxs, function(x) x[i])))
+    c(min(unlist(lapply(chr_mins, function(x) x[i])), na.rm = TRUE),
+      max(unlist(lapply(chr_maxs, function(x) x[i])), na.rm = TRUE))
   }, numeric(2)))
+}
+
+
+align_manhats <- function(x) {
+  mrange <- vapply(x, function(i) range(i$data$genome_pos, na.rm = TRUE),
+                   numeric(2))
+  c(min(mrange[1, ]), max(mrange[2, ]))
 }
 
 

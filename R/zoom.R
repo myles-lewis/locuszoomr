@@ -174,6 +174,7 @@ zoom <- function(data, ens_db,
   man_ylab <- "-log<sub>10</sub> P"
   height <- c(300, 220, 624)
   chrom_lim <- manhat$chrom_lim
+  man_lim <- NULL
   
   if (man2) {
     message("Generating Manhattan plot 2")
@@ -187,6 +188,7 @@ zoom <- function(data, ens_db,
     man_ylab <- paste(traits, man_ylab)
     height <- c(220, 180, 824)
     chrom_lim <- align_chrom_lim(list(manhat, manhat2))
+    man_lim <- align_manhats(list(manhat, manhat2))
   }
   
   js <- '$(document).on("keyup", function(e) {
@@ -347,7 +349,7 @@ zoom <- function(data, ens_db,
     
     output$manhattan <- renderPlotly({
       plotly_manhattan(manhat, ylab = man_ylab[1], pcutline = NULL,
-                       scheme = scheme)
+                       scheme = scheme, xlim = man_lim)
     })
     
     output$chrom <- renderPlotly({
@@ -467,7 +469,7 @@ zoom <- function(data, ens_db,
       output$manhattan2 <- renderPlotly({
         req(man2)
         plotly_manhattan(manhat2, ylab = man_ylab[2], pcutline = NULL,
-                         scheme = scheme2,
+                         scheme = scheme2, xlim = man_lim,
                          source = "plotly_manh2")
       })
       
