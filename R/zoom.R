@@ -141,8 +141,6 @@ zoom <- function(data, ens_db,
   }
   # currently eqtl_gene can only apply to data1
   
-  chr_set <- list()
-  chr_set[[1]] <- unique(data[, chrom[1]])
   if (is.character(ens_db)) {
     if (!ens_db %in% (.packages())) {
       stop("Ensembl database not loaded. Try: library(", ens_db, ")",
@@ -171,19 +169,24 @@ zoom <- function(data, ens_db,
   data[which(data[, p[1]] < 5e-324), p[1]] <- 5e-324
   manhat <- manhattan(data, chrom[1], pos[1], p[1], labs[1], pcutoff = pcutoff,
                       npoints = mh_points)
+  chr_set <- list()
+  chr_set[[1]] <- manhat$chrom_list
   man_ylab <- "-log<sub>10</sub> P"
   height <- c(300, 220, 624)
+  chrom_lim <- manhat$chrom_lim
   
   if (man2) {
     message("Generating Manhattan plot 2")
     data2 <- complete_data(data2, chrom[2], pos[2], p[2])
     data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
     data2[which(data2[, p[2]] < 5e-324), p[2]] <- 5e-324
-    chr_set[[2]] <- unique(data2[, chrom[2]])
     manhat2 <- manhattan(data2, chrom[2], pos[2], p[2], labs[2], pcutoff = pcutoff,
                          npoints = mh_points)
+    chr_set[[2]] <- manhat2$chrom_list
+    full_chr_set <- unique(unlist(chr_set))
     man_ylab <- paste(traits, man_ylab)
     height <- c(220, 180, 824)
+    chrom_lim <- align_chrom_lim(list(manhat, manhat2))
   }
   
   js <- '$(document).on("keyup", function(e) {
@@ -363,6 +366,7 @@ zoom <- function(data, ens_db,
       isolate(xr <- coords$xrange)
       
       plotly_manhattan(chr_manhat, scheme = scheme, ylab = man_ylab[1],
+                       xlim = chrom_lim[coords$chr, ],
                        source = "plotly_chrom") %>%
         layout(margin = list(t = 5),
                shapes = list(
@@ -484,6 +488,7 @@ zoom <- function(data, ens_db,
         isolate(xr <- coords$xrange)
         
         plotly_manhattan(chr_manhat2, scheme = scheme2, ylab = man_ylab[2],
+                         xlim = chrom_lim[coords$chr, ],
                          source = "plotly_chrom2") %>%
           layout(margin = list(t = 5),
                  shapes = list(
