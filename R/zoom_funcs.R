@@ -13,6 +13,32 @@ manhattan <- function(data,
   p <- dc$p
   labs <- dc$labs
   
+  data$logP <- -log10(data[, p])
+  chrom_list <- as.character(mixedsort(unique(data[, chrom]), na.last = NA))
+  data[, chrom] <- factor(data[, chrom], levels = chrom_list)
+  
+  if (length(chrom_list) == 1) {
+    data$genome_pos <- data[, pos]  # single chrom
+    lim <- NULL
+  } else {
+    maxpos <- tapply(data[, pos], data[, chrom], max, na.rm = TRUE)
+    maxpos <- maxpos[chrom_list]  # reorder
+    minpos <- tapply(data[, pos], data[, chrom], min, na.rm = TRUE)
+    minpos <- minpos[chrom_list]  # reorder
+    lim <- matrix(c(minpos, maxpos), ncol = 2,
+                  dimnames = list(chrom_list, c("min", "max")))
+    # calculate gap
+    if (is.null(chromGap)) {
+      chromGap <- sum(maxpos - minpos) / length(chrom_list) / 4.15
+    }
+    chrom_cumsum <- c(0, cumsum(maxpos - minpos + chromGap))
+    chrom_cumsum2 <- chrom_cumsum - c(minpos, 0)
+    chrom_cumsum <- chrom_cumsum[1:length(maxpos)]
+    chrom_cumsum2 <- chrom_cumsum2[1:length(maxpos)]
+    data$genome_pos <- data[, pos] + chrom_cumsum2[as.numeric(data[, chrom])]
+  }
+  
+  # thin points
   if (!is.na(npoints) & nrow(data) > npoints) {
     index <- order(data[, p])
     if (npoints <= 1e5) {
@@ -27,28 +53,6 @@ manhattan <- function(data,
     }
   }
   
-  data$logP <- -log10(data[, p])
-  chrom_list <- mixedsort(unique(data[, chrom]), na.last = NA)
-  chrom_list <- as.character(chrom_list)
-  
-  data[, chrom] <- factor(data[, chrom], levels = chrom_list)
-  if (length(chrom_list) == 1) {
-    data$genome_pos <- data[, pos]  # single chrom
-  } else {
-    maxpos <- tapply(data[, pos], data[, chrom], max, na.rm = TRUE)
-    maxpos <- maxpos[chrom_list]  # reorder
-    minpos <- tapply(data[, pos], data[, chrom], min, na.rm = TRUE)
-    minpos <- minpos[chrom_list]  # reorder
-    # calculate gap
-    if (is.null(chromGap)) {
-      chromGap <- sum(maxpos - minpos) / length(chrom_list) / 4.15
-    }
-    chrom_cumsum <- c(0, cumsum(maxpos - minpos + chromGap))
-    chrom_cumsum2 <- chrom_cumsum - c(minpos, 0)
-    chrom_cumsum <- chrom_cumsum[1:length(maxpos)]
-    chrom_cumsum2 <- chrom_cumsum2[1:length(maxpos)]
-    data$genome_pos <- data[, pos] + chrom_cumsum2[as.numeric(data[, chrom])]
-  }
   data <- data[order(data$genome_pos), ]
   data$col <- ((as.numeric(data[, chrom]) - 1) %% length(chromCols)) + 1
   colScheme <- chromCols
@@ -68,8 +72,8 @@ manhattan <- function(data,
   yrange <- range(data$logP, na.rm = TRUE)
   
   ret <- list(data = data, xticks = xticks, chrom_range = chrom_range,
-              pcutoff = pcutoff, chrom_list = chrom_list, labs = labs,
-              yrange = yrange)
+              chrom_lim = lim, pcutoff = pcutoff, chrom_list = chrom_list,
+              labs = labs, yrange = yrange)
   class(ret) <- "manhattan"
   ret
 }
@@ -80,6 +84,7 @@ plotly_manhattan <- function(obj,
                              xlab = "Chromosome",
                              ylab = "-log<sub>10</sub> P",
                              pcutline = NULL,
+                             xlim = NULL,
                              source = "plotly_manh") {
   
   df <- obj$data
@@ -91,7 +96,7 @@ plotly_manhattan <- function(obj,
     df$genome_pos <- df$genome_pos / 1e6
     if (xlab == "Chromosome") xlab <- paste(xlab, obj$chrom_list, "(Mb)")
   }
-  xr <- range(df$genome_pos, na.rm = TRUE)
+  xr <- if (is.null(xlim)) range(df$genome_pos, na.rm = TRUE) else xlim / 1e6
   xr <- xr + diff(xr) * c(-0.01, 0.01)
   yr <- range(df$logP, na.rm = TRUE)
   yr <- yr + diff(yr) * c(-0.05, 0.05)
@@ -203,6 +208,20 @@ complete_data <- function(data, chrom, pos, p) {
     data <- data[which(ok), ]
   }
   data
+}
+
+
+# x is a list of manhattans
+align_chrom_lim <- function(x) {
+  chr_mins <- lapply(x, function(i) i$chrom_lim[, "min"])
+  chr_maxs <- lapply(x, function(i) i$chrom_lim[, "max"])
+  full_set <- unique(unlist(lapply(x, function(i) i$chrom_list)))
+  pmin2 <- function(...) pmin(..., na.rm = TRUE)
+  pmax2 <- function(...) pmax(..., na.rm = TRUE)
+  t(vapply(full_set, function(i) {
+    c(do.call(pmin2, lapply(chr_mins, function(x) x[i])),
+      do.call(pmax2, lapply(chr_maxs, function(x) x[i])))
+  }, numeric(2)))
 }
 
 
