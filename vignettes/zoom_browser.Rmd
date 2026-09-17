@@ -112,10 +112,34 @@ knitr::include_graphics("zoom2.png")
 ### Dual GWAS browsing
 
 Using the `data2` argument, users can browse 2 GWAS at the same time. Shown
-below, eQTL data from synovial tissue is compared to data from a rheumatoid
-arthritis GWAS. The display now has 2 whole genome manhattan plots followed by 2
+below, eQTL data from synovial tissue^1^ is compared to data from a rheumatoid
+arthritis GWAS.^2^ eQTL data is best placed first, so that the `eqtl_gene` argument
+can be used to show which gene a SNP drives, as each SNP sometimes drives
+multiple genes. The `beta` argument is used to show up/down triangles for
+positive/ negative beta values. It points to the relevant column of beta values
+and can be applied to either dataset. But here `NA` is used to indicate that
+beta is not being applied to the 2nd GWAS dataset.
+
+The display now has 2 whole genome manhattan plots followed by 2
 optional chromosome plots for the current locus, followed by the dual layered
-locus plot.
+locus plot. LD information can also be overlaid and either locus plot can be
+clicked to rebase the LD information.
+
+```{r eval=FALSE}
+# load ensembl Homo sapiens database v110
+library(AnnotationHub)
+ah <- AnnotationHub()
+query(ah, c("EnsDb", "Homo sapiens"))  # shows latest versions
+ensDb_v110 <- ah[["AH113665"]]
+
+# load hg38 recombination rate data downloaded from UCSC
+recomb1000G <- import.bw("/../recomb1000GAvg.bw")
+
+# double GWAS, eQTL first
+zoom(eqtlres, data2 = RA_gwas, ens_db = ensDb_v110,
+     eqtl_gene = "gene", beta = c("beta", NA),
+     recomb = recomb1000G, ld_token = "my_token")
+```
 
 ```{r, out.width='100%', echo=FALSE}
 knitr::include_graphics("dbl_gwas_manh.png")
@@ -148,3 +172,8 @@ If you use this package please cite as:
 Lewis MJ, Wang S. (2025) locuszoomr: an R package for visualising
 publication-ready regional gene locus plots. *Bioinformatics Advances* 2025;
 vbaf006, [doi:10.1093/bioadv/vbaf006](https://doi.org/10.1093/bioadv/vbaf006)
+
+### References
+
+1. Goldmann, K. et al. *Ann Rheum Dis* 2023; doi:10.1136/ard-2023-224540
+2. Ishigaki, K. et al. *Nat Genet* 2022; 54: 1640-1651, doi:10.1038/s41588-022-01213-w
