@@ -187,8 +187,12 @@ zoom <- function(data, ens_db,
     full_chr_set <- unique(unlist(chr_set))
     man_ylab <- paste(traits, man_ylab)
     height <- c(220, 180, 824)
-    chrom_lim <- align_chrom_lim(list(manhat, manhat2))
-    man_lim <- align_manhats(list(manhat, manhat2))
+    message("Aligning Manhattans")
+    aligned <- align_manhats(list(manhat, manhat2))
+    manhat <- aligned$manhats[[1]]
+    manhat2 <- aligned$manhats[[2]]
+    chrom_lim <- aligned$chrom_lim
+    man_lim <- aligned$man_lim
   }
   
   js <- '$(document).on("keyup", function(e) {

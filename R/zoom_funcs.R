@@ -73,7 +73,7 @@ manhattan <- function(data,
   
   ret <- list(data = data, xticks = xticks, chrom_range = chrom_range,
               chrom_lim = lim, pcutoff = pcutoff, chrom_list = chrom_list,
-              labs = labs, yrange = yrange)
+              labs = labs, yrange = yrange, chrom = chrom, pos = pos)
   class(ret) <- "manhattan"
   ret
 }
@@ -224,10 +224,37 @@ align_chrom_lim <- function(x) {
 }
 
 
-align_manhats <- function(x) {
+man_lim <- function(x) {
   mrange <- vapply(x, function(i) range(i$data$genome_pos, na.rm = TRUE),
                    numeric(2))
   c(min(mrange[1, ]), max(mrange[2, ]))
+}
+
+
+realign_manhat <- function(m, chrom_lim) {
+  minpos <- chrom_lim[m$chrom_list, 1]
+  maxpos <- chrom_lim[m$chrom_list, 2]
+  chromGap <- sum(maxpos - minpos) / length(m$chrom_list) / 4.15
+  
+  chrom_cumsum <- c(0, cumsum(maxpos - minpos + chromGap))
+  chrom_cumsum2 <- chrom_cumsum - c(minpos, 0)
+  chrom_cumsum <- chrom_cumsum[1:length(maxpos)]
+  chrom_cumsum2 <- chrom_cumsum2[1:length(maxpos)]
+  m$data$genome_pos <- m$data[, m$pos] + chrom_cumsum2[as.numeric(m$data[, m$chrom])]
+  
+  chrom_widths <- maxpos - minpos
+  m$xticks <- list(at = chrom_cumsum + 0.5 * chrom_widths, 
+                   labels = levels(m$data[, m$chrom]))
+  m$chrom_range <- matrix(c(chrom_cumsum, chrom_cumsum + chrom_widths),
+                          ncol = 2, dimnames = list(m$chrom_list, NULL))
+  m
+}
+
+
+align_manhats <- function(x) {
+  chrom_lim <- align_chrom_lim(x)
+  manhats <- lapply(x, realign_manhat, chrom_lim)
+  list(manhats = manhats, chrom_lim = chrom_lim, man_lim = man_lim(manhats))
 }
 
 
