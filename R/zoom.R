@@ -68,6 +68,8 @@
 #'   either as a character string or as an `AnnotationDb` class object, used to
 #'   obtain expanded gene names. The ensembl database specified in `ens_db` is
 #'   queried first. Set to `NULL` to disable this feature.
+#' @param align Logical, whether to align the chromosomes in the main Manhattan
+#'   plots and chromosome subplots when comparing 2 GWAS.
 #' @returns No return value. Opens an interactive shiny window.
 #' @importFrom plotly plotlyOutput renderPlotly event_data config plotlyProxy
 #' @importFrom plotly plotlyProxyInvoke layout
@@ -104,7 +106,8 @@ zoom <- function(data, ens_db,
                  ld_token = Sys.getenv("LDLINK_TOKEN"),
                  ld_pop = "EUR",
                  seq_filter = c(1:22, 'X', 'Y'),
-                 AnnotationDb = "org.Hs.eg.db") {
+                 AnnotationDb = "org.Hs.eg.db",
+                 align = TRUE) {
   dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings
@@ -187,12 +190,16 @@ zoom <- function(data, ens_db,
     full_chr_set <- unique(unlist(chr_set))
     man_ylab <- paste(traits, man_ylab)
     height <- c(220, 180, 824)
-    message("Aligning Manhattans")
-    aligned <- align_manhats(list(manhat, manhat2))
-    manhat <- aligned$manhats[[1]]
-    manhat2 <- aligned$manhats[[2]]
-    chrom_lim <- aligned$chrom_lim
-    man_lim <- aligned$man_lim
+    if (align) {
+      message("Aligning Manhattans")
+      aligned <- align_manhats(list(manhat, manhat2))
+      manhat <- aligned$manhats[[1]]
+      manhat2 <- aligned$manhats[[2]]
+      chrom_lim <- aligned$chrom_lim
+      man_lim <- aligned$man_lim
+    } else {
+      chrom_lim <- NULL
+    }
   }
   
   js <- '$(document).on("keyup", function(e) {

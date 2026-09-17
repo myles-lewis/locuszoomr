@@ -26,7 +26,8 @@ zoom(
   ld_token = Sys.getenv("LDLINK_TOKEN"),
   ld_pop = "EUR",
   seq_filter = c(1:22, "X", "Y"),
-  AnnotationDb = "org.Hs.eg.db"
+  AnnotationDb = "org.Hs.eg.db",
+  align = TRUE
 )
 }
 \arguments{
@@ -102,6 +103,9 @@ to standard chromosome assembly.}
 either as a character string or as an \code{AnnotationDb} class object, used to
 obtain expanded gene names. The ensembl database specified in \code{ens_db} is
 queried first. Set to \code{NULL} to disable this feature.}
+
+\item{align}{Logical, whether to align the chromosomes in the main Manhattan
+plots and chromosome subplots when comparing 2 GWAS.}
 }
 \value{
 No return value. Opens an interactive shiny window.
