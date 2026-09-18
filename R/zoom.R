@@ -828,7 +828,7 @@ zoom <- function(data, ens_db,
       s <- event_data("plotly_relayout", source = "plotly_locus")
       req(c("xaxis.range[0]", "xaxis.range[1]") %in% names(s))
       xr <- c(s$`xaxis.range[0]`, s$`xaxis.range[1]`)
-      xd <- diff(xr) * (1 - 1/1.02) / 2
+      xd <- diff(xr) * 0.01 / 1.02
       xr <- xr + c(xd, -xd)
       coords$xrange <- as.integer(xr * 1e6)
     })
