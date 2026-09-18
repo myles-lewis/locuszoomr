@@ -175,5 +175,5 @@ vbaf006, [doi:10.1093/bioadv/vbaf006](https://doi.org/10.1093/bioadv/vbaf006)
 
 ### References
 
-1. Goldmann, K. et al. *Ann Rheum Dis* 2023; doi:10.1136/ard-2023-224540
-2. Ishigaki, K. et al. *Nat Genet* 2022; 54: 1640-1651, doi:10.1038/s41588-022-01213-w
+1. Goldmann, K. et al. *Ann Rheum Dis* 2023; [doi:10.1136/ard-2023-224540](https://doi.org/10.1136/ard-2023-224540)
+2. Ishigaki, K. et al. *Nat Genet* 2022; 54: 1640-1651, [doi:10.1038/s41588-022-01213-w](https://doi.org/10.1038/s41588-022-01213-w)
