@@ -37,8 +37,9 @@
 #'   SNP p-values. See `chrom`.
 #' @param labs Determines which column in `data` (and optionally `data2`)
 #'   contains SNP rs IDs. See `chrom`.
-#' @param scheme Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
-#'   for alternating chromosomes, 3rd colour for significant points.
+#' @param scheme Vector of 4 colours for main Manhattan plot: 1st, 2nd colours
+#'   for alternating chromosomes, 3rd colour for significant points, 4th colour
+#'   for highlighting chromosomes.
 #' @param scheme2 Vector of colours for 2nd Manhattan plot.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
@@ -93,8 +94,8 @@ zoom <- function(data, ens_db,
                  chrom = NULL, pos = NULL, p = NULL, labs = NULL,
                  data2 = NULL,
                  traits = NULL,
-                 scheme = c('royalblue', 'skyblue', 'red'),
-                 scheme2 = c("#33a02c", "#b2df8a", "purple"),
+                 scheme = c('royalblue', 'skyblue', 'red', "#00CD00"),
+                 scheme2 = c("#33a02c", "#b2df8a", "purple", "red"),
                  pcutoff = 5e-8,
                  eqtl_gene = NULL,
                  beta = NULL,
@@ -384,7 +385,7 @@ zoom <- function(data, ens_db,
         layout(margin = list(t = 5),
                shapes = list(
                  list(type = "rect",
-                      line = list(width = 1, color = "#00CD00"),
+                      line = list(width = 1, color = scheme[4]),
                       x0 = xr[1] / 1e6,
                       x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
                       xref = "x", yref = "paper", layer = "above")))
@@ -506,7 +507,7 @@ zoom <- function(data, ens_db,
           layout(margin = list(t = 5),
                  shapes = list(
                    list(type = "rect",
-                        line = list(width = 1, color = "red"),
+                        line = list(width = 1, color = scheme2[4]),
                         x0 = xr[1] / 1e6,
                         x1 = xr[2] / 1e6, y0 = 0, y1 = 1,
                         xref = "x", yref = "paper", layer = "above")))
@@ -920,7 +921,7 @@ zoom <- function(data, ens_db,
         chrom_range <- manhat$chrom_range[coords$chr, ]
         shapes <- list(
           list(type = "rect",
-               line = list(width = 1, color = "#00CD00"),
+               line = list(width = 1, color = scheme[4]),
                x0 = chrom_range[1],
                x1 = chrom_range[2], y0 = 0, y1 = 1,
                xref = "x", yref = "paper", layer = "above")
@@ -938,7 +939,7 @@ zoom <- function(data, ens_db,
           chrom_range <- manhat2$chrom_range[coords$chr, ]
           shapes <- list(
             list(type = "rect",
-                 line = list(width = 1, color = "red"),
+                 line = list(width = 1, color = scheme2[4]),
                  x0 = chrom_range[1],
                  x1 = chrom_range[2], y0 = 0, y1 = 1,
                  xref = "x", yref = "paper", layer = "above")
@@ -959,7 +960,7 @@ zoom <- function(data, ens_db,
         plotlyProxyInvoke("relayout",
                           list(shapes = list(
                             list(type = "rect",
-                                 line = list(width = 1, color = "#00CD00"),
+                                 line = list(width = 1, color = scheme[4]),
                                  x0 = coords$xrange[1] / 1e6,
                                  x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
                                  xref = "x", yref = "paper", layer = "above")
@@ -970,7 +971,7 @@ zoom <- function(data, ens_db,
           plotlyProxyInvoke("relayout",
                             list(shapes = list(
                               list(type = "rect",
-                                   line = list(width = 1, color = "red"),
+                                   line = list(width = 1, color = scheme2[4]),
                                    x0 = coords$xrange[1] / 1e6,
                                    x1 = coords$xrange[2] / 1e6, y0 = 0, y1 = 1,
                                    xref = "x", yref = "paper", layer = "above")

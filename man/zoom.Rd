@@ -13,8 +13,8 @@ zoom(
   labs = NULL,
   data2 = NULL,
   traits = NULL,
-  scheme = c("royalblue", "skyblue", "red"),
-  scheme2 = c("#33a02c", "#b2df8a", "purple"),
+  scheme = c("royalblue", "skyblue", "red", "#00CD00"),
+  scheme2 = c("#33a02c", "#b2df8a", "purple", "red"),
   pcutoff = 5e-08,
   eqtl_gene = NULL,
   beta = NULL,
@@ -60,8 +60,9 @@ contains SNP rs IDs. See \code{chrom}.}
 \item{traits}{Vector of trait names for identifying \code{data} and \code{data2}
 datasets.}
 
-\item{scheme}{Vector of 3 colours for main Manhattan plot: 1st, 2nd colours
-for alternating chromosomes, 3rd colour for significant points.}
+\item{scheme}{Vector of 4 colours for main Manhattan plot: 1st, 2nd colours
+for alternating chromosomes, 3rd colour for significant points, 4th colour
+for highlighting chromosomes.}
 
 \item{scheme2}{Vector of colours for 2nd Manhattan plot.}
 
