@@ -69,8 +69,8 @@ scatter_plotly <- function(loc,
   type <- if (webGL) "scattergl" else "scatter"
   
   if (is.null(data)) {
-    data <- data.frame(matrix(nrow = 0, ncol = 5))
-    colnames(data) <- loc[c("chrom", "pos", "p", "yvar", "labs")]
+    data <- data.frame(matrix(nrow = 0, ncol = 2))
+    colnames(data) <- loc[c("pos", "yvar")]
     # blank plot
     p <- plot_ly(data,
                  x = data[, loc$pos], y = data[, loc$yvar],

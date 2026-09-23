@@ -17,7 +17,7 @@
 #' @param genome_build Choose between one of the three options: 'grch37' for
 #'   genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
 #'   'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
-#'   data sets. Default is GRCh37 (hg19).
+#'   data sets.
 #' @param ... Optional arguments which are passed on to `LDlinkR::LDmatrix()` or
 #'   `LDlinkR::LDproxy()`
 #' @return Returns a list object of class 'locus'. LD information is added as a

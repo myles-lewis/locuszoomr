@@ -50,10 +50,6 @@ eqtl_plot <- function(loc,
   data <- data[data$Tissue == tissue & data$Gene_Symbol == eqtl_gene, ]
   if (nrow(data) == 0) stop("No data")
   
-  data$pos <- gsub(".*:", "", data$Position_grch37)  # remove up to ':'
-  data$pos <- as.numeric(data$pos)
-  data$logP <- -log10(data$P_value)
-  
   # fix effect allele not being minor allele
   data$Effect_Allele_Freq <- gsub(".*=", "", data$Effect_Allele_Freq)
   data$Effect_Allele_Freq <- as.numeric(data$Effect_Allele_Freq)
