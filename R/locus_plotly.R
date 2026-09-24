@@ -104,8 +104,16 @@ locus_plotly <- function(loc,
   
   if (!is.null(loc2)) {
     if (!is.null(beta)) beta <- rep_len(beta, 2)
-    p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
-                         height = pheights[2], showlegend = FALSE, beta = beta[2])
+    if (is.null(loc2$LDexp)) {
+      p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
+                           height = pheights[2], showlegend = FALSE,
+                           beta = beta[2])
+    } else {
+      # overlay LDlink eQTL
+      p2 <- overlay_plotly(loc2, xlab = xlab, ylab = ylab[2],
+                           height = pheights[2], showlegend = FALSE)
+    }
+    
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
     return(remap_overlaying_yaxes(pp))

@@ -692,6 +692,11 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
+        if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
+          loc2$index_snp <- pin2
+          loc2b <- try(link_eqtl(loc2, token = ld_token))
+          if (!inherits(loc2b, "try-error")) loc2 <- loc2b
+        }
       }
       
       loc$i <- loc1
