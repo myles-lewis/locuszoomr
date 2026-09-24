@@ -4,7 +4,7 @@
 \alias{eqtl_plotly}
 \title{Locus eQTL scatter plotly}
 \usage{
-eqtl_plotly(loc, gene_filter = NULL, tissue_filter = NULL, height = NULL)
+eqtl_plotly(loc, gene_filter = NULL, tissue_filter = NULL, ...)
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
@@ -13,7 +13,7 @@ eqtl_plotly(loc, gene_filter = NULL, tissue_filter = NULL, height = NULL)
 
 \item{tissue_filter}{Character vector of tissues to filter eQTL results.}
 
-\item{height}{Controls the plot height.}
+\item{...}{Optional arguments passed to \code{plot_ly()}.}
 }
 \value{
 A \code{plotly} scatter plot.

@@ -284,11 +284,6 @@ scatter_plotly <- function(loc,
                      shapes = hline,
                      legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
-  if (is.null(loc$data)) {
-    p <- p %>%
-      plotly::layout(yaxis = list(title = "", showticklabels = FALSE,
-                                  zeroline = FALSE, showline = FALSE))
-  }
   
   p <- p %>%
     plotly::config(displaylogo = FALSE,

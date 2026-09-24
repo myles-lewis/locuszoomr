@@ -7,16 +7,14 @@
 #' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param gene_filter Character vector of genes to filter eQTL results.
 #' @param tissue_filter Character vector of tissues to filter eQTL results.
-#' @param height Controls the plot height.
+#' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_eqtl()] [locus_plotly()]
 
 eqtl_plotly <- function(loc,
                         gene_filter = NULL,
-                        tissue_filter = NULL,
-                        height = NULL) {
+                        tissue_filter = NULL, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
-  if (!"LDexp" %in% names(loc)) stop("Contains no eQTL data")
   
   xlim <- loc$xrange / 1e6
   xlim <- xlim + diff(xlim) * c(-0.01, 0.01)
@@ -29,16 +27,15 @@ eqtl_plotly <- function(loc,
   if (!is.null(tissue_filter)) {
     LDX <- LDX[LDX$Tissue %in% tissue_filter, ]
   }
-  if (nrow(LDX) == 0) {
+  if (is.null(LDX) || nrow(LDX) == 0) {
     # blank plotly
     LDX <- data.frame(matrix(nrow = 0, ncol = 2))
-    colnames(LDX) <- c("pos", "logP")]
-    # blank plot
+    colnames(LDX) <- c("pos", "logP")
     p <- plot_ly(LDX,
                  x = ~pos, y = ~logP,
                  showlegend = FALSE,
-                 source = "plotly_locus", height = height,
-                 type = type, mode = "markers") %>%
+                 source = "plotly_locus",
+                 type = "scattergl", mode = "markers", ...) %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
                                   zeroline = FALSE, showgrid = FALSE,
@@ -57,7 +54,7 @@ eqtl_plotly <- function(loc,
     return(p)
   }
   
-  ylab <- "-log<sub>10</sub> P"
+  ylab <- "eQTL -log<sub>10</sub> P"
   ylim <- range(LDX$logP, na.rm = TRUE)
   ylim <- ylim + diff(ylim) * c(-0.01, 0.01)
   LDX$sign <- factor(sign(LDX$Effect_Size), levels = c(1, -1),
@@ -66,7 +63,7 @@ eqtl_plotly <- function(loc,
   ngene <- length(unique(LDX$Gene_Symbol))
   scheme <- rainbow(ngene)
   
-  hovertext <- paste0(LDX$RS_ID, "<br>Chr ",
+  hovertext <- paste0("eQTL: ", LDX$RS_ID, "<br>Chr ",
                       loc$seqname, ": ", LDX$pos,
                       "<br>P = ", signif(LDX$P_value, 3),
                       "<br>Gene: ", LDX$Gene_Symbol,
@@ -80,10 +77,8 @@ eqtl_plotly <- function(loc,
                text = hovertext, hoverinfo = 'text',
                key = LDX$RS_ID,
                showlegend = FALSE,
-               source = "plotly_locus", height = height,
-               type = "scattergl", mode = "markers")
-  
-  p <- p %>%
+               source = "plotly_locus",
+               type = "scattergl", mode = "markers", ...) %>%
     plotly::layout(xaxis = list(title = xlab,
                                 ticks = "outside",
                                 zeroline = FALSE, showgrid = FALSE,
