@@ -345,11 +345,11 @@ zoom <- function(data, ens_db,
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
                           }),
-                          radioButtons("export", h5("Export"),
-                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           (if (!is.null(eqtl_gene)) {
                             uiOutput("ui_genes")
                           }),
+                          radioButtons("export", h5("Export"),
+                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
