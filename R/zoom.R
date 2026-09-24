@@ -167,6 +167,7 @@ zoom <- function(data, ens_db,
   }
   
   show_ld <- nzchar(ld_token)
+  show_eqtl <- show_ld & is.null(eqtl_gene)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -325,9 +326,13 @@ zoom <- function(data, ens_db,
                           (if (show_ld) {
                             fluidRow(
                               column(12,
-                                     h5("Linkage disequilibrium"),
+                                     h5("LDlink tools"),
                                      actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
                                                   class = "btn-primary btn-sm"),
+                                     (if (show_eqtl) {
+                                       actionButton("eqtl_get", "Get eQTL", icon = icon("compass"),
+                                                    class = "btn-info btn-sm")
+                                     }),
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
@@ -605,6 +610,8 @@ zoom <- function(data, ens_db,
     genes <- reactiveValues(x = NULL)
     ld_snp <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
+    eqtl_snp <- reactiveVal(NULL)
+    cur_eqtl <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -662,7 +669,31 @@ zoom <- function(data, ens_db,
           if (!inherits(loc2b, "try-error")) loc2 <- loc2b
         }
       }
-       
+      
+      # retrieve eQTL
+      isolate(cur_eqtl(loc1$index_snp))
+      pin2 <- eqtl_snp()
+      ld_msg <- NULL
+      if (!is.null(pin2) && (pin2 %in% loc1$data[, labs[1]] ||
+                            (man2 && pin2 %in% loc2$data[, labs[2]]))) {
+        loc1b <- withCallingHandlers(
+          try(link_eqtl(loc1, token = ld_token)),
+          message = function(m) {
+            txt <- conditionMessage(m)
+            ld_msg <<- trimws(txt)
+          })
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
+        removeNotification("ld_busy")
+        if (is.null(loc1$LDexp)) {
+          showNotification(
+            paste0("eQTL request failed for ", pin2,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "error", duration = 10)
+        }
+      }
+      
       loc$i <- loc1
       if (man2) locv2$i <- loc2
       
@@ -979,8 +1010,6 @@ zoom <- function(data, ens_db,
       }
     })
     
-    get_ld <- reactiveVal(FALSE)
-    
     # retrieve LD
     observeEvent(input$ld_get, {
       snp <- cur_index()
@@ -991,10 +1020,12 @@ zoom <- function(data, ens_db,
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
       ld_snp(snp)
+      eqtl_snp(NULL)
     })
     
     observeEvent(input$ld_clear, {
       ld_snp(NULL)
+      eqtl_snp(NULL)
       removeNotification("ld_busy")
     })
     
@@ -1013,12 +1044,34 @@ zoom <- function(data, ens_db,
     })
     
     output$ld_status <- renderText({
-      if (man2) {
-        req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+      if (!is.null(ld_snp())) {
+        if (man2) {
+          req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+        } else {
+          req(ld_snp() %in% loc$i$data[, labs])
+        }
+        paste0("LD: ", ld_snp(), " (", ld_pop, ")")
       } else {
-        req(ld_snp() %in% loc$i$data[, labs])
+        if (man2) {
+          req(eqtl_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+        } else {
+          req(eqtl_snp() %in% loc$i$data[, labs])
+        }
+        "eQTL overlay"
       }
-      paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+    })
+    
+    # retrieve eQTL
+    observeEvent(input$eqtl_get, {
+      snp <- cur_eqtl()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification(paste0("Fetching eQTL data"),
+                       id = "ld_busy", duration = NULL)
+      eqtl_snp(snp)
+      ld_snp(NULL)
     })
     
     # inline conditional UI

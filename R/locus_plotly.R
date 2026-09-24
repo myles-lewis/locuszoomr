@@ -93,8 +93,15 @@ locus_plotly <- function(loc,
                     italics, gene_col, exon_col, exon_border, showExons, 
                     maxrows, width, xlab, prioritise, blanks,
                     height = pheights[length(pheights)])
-  p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
-                      beta = beta[1], ...)
+  
+  if (is.null(loc$LDexp)) {
+    p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
+                        beta = beta[1], ...)
+  } else {
+    # overlay LDlink eQTL
+    p <- overlay_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1])
+  }
+  
   if (!is.null(loc2)) {
     if (!is.null(beta)) beta <- rep_len(beta, 2)
     p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
