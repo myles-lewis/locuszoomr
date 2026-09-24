@@ -323,6 +323,11 @@ zoom <- function(data, ens_db,
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
                           checkboxInput("alltracks", "show all gene tracks"),
+                          pickerInput("biotype", h5("Select gene biotypes"),
+                                      choices = biotypes, selected = biotypes,
+                                      multiple = TRUE,
+                                      options = pickerOptions(actionsBox = TRUE,
+                                                              selectedTextFormat = 'count > 1')),
                           (if (show_ld) {
                             fluidRow(
                               column(12,
@@ -336,17 +341,15 @@ zoom <- function(data, ens_db,
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
-                          } else NULL),
-                          pickerInput("biotype", h5("Select gene biotypes"),
-                                      choices = biotypes, selected = biotypes,
-                                      multiple = TRUE,
-                                      options = pickerOptions(actionsBox = TRUE,
-                                                              selectedTextFormat = 'count > 1')),
+                          }),
+                          (if (show_eqtl) {
+                            uiOutput("ui_link_genes")
+                          }),
                           radioButtons("export", h5("Export"),
                                        list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           (if (!is.null(eqtl_gene)) {
                             uiOutput("ui_genes")
-                          } else NULL),
+                          }),
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
@@ -612,6 +615,7 @@ zoom <- function(data, ens_db,
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
+    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -692,11 +696,17 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
+        g <- unique(loc1$LDexp$Gene_Symbol)
+        tiss <- unique(loc1$LDexp$Tissue)
         if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
           loc2$index_snp <- pin2
           loc2b <- try(link_eqtl(loc2, token = ld_token))
           if (!inherits(loc2b, "try-error")) loc2 <- loc2b
+          g <- union(g, loc2$LDexp$Gene_Symbol)
+          tiss <- union(tiss, loc2$LDexp$Tissue)
         }
+        link_eqtl$genes <- sort(g)
+        link_eqtl$tissues <- sort(tiss)
       }
       
       loc$i <- loc1
@@ -733,7 +743,9 @@ zoom <- function(data, ens_db,
                    width = width, eqtl_gene = eqtl_gene, beta = beta,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
                    loc2 = if (man2) loc2 else NULL,
-                   ylab = man_ylab)
+                   ylab = man_ylab,
+                   gene_filter = input$eqtl_gene_filter,
+                   tissue_filter = input$eqtl_tissue_filter)
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -751,6 +763,22 @@ zoom <- function(data, ens_db,
     })
     
     outputOptions(output, "ui_genes", suspendWhenHidden = FALSE)
+    
+    output$ui_link_genes <- renderUI({
+      req(link_eqtl$genes)
+      fluidRow(column(12,
+        pickerInput("eqtl_gene_filter", h5("Select eQTL genes"),
+                    choices = link_eqtl$genes, selected = link_eqtl$genes,
+                    multiple = TRUE,
+                    options = pickerOptions(actionsBox = TRUE,
+                                            selectedTextFormat = 'count > 1')),
+        pickerInput("eqtl_tissue_filter", h5("Select eQTL tissues"),
+                    choices = link_eqtl$tissues, selected = link_eqtl$tissues,
+                    multiple = TRUE,
+                    options = pickerOptions(actionsBox = TRUE,
+                                            selectedTextFormat = 'count > 1'))
+      ))
+    })
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
@@ -1031,6 +1059,8 @@ zoom <- function(data, ens_db,
     observeEvent(input$ld_clear, {
       ld_snp(NULL)
       eqtl_snp(NULL)
+      link_eqtl$genes <- NULL
+      link_eqtl$tissues <- NULL
       removeNotification("ld_busy")
     })
     

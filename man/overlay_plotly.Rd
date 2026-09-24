@@ -58,7 +58,8 @@ A \code{plotly} scatter plot.
 Produces a scatter plot using plotly of embedded eQTL data acquired through
 the LDlink API via \code{\link[=link_eqtl]{link_eqtl()}} overlaid on GWAS data. As each SNP may
 have eQTLs with multiple genes in multiple tissues, the method used is to
-select the gene/tissue eQTL with the lowest p-value.
+select the gene/tissue eQTL with the lowest p-value. SNPs are matched by
+rsID.
 }
 \seealso{
 \code{\link[=link_eqtl]{link_eqtl()}} \code{\link[=locus_plotly]{locus_plotly()}}

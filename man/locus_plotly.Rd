@@ -23,6 +23,8 @@ locus_plotly(
   prioritise = NULL,
   blanks = "show",
   beta = NULL,
+  gene_filter = NULL,
+  tissue_filter = NULL,
   ...
 )
 }
@@ -57,14 +59,14 @@ Alternatively a vector of length 2 of height in pixels passed to
 rectangle. If \code{showExons = FALSE} colours are specified by \code{exon_border}
 for rectangle border and \code{gene_col} for the fill colour.}
 
-\item{maxrows}{Specifies maximum number of rows to display in gene
-annotation panel.}
+\item{maxrows}{Specifies maximum number of rows to display in gene annotation
+panel.}
 
 \item{width}{Width of plotly plot in pixels which is purely used to prevent
 overlapping text for gene names.}
 
-\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
-in \code{locus}.}
+\item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified in
+\code{locus}.}
 
 \item{ylab}{Title for y axis, or a vector of 2 titles for each y axis if
 \code{loc2} is provided.}
@@ -82,6 +84,12 @@ triangles for positive beta and downward triangles for negative beta
 to specify different beta columns in \code{loc} and \code{loc2}; use \code{NA} to indicate
 no \code{beta}.}
 
+\item{gene_filter}{Character vector of genes to filter LDlink eQTL results.
+See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
+
+\item{tissue_filter}{Character vector of tissues to filter LDlink eQTL
+results. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
+
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}
 }
@@ -92,9 +100,9 @@ A 'plotly' plotting object showing a scatter plot above gene tracks.
 Genomic locus plot similar to locuszoom, using plotly.
 }
 \details{
-This is an R/plotly version of locuszoom for exploring regional Manhattan
-plots of gene loci. Use \code{\link[=locus]{locus()}} first to generate an object of class
-'locus' for plotting. This references a selected Ensembl database for
+This is an R/plotly version of locuszoom for exploring regional
+Manhattan plots of gene loci. Use \code{\link[=locus]{locus()}} first to generate an object of
+class 'locus' for plotting. This references a selected Ensembl database for
 annotating genes and exons. Hover over the points or gene tracks to reveal
 more information.
 }

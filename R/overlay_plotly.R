@@ -4,7 +4,8 @@
 #' Produces a scatter plot using plotly of embedded eQTL data acquired through
 #' the LDlink API via [link_eqtl()] overlaid on GWAS data. As each SNP may
 #' have eQTLs with multiple genes in multiple tissues, the method used is to
-#' select the gene/tissue eQTL with the lowest p-value.
+#' select the gene/tissue eQTL with the lowest p-value. SNPs are matched by
+#' rsID.
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param gene_filter Character vector of genes to filter eQTL results.
