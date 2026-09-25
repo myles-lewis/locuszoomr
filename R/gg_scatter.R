@@ -203,11 +203,11 @@ gg_scatter <- function(loc,
         df <- loc$recomb[, c("start", "value")]
         colnames(df) <- c(loc$pos, "recomb")
         if (!requireNamespace("dplyr", quietly = TRUE))
-          stop("Package 'dplyr' must be installed", call. = FALSE)
+          stop("Need dplyr package for recombination line", call. = FALSE)
         data <- dplyr::bind_rows(data, df)
         data <- data[order(data[, loc$pos]), ]
         if (!requireNamespace("zoo", quietly = TRUE))
-            stop("Package 'zoo' must be installed", call. = FALSE)
+            stop("Need zoo package for recombination line", call. = FALSE)
         data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
         ymult <- 100 / diff(yrange)
         yd <- diff(yrange)
@@ -443,8 +443,7 @@ gg_scatter <- function(loc,
 
     if (!is.null(labels)) {
         if (!requireNamespace("ggrepel", quietly = TRUE))
-            stop("Package 'ggrepel' must be installed to use this feature",
-                 call. = FALSE)
+            stop("Need ggrepel package for labels", call. = FALSE)
         p <- p +
             ggrepel::geom_text_repel(
                 data = data[text_label_ind, ],
