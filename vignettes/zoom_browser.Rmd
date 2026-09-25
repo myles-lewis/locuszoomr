@@ -109,6 +109,13 @@ clicking on other points can re-base the LD to alternative SNPs.
 knitr::include_graphics("zoom2.png")
 ```
 
+### Overlay eQTL data via LDlink
+
+The LDlink API can also be queried for eQTL data which can be overlaid on the
+GWAS plots. Click on the `Get eQTL` button in the `r shiny::icon("gear")`
+settings dropdown menu. Once eQTL data has been obtained, eQTL genes and tissues
+can be filtered using picker menus which become available in the Settings menu.
+
 ### Dual GWAS browsing
 
 Using the `data2` argument, users can browse 2 GWAS at the same time. Shown
