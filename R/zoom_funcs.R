@@ -13,7 +13,6 @@ manhattan <- function(data,
   p <- dc$p
   labs <- dc$labs
   
-  data$logP <- -log10(data[, p])
   chrom_list <- as.character(mixedsort(unique(data[, chrom]), na.last = NA))
   data[, chrom] <- factor(data[, chrom], levels = chrom_list)
   
@@ -39,7 +38,7 @@ manhattan <- function(data,
   }
   
   # thin points
-  if (!is.na(npoints) & nrow(data) > npoints) {
+  if (!is.na(npoints) && nrow(data) > npoints) {
     index <- order(data[, p])
     if (npoints <= 1e5) {
       data <- data[index[seq_len(npoints)], ]
@@ -69,6 +68,7 @@ manhattan <- function(data,
                           ncol = 2, dimnames = list(chrom_list, NULL))
   }
   
+  data$logP <- -log10(data[, p])
   yrange <- range(data$logP, na.rm = TRUE)
   
   ret <- list(data = data, xticks = xticks, chrom_range = chrom_range,
