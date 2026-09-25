@@ -1,15 +1,14 @@
 
 #' Locus plotly
-#' 
+#'
 #' Genomic locus plot similar to locuszoom, using plotly.
-#' 
-#' @details 
-#' This is an R/plotly version of locuszoom for exploring regional Manhattan
-#' plots of gene loci. Use [locus()] first to generate an object of class
-#' 'locus' for plotting. This references a selected Ensembl database for
+#'
+#' @details This is an R/plotly version of locuszoom for exploring regional
+#' Manhattan plots of gene loci. Use [locus()] first to generate an object of
+#' class 'locus' for plotting. This references a selected Ensembl database for
 #' annotating genes and exons. Hover over the points or gene tracks to reveal
 #' more information.
-#' 
+#'
 #' @param loc Object of class 'locus' to use for plot. See [locus()].
 #' @param loc2 Optional 2nd 'locus' object to be layered underneath the 1st
 #'   scatter plot.
@@ -18,8 +17,8 @@
 #'   `scatter_plotly()` and `genetrack_ly()`.
 #' @param filter_gene_name Vector of gene names to display.
 #' @param filter_gene_biotype Vector of gene biotypes to be filtered. Use
-#' [ensembldb::listGenebiotypes()] to display possible biotypes. For example, 
-#' `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
+#'   [ensembldb::listGenebiotypes()] to display possible biotypes. For example,
+#'   `ensembldb::listGenebiotypes(EnsDb.Hsapiens.v75)`
 #' @param cex.text Font size for gene text.
 #' @param italics Logical whether gene text is in italics.
 #' @param gene_col Colour for gene lines.
@@ -29,12 +28,12 @@
 #' @param showExons Logical whether to show exons or simply show whole gene as a
 #'   rectangle. If `showExons = FALSE` colours are specified by `exon_border`
 #'   for rectangle border and `gene_col` for the fill colour.
-#' @param maxrows Specifies maximum number of rows to display in gene 
-#' annotation panel.
+#' @param maxrows Specifies maximum number of rows to display in gene annotation
+#'   panel.
 #' @param width Width of plotly plot in pixels which is purely used to prevent
 #'   overlapping text for gene names.
-#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
-#' in `locus`.
+#' @param xlab Title for x axis. Defaults to chromosome `seqname` specified in
+#'   `locus`.
 #' @param ylab Title for y axis, or a vector of 2 titles for each y axis if
 #'   `loc2` is provided.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
@@ -47,6 +46,10 @@
 #'   (significant SNPs only). If `loc2` is supplied, then a vector can be used
 #'   to specify different beta columns in `loc` and `loc2`; use `NA` to indicate
 #'   no `beta`.
+#' @param gene_filter Character vector of genes to filter LDlink eQTL results.
+#'   See [overlay_plotly()].
+#' @param tissue_filter Character vector of tissues to filter LDlink eQTL
+#'   results. See [overlay_plotly()].
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -78,6 +81,8 @@ locus_plotly <- function(loc,
                          prioritise = NULL,
                          blanks = "show",
                          beta = NULL,
+                         gene_filter = NULL,
+                         tissue_filter = NULL,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -93,12 +98,29 @@ locus_plotly <- function(loc,
                     italics, gene_col, exon_col, exon_border, showExons, 
                     maxrows, width, xlab, prioritise, blanks,
                     height = pheights[length(pheights)])
-  p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
-                      beta = beta[1], ...)
+  
+  if (is.null(loc$LDexp)) {
+    p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
+                        beta = beta[1], ...)
+  } else {
+    # overlay LDlink eQTL
+    p <- overlay_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
+                        gene_filter = gene_filter, tissue_filter = tissue_filter)
+  }
+  
   if (!is.null(loc2)) {
     if (!is.null(beta)) beta <- rep_len(beta, 2)
-    p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
-                         height = pheights[2], showlegend = FALSE, beta = beta[2])
+    if (is.null(loc2$LDexp)) {
+      p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
+                           height = pheights[2], showlegend = FALSE,
+                           beta = beta[2])
+    } else {
+      # overlay LDlink eQTL
+      p2 <- overlay_plotly(loc2, xlab = xlab, ylab = ylab[2],
+                           height = pheights[2], showlegend = FALSE,
+                           gene_filter = gene_filter, tissue_filter = tissue_filter)
+    }
+    
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
     return(remap_overlaying_yaxes(pp))

@@ -13,8 +13,11 @@
 #' to `LDlinkR::LDexpress()`.
 #' @param token Personal access token for accessing 1000 Genomes LD data via 
 #' LDlink API. See `LDlinkR` package documentation.
-#' @param ... Optional arguments such as `genome_build` which are passed on to
-#'   `LDlinkR::LDexpress()`
+#' @param genome_build Choose between one of the three options: 'grch37' for
+#'   genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
+#'   'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
+#'   data sets.
+#' @param ... Optional arguments passed to `LDlinkR::LDexpress()`
 #' @return Returns an object of class 'locus' with an extra list element 'LDexp'
 #'   containing a dataframe of information obtained via `LDexpress()`.
 #' @details
@@ -29,7 +32,8 @@
 link_eqtl <- function(loc,
                       pop = "CEU",
                       r2d = "r2",
-                      token = "", ...) {
+                      token = "",
+                      genome_build = tolower(loc$genome), ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -40,11 +44,14 @@ link_eqtl <- function(loc,
   
   if (token == "") stop("token is missing")
   LDexp <- mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
-                         token = token, ...)
+                         token = token, genome_build = genome_build, ...)
   for (i in c("R2", "D'", "Effect_Size", "P_value")) {
     LDexp[, i] <- as.numeric(LDexp[, i])
   }
   LDexp$Effect_Allele <- gsub("=.*", "", LDexp$Effect_Allele_Freq)
+  pos_col <- colnames(LDexp)[grep("Position", colnames(LDexp))]
+  LDexp$pos <- as.numeric(gsub(".*:", "", LDexp[, pos_col]))  # remove up to ':'
+  LDexp$logP <- -log10(LDexp$P_value)
   loc$LDexp <- LDexp
   
   loc

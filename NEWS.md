@@ -1,6 +1,11 @@
 News
 =====
 
+# locuszoomr 1.1.1
+###### 14/09/2026
+* `zoom()` can now request eQTL data via the LDlink API and overlay this on GWAS 
+data.
+
 # locuszoomr 1.1.0
 ###### 14/09/2026
 

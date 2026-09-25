@@ -167,6 +167,7 @@ zoom <- function(data, ens_db,
   }
   
   show_ld <- nzchar(ld_token)
+  show_eqtl <- show_ld & is.null(eqtl_gene)
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -322,26 +323,33 @@ zoom <- function(data, ens_db,
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
                           checkboxInput("alltracks", "show all gene tracks"),
-                          (if (show_ld) {
-                            fluidRow(
-                              column(12,
-                                     h5("Linkage disequilibrium"),
-                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
-                                                  class = "btn-primary btn-sm"),
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")
-                              ))
-                          } else NULL),
                           pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
                                       options = pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          radioButtons("export", h5("Export"),
-                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
+                          (if (show_ld) {
+                            fluidRow(
+                              column(12,
+                                     h5("LDlink tools"),
+                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
+                                                  class = "btn-primary btn-sm"),
+                                     (if (show_eqtl) {
+                                       actionButton("eqtl_get", "Get eQTL", icon = icon("compass"),
+                                                    class = "btn-info btn-sm")
+                                     }),
+                                     actionButton("ld_clear", "Clear",
+                                                  class = "btn-default btn-sm")
+                              ))
+                          }),
+                          (if (show_eqtl) {
+                            uiOutput("ui_link_genes")
+                          }),
                           (if (!is.null(eqtl_gene)) {
                             uiOutput("ui_genes")
-                          } else NULL),
+                          }),
+                          radioButtons("export", h5("Export"),
+                                       list(pdf = "pdf", plotly = "rds"), inline = TRUE),
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
@@ -605,6 +613,9 @@ zoom <- function(data, ens_db,
     genes <- reactiveValues(x = NULL)
     ld_snp <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
+    eqtl_snp <- reactiveVal(NULL)
+    cur_eqtl <- reactiveVal(NULL)
+    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -662,7 +673,42 @@ zoom <- function(data, ens_db,
           if (!inherits(loc2b, "try-error")) loc2 <- loc2b
         }
       }
-       
+      
+      # retrieve eQTL
+      isolate(cur_eqtl(loc1$index_snp))
+      pin2 <- eqtl_snp()
+      ld_msg <- NULL
+      if (!is.null(pin2) && (pin2 %in% loc1$data[, labs[1]] ||
+                            (man2 && pin2 %in% loc2$data[, labs[2]]))) {
+        loc1b <- withCallingHandlers(
+          try(link_eqtl(loc1, token = ld_token)),
+          message = function(m) {
+            txt <- conditionMessage(m)
+            ld_msg <<- trimws(txt)
+          })
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
+        removeNotification("ld_busy")
+        if (is.null(loc1$LDexp)) {
+          showNotification(
+            paste0("eQTL request failed for ", pin2,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "error", duration = 10)
+        }
+        g <- unique(loc1$LDexp$Gene_Symbol)
+        tiss <- unique(loc1$LDexp$Tissue)
+        if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
+          loc2$index_snp <- pin2
+          loc2b <- try(link_eqtl(loc2, token = ld_token))
+          if (!inherits(loc2b, "try-error")) loc2 <- loc2b
+          g <- union(g, loc2$LDexp$Gene_Symbol)
+          tiss <- union(tiss, loc2$LDexp$Tissue)
+        }
+        link_eqtl$genes <- sort(g)
+        link_eqtl$tissues <- sort(tiss)
+      }
+      
       loc$i <- loc1
       if (man2) locv2$i <- loc2
       
@@ -697,7 +743,9 @@ zoom <- function(data, ens_db,
                    width = width, eqtl_gene = eqtl_gene, beta = beta,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
                    loc2 = if (man2) loc2 else NULL,
-                   ylab = man_ylab)
+                   ylab = man_ylab,
+                   gene_filter = input$eqtl_gene_filter,
+                   tissue_filter = input$eqtl_tissue_filter)
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -715,6 +763,22 @@ zoom <- function(data, ens_db,
     })
     
     outputOptions(output, "ui_genes", suspendWhenHidden = FALSE)
+    
+    output$ui_link_genes <- renderUI({
+      req(link_eqtl$genes)
+      fluidRow(column(12,
+        pickerInput("eqtl_gene_filter", h5("Select eQTL genes"),
+                    choices = link_eqtl$genes, selected = link_eqtl$genes,
+                    multiple = TRUE,
+                    options = pickerOptions(actionsBox = TRUE,
+                                            selectedTextFormat = 'count > 1')),
+        pickerInput("eqtl_tissue_filter", h5("Select eQTL tissues"),
+                    choices = link_eqtl$tissues, selected = link_eqtl$tissues,
+                    multiple = TRUE,
+                    options = pickerOptions(actionsBox = TRUE,
+                                            selectedTextFormat = 'count > 1'))
+      ))
+    })
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
@@ -979,8 +1043,6 @@ zoom <- function(data, ens_db,
       }
     })
     
-    get_ld <- reactiveVal(FALSE)
-    
     # retrieve LD
     observeEvent(input$ld_get, {
       snp <- cur_index()
@@ -991,10 +1053,14 @@ zoom <- function(data, ens_db,
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
       ld_snp(snp)
+      eqtl_snp(NULL)
     })
     
     observeEvent(input$ld_clear, {
       ld_snp(NULL)
+      eqtl_snp(NULL)
+      link_eqtl$genes <- NULL
+      link_eqtl$tissues <- NULL
       removeNotification("ld_busy")
     })
     
@@ -1013,12 +1079,34 @@ zoom <- function(data, ens_db,
     })
     
     output$ld_status <- renderText({
-      if (man2) {
-        req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+      if (!is.null(ld_snp())) {
+        if (man2) {
+          req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+        } else {
+          req(ld_snp() %in% loc$i$data[, labs])
+        }
+        paste0("LD: ", ld_snp(), " (", ld_pop, ")")
       } else {
-        req(ld_snp() %in% loc$i$data[, labs])
+        if (man2) {
+          req(eqtl_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
+        } else {
+          req(eqtl_snp() %in% loc$i$data[, labs])
+        }
+        "eQTL overlay"
       }
-      paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+    })
+    
+    # retrieve eQTL
+    observeEvent(input$eqtl_get, {
+      snp <- cur_eqtl()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification(paste0("Fetching eQTL data"),
+                       id = "ld_busy", duration = NULL)
+      eqtl_snp(snp)
+      ld_snp(NULL)
     })
     
     # inline conditional UI

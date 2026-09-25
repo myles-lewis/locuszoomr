@@ -258,6 +258,19 @@ align_manhats <- function(x) {
 }
 
 
+# Find minimum p-value per SNP/gene in eQTL results
+# @param res Dataframe of LDlink eQTL output
+# @param col Column e.g. SNP or gene
+# @return Dataframe containing the minimum p-value for each SNP/gene 
+
+min_p_by_col <- function(res, col) {
+  ord <- order(res$P_value)
+  res_col <- res[ord, col]
+  dup <- duplicated(res_col)
+  res[ord[!dup], ]
+}
+
+
 suppress_warnings <- function(expr, pattern) {
   withCallingHandlers(
     expr,
