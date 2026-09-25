@@ -680,12 +680,8 @@ zoom <- function(data, ens_db,
       ld_msg <- NULL
       if (!is.null(pin2) && (pin2 %in% loc1$data[, labs[1]] ||
                             (man2 && pin2 %in% loc2$data[, labs[2]]))) {
-        loc1b <- withCallingHandlers(
-          try(link_eqtl(loc1, token = ld_token)),
-          message = function(m) {
-            txt <- conditionMessage(m)
-            ld_msg <<- trimws(txt)
-          })
+        message("LDlink eQTL")
+        loc1b <- try(suppressMessages(link_eqtl(loc1, token = ld_token)))
         if (inherits(loc1b, "try-error")) {
           ld_msg <- attr(loc1b, "condition")$message
         } else loc1 <- loc1b
