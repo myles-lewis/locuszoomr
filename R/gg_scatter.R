@@ -67,7 +67,6 @@
 #' }
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme scale_fill_manual scale_color_manual aes guide_legend element_text
 #' @importFrom ggplot2 element_blank element_rect unit geom_hline scale_y_continuous sec_axis geom_line scale_shape_manual guides
-#' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
 #' @export
 #'
@@ -203,6 +202,8 @@ gg_scatter <- function(loc,
     if (recomb) {
         df <- loc$recomb[, c("start", "value")]
         colnames(df) <- c(loc$pos, "recomb")
+        if (!requireNamespace("dplyr", quietly = TRUE))
+          stop("Package 'dplyr' must be installed", call. = FALSE)
         data <- dplyr::bind_rows(data, df)
         data <- data[order(data[, loc$pos]), ]
         if (!requireNamespace("zoo", quietly = TRUE))

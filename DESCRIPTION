@@ -21,7 +21,6 @@ Imports:
     AnnotationFilter,
     BiocGenerics,
     cowplot,
-    dplyr,
     DT,
     ensembldb,
     GenomeInfoDb,
@@ -49,6 +48,7 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     AnnotationDbi,
     AnnotationHub,
+    dplyr,
     EnsDb.Hsapiens.v75,
     ggrepel,
     knitr,

@@ -57,7 +57,6 @@ importFrom(LDlinkR,
 )
 importFrom(Rcpp,sourceCpp)
 importFrom(cowplot,plot_grid)
-importFrom(dplyr,bind_rows)
 importFrom(ensembldb,
   ensemblVersion,
   exons,
