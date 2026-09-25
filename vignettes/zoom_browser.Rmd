@@ -115,6 +115,12 @@ The LDlink API can also be queried for eQTL data which can be overlaid on the
 GWAS plots. Click on the `Get eQTL` button in the `r shiny::icon("gear")`
 settings dropdown menu. Once eQTL data has been obtained, eQTL genes and tissues
 can be filtered using picker menus which become available in the Settings menu.
+The plot below shows how the top GWAS SNPs in the *IRF5* locus are linked to an
+IRF5 eQTL.
+
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("zoom_eqtl.png")
+```
 
 ### Dual GWAS browsing
 
