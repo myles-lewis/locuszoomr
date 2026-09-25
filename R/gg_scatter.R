@@ -67,10 +67,8 @@
 #' }
 #' @importFrom ggplot2 ggplot geom_point xlim ylim labs theme_classic theme scale_fill_manual scale_color_manual aes guide_legend element_text
 #' @importFrom ggplot2 element_blank element_rect unit geom_hline scale_y_continuous sec_axis geom_line scale_shape_manual guides
-#' @importFrom ggrepel geom_text_repel
 #' @importFrom dplyr bind_rows
 #' @importFrom rlang .data
-#' @importFrom zoo na.approx
 #' @export
 #'
 gg_scatter <- function(loc,
@@ -207,6 +205,8 @@ gg_scatter <- function(loc,
         colnames(df) <- c(loc$pos, "recomb")
         data <- dplyr::bind_rows(data, df)
         data <- data[order(data[, loc$pos]), ]
+        if (!requireNamespace("zoo", quietly = TRUE))
+            stop("Package 'zoo' must be installed", call. = FALSE)
         data$recomb <- zoo::na.approx(data$recomb, data[, loc$pos], na.rm = FALSE)
         ymult <- 100 / diff(yrange)
         yd <- diff(yrange)
@@ -441,8 +441,11 @@ gg_scatter <- function(loc,
     }
 
     if (!is.null(labels)) {
+        if (!requireNamespace("ggrepel", quietly = TRUE))
+            stop("Package 'ggrepel' must be installed to use this feature",
+                 call. = FALSE)
         p <- p +
-            geom_text_repel(
+            ggrepel::geom_text_repel(
                 data = data[text_label_ind, ],
                 mapping = aes(
                     x = .data[[loc$pos]], y = .data[[loc$yvar]],

@@ -91,7 +91,6 @@ importFrom(ggplot2,
   xlim,
   ylim
 )
-importFrom(ggrepel,geom_text_repel)
 importFrom(grDevices,
   adjustcolor,
   col2rgb,
@@ -209,5 +208,4 @@ importFrom(stats,
   relevel,
   setNames
 )
-importFrom(zoo,na.approx)
 useDynLib(locuszoomr)

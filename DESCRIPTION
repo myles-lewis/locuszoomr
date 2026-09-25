@@ -28,7 +28,6 @@ Imports:
     GenomicRanges,
     gggrid,
     ggplot2,
-    ggrepel,
     graphics,
     grDevices,
     grid,
@@ -44,16 +43,17 @@ Imports:
     shiny,
     shinycssloaders,
     shinyFeedback,
-    shinyWidgets,
-    zoo
+    shinyWidgets
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
     AnnotationDbi,
     AnnotationHub,
     EnsDb.Hsapiens.v75,
+    ggrepel,
     knitr,
     org.Hs.eg.db,
-    rmarkdown
+    rmarkdown,
+    zoo
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
