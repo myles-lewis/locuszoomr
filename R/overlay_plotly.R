@@ -55,14 +55,7 @@ overlay_plotly <- function(loc,
     LDX <- LDX[LDX$Tissue %in% tissue_filter, ]
   }
   LDX_snps <- intersect(LDX$RS_ID, data[, loc$labs])
-  if (is.null(LDX) || nrow(LDX) == 0 || length(LDX_snps) == 0) {
-    # no LD eQTL data
-    return(scatter_plotly(loc, pcutoff = pcutoff, scheme = scheme, xlab = xlab,
-                          ylab = ylab, marker_outline = marker_outline,
-                          marker_size = marker_size, recomb_col = recomb_col,
-                          showlegend = showlegend, height = height,
-                          webGL = webGL))
-  }
+  noEqtl <- is.null(LDX) || nrow(LDX) == 0 || length(LDX_snps) == 0
   
   xlim <- loc$xrange / 1e6
   xlim <- xlim + diff(xlim) * c(-0.01, 0.01)
@@ -78,46 +71,48 @@ overlay_plotly <- function(loc,
   ylim[2] <- ylim[2] + ydiff * 0.05
   ylim[1] <- if (ylim[1] != 0) ylim[1] - ydiff *0.05 else ylim[1] - ydiff *0.02
   
-  LDX <- min_p_by_col(LDX, "RS_ID")
-  LDX <- LDX[match(LDX_snps, LDX$RS_ID), ]
-  inData <- match(LDX_snps, data[, loc$labs])
-  message(length(inData), " (",
-          format(length(inData) / nrow(data) * 100, digits = 3), "%) eQTL SNPs")
-  # colours, shapes
-  LDX$sign <- sign(LDX$Effect_Size)
   data$bg <- "ns"
-  # data$bg[data[, loc$p] < pcutoff] <- "sig"
-  LDX_by_gene <- min_p_by_col(LDX, "Gene_Symbol")
-  geneset <- LDX_by_gene$Gene_Symbol
-  ngene <- nrow(LDX_by_gene)
-  ldx_scheme <- rainbow(ngene)
-  data$bg[inData] <- LDX$Gene_Symbol
-  data$bg <- factor(data$bg, levels = c("ns", # "sig",
-                                        geneset),
-                    labels =  c("ns", # paste("P <", signif(pcutoff, 3)),
-                                geneset))
-  scheme <- c(scheme[1], ldx_scheme)
-  
-  # beta symbols
-  symbol <- rep_len("ns", nrow(data))
-  symbol[inData] <- LDX$sign
-  data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
-                        labels = c(" ", "up", "down"))
+  scheme <- scheme[1]
   symbols <- c(21L, 24L, 25L)
-  data$size <- 1L
-  data$size[inData] <- 2L
-  sizes <- c(40, 100)
-  if (!webGL) sizes <- sizes/2
-  leg <- list(traceorder = "reversed")
+  sizes <- NULL
   
+  leg <- list(traceorder = "reversed")
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
-  LDX_hovertext <- paste0("<br>eQTL P = ", signif(LDX$P_value, 3),
-                          "<br>eQTL beta = ", signif(LDX$Effect_Size, 3),
-                          "<br>Gene: ", LDX$Gene_Symbol,
-                          "<br>Tissue: ", LDX$Tissue)
-  hovertext[inData] <- paste0(hovertext[inData], LDX_hovertext)
+  if (!noEqtl) {
+    LDX <- min_p_by_col(LDX, "RS_ID")
+    LDX <- LDX[match(LDX_snps, LDX$RS_ID), ]
+    inData <- match(LDX_snps, data[, loc$labs])
+    message(length(inData), " (",
+            format(length(inData) / nrow(data) * 100, digits = 3), "%) eQTL SNPs")
+    # colours, shapes
+    LDX$sign <- sign(LDX$Effect_Size)
+    LDX_by_gene <- min_p_by_col(LDX, "Gene_Symbol")
+    geneset <- LDX_by_gene$Gene_Symbol
+    ngene <- nrow(LDX_by_gene)
+    ldx_scheme <- rainbow(ngene)
+    data$bg[inData] <- LDX$Gene_Symbol
+    data$bg <- factor(data$bg, levels = c("ns", geneset),
+                      labels =  c("ns", geneset))
+    scheme <- c(scheme[1], ldx_scheme)
+    
+    # beta symbols
+    symbol <- rep_len("ns", nrow(data))
+    symbol[inData] <- LDX$sign
+    data$symbol <- factor(symbol, levels = c("ns", "1", "-1"),
+                          labels = c(" ", "up", "down"))
+    data$size <- 1L
+    data$size[inData] <- 2L
+    sizes <- c(40, 100)
+    if (!webGL) sizes <- sizes/2
+    
+    LDX_hovertext <- paste0("<br>eQTL P = ", signif(LDX$P_value, 3),
+                            "<br>eQTL beta = ", signif(LDX$Effect_Size, 3),
+                            "<br>Gene: ", LDX$Gene_Symbol,
+                            "<br>Tissue: ", LDX$Tissue)
+    hovertext[inData] <- paste0(hovertext[inData], LDX_hovertext)
+  }
   
   hline <- list(type = "line",
                 line = list(width = 1, color = '#999999', dash = 'dash'),

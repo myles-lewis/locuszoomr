@@ -1,17 +1,18 @@
 News
 =====
 
-# locuszoomr 1.1.1
-###### 14/09/2026
-* `zoom()` can now request eQTL data via the LDlink API and overlay this on GWAS 
-data.
+# locuszoomr 1.2.0
+###### 26/09/2026
+* Added Get eQTL button to `zoom()` to pull LDlink API eQTL information and 
+overlay this on GWAS data.
+* Added `overlay_plotly()` and `eqtl_plotly()`.
 
 # locuszoomr 1.1.0
 ###### 14/09/2026
 
 ## Major update
 * `zoom()` can now browse and compare two GWAS simultaneously. 
-* Save plot to svg, pdf or plotly object functionality added.
+* Save plot to svg, pdf or plotly object functionality added in `zoom()`.
 
 # locuszoomr 1.0.0
 ###### 25/08/2026
