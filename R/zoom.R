@@ -615,6 +615,7 @@ zoom <- function(data, ens_db,
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
+    eqtl_match_shown <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL)
     save_plotly <- reactiveValues(p = NULL)
     
@@ -703,6 +704,21 @@ zoom <- function(data, ens_db,
         }
         link_eqtl$genes <- sort(g)
         link_eqtl$tissues <- sort(tiss)
+        gf <- input$eqtl_gene_filter
+        tf <- input$eqtl_tissue_filter
+        match_msg <- c(
+          eqtl_match_msg(eqtl_match_counts(loc1, data, coords$chr, chrom[1],
+                                           labs[1], gf, tf), if (man2) traits[1]),
+          if (man2) eqtl_match_msg(eqtl_match_counts(loc2, data2, coords$chr,
+                                                     chrom[2], labs[2], gf, tf),
+                                   traits[2]))
+        # only re-notify when the counts change, not on every re-render
+        if (length(match_msg) > 0 &&
+            !identical(match_msg, isolate(eqtl_match_shown()))) {
+          eqtl_match_shown(match_msg)
+          showNotification(HTML(paste(match_msg, collapse = "<br>")),
+                           id = "eqtl_match", duration = 10)
+        }
       }
       
       loc$i <- loc1
@@ -1101,6 +1117,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching eQTL data"),
                        id = "ld_busy", duration = NULL)
+      eqtl_match_shown(NULL)
       eqtl_snp(snp)
       ld_snp(NULL)
     })
