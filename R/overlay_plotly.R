@@ -81,8 +81,12 @@ overlay_plotly <- function(loc,
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
   if (!noEqtl) {
+    gtab <- tapply(LDX$Gene_Symbol, LDX$RS_ID, function(x) length(unique(x)))
+    tisstab <- tapply(LDX$Tissue, LDX$RS_ID, function(x) length(unique(x)))
     LDX <- min_p_by_col(LDX, "RS_ID")
     LDX <- LDX[match(LDX_snps, LDX$RS_ID), ]
+    LDX$ngene <- gtab[LDX$RS_ID] -1
+    LDX$ntissue <- tisstab[LDX$RS_ID] -1
     inData <- match(LDX_snps, data[, loc$labs])
     message(length(inData), " (",
             format(length(inData) / nrow(data) * 100, digits = 3), "%) eQTL SNPs")
@@ -111,6 +115,12 @@ overlay_plotly <- function(loc,
                             "<br>eQTL beta = ", signif(LDX$Effect_Size, 3),
                             "<br>Gene: ", LDX$Gene_Symbol,
                             "<br>Tissue: ", LDX$Tissue)
+    w <- LDX$ngene > 0
+    LDX_hovertext[w] <- paste0(LDX_hovertext[w], "<br>+ ",
+                               plural(LDX$ngene[w], "gene(s)"))
+    w <- LDX$ntissue > 0
+    LDX_hovertext[w] <- paste0(LDX_hovertext[w], "<br>+ ",
+                               plural(LDX$ntissue[w], "tissue(s)"))
     hovertext[inData] <- paste0(hovertext[inData], LDX_hovertext)
   }
   
@@ -189,4 +199,13 @@ overlay_plotly <- function(loc,
                                               "autoScale2d", "resetScale2d",
                                               "hoverClosest", "hoverCompare"),
                    toImageButtonOptions = list(format = "svg"))
+}
+
+
+plural <- function(n, text) {
+  is1 <- n == 1
+  textout <- rep_len(text, length(n))
+  textout[is1] <- gsub("\\(s\\)", "", text)
+  textout[!is1] <- gsub("\\(|\\)", "", text)
+  paste(n, textout)
 }
