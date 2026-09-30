@@ -153,17 +153,25 @@ overlay_plotly <- function(loc,
   
   if (!recomb) {
     # beta shapes
-    p <- plot_ly(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                 color = data$bg, colors = scheme,
-                 symbol = data$symbol, symbols = symbols,
-                 size = data$size, sizes = sizes,
-                 marker = list(opacity = 0.8,
+    p <- plot_ly(x = data[-inData, loc$pos] / 1e6, y = data[-inData, loc$yvar],
+                 color = data$bg[-inData], colors = scheme,
+                 symbol = data$symbol[-inData], symbols = symbols,
+                 marker = list(opacity = 0.5, size = 6.5,
                                line = list(width = 1, color = marker_outline)),
-                 text = hovertext, hoverinfo = 'text',
-                 key = data[, loc$labs],
+                 text = hovertext[-inData], hoverinfo = 'text',
+                 key = data[-inData, loc$labs],
                  showlegend = showlegend,
                  source = "plotly_locus", height = height,
                  type = type, mode = "markers") %>%
+      add_trace(x = data[inData, loc$pos] / 1e6, y = data[inData, loc$yvar],
+                color = data$bg[inData], colors = scheme,
+                symbol = data$symbol[inData], symbols = symbols,
+                marker = list(opacity = 0.8, size = 11,
+                              line = list(width = 1, color = marker_outline)),
+                text = hovertext[inData], hoverinfo = 'text',
+                key = data[inData, loc$labs],
+                showlegend = showlegend,
+                type = type, mode = "markers") %>%
       plotly::layout(xaxis = list(title = xlab,
                                   ticks = "outside",
                                   zeroline = FALSE, showgrid = FALSE,
@@ -181,16 +189,22 @@ overlay_plotly <- function(loc,
     
     # beta shapes
     p <- plot_ly(source = "plotly_locus", height = height) %>%
-      # scatter plot
-      add_trace(x = data[, loc$pos] / 1e6, y = data[, loc$yvar],
-                color = data$bg,
-                symbol = data$symbol,
-                size = data$size,
-                colors = scheme,  # colors, symbols, sizes must go here
-                symbols = symbols, sizes = sizes,
-                marker = list(opacity = 0.8,
+      add_trace(x = data[-inData, loc$pos] / 1e6, y = data[-inData, loc$yvar],
+                color = data$bg[-inData], colors = scheme,
+                symbol = data$symbol[-inData], symbols = symbols,
+                marker = list(opacity = 0.5, size = 6.5,
                               line = list(width = 1, color = marker_outline)),
-                text = hovertext, hoverinfo = 'text', key = data[, loc$labs],
+                text = hovertext[-inData], hoverinfo = 'text',
+                key = data[-inData, loc$labs],
+                showlegend = showlegend,
+                type = type, mode = "markers") %>%
+      add_trace(x = data[inData, loc$pos] / 1e6, y = data[inData, loc$yvar],
+                color = data$bg[inData], colors = scheme,
+                symbol = data$symbol[inData], symbols = symbols,
+                marker = list(opacity = 0.8, size = 11,
+                              line = list(width = 1, color = marker_outline)),
+                text = hovertext[inData], hoverinfo = 'text',
+                key = data[inData, loc$labs],
                 showlegend = showlegend,
                 type = type, mode = "markers") %>%
       # recombination line
