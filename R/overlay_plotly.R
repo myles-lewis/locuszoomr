@@ -134,16 +134,15 @@ overlay_plotly <- function(loc,
     hovertext[inData] <- paste0(hovertext[inData], LDX_hovertext)
     # annotation
     if (show_annot) {
-      msg <- paste0("LDlink eQTL<br>", nsnp[1], " eSNPs<br>",
+      msg <- paste0(nsnp[1], " eQTL SNPs<br>",
                     (if (nsnp[1] != nsnp[2]) paste0(nsnp[2], " filtered<br>")),
                     nsnp[3], " shown",
                     (if (nsnp[4] > 0) paste0("<br>", nsnp[4], " outside window")))
       annot <- list(x = 0.01, y = 1,
-                    text = msg,
-                    font = list(size = 14 * 0.7),
+                    text = msg, font = list(size = 10),
                     bgcolor = "rgba(255, 255, 255, 0.9)",
-                    xref = "paper", yref = "paper", align = "left", yanchor = "top",
-                    showarrow = FALSE)
+                    xref = "paper", yref = "paper", align = "left",
+                    yanchor = "top", showarrow = FALSE)
     }
   }
   
