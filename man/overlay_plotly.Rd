@@ -16,6 +16,7 @@ overlay_plotly(
   marker_size = 7,
   recomb_col = "blue",
   showlegend = TRUE,
+  show_annot = TRUE,
   height = NULL,
   webGL = TRUE
 )
@@ -46,6 +47,9 @@ data is present. Set to \code{NA} to hide the line. See \code{\link[=link_recomb
 recombination rate data.}
 
 \item{showlegend}{Logical whether to show a legend for the scatter points.}
+
+\item{show_annot}{Logical whether to show an annotation of how many eQTL SNPs
+were retrieved from LDlink and how many are shown.}
 
 \item{height}{Height in pixels (optional, defaults to automatic sizing).}
 

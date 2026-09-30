@@ -22,6 +22,8 @@
 #'   data is present. Set to `NA` to hide the line. See [link_recomb()] to add
 #'   recombination rate data.
 #' @param showlegend Logical whether to show a legend for the scatter points.
+#' @param show_annot Logical whether to show an annotation of how many eQTL SNPs
+#'   were retrieved from LDlink and how many are shown.
 #' @param height Height in pixels (optional, defaults to automatic sizing).
 #' @param webGL Logical whether to use webGL or SVG for scatter plot.
 #' @returns A `plotly` scatter plot.
@@ -38,6 +40,7 @@ overlay_plotly <- function(loc,
                            marker_size = 7,
                            recomb_col = "blue",
                            showlegend = TRUE,
+                           show_annot = TRUE,
                            height = NULL,
                            webGL = TRUE) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -48,13 +51,18 @@ overlay_plotly <- function(loc,
   }
   
   LDX <- loc$LDexp
+  nsnp <- length(unique(LDX$RS_ID))
   if (!is.null(gene_filter)) {
     LDX <- LDX[LDX$Gene_Symbol %in% gene_filter, ]
   }
   if (!is.null(tissue_filter)) {
     LDX <- LDX[LDX$Tissue %in% tissue_filter, ]
   }
+  nsnp[2] <- length(unique(LDX$RS_ID))  # filtered
   LDX_snps <- intersect(LDX$RS_ID, data[, loc$labs])
+  nsnp[3] <- length(LDX_snps)
+  nsnp[4] <- length(unique(LDX$RS_ID[LDX$pos < loc$xrange[1] |
+                                       LDX$pos > loc$xrange[2]]))
   noEqtl <- is.null(LDX) || nrow(LDX) == 0 || length(LDX_snps) == 0
   
   xlim <- loc$xrange / 1e6
@@ -80,6 +88,7 @@ overlay_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
+  annot <- NULL
   if (!noEqtl) {
     gtab <- tapply(LDX$Gene_Symbol, LDX$RS_ID, function(x) length(unique(x)))
     tisstab <- tapply(LDX$Tissue, LDX$RS_ID, function(x) length(unique(x)))
@@ -88,8 +97,9 @@ overlay_plotly <- function(loc,
     LDX$ngene <- gtab[LDX$RS_ID] -1
     LDX$ntissue <- tisstab[LDX$RS_ID] -1
     inData <- match(LDX_snps, data[, loc$labs])
-    message(length(inData), " (",
-            format(length(inData) / nrow(data) * 100, digits = 3), "%) eQTL SNPs")
+    if (!show_annot) {
+      message(nsnp[3], " / ", nsnp[1], " eQTL SNPs shown")
+    }
     # colours, shapes
     LDX$sign <- sign(LDX$Effect_Size)
     LDX_by_gene <- min_p_by_col(LDX, "Gene_Symbol")
@@ -122,6 +132,19 @@ overlay_plotly <- function(loc,
     LDX_hovertext[w] <- paste0(LDX_hovertext[w], "<br>+ ",
                                plural(LDX$ntissue[w], "tissue(s)"))
     hovertext[inData] <- paste0(hovertext[inData], LDX_hovertext)
+    # annotation
+    if (show_annot) {
+      msg <- paste0("LDlink eQTL<br>", nsnp[1], " eSNPs<br>",
+                    (if (nsnp[1] != nsnp[2]) paste0(nsnp[2], " filtered<br>")),
+                    nsnp[3], " shown",
+                    (if (nsnp[4] > 0) paste0("<br>", nsnp[4], " outside window")))
+      annot <- list(x = 0.01, y = 1,
+                    text = msg,
+                    font = list(size = 14 * 0.7),
+                    bgcolor = "rgba(255, 255, 255, 0.9)",
+                    xref = "paper", yref = "paper", align = "left", yanchor = "top",
+                    showarrow = FALSE)
+    }
   }
   
   hline <- list(type = "line",
@@ -151,6 +174,7 @@ overlay_plotly <- function(loc,
                                   fixedrange = TRUE,
                                   showline = TRUE,
                                   range = ylim),
+                     annotations = annot,
                      shapes = hline, legend = leg, dragmode = "pan")
   } else {
     # double y axis with recombination
@@ -189,6 +213,7 @@ overlay_plotly <- function(loc,
                                    ticks = "outside", showgrid = FALSE,
                                    showline = TRUE, fixedrange = TRUE,
                                    zeroline = FALSE, range = ylim2),
+                     annotations = annot,
                      shapes = hline,
                      legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
