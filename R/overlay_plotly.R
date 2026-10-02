@@ -12,8 +12,7 @@
 #' @param tissue_filter Character vector of tissues to filter eQTL results.
 #' @param pcutoff Cut-off for p value significance. Defaults to p = 5e-08. Set
 #'   to `NULL` to disable.
-#' @param scheme Vector of 3 colours if LD is not shown: 1st = normal points,
-#'   2nd = colour for significant points, 3rd = index SNP(s).
+#' @param eqtl_scheme Vector of colours for eQTL genes, which can be named.
 #' @param xlab x axis title.
 #' @param ylab y axis title.
 #' @param marker_outline Specifies colour for outlining points.
@@ -33,7 +32,7 @@ overlay_plotly <- function(loc,
                            gene_filter = NULL,
                            tissue_filter = NULL,
                            pcutoff = 5e-08,
-                           scheme = c('grey', 'dodgerblue', 'red'),
+                           eqtl_scheme = NULL,
                            xlab = NULL,
                            ylab = NULL,
                            marker_outline = "grey",
@@ -80,9 +79,11 @@ overlay_plotly <- function(loc,
   ylim[1] <- if (ylim[1] != 0) ylim[1] - ydiff *0.05 else ylim[1] - ydiff *0.02
   
   data$bg <- "ns"
-  scheme <- scheme[1]
+  scheme <- "grey"
   symbols <- c(21L, 24L, 25L)
   sizes <- NULL
+  inData <- FALSE
+  ns <- TRUE
   
   leg <- list(traceorder = "reversed")
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
@@ -97,6 +98,7 @@ overlay_plotly <- function(loc,
     LDX$ngene <- gtab[LDX$RS_ID] -1
     LDX$ntissue <- tisstab[LDX$RS_ID] -1
     inData <- match(LDX_snps, data[, loc$labs])
+    ns <- -inData
     if (!show_annot) {
       message(nsnp[3], " / ", nsnp[1], " eQTL SNPs shown")
     }
@@ -105,11 +107,16 @@ overlay_plotly <- function(loc,
     LDX_by_gene <- min_p_by_col(LDX, "Gene_Symbol")
     geneset <- LDX_by_gene$Gene_Symbol
     ngene <- nrow(LDX_by_gene)
-    ldx_scheme <- rainbow(ngene)
+    ldx_scheme <- if (is.null(eqtl_scheme)) {
+      rainbow(ngene)
+    } else {
+      if (is.null(names(eqtl_scheme))) eqtl_scheme else eqtl_scheme[geneset]
+    }
     data$bg[inData] <- LDX$Gene_Symbol
     data$bg <- factor(data$bg, levels = c("ns", geneset),
                       labels =  c("ns", geneset))
-    scheme <- c(scheme[1], ldx_scheme)
+    scheme <- c("grey", ldx_scheme)
+    names(scheme) <- NULL
     
     # beta symbols
     symbol <- rep_len("ns", nrow(data))
@@ -153,13 +160,13 @@ overlay_plotly <- function(loc,
   
   if (!recomb) {
     # beta shapes
-    p <- plot_ly(x = data[-inData, loc$pos] / 1e6, y = data[-inData, loc$yvar],
-                 color = data$bg[-inData], colors = scheme,
-                 symbol = data$symbol[-inData], symbols = symbols,
+    p <- plot_ly(x = data[ns, loc$pos] / 1e6, y = data[ns, loc$yvar],
+                 color = data$bg[ns], colors = scheme,
+                 symbol = data$symbol[ns], symbols = symbols,
                  marker = list(opacity = 0.5, size = 6.5,
                                line = list(width = 1, color = marker_outline)),
-                 text = hovertext[-inData], hoverinfo = 'text',
-                 key = data[-inData, loc$labs],
+                 text = hovertext[ns], hoverinfo = 'text',
+                 key = data[ns, loc$labs],
                  showlegend = showlegend,
                  source = "plotly_locus", height = height,
                  type = type, mode = "markers") %>%
@@ -189,13 +196,13 @@ overlay_plotly <- function(loc,
     
     # beta shapes
     p <- plot_ly(source = "plotly_locus", height = height) %>%
-      add_trace(x = data[-inData, loc$pos] / 1e6, y = data[-inData, loc$yvar],
-                color = data$bg[-inData], colors = scheme,
-                symbol = data$symbol[-inData], symbols = symbols,
+      add_trace(x = data[ns, loc$pos] / 1e6, y = data[ns, loc$yvar],
+                color = data$bg[ns], colors = scheme,
+                symbol = data$symbol[ns], symbols = symbols,
                 marker = list(opacity = 0.5, size = 6.5,
                               line = list(width = 1, color = marker_outline)),
-                text = hovertext[-inData], hoverinfo = 'text',
-                key = data[-inData, loc$labs],
+                text = hovertext[ns], hoverinfo = 'text',
+                key = data[ns, loc$labs],
                 showlegend = showlegend,
                 type = type, mode = "markers") %>%
       add_trace(x = data[inData, loc$pos] / 1e6, y = data[inData, loc$yvar],

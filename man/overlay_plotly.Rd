@@ -9,7 +9,7 @@ overlay_plotly(
   gene_filter = NULL,
   tissue_filter = NULL,
   pcutoff = 5e-08,
-  scheme = c("grey", "dodgerblue", "red"),
+  eqtl_scheme = NULL,
   xlab = NULL,
   ylab = NULL,
   marker_outline = "grey",
@@ -31,8 +31,7 @@ overlay_plotly(
 \item{pcutoff}{Cut-off for p value significance. Defaults to p = 5e-08. Set
 to \code{NULL} to disable.}
 
-\item{scheme}{Vector of 3 colours if LD is not shown: 1st = normal points,
-2nd = colour for significant points, 3rd = index SNP(s).}
+\item{eqtl_scheme}{Vector of colours for eQTL genes, which can be named.}
 
 \item{xlab}{x axis title.}
 

@@ -678,6 +678,7 @@ zoom <- function(data, ens_db,
       isolate(cur_eqtl(loc1$index_snp))
       pin2 <- eqtl_snp()
       ld_msg <- NULL
+      eqtl_scheme <- NULL
       if (!is.null(pin2) && (pin2 %in% loc1$data[, labs[1]] ||
                             (man2 && pin2 %in% loc2$data[, labs[2]]))) {
         message("LDlink eQTL")
@@ -692,14 +693,19 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
-        g <- unique(loc1$LDexp$Gene_Symbol)
-        tiss <- unique(loc1$LDexp$Tissue)
+        LDX1 <- loc1$LDexp[loc1$LDexp$inData, ]
+        g <- unique(LDX1$Gene_Symbol[order(LDX1$P_value)])
+        tiss <- unique(LDX1$Tissue)
         if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
           loc2$index_snp <- pin2
           loc2b <- try(link_eqtl(loc2, token = ld_token))
-          if (!inherits(loc2b, "try-error")) loc2 <- loc2b
-          g <- union(g, loc2$LDexp$Gene_Symbol)
-          tiss <- union(tiss, loc2$LDexp$Tissue)
+          if (!inherits(loc2b, "try-error")) {
+            loc2 <- loc2b
+            LDX2 <- loc2$LDexp[loc2$LDexp$inData, ]
+            g <- union(g, LDX2$Gene_Symbol[order(LDX2$P_value)])
+            tiss <- union(tiss, LDX2$Tissue)
+            eqtl_scheme <- setNames(rainbow(length(g)), g)  # synchronise colours
+          }
         }
         link_eqtl$genes <- sort(g)
         link_eqtl$tissues <- sort(tiss)
@@ -741,7 +747,8 @@ zoom <- function(data, ens_db,
                    loc2 = if (man2) loc2 else NULL,
                    ylab = man_ylab,
                    gene_filter = input$eqtl_gene_filter,
-                   tissue_filter = input$eqtl_tissue_filter)
+                   tissue_filter = input$eqtl_tissue_filter,
+                   eqtl_scheme = eqtl_scheme)
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -1142,6 +1149,6 @@ zoom <- function(data, ens_db,
     
   }
   
-  runApp(list(ui = ui, server = server)) %>%
-    suppress_warnings("please add `event_register\\(p")
+  runApp(list(ui = ui, server = server)) # %>%
+    # suppress_warnings("please add `event_register\\(p")
 }

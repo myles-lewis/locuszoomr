@@ -52,6 +52,7 @@ link_eqtl <- function(loc,
   pos_col <- colnames(LDexp)[grep("Position", colnames(LDexp))]
   LDexp$pos <- as.numeric(gsub(".*:", "", LDexp[, pos_col]))  # remove up to ':'
   LDexp$logP <- -log10(LDexp$P_value)
+  LDexp$inData <- LDexp$RS_ID %in% unique(loc$data[, loc$labs])
   loc$LDexp <- LDexp
   
   loc
