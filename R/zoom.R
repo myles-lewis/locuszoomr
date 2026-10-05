@@ -1149,6 +1149,6 @@ zoom <- function(data, ens_db,
     
   }
   
-  runApp(list(ui = ui, server = server)) # %>%
-    # suppress_warnings("please add `event_register\\(p")
+  runApp(list(ui = ui, server = server)) %>%
+    suppress_warnings("please add `event_register\\(p")
 }
