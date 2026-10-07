@@ -24,8 +24,7 @@
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
 #' @param highlight Vector of genes to highlight.
-#' @param highlight_col Single colour or vector of colours for highlighted
-#'   genes.
+#' @param highlight_col Colour for highlighted genes.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
@@ -203,7 +202,7 @@ genetrack_ly <- function(locus,
     p <- p %>%
       add_segments(data = TX[!ok, ], x = ~start, y = ~-row,
                    xend = ~end, yend = ~-row,
-                   color = I(highlight_col),
+                   color = I(highlight_col[1]),
                    text = hovertext[!ok], hoverinfo = 'text',
                    showlegend = FALSE)
   }

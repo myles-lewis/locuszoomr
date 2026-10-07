@@ -37,8 +37,7 @@
 #' @param ylab Title for y axis, or a vector of 2 titles for each y axis if
 #'   `loc2` is provided.
 #' @param highlight Vector of genes to highlight.
-#' @param highlight_col Single colour or vector of colours for highlighted
-#'   genes.
+#' @param highlight_col Colour for highlighted genes.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes

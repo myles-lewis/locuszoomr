@@ -60,8 +60,7 @@ in \code{locus}.}
 
 \item{highlight}{Vector of genes to highlight.}
 
-\item{highlight_col}{Single colour or vector of colours for highlighted
-genes.}
+\item{highlight_col}{Colour for highlighted genes.}
 
 \item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 
