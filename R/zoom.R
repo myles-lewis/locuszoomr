@@ -709,6 +709,8 @@ zoom <- function(data, ens_db,
         }
         link_eqtl$genes <- sort(g)
         link_eqtl$tissues <- sort(tiss)
+      } else {
+        link_eqtl$genes <- NULL
       }
       
       loc$i <- loc1
@@ -746,8 +748,8 @@ zoom <- function(data, ens_db,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
                    loc2 = if (man2) loc2 else NULL,
                    ylab = man_ylab,
-                   gene_filter = input$eqtl_gene_filter,
-                   tissue_filter = input$eqtl_tissue_filter,
+                   gene_filter = eqtl_gene_filter(),
+                   tissue_filter = eqtl_tissue_filter(),
                    eqtl_scheme = eqtl_scheme)
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
@@ -774,13 +776,38 @@ zoom <- function(data, ens_db,
                     choices = link_eqtl$genes, selected = link_eqtl$genes,
                     multiple = TRUE,
                     options = pickerOptions(actionsBox = TRUE,
-                                            selectedTextFormat = 'count > 1')),
+                                            selectedTextFormat = 'count > 3')),
         pickerInput("eqtl_tissue_filter", h5("Select eQTL tissues"),
                     choices = link_eqtl$tissues, selected = link_eqtl$tissues,
                     multiple = TRUE,
                     options = pickerOptions(actionsBox = TRUE,
                                             selectedTextFormat = 'count > 1'))
       ))
+    })
+    
+    eqtl_gene_filter <- reactiveVal(NULL)
+    eqtl_tissue_filter <- reactiveVal(NULL)
+    
+    deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
+    deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
+    
+    # prevents ui update double trigger output$locus
+    observeEvent(deb_gene_filter(), {
+      i <- deb_gene_filter()
+      geneset <- link_eqtl$genes
+      req(i, geneset)
+      if (!identical(i, geneset)) {
+        eqtl_gene_filter(i)
+      } else eqtl_gene_filter(NULL)
+    })
+    
+    observeEvent(deb_tissue_filter(), {
+      i <- deb_tissue_filter()
+      tset <- link_eqtl$tissues
+      req(i, tset)
+      if (!identical(i, tset)) {
+        eqtl_tissue_filter(i)
+      } else eqtl_tissue_filter(NULL)
     })
     
     observeEvent(input$left2, {
