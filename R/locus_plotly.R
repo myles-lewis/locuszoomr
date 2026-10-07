@@ -36,6 +36,9 @@
 #'   `locus`.
 #' @param ylab Title for y axis, or a vector of 2 titles for each y axis if
 #'   `loc2` is provided.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
@@ -79,6 +82,8 @@ locus_plotly <- function(loc,
                          width = 600,
                          xlab = NULL,
                          ylab = NULL,
+                         highlight = NULL,
+                         highlight_col = "red",
                          prioritise = NULL,
                          blanks = "show",
                          beta = NULL,
@@ -98,8 +103,8 @@ locus_plotly <- function(loc,
   
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
                     italics, gene_col, exon_col, exon_border, showExons, 
-                    maxrows, width, xlab, prioritise, blanks,
-                    height = pheights[length(pheights)])
+                    maxrows, width, xlab, highlight, highlight_col, prioritise,
+                    blanks, height = pheights[length(pheights)])
   
   if (is.null(loc$LDexp)) {
     p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],

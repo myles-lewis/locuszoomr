@@ -17,6 +17,8 @@ genetrack_ly(
   maxrows = 8,
   width = 600,
   xlab = NULL,
+  highlight = NULL,
+  highlight_col = "red",
   prioritise = NULL,
   blanks = c("fill", "hide", "show"),
   height = NULL,
@@ -55,6 +57,11 @@ overlapping text for gene names.}
 
 \item{xlab}{Title for x axis. Defaults to chromosome \code{seqname} specified
 in \code{locus}.}
+
+\item{highlight}{Vector of genes to highlight.}
+
+\item{highlight_col}{Single colour or vector of colours for highlighted
+genes.}
 
 \item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 

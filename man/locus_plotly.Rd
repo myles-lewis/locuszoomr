@@ -20,6 +20,8 @@ locus_plotly(
   width = 600,
   xlab = NULL,
   ylab = NULL,
+  highlight = NULL,
+  highlight_col = "red",
   prioritise = NULL,
   blanks = "show",
   beta = NULL,
@@ -71,6 +73,11 @@ overlapping text for gene names.}
 
 \item{ylab}{Title for y axis, or a vector of 2 titles for each y axis if
 \code{loc2} is provided.}
+
+\item{highlight}{Vector of genes to highlight.}
+
+\item{highlight_col}{Single colour or vector of colours for highlighted
+genes.}
 
 \item{prioritise}{Vector of genes to be placed first in the gene tracks.}
 

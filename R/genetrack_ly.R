@@ -23,6 +23,9 @@
 #'   overlapping text for gene names.
 #' @param xlab Title for x axis. Defaults to chromosome `seqname` specified 
 #' in `locus`.
+#' @param highlight Vector of genes to highlight.
+#' @param highlight_col Single colour or vector of colours for highlighted
+#'   genes.
 #' @param prioritise Vector of genes to be placed first in the gene tracks.
 #' @param blanks Controls handling of genes with blank names: `"fill"` replaces
 #'   blank gene symbols with ensembl gene ids. `"hide"` completely hides genes
@@ -56,6 +59,8 @@ genetrack_ly <- function(locus,
                          maxrows = 8,
                          width = 600,
                          xlab = NULL,
+                         highlight = NULL,
+                         highlight_col = "red",
                          prioritise = NULL,
                          blanks = c("fill", "hide", "show"),
                          height = NULL,
@@ -111,6 +116,12 @@ genetrack_ly <- function(locus,
   }
   
   cex.width <- cex.text * par("pin")[1] * 80 / (width - 250)
+  gene_col <- col2hex(gene_col)
+  exon_col <- col2hex(exon_col)
+  exon_border <- col2hex(exon_border)
+  highlight_col <- col2hex(highlight_col)
+  TX <- gene_colours(TX, gene_col, exon_col, exon_border, showExons,
+                     highlight, highlight_col)
   TX <- mapRow(TX, xlim = xrange, cex.text = cex.width, blanks = blanks,
                prioritise = prioritise, xnudge = 0.005)
   maxrows <- if (is.null(maxrows)) max(TX$row) else min(c(max(TX$row), maxrows))
@@ -126,11 +137,10 @@ genetrack_ly <- function(locus,
   }
   TX <- TX[TX$row <= maxrows, ]
   EX <- EX[EX$gene_id %in% TX$gene_id, ]
-  
-  gene_col <- col2hex(gene_col)
-  exon_col <- col2hex(exon_col)
-  exon_border <- col2hex(exon_border)
-  EX$row <- TX$row[match(EX$gene_id, TX$gene_id)]
+  m <- match(EX$gene_id, TX$gene_id)
+  EX$row <- TX$row[m]
+  EX$exon_col <- TX$exon_col[m]
+  EX$exon_border <- TX$exon_border[m]
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   TX$tx <- TX$mean
@@ -152,8 +162,8 @@ genetrack_ly <- function(locus,
     y0 <- -EX$row - 0.15
     y1 <- -EX$row + 0.15
     shapes <- lapply(seq_len(nrow(EX)), function(i) {
-      list(type = "rect", fillcolor = exon_col, line = list(color = exon_border,
-                                                            width = 0.5),
+      list(type = "rect", fillcolor = EX$exon_col[i],
+           line = list(color = EX$exon_border[i], width = 0.5),
            x0 = EX$start[i], x1 = EX$end[i], xref = "x",
            y0 = y0[i], y1 = y1[i], yref = "y")
     })
@@ -182,12 +192,22 @@ genetrack_ly <- function(locus,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  plot_ly(TX, source = "plotly_locus", height = height) %>%
+  ok <- if (!is.null(highlight)) !TX$gene_name %in% highlight else TRUE
+  p <- plot_ly(TX[ok, ], source = "plotly_locus", height = height) %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
-                 text = hovertext, hoverinfo = 'text',
-                 showlegend = FALSE) %>%
+                 text = hovertext[ok], hoverinfo = 'text',
+                 showlegend = FALSE)
+  if (!is.null(highlight)) {
+    p <- p %>%
+      add_segments(data = TX[!ok, ], x = ~start, y = ~-row,
+                   xend = ~end, yend = ~-row,
+                   color = I(highlight_col),
+                   text = hovertext[!ok], hoverinfo = 'text',
+                   showlegend = FALSE)
+  }
+  p %>%
     add_text(x = xtex, y = ytex, text = ttext,
              textfont = list(size = 14 * cex.text),
              showlegend = FALSE, hoverinfo = 'none') %>%
