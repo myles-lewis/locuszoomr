@@ -138,8 +138,6 @@ genetrack_ly <- function(locus,
   EX <- EX[EX$gene_id %in% TX$gene_id, ]
   m <- match(EX$gene_id, TX$gene_id)
   EX$row <- TX$row[m]
-  EX$exon_col <- TX$exon_col[m]
-  EX$exon_border <- TX$exon_border[m]
   
   EX[, c('start', 'end')] <- EX[, c('start', 'end')] / 1e6
   TX$tx <- TX$mean
@@ -161,8 +159,8 @@ genetrack_ly <- function(locus,
     y0 <- -EX$row - 0.15
     y1 <- -EX$row + 0.15
     shapes <- lapply(seq_len(nrow(EX)), function(i) {
-      list(type = "rect", fillcolor = EX$exon_col[i],
-           line = list(color = EX$exon_border[i], width = 0.5),
+      list(type = "rect", fillcolor = exon_col,
+           line = list(color = exon_border, width = 0.5),
            x0 = EX$start[i], x1 = EX$end[i], xref = "x",
            y0 = y0[i], y1 = y1[i], yref = "y")
     })
@@ -180,9 +178,12 @@ genetrack_ly <- function(locus,
     xtex <- TX$tx[ok]
     ytex <- TX$ty[ok]
     ttext <- TX$gene_name2[ok]
+    text_col <- rep_len("black", length(ttext))
+    text_col[TX$gene_name[ok] %in% highlight] <- highlight_col
   } else {
     xtex <- ytex <- 0
     ttext <- ""
+    text_col <- "black"
   }
   
   hovertext <- paste0(TX$gene_name,
@@ -191,24 +192,14 @@ genetrack_ly <- function(locus,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  ok <- if (!is.null(highlight)) !TX$gene_name %in% highlight else TRUE
-  p <- plot_ly(TX[ok, ], source = "plotly_locus", height = height) %>%
+  plot_ly(TX[ok, ], source = "plotly_locus", height = height) %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
                  text = hovertext[ok], hoverinfo = 'text',
-                 showlegend = FALSE)
-  if (!is.null(highlight)) {
-    p <- p %>%
-      add_segments(data = TX[!ok, ], x = ~start, y = ~-row,
-                   xend = ~end, yend = ~-row,
-                   color = I(highlight_col[1]),
-                   text = hovertext[!ok], hoverinfo = 'text',
-                   showlegend = FALSE)
-  }
-  p %>%
+                 showlegend = FALSE) %>%
     add_text(x = xtex, y = ytex, text = ttext,
-             textfont = list(size = 14 * cex.text),
+             textfont = list(size = 14 * cex.text, color = text_col),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = list(text = xlab, standoff = 10),

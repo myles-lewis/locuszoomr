@@ -89,7 +89,7 @@ overlay_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
-  annot <- NULL
+  annot <- geneset <- NULL
   if (!noEqtl) {
     gtab <- tapply(LDX$Gene_Symbol, LDX$RS_ID, function(x) length(unique(x)))
     tisstab <- tapply(LDX$Tissue, LDX$RS_ID, function(x) length(unique(x)))
@@ -237,6 +237,8 @@ overlay_plotly <- function(loc,
                      shapes = hline,
                      legend = c(leg, x = 1.1, y = 1), showlegend = TRUE)
   }
+  
+  attr(p, "eqtl_genes") <- geneset
   
   p %>%
     plotly::config(displaylogo = FALSE,
