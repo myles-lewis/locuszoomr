@@ -100,11 +100,7 @@ locus_plotly <- function(loc,
     heights <- heights / sum(heights)
   }
   
-  g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
-                    italics, gene_col, exon_col, exon_border, showExons, 
-                    maxrows, width, xlab, highlight, highlight_col, prioritise,
-                    blanks, height = pheights[length(pheights)])
-  
+  egenes <- NULL
   if (is.null(loc$LDexp)) {
     p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
                         beta = beta[1], ...)
@@ -113,6 +109,7 @@ locus_plotly <- function(loc,
     p <- overlay_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
                         gene_filter = gene_filter, tissue_filter = tissue_filter,
                         eqtl_scheme = eqtl_scheme)
+    egenes <- attr(p, "eqtl_genes")
   }
   
   if (!is.null(loc2)) {
@@ -127,15 +124,28 @@ locus_plotly <- function(loc,
                            height = pheights[2], showlegend = FALSE,
                            gene_filter = gene_filter, tissue_filter = tissue_filter,
                            eqtl_scheme = eqtl_scheme)
+      egenes <- unique(c(egenes, attr(p2, "eqtl_genes")))
     }
+  }
+  
+  if (is.null(highlight)) highlight <- egenes
+  
+  g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
+                    italics, gene_col, exon_col, exon_border, showExons, 
+                    maxrows, width, xlab, highlight, highlight_col, prioritise,
+                    blanks, height = pheights[length(pheights)]) 
     
+  if (!is.null(loc2)) {
     pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
+    attr(pp, "eqtl_genes") <- egenes
     return(remap_overlaying_yaxes(pp))
   }
   
-  plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
+  pp <- plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                   titleY = TRUE, margin = 0)
+  attr(pp, "eqtl_genes") <- egenes
+  pp
 }
 
 
