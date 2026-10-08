@@ -21,7 +21,6 @@ Imports:
     AnnotationFilter,
     BiocGenerics,
     cowplot,
-    DT,
     ensembldb,
     GenomeInfoDb,
     GenomicRanges,
@@ -39,21 +38,22 @@ Imports:
     Rcpp,
     rlang,
     rtracklayer,
-    shiny,
-    shinycssloaders,
-    shinyFeedback,
-    shinyWidgets
+    shiny
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
     AnnotationDbi,
     AnnotationHub,
     dplyr,
+    DT,
     EnsDb.Hsapiens.v75,
     ggrepel,
     knitr,
     org.Hs.eg.db,
     rmarkdown,
+    shinycssloaders,
+    shinyFeedback,
+    shinyWidgets,
     zoo
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0

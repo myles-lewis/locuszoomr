@@ -38,10 +38,6 @@ importFrom(BiocGenerics,
   end,
   start
 )
-importFrom(DT,
-  datatable,
-  formatSignif
-)
 importFrom(GenomeInfoDb,
   "genome<-",
   genome,
@@ -190,17 +186,6 @@ importFrom(shiny,
   updateTextInput,
   validate
 )
-importFrom(shinyFeedback,
-  hideFeedback,
-  showFeedback,
-  useShinyFeedback
-)
-importFrom(shinyWidgets,
-  dropdown,
-  pickerInput,
-  pickerOptions
-)
-importFrom(shinycssloaders,withSpinner)
 importFrom(stats,
   as.formula,
   complete.cases,

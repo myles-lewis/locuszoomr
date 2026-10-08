@@ -80,11 +80,7 @@
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
-#' @importFrom shinyFeedback useShinyFeedback hideFeedback showFeedback
-#' @importFrom shinyWidgets pickerInput pickerOptions dropdown
-#' @importFrom shinycssloaders withSpinner
 #' @importFrom htmltools tags br
-#' @importFrom DT datatable formatSignif
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
 #' @importFrom grDevices dev.off pdf
@@ -109,6 +105,15 @@ zoom <- function(data, ens_db,
                  seq_filter = c(1:22, 'X', 'Y'),
                  AnnotationDb = "org.Hs.eg.db",
                  align = TRUE) {
+  if (!requireNamespace("shinycssloaders", quietly = TRUE))
+    stop("Need shinycssloaders package", call. = FALSE)
+  if (!requireNamespace("shinyWidgets", quietly = TRUE))
+    stop("Need shinyWidgets package", call. = FALSE)
+  if (!requireNamespace("shinyFeedback", quietly = TRUE))
+    stop("Need shinyFeedback package", call. = FALSE)
+  if (!requireNamespace("DT", quietly = TRUE))
+    stop("Need DT package", call. = FALSE)
+  
   dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings
@@ -224,12 +229,12 @@ zoom <- function(data, ens_db,
         align-items: center;
       }"))
     ),
-    useShinyFeedback(),
+    shinyFeedback::useShinyFeedback(),
     tabsetPanel(
       tabPanel("Plot",
                fluidRow(
                  column(11,
-                        withSpinner(
+                        shinycssloaders::withSpinner(
                           plotlyOutput("manhattan", width = "85vw", height = height[1]),
                           type = 8, size = 0.7)
                  ),
@@ -241,7 +246,7 @@ zoom <- function(data, ens_db,
                (if (man2) {
                  fluidRow(
                    column(11,
-                          withSpinner(
+                          shinycssloaders::withSpinner(
                             plotlyOutput("manhattan2", width = "85vw", height = height[1]),
                             type = 8, size = 0.7)
                    ),
@@ -257,7 +262,7 @@ zoom <- function(data, ens_db,
                         conditionalPanel('input.show_chrom & output.coords_ok',
                                          fluidRow(
                                            column(11,
-                                                  withSpinner(
+                                                  shinycssloaders::withSpinner(
                                                     plotlyOutput("chrom", width = "85vw", height = height[2]),
                                                     type = 8, size = 0.7)
                                            ),
@@ -276,7 +281,7 @@ zoom <- function(data, ens_db,
                           conditionalPanel('input.show_chrom & output.coords_ok',
                                            fluidRow(
                                              column(11,
-                                                    withSpinner(
+                                                    shinycssloaders::withSpinner(
                                                       plotlyOutput("chrom2", width = "85vw", height = height[2]),
                                                       type = 8, size = 0.7)
                                              ),
@@ -318,15 +323,15 @@ zoom <- function(data, ens_db,
                           cellWidths = c("75%", "25%")
                         )),
                  column(1,
-                        dropdown(
+                        shinyWidgets::dropdown(
                           (if (!is.null(recomb)) {
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
                           checkboxInput("alltracks", "show all gene tracks"),
-                          pickerInput("biotype", h5("Select gene biotypes"),
+                          shinyWidgets::pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
-                                      options = pickerOptions(actionsBox = TRUE,
+                                      options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
                           (if (show_ld) {
                             fluidRow(
@@ -742,7 +747,7 @@ zoom <- function(data, ens_db,
         h <- if (!man2) c(364, 24 * needrow + 80) else c(305, 305, 20 * needrow + 40)
         maxrows <- NULL
       }
-      hideFeedback("tex")
+      shinyFeedback::hideFeedback("tex")
       p <- locus_plotly(loc1, h, filter_gene_biotype = biotype, pcutoff = pcutoff,
                    width = width, eqtl_gene = eqtl_gene, beta = beta,
                    add_hover = add_hover, scheme = locscheme, maxrows = maxrows,
@@ -772,15 +777,15 @@ zoom <- function(data, ens_db,
     output$ui_link_genes <- renderUI({
       req(link_eqtl$genes)
       fluidRow(column(12,
-        pickerInput("eqtl_gene_filter", h5("Select eQTL genes"),
+        shinyWidgets::pickerInput("eqtl_gene_filter", h5("Select eQTL genes"),
                     choices = link_eqtl$genes, selected = link_eqtl$genes,
                     multiple = TRUE,
-                    options = pickerOptions(actionsBox = TRUE,
+                    options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                             selectedTextFormat = 'count > 3')),
-        pickerInput("eqtl_tissue_filter", h5("Select eQTL tissues"),
+        shinyWidgets::pickerInput("eqtl_tissue_filter", h5("Select eQTL tissues"),
                     choices = link_eqtl$tissues, selected = link_eqtl$tissues,
                     multiple = TRUE,
-                    options = pickerOptions(actionsBox = TRUE,
+                    options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                             selectedTextFormat = 'count > 1'))
       ))
     })
@@ -855,7 +860,7 @@ zoom <- function(data, ens_db,
     
     # parse text box
     observeEvent(c(input$text_go, input$enter), {
-      hideFeedback("tex")
+      shinyFeedback::hideFeedback("tex")
       req(input$tex)
       chr <- NULL
       tex <- input$tex
@@ -888,11 +893,11 @@ zoom <- function(data, ens_db,
           chr <- data[w[1], chrom[1]]
           xr <- data[w[1], pos[1]] + c(-5e5, 5e5)
         } else {
-          showFeedback("tex", "SNP not found")
+          shinyFeedback::showFeedback("tex", "SNP not found")
           return()
         }
       } else {
-        if (nchar(tex) > 1) showFeedback("tex", "not found")
+        if (nchar(tex) > 1) shinyFeedback::showFeedback("tex", "not found")
         return()
       }
       xr <- as.integer(pmax(xr, 0))
@@ -900,13 +905,13 @@ zoom <- function(data, ens_db,
       if (chr %in% chr_set[[1]]) {
         coords$chr <- chr
         if (any(is.na(xr))) {
-          showFeedback("tex", "invalid entry")
+          shinyFeedback::showFeedback("tex", "invalid entry")
           return()
         }
         coords$xrange <- xr
-        hideFeedback("tex")
+        shinyFeedback::hideFeedback("tex")
       } else {
-        showFeedback("tex", "not present")
+        shinyFeedback::showFeedback("tex", "not present")
       }
     })
     
@@ -914,7 +919,7 @@ zoom <- function(data, ens_db,
     output$table <- DT::renderDataTable({
       cols <- colnames(data)[sapply(data, class) == "numeric"]
       cols <- cols[!cols %in% c(chrom[1], pos[1])]
-      datatable(data) %>% formatSignif(cols, digits = 3)
+      DT::datatable(data) %>% DT::formatSignif(cols, digits = 3)
     })
     
     # detect change to x axis range
