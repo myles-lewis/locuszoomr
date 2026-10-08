@@ -180,6 +180,8 @@ genetrack_ly <- function(locus,
     xtex <- TX$tx[ok]
     ytex <- TX$ty[ok]
     ttext <- TX$gene_name2[ok]
+    text_col <- rep_len("black", length(ttext))
+    text_col[TX$gene_name[ok] %in% highlight] <- highlight_col
   } else {
     xtex <- ytex <- 0
     ttext <- ""
@@ -208,7 +210,7 @@ genetrack_ly <- function(locus,
   }
   p %>%
     add_text(x = xtex, y = ytex, text = ttext,
-             textfont = list(size = 14 * cex.text),
+             textfont = list(size = 14 * cex.text, color = text_col),
              showlegend = FALSE, hoverinfo = 'none') %>%
     plotly::layout(shapes = shapes,
                    xaxis = list(title = list(text = xlab, standoff = 10),
