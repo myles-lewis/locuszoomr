@@ -3,6 +3,5 @@
 0 errors | 0 warnings | 0 note
 
 This release includes:
-* Major update extending the shiny/plotly zoom browser to browse and compare 2 
-GWAS simultaneously. 
+* Update extending the shiny/plotly zoom browser to overlay LDlink eQTL data. 
 * Bug fixes.
