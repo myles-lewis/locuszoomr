@@ -40,25 +40,32 @@ link_trait <- function(loc,
   
   start <- Sys.time()
   message("LDtrait ", index_snp, appendLF = FALSE)
-  ldt <- suppressMessages(
+  LDT <- suppressMessages(
     mem_LDtrait(index_snp, pop = pop, r2d = r2d, token = token,
                 genome_build = genome_build, ...))
-  if (!ld_response_ok(ldt, c(snp_col, "GWAS_Trait"))) {
-    emsg <- ld_response_error(ldt)
+  if (ld_response_ok(LDT, c(snp_col, "GWAS_Trait"))) {
+    for (i in c("R2", "D'", "P_value")) {
+      LDT[, i] <- as.numeric(LDT[, i])
+    }
+    pos_col <- colnames(LDT)[grep("Position", colnames(LDT))]
+    LDT$pos <- as.numeric(gsub(".*:", "", LDT[, pos_col]))  # remove up to ':'
+    LDT$logP <- -log10(LDT$P_value)
+  } else {
+    emsg <- ld_response_error(LDT)
   }
   
   if (is.null(emsg)) {
     end <- Sys.time()
-    ldt$indata <- ldt[, snp_col] %in% loc$data[, loc$labs]
-    m <- length(unique(ldt[ldt$indata, snp_col]))
-    a <- length(unique(ldt[, snp_col]))
+    LDT$indata <- LDT[, snp_col] %in% loc$data[, loc$labs]
+    m <- length(unique(LDT[LDT$indata, snp_col]))
+    a <- length(unique(LDT[, snp_col]))
     message(" - matched ", m, " of ", a, " trait SNPs (",
             format(end - start, digits = 3),")")
   } else {
     message("\n", if (is.na(emsg)) "Unexpected LDtrait response" else emsg)
   }
   
-  loc$LDtrait <- ldt
+  loc$LDtrait <- LDT
   loc
 }
   
