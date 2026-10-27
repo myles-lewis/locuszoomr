@@ -53,7 +53,7 @@ trait_plotly <- function(loc,
   
   ylab <- "GWAS trait -log<sub>10</sub> P"
   ylim <- range(LDT$logP, na.rm = TRUE)
-  ylim <- ylim + diff(ylim) * c(-0.01, 0.01)
+  ylim <- ylim + diff(ylim) * c(-0.05, 0.05)
   
   traits <- sort(unique(LDT$GWAS_Trait))
   trait_group <- similarGroups(traits)
@@ -73,9 +73,9 @@ trait_plotly <- function(loc,
                       "<br>Trait: ", LDT$GWAS_Trait)
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
-               marker = list(size = 9, opacity = 0.8,
+               marker = list(opacity = 0.8,
                              color = I(LDT$colour),
-                             line = list(width = 0.5, color = "black")),
+                             line = list(width = 1, color = "black")),
                text = hovertext, hoverinfo = 'text',
                key = LDT$RS_Number,
                showlegend = FALSE,
