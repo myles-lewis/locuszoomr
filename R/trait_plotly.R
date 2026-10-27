@@ -56,9 +56,13 @@ trait_plotly <- function(loc,
   ylim <- ylim + diff(ylim) * c(-0.05, 0.05)
   
   traits <- sort(unique(LDT$GWAS_Trait))
-  trait_group <- similarGroups(traits)
-  scheme <- rainbow(length(unique(trait_group)))
-  LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
+  if (length(traits) > 1) {
+    trait_group <- similarGroups(traits)
+    scheme <- rainbow(length(unique(trait_group)))
+    LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
+  } else {
+    LDT$colour <- "red"
+  }
   
   # 27/10/26
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`

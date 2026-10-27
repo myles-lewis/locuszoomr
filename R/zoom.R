@@ -343,11 +343,14 @@ zoom <- function(data, ens_db,
                                        actionButton("eqtl_get", "eQTL", icon = icon("compass"),
                                                     class = "btn-info btn-sm")
                                      }),
-                                     actionButton("trait_get", "GWAS trait", #icon = icon("person"),
+                                     actionButton("trait_get", "GWAS trait",
                                                   class = "btn-success btn-sm"),
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
+                          }),
+                          (if (show_ld) {
+                            uiOutput("ui_link_traits")
                           }),
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
@@ -622,7 +625,7 @@ zoom <- function(data, ens_db,
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
-    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL)
+    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL)
     trait_snp <- reactiveVal(NULL)
     cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
@@ -756,6 +759,9 @@ zoom <- function(data, ens_db,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         }
+        link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
+      } else {
+        link_eqtl$traits <- NULL
       }
       
       isolate(width <- loc_width())
@@ -778,7 +784,8 @@ zoom <- function(data, ens_db,
                    ylab = man_ylab,
                    gene_filter = eqtl_gene_filter(),
                    tissue_filter = eqtl_tissue_filter(),
-                   eqtl_scheme = eqtl_scheme)
+                   eqtl_scheme = eqtl_scheme,
+                   trait_filter = trait_filter())
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -813,11 +820,28 @@ zoom <- function(data, ens_db,
       ))
     })
     
+    output$ui_link_genes <- renderUI({
+      req(link_eqtl$traits)
+      fluidRow(
+        column(12,
+               shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
+                                         choices = link_eqtl$traits, selected = link_eqtl$traits,
+                                         multiple = TRUE,
+                                         options = shinyWidgets::pickerOptions(
+                                           actionsBox = TRUE,
+                                           selectedTextFormat = 'count > 1',
+                                           dropdownAlignRight = 'auto',
+                                           liveSearch = TRUE))
+        ))
+    })
+                    
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
+    trait_filter <- reactiveVal(NULL)
     
     deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
     deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
+    deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     
     # prevents ui update double trigger output$locus
     observeEvent(deb_gene_filter(), {
@@ -836,6 +860,15 @@ zoom <- function(data, ens_db,
       if (!identical(i, tset)) {
         eqtl_tissue_filter(i)
       } else eqtl_tissue_filter(NULL)
+    })
+    
+    observeEvent(deb_trait_filter(), {
+      i <- deb_trait_filter()
+      tset <- link_eqtl$traits
+      req(i, tset)
+      if (!identical(i, tset)) {
+        trait_filter(i)
+      } else trait_filter(NULL)
     })
     
     observeEvent(input$left2, {
