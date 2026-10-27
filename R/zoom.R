@@ -825,7 +825,8 @@ zoom <- function(data, ens_db,
       fluidRow(
         column(12,
                shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
-                                         choices = link_eqtl$traits, selected = link_eqtl$traits,
+                                         choices = link_eqtl$traits,
+                                         selected = link_eqtl$traits,
                                          multiple = TRUE,
                                          options = shinyWidgets::pickerOptions(
                                            actionsBox = TRUE,

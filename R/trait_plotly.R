@@ -68,13 +68,16 @@ trait_plotly <- function(loc,
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`
   # are the wrong way round!
   
+  sw <- strwrap(LDT$GWAS_Trait, 40, simplify = FALSE)
+  wrap_traits <- vapply(sw, paste, collapse = "\n   ", character(1))
+  
   hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
                       "<br>RAF = ", LDT$Risk_Allele,
                       "<br>OR/beta = ", LDT$Effect_size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,
-                      "<br>Trait: ", LDT$GWAS_Trait)
+                      "<br>Trait: ", wrap_traits)
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(opacity = 0.8,
