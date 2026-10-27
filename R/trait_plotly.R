@@ -64,7 +64,7 @@ trait_plotly <- function(loc,
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`
   # are the wrong way round!
   
-  hovertext <- paste0("GWAS Catologue: ", LDT$RS_Number,
+  hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
                       "<br>RAF = ", LDT$Risk_Allele,

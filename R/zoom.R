@@ -340,9 +340,11 @@ zoom <- function(data, ens_db,
                                      actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
                                                   class = "btn-primary btn-sm"),
                                      (if (show_eqtl) {
-                                       actionButton("eqtl_get", "Get eQTL", icon = icon("compass"),
+                                       actionButton("eqtl_get", "eQTL", icon = icon("compass"),
                                                     class = "btn-info btn-sm")
                                      }),
+                                     actionButton("trait_get", "GWAS trait", #icon = icon("person"),
+                                                  class = "btn-success btn-sm"),
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
@@ -621,6 +623,8 @@ zoom <- function(data, ens_db,
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL)
+    trait_snp <- reactiveVal(NULL)
+    cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -734,6 +738,25 @@ zoom <- function(data, ens_db,
           locscheme <- unname(c('grey', eqtl_colour[input$select_gene]))
         }
       } else locscheme <- c('grey', 'dodgerblue', 'red')
+      
+      # retrieve trait
+      isolate(cur_trait(loc1$index_snp))
+      pin <- trait_snp()
+      ld_msg <- NULL
+      if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
+                            (man2 && pin %in% loc2$data[, labs[2]]))) {
+        loc1b <- try(link_trait(loc1, token = ld_token))
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
+        removeNotification("ld_busy")
+        if (is.null(loc1$LDtrait)) {
+          showNotification(
+            paste0("GWAS trait request failed for ", pin,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "error", duration = 10)
+        }
+      }
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
@@ -1089,11 +1112,13 @@ zoom <- function(data, ens_db,
                        id = "ld_busy", duration = NULL)
       ld_snp(snp)
       eqtl_snp(NULL)
+      trait_snp(NULL)
     })
     
     observeEvent(input$ld_clear, {
       ld_snp(NULL)
       eqtl_snp(NULL)
+      trait_snp(NULL)
       link_eqtl$genes <- NULL
       link_eqtl$tissues <- NULL
       removeNotification("ld_busy")
@@ -1142,6 +1167,21 @@ zoom <- function(data, ens_db,
                        id = "ld_busy", duration = NULL)
       eqtl_snp(snp)
       ld_snp(NULL)
+      trait_snp(NULL)
+    })
+    
+    # retrieve trait
+    observeEvent(input$trait_get, {
+      snp <- cur_trait()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification(paste0("Fetching GWAS trait data"),
+                       id = "ld_busy", duration = NULL)
+      trait_snp(snp)
+      ld_snp(NULL)
+      eqtl_snp(NULL)
     })
     
     # inline conditional UI
