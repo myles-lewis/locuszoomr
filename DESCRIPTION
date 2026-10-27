@@ -54,6 +54,7 @@ Suggests:
     shinycssloaders,
     shinyFeedback,
     shinyWidgets,
+    stringdist,
     zoo
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0

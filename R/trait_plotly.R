@@ -22,6 +22,7 @@ trait_plotly <- function(loc,
   if (!is.null(trait_filter)) {
     LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
   }
+  traits <- sort(unique(LDT$GWAS_Trait))
   
   if (is.null(LDT) || nrow(LDT) == 0) {
     # blank plotly
@@ -54,6 +55,11 @@ trait_plotly <- function(loc,
   ylim <- range(LDT$logP, na.rm = TRUE)
   ylim <- ylim + diff(ylim) * c(-0.01, 0.01)
   
+  traits <- sort(unique(LDT$GWAS_Trait))
+  trait_group <- similarGroups(traits)
+  scheme <- rainbow(length(unique(trait_group)))
+  LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
+  
   # 27/10/26
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`
   # are the wrong way round!
@@ -68,6 +74,7 @@ trait_plotly <- function(loc,
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(size = 9, opacity = 0.8,
+                             color = I(LDT$colour),
                              line = list(width = 0.5, color = "black")),
                text = hovertext, hoverinfo = 'text',
                key = LDT$RS_Number,
@@ -90,4 +97,30 @@ trait_plotly <- function(loc,
                                               "hoverClosest", "hoverCompare"),
                    toImageButtonOptions = list(format = "svg"))
   p
+}
+
+
+#' @importFrom stats as.dist cutree hclust
+similarGroups <- function(x, thresh = 0.7, method = "jw"){
+  ox <- x
+  # remove stop words
+  x <- gsub("-", " ", tolower(x))
+  x <- gsub("\\(|\\)|,", "", x)
+  stop_words <- c("to", "in", "and", "or", "at", "of", "ratio", "concentration",
+                  "ukb", "data", "field", "fraction", "absolute", "percentage", "total",
+                  "fraction", "maximum", "minimum", "mean", "inv norm transformed")
+  x <- removeWords(stop_words, x)
+  x <- gsub('[0-9]+', '', x)
+  
+  if (!requireNamespace("stringdist")) stop("stringdist package required")
+  simmat <- stringdist::stringsimmatrix(x, x, method)
+  hc <- hclust(as.dist(1 - simmat), method = "complete")
+  grp <- cutree(hc, h = 1 - thresh)
+  setNames(grp, ox)
+}
+
+
+removeWords <- function(words, x) {
+  p <- paste0("(?:\\s+|^)\\S*(?<!\\w)(?:", paste(words, collapse = "|"), ")(?!\\w)\\S*")
+  trimws(gsub(p, "", x, perl = TRUE))
 }
