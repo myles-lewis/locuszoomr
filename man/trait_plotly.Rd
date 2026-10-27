@@ -4,10 +4,12 @@
 \alias{trait_plotly}
 \title{Locus scatter plotly for GWAS Catologue traits}
 \usage{
-trait_plotly(loc, ...)
+trait_plotly(loc, trait_filter = NULL, ...)
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
+
+\item{trait_filter}{Character vector of traits to filter results.}
 
 \item{...}{Optional arguments passed to \code{plot_ly()}.}
 }

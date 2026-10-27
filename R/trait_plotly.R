@@ -5,11 +5,13 @@
 #' acquired through the LDlink API via [link_trait()].
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
+#' @param trait_filter Character vector of traits to filter results.
 #' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_trait()] [locus_plotly()]
 
 trait_plotly <- function(loc,
+                         trait_filter = NULL,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
@@ -17,6 +19,9 @@ trait_plotly <- function(loc,
   xlim <- xlim + diff(xlim) * c(-0.01, 0.01)
   xlab <- paste("Chromosome", loc$seqname, "(Mb)")
   LDT <- loc$LDtrait
+  if (!is.null(trait_filter)) {
+    LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
+  }
   
   if (is.null(LDT) || nrow(LDT) == 0) {
     # blank plotly
