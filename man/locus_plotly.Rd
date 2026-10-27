@@ -28,6 +28,7 @@ locus_plotly(
   gene_filter = NULL,
   tissue_filter = NULL,
   eqtl_scheme = NULL,
+  trait_filter = NULL,
   ...
 )
 }
@@ -98,6 +99,9 @@ See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
 results. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
 
 \item{eqtl_scheme}{Vector of colours for eQTL genes. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
+
+\item{trait_filter}{Character vector of traits to filter results. See
+\code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}
