@@ -18,6 +18,7 @@
 #' @param ... Optional arguments passed on to `LDlinkR::LDtrait()`
 #' @return Returns an object of class 'locus' with an extra list element 'LDtrait'
 #'   containing a dataframe of information obtained via `LDtrait()`.
+#' @export
 
 link_trait <- function(loc,
                        pop = "CEU",

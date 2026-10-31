@@ -820,7 +820,7 @@ zoom <- function(data, ens_db,
       ))
     })
     
-    output$ui_link_genes <- renderUI({
+    output$ui_link_traits <- renderUI({
       req(link_eqtl$traits)
       fluidRow(
         column(12,
