@@ -30,6 +30,7 @@ locus_plotly(
   eqtl_scheme = NULL,
   trait_filter = NULL,
   trait_category_filter = NULL,
+  trait_collapse = TRUE,
   ...
 )
 }
@@ -106,6 +107,9 @@ results. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
 
 \item{trait_category_filter}{Character vector of GWAS Catalog trait categories
 to filter results. See \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_collapse}{Logical whether to collapse duplicate GWAS trait
+associations. See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}

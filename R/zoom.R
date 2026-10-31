@@ -789,7 +789,8 @@ zoom <- function(data, ens_db,
                    tissue_filter = eqtl_tissue_filter(),
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
-                   trait_category_filter = trait_category_filter())
+                   trait_category_filter = trait_category_filter(),
+                   trait_collapse = !isFALSE(input$trait_collapse))
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -847,7 +848,9 @@ zoom <- function(data, ens_db,
                                            actionsBox = TRUE,
                                            selectedTextFormat = 'count > 1',
                                            dropdownAlignRight = 'auto',
-                                           liveSearch = TRUE))
+                                           liveSearch = TRUE)),
+               checkboxInput("trait_collapse", "collapse duplicate associations",
+                             value = !isFALSE(isolate(input$trait_collapse)))
         ))
     })
                     
