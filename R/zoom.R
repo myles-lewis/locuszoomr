@@ -371,7 +371,8 @@ zoom <- function(data, ens_db,
       ),
       tabPanel("Table",
                fluidRow(
-                 column(12, br(), DT::dataTableOutput("table"))))
+                 column(12, br(), DT::dataTableOutput("table"),
+                        uiOutput("ui_link_table"))))
     )
   )
   
@@ -627,6 +628,8 @@ zoom <- function(data, ens_db,
     cur_eqtl <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
                                 categories = NULL)
+    link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
+                                LDexp = NULL)
     trait_snp <- reactiveVal(NULL)
     cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
@@ -766,6 +769,9 @@ zoom <- function(data, ens_db,
         link_eqtl$traits <- NULL
         link_eqtl$categories <- NULL
       }
+      link_data$LDtrait <- loc1$LDtrait
+      link_data$trait_category <- loc1$trait_category
+      link_data$LDexp <- loc1$LDexp
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
@@ -1009,6 +1015,32 @@ zoom <- function(data, ens_db,
       cols <- colnames(data)[sapply(data, class) == "numeric"]
       cols <- cols[!cols %in% c(chrom[1], pos[1])]
       DT::datatable(data) %>% DT::formatSignif(cols, digits = 3)
+    })
+
+    output$ui_link_table <- renderUI({
+      title <- if (!is.null(link_data$LDtrait)) {
+        "GWAS Catalog associations (LDtrait)"
+      } else if (!is.null(link_data$LDexp)) "eQTL associations (LDexpress)"
+      req(title)
+      shiny::tagList(br(), h5(title), DT::dataTableOutput("link_table"))
+    })
+
+    output$link_table <- DT::renderDataTable({
+      if (!is.null(link_data$LDtrait)) {
+        tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
+                           trait_category_filter(),
+                           !isFALSE(input$trait_collapse))
+        tab$PMID <- pubmed_links(tab$PMID)
+        num <- c("r2", "P")
+      } else {
+        tab <- eqtl_table(shiny::reactiveValuesToList(link_data), eqtl_gene_filter(),
+                          eqtl_tissue_filter())
+        num <- c("r2", "Effect size", "P")
+      }
+      req(tab)
+      DT::datatable(tab, rownames = FALSE,
+                    escape = setdiff(colnames(tab), "PMID")) %>%
+        DT::formatSignif(num, digits = 3)
     })
     
     # detect change to x axis range
