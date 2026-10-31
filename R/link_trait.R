@@ -15,6 +15,8 @@
 #'   genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
 #'   'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
 #'   data sets.
+#' @param category Logical whether to download GWAS Catalog trait categories
+#'   (EFO parent terms) and store them in list element `trait_category`.
 #' @param ... Optional arguments passed on to `LDlinkR::LDtrait()`
 #' @return Returns an object of class 'locus' with an extra list element 'LDtrait'
 #'   containing a dataframe of information obtained via `LDtrait()`.
@@ -24,7 +26,8 @@ link_trait <- function(loc,
                        pop = "CEU",
                        r2d = "r2",
                        token = "",
-                       genome_build = loc$genome, ...) {
+                       genome_build = loc$genome,
+                       category = FALSE, ...) {
   if (!inherits(loc, "locus")) stop("Not a locus object")
   if (!requireNamespace("LDlinkR", quietly = TRUE)) {
     stop("Package 'LDlinkR' must be installed to use this feature",
@@ -64,6 +67,9 @@ link_trait <- function(loc,
             format(end - start, digits = 3),")")
   } else {
     message("\n", if (is.na(emsg)) "Unexpected LDtrait response" else emsg)
+  }
+  if (is.null(emsg) && category) {
+    loc$trait_category <- link_category(LDT$GWAS_Trait)
   }
   
   loc$LDtrait <- LDT

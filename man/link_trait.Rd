@@ -10,6 +10,7 @@ link_trait(
   r2d = "r2",
   token = "",
   genome_build = loc$genome,
+  category = FALSE,
   ...
 )
 }
@@ -28,6 +29,9 @@ LDlink API. See \code{LDlinkR} package documentation.}
 genome build GRCh37 (hg19), 'grch38' for GRCh38 (hg38), or
 'grch38_high_coverage' for GRCh38 High Coverage (hg38) 1000 Genome Project
 data sets.}
+
+\item{category}{Logical whether to download GWAS Catalog trait categories
+(EFO parent terms) and store them in list element \code{trait_category}.}
 
 \item{...}{Optional arguments passed on to \code{LDlinkR::LDtrait()}}
 }

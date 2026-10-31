@@ -4,12 +4,21 @@
 \alias{trait_plotly}
 \title{Locus scatter plotly for GWAS Catologue traits}
 \usage{
-trait_plotly(loc, trait_filter = NULL, collapse = TRUE, ...)
+trait_plotly(
+  loc,
+  trait_filter = NULL,
+  category_filter = NULL,
+  collapse = TRUE,
+  ...
+)
 }
 \arguments{
 \item{loc}{Object of class 'locus' to use for plot. See \link{locus}.}
 
 \item{trait_filter}{Character vector of traits to filter results.}
+
+\item{category_filter}{Character vector of GWAS Catalog trait categories to
+filter results. See \code{\link[=link_trait]{link_trait()}}.}
 
 \item{collapse}{Logical whether to collapse duplicate associations of the same
 SNP and trait, keeping the smallest P value.}

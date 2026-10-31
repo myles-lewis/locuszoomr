@@ -6,6 +6,8 @@
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param trait_filter Character vector of traits to filter results.
+#' @param category_filter Character vector of GWAS Catalog trait categories to
+#'   filter results. See [link_trait()].
 #' @param collapse Logical whether to collapse duplicate associations of the same
 #'   SNP and trait, keeping the smallest P value.
 #' @param ... Optional arguments passed to `plot_ly()`.
@@ -15,6 +17,7 @@
 
 trait_plotly <- function(loc,
                          trait_filter = NULL,
+                         category_filter = NULL,
                          collapse = TRUE,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -25,6 +28,10 @@ trait_plotly <- function(loc,
   LDT <- loc$LDtrait
   if (!is.null(trait_filter)) {
     LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
+  }
+  if (!is.null(category_filter) && !is.null(loc$trait_category)) {
+    tc <- loc$trait_category
+    LDT <- LDT[LDT$GWAS_Trait %in% tc$trait[tc$category %in% category_filter], ]
   }
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))

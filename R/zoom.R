@@ -625,7 +625,8 @@ zoom <- function(data, ens_db,
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
-    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL)
+    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
+                                categories = NULL)
     trait_snp <- reactiveVal(NULL)
     cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
@@ -748,7 +749,7 @@ zoom <- function(data, ens_db,
       ld_msg <- NULL
       if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
                             (man2 && pin %in% loc2$data[, labs[2]]))) {
-        loc1b <- try(link_trait(loc1, token = ld_token))
+        loc1b <- try(link_trait(loc1, token = ld_token, category = TRUE))
         if (inherits(loc1b, "try-error")) {
           ld_msg <- attr(loc1b, "condition")$message
         } else loc1 <- loc1b
@@ -760,8 +761,10 @@ zoom <- function(data, ens_db,
             type = "error", duration = 10)
         }
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
+        link_eqtl$categories <- sort(unique(loc1$trait_category$category))
       } else {
         link_eqtl$traits <- NULL
+        link_eqtl$categories <- NULL
       }
       
       isolate(width <- loc_width())
@@ -785,7 +788,8 @@ zoom <- function(data, ens_db,
                    gene_filter = eqtl_gene_filter(),
                    tissue_filter = eqtl_tissue_filter(),
                    eqtl_scheme = eqtl_scheme,
-                   trait_filter = trait_filter())
+                   trait_filter = trait_filter(),
+                   trait_category_filter = trait_category_filter())
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -824,6 +828,17 @@ zoom <- function(data, ens_db,
       req(link_eqtl$traits)
       fluidRow(
         column(12,
+               (if (!is.null(link_eqtl$categories)) {
+                 shinyWidgets::pickerInput(
+                   "trait_category_filter", h5("Select trait categories"),
+                   choices = link_eqtl$categories,
+                   selected = link_eqtl$categories,
+                   multiple = TRUE,
+                   options = shinyWidgets::pickerOptions(
+                     actionsBox = TRUE,
+                     selectedTextFormat = 'count > 1',
+                     dropdownAlignRight = 'auto'))
+               }),
                shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
                                          choices = link_eqtl$traits,
                                          selected = link_eqtl$traits,
@@ -839,10 +854,13 @@ zoom <- function(data, ens_db,
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
     trait_filter <- reactiveVal(NULL)
+    trait_category_filter <- reactiveVal(NULL)
     
     deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
     deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
+    deb_category_filter <- reactive({input$trait_category_filter}) %>%
+      debounce(500)
     
     # prevents ui update double trigger output$locus
     observeEvent(deb_gene_filter(), {
@@ -871,6 +889,17 @@ zoom <- function(data, ens_db,
         trait_filter(i)
       } else trait_filter(NULL)
     })
+    
+    observeEvent(deb_category_filter(), {
+      i <- deb_category_filter()
+      cset <- link_eqtl$categories
+      req(cset)
+      if (is.null(i)) {
+        trait_category_filter(character(0))
+      } else if (!identical(i, cset)) {
+        trait_category_filter(i)
+      } else trait_category_filter(NULL)
+    }, ignoreNULL = FALSE)
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
