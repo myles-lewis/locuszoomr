@@ -6,6 +6,8 @@
 #'
 #' @param loc Object of class 'locus' to use for plot. See [locus].
 #' @param trait_filter Character vector of traits to filter results.
+#' @param collapse Logical whether to collapse duplicate associations of the same
+#'   SNP and trait, keeping the smallest P value.
 #' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_trait()] [locus_plotly()]
@@ -13,6 +15,7 @@
 
 trait_plotly <- function(loc,
                          trait_filter = NULL,
+                         collapse = TRUE,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
@@ -23,6 +26,7 @@ trait_plotly <- function(loc,
   if (!is.null(trait_filter)) {
     LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
   }
+  if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
   
   if (is.null(LDT) || nrow(LDT) == 0) {
@@ -71,17 +75,20 @@ trait_plotly <- function(loc,
   
   sw <- strwrap(LDT$GWAS_Trait, 40, simplify = FALSE)
   wrap_traits <- vapply(sw, paste, collapse = "\n   ", character(1))
+  n_assoc <- if (collapse) paste0("<br>Associations: ", LDT$n_assoc) else ""
   
   hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
+                      "<br>r<sup>2</sup> = ", signif(LDT$R2, 3),
                       "<br>RAF = ", LDT$Risk_Allele,
                       "<br>OR/beta = ", LDT$Effect_Size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,
-                      "<br>Trait: ", wrap_traits)
+                      "<br>Trait: ", wrap_traits, n_assoc)
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(opacity = 0.8,
+                             size = 6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2),
                              color = I(LDT$colour),
                              line = list(width = 1, color = "black")),
                text = hovertext, hoverinfo = 'text',
