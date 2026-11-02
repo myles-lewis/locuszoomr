@@ -816,7 +816,8 @@ zoom <- function(data, ens_db,
                     choices = link_eqtl$tissues, selected = link_eqtl$tissues,
                     multiple = TRUE,
                     options = shinyWidgets::pickerOptions(actionsBox = TRUE,
-                                            selectedTextFormat = 'count > 1'))
+                                            selectedTextFormat = 'count > 1',
+                                            liveSearch = TRUE))
       ))
     })
     
