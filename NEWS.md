@@ -1,6 +1,14 @@
 News
 =====
 
+# locuszoomr 1.3.0
+###### 27/10/2026
+* Added 'GWAS trait' button to `zoom()` to pull GWAS Catalogue trait information 
+via LDlink and display it as an extra track.
+* Added `link_trait()` to pull GWAS Catalogue trait data and add it to a `locus` 
+object.
+* Added `trait_plotly()` to display GWAS trait SNPs as an extra track.
+
 # locuszoomr 1.2.0
 ###### 26/09/2026
 * Added Get eQTL button to `zoom()` to pull LDlink API eQTL information and 

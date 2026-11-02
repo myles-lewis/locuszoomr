@@ -53,6 +53,8 @@
 #' @param tissue_filter Character vector of tissues to filter LDlink eQTL
 #'   results. See [overlay_plotly()].
 #' @param eqtl_scheme Vector of colours for eQTL genes. See [overlay_plotly()].
+#' @param trait_filter Character vector of traits to filter results. See
+#'   [trait_plotly()].
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -89,6 +91,7 @@ locus_plotly <- function(loc,
                          gene_filter = NULL,
                          tissue_filter = NULL,
                          eqtl_scheme = NULL,
+                         trait_filter = NULL,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -128,6 +131,13 @@ locus_plotly <- function(loc,
     }
   }
   
+  if (!is.null(loc$LDtrait)) {
+    ptr <- trait_plotly(loc, trait_filter)
+    n <- length(heights)
+    heights <- heights[c(1:(n-1), n-1, n)]
+    heights <- heights / sum(heights)
+  }
+  
   if (is.null(highlight)) highlight <- egenes
   
   g <- genetrack_ly(loc, filter_gene_name, filter_gene_biotype, cex.text, 
@@ -136,14 +146,25 @@ locus_plotly <- function(loc,
                     blanks, height = pheights[length(pheights)]) 
     
   if (!is.null(loc2)) {
-    pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
-                           titleY = TRUE, margin = c(0, 0, 0, 0.02))
+    if (is.null(loc$LDtrait)) {
+      pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
+                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
+    } else {
+      pp <- plotly::subplot(p, p2, ptr, g, shareX = TRUE, nrows = 4, heights = heights,
+                            titleY = TRUE, margin = c(0, 0, 0, 0.02))
+    }
     attr(pp, "eqtl_genes") <- egenes
     return(remap_overlaying_yaxes(pp))
   }
   
-  pp <- plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
-                  titleY = TRUE, margin = 0)
+  if (is.null(loc$LDtrait)) {
+    pp <- plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
+                          titleY = TRUE, margin = 0)
+  } else {
+    pp <- plotly::subplot(p, ptr, g, shareX = TRUE, nrows = 3, heights = heights,
+                          titleY = TRUE, margin = c(0, 0, 0, 0.02))
+  }
+  
   attr(pp, "eqtl_genes") <- egenes
   pp
 }
