@@ -9,6 +9,7 @@
 #' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_trait()] [locus_plotly()]
+#' @export
 
 trait_plotly <- function(loc,
                          trait_filter = NULL,
@@ -75,7 +76,7 @@ trait_plotly <- function(loc,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
                       "<br>RAF = ", LDT$Risk_Allele,
-                      "<br>OR/beta = ", LDT$Effect_size_95_CI,
+                      "<br>OR/beta = ", LDT$Effect_Size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,
                       "<br>Trait: ", wrap_traits)
   
@@ -119,7 +120,9 @@ similarGroups <- function(x, thresh = 0.7, method = "jw"){
   x <- removeWords(stop_words, x)
   x <- gsub('[0-9]+', '', x)
   
-  if (!requireNamespace("stringdist")) stop("stringdist package required")
+  if (!requireNamespace("stringdist", quietly = TRUE)) {
+    return(setNames(seq_along(ox), ox))
+  }
   simmat <- stringdist::stringsimmatrix(x, x, method)
   hc <- hclust(as.dist(1 - simmat), method = "complete")
   grp <- cutree(hc, h = 1 - thresh)
