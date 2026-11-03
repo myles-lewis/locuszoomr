@@ -230,7 +230,7 @@ zoom <- function(data, ens_db,
       }"))
     ),
     shinyFeedback::useShinyFeedback(),
-    tabsetPanel(
+    tabsetPanel(id = "topTabs",
       tabPanel("Plot",
                fluidRow(
                  column(11,
@@ -379,7 +379,18 @@ zoom <- function(data, ens_db,
       tabPanel("Table",
                fluidRow(
                  column(12, br(), DT::dataTableOutput("table"),
-                        uiOutput("ui_link_table"))))
+                        ))),
+      (if (man2) {
+        tabPanel("Table 2",
+                 fluidRow(
+                   column(12, br(), DT::dataTableOutput("table2"),
+                   ))
+                 )
+      }),
+      tabPanel(title = uiOutput("extra_tab_nm"), value = "linktab",
+               fluidRow(
+                 column(12, br(), DT::dataTableOutput("link_table")
+                 )))
     )
   )
   
@@ -617,6 +628,13 @@ zoom <- function(data, ens_db,
                                               title = man_ylab[2],
                                               ticks = "outside",
                                               zeroline = FALSE, showline = TRUE)))
+      })
+      
+      # Table 2 tab
+      output$table2 <- DT::renderDataTable({
+        cols <- colnames(data2)[sapply(data2, class) == "numeric"]
+        cols <- cols[!cols %in% c(chrom[2], pos[2])]
+        DT::datatable(data2) %>% DT::formatSignif(cols, digits = 3)
       })
       
     }  # end of 2nd manhattan section
@@ -1028,14 +1046,6 @@ zoom <- function(data, ens_db,
       DT::datatable(data) %>% DT::formatSignif(cols, digits = 3)
     })
 
-    output$ui_link_table <- renderUI({
-      title <- if (!is.null(link_data$LDtrait)) {
-        "GWAS Catalog associations (LDtrait)"
-      } else if (!is.null(link_data$LDexp)) "eQTL associations (LDexpress)"
-      req(title)
-      shiny::tagList(br(), h5(title), DT::dataTableOutput("link_table"))
-    })
-
     output$link_table <- DT::renderDataTable({
       if (!is.null(link_data$LDtrait)) {
         tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
@@ -1052,6 +1062,22 @@ zoom <- function(data, ens_db,
       DT::datatable(tab, rownames = FALSE,
                     escape = setdiff(colnames(tab), "PMID")) %>%
         DT::formatSignif(num, digits = 3)
+    })
+    
+    # control extra table tab
+    output$extra_tab_nm <- renderText({
+      if (!is.null(link_data$LDtrait)) return("GWAS Catalog associations")
+      if (!is.null(link_data$LDexp)) return("eQTL associations")
+      ""
+    })
+    
+    # show/hide extra table tab
+    observe({
+      if (!is.null(link_data$LDtrait) || !is.null(link_data$LDexp)) {
+        showTab("topTabs", "linktab")
+      } else {
+        hideTab("topTabs", "linktab")
+      }
     })
     
     # detect change to x axis range
