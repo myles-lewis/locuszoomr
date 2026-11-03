@@ -55,6 +55,10 @@
 #' @param eqtl_scheme Vector of colours for eQTL genes. See [overlay_plotly()].
 #' @param trait_filter Character vector of traits to filter results. See
 #'   [trait_plotly()].
+#' @param trait_category_filter Character vector of GWAS Catalog trait categories
+#'   to filter results. See [trait_plotly()].
+#' @param trait_collapse Logical whether to collapse duplicate GWAS trait
+#'   associations. See [trait_plotly()].
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -92,6 +96,8 @@ locus_plotly <- function(loc,
                          tissue_filter = NULL,
                          eqtl_scheme = NULL,
                          trait_filter = NULL,
+                         trait_category_filter = NULL,
+                         trait_collapse = TRUE,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -132,7 +138,9 @@ locus_plotly <- function(loc,
   }
   
   if (!is.null(loc$LDtrait)) {
-    ptr <- trait_plotly(loc, trait_filter)
+    ptr <- trait_plotly(loc, trait_filter,
+                        category_filter = trait_category_filter,
+                        collapse = trait_collapse)
     n <- length(heights)
     heights <- heights[c(1:(n-1), n-1, n)]
     heights <- heights / sum(heights)

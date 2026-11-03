@@ -350,7 +350,14 @@ zoom <- function(data, ens_db,
                               ))
                           }),
                           (if (show_ld) {
-                            uiOutput("ui_link_traits")
+                            fluidRow(
+                              column(12,
+                                     uiOutput("ui_link_traits"),
+                                     conditionalPanel("output.has_trait",
+                                                      checkboxInput("trait_collapse", "collapse duplicate associations",
+                                                                    value = TRUE)
+                                     )
+                              ))
                           }),
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
@@ -371,7 +378,8 @@ zoom <- function(data, ens_db,
       ),
       tabPanel("Table",
                fluidRow(
-                 column(12, br(), DT::dataTableOutput("table"))))
+                 column(12, br(), DT::dataTableOutput("table"),
+                        uiOutput("ui_link_table"))))
     )
   )
   
@@ -625,7 +633,10 @@ zoom <- function(data, ens_db,
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
     cur_eqtl <- reactiveVal(NULL)
-    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL)
+    link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
+                                categories = NULL)
+    link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
+                                LDexp = NULL)
     trait_snp <- reactiveVal(NULL)
     cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
@@ -748,7 +759,7 @@ zoom <- function(data, ens_db,
       ld_msg <- NULL
       if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
                             (man2 && pin %in% loc2$data[, labs[2]]))) {
-        loc1b <- try(link_trait(loc1, token = ld_token))
+        loc1b <- try(link_trait(loc1, token = ld_token, category = TRUE))
         if (inherits(loc1b, "try-error")) {
           ld_msg <- attr(loc1b, "condition")$message
         } else loc1 <- loc1b
@@ -760,9 +771,14 @@ zoom <- function(data, ens_db,
             type = "error", duration = 10)
         }
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
+        link_eqtl$categories <- sort(unique(loc1$trait_category$category))
       } else {
         link_eqtl$traits <- NULL
+        link_eqtl$categories <- NULL
       }
+      link_data$LDtrait <- loc1$LDtrait
+      link_data$trait_category <- loc1$trait_category
+      link_data$LDexp <- loc1$LDexp
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
@@ -785,7 +801,9 @@ zoom <- function(data, ens_db,
                    gene_filter = eqtl_gene_filter(),
                    tissue_filter = eqtl_tissue_filter(),
                    eqtl_scheme = eqtl_scheme,
-                   trait_filter = trait_filter())
+                   trait_filter = trait_filter(),
+                   trait_category_filter = trait_category_filter(),
+                   trait_collapse = !isFALSE(input$trait_collapse))
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -823,8 +841,21 @@ zoom <- function(data, ens_db,
     
     output$ui_link_traits <- renderUI({
       req(link_eqtl$traits)
+      cat_ok <- !(is.null(link_eqtl$categories) || 
+          (length(link_eqtl$categories) == 1 && is.na(link_eqtl$categories)))
       fluidRow(
         column(12,
+               (if (cat_ok) {
+                 shinyWidgets::pickerInput(
+                   "trait_category_filter", h5("Select trait categories"),
+                   choices = link_eqtl$categories,
+                   selected = link_eqtl$categories,
+                   multiple = TRUE,
+                   options = shinyWidgets::pickerOptions(
+                     actionsBox = TRUE,
+                     selectedTextFormat = 'count > 1',
+                     dropdownAlignRight = 'auto'))
+               }),
                shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
                                          choices = link_eqtl$traits,
                                          selected = link_eqtl$traits,
@@ -836,16 +867,24 @@ zoom <- function(data, ens_db,
                                            liveSearch = TRUE))
         ))
     })
-                    
+    
+    # conditionalPanel for trait_collapse checkbox
+    output$has_trait <- reactive({!is.null(link_eqtl$traits)})
+    outputOptions(output, "has_trait", suspendWhenHidden = FALSE)
+    
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
     trait_filter <- reactiveVal(NULL)
+    trait_category_filter <- reactiveVal(NULL)
     
     deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
     deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
+    deb_category_filter <- reactive({input$trait_category_filter}) %>%
+      debounce(500)
     
     # prevents ui update double trigger output$locus
+    # NULL special meaning = all categories ticked
     observeEvent(deb_gene_filter(), {
       i <- deb_gene_filter()
       geneset <- link_eqtl$genes
@@ -871,6 +910,15 @@ zoom <- function(data, ens_db,
       if (!identical(i, tset)) {
         trait_filter(i)
       } else trait_filter(NULL)
+    })
+    
+    observeEvent(deb_category_filter(), {
+      i <- deb_category_filter()
+      cset <- link_eqtl$categories
+      req(i, cset)
+      if (!identical(i, cset)) {
+        trait_category_filter(i)
+      } else trait_category_filter(NULL)
     })
     
     observeEvent(input$left2, {
@@ -978,6 +1026,32 @@ zoom <- function(data, ens_db,
       cols <- colnames(data)[sapply(data, class) == "numeric"]
       cols <- cols[!cols %in% c(chrom[1], pos[1])]
       DT::datatable(data) %>% DT::formatSignif(cols, digits = 3)
+    })
+
+    output$ui_link_table <- renderUI({
+      title <- if (!is.null(link_data$LDtrait)) {
+        "GWAS Catalog associations (LDtrait)"
+      } else if (!is.null(link_data$LDexp)) "eQTL associations (LDexpress)"
+      req(title)
+      shiny::tagList(br(), h5(title), DT::dataTableOutput("link_table"))
+    })
+
+    output$link_table <- DT::renderDataTable({
+      if (!is.null(link_data$LDtrait)) {
+        tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
+                           trait_category_filter(),
+                           !isFALSE(input$trait_collapse))
+        tab$PMID <- pubmed_links(tab$PMID)
+        num <- c("r2", "P")
+      } else {
+        tab <- eqtl_table(shiny::reactiveValuesToList(link_data), eqtl_gene_filter(),
+                          eqtl_tissue_filter())
+        num <- c("r2", "Effect size", "P")
+      }
+      req(tab)
+      DT::datatable(tab, rownames = FALSE,
+                    escape = setdiff(colnames(tab), "PMID")) %>%
+        DT::formatSignif(num, digits = 3)
     })
     
     # detect change to x axis range
