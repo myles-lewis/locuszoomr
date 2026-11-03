@@ -80,6 +80,7 @@
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
+#' @importFrom shiny showTab hideTab
 #' @importFrom htmltools tags br
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
