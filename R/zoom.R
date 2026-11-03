@@ -634,7 +634,7 @@ zoom <- function(data, ens_db,
       output$table2 <- DT::renderDataTable({
         cols <- colnames(data2)[sapply(data2, class) == "numeric"]
         cols <- cols[!cols %in% c(chrom[2], pos[2])]
-        DT::datatable(data2) %>% DT::formatSignif(cols, digits = 3)
+        DT::datatable(data2, caption = traits[2]) %>% DT::formatSignif(cols, digits = 3)
       })
       
     }  # end of 2nd manhattan section
@@ -1043,9 +1043,10 @@ zoom <- function(data, ens_db,
     output$table <- DT::renderDataTable({
       cols <- colnames(data)[sapply(data, class) == "numeric"]
       cols <- cols[!cols %in% c(chrom[1], pos[1])]
-      DT::datatable(data) %>% DT::formatSignif(cols, digits = 3)
+      DT::datatable(data, caption = traits[1]) %>% DT::formatSignif(cols, digits = 3)
     })
-
+    
+    # Extra table tab
     output$link_table <- DT::renderDataTable({
       if (!is.null(link_data$LDtrait)) {
         tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
@@ -1064,7 +1065,7 @@ zoom <- function(data, ens_db,
         DT::formatSignif(num, digits = 3)
     })
     
-    # control extra table tab
+    # control extra table tab title
     output$extra_tab_nm <- renderText({
       if (!is.null(link_data$LDtrait)) return("GWAS Catalog associations")
       if (!is.null(link_data$LDexp)) return("eQTL associations")
