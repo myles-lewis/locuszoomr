@@ -11,6 +11,8 @@
 
 read_trait_mappings <- function(
     file = "https://www.ebi.ac.uk/gwas/api/search/downloads/trait_mappings") {
+  message("Downloading GWAS Catalog mappings", appendLF = FALSE)
+  start <- Sys.time()
   txt <- readLines(file, encoding = "UTF-8", warn = FALSE)
   fields <- strsplit(txt, "\t", fixed = TRUE)
   cols <- match(c("Disease trait", "Parent term"), fields[[1]])
@@ -19,6 +21,8 @@ read_trait_mappings <- function(
                     category = vapply(fields, `[`, character(1), cols[2]))
   map <- unique(map)
   rownames(map) <- NULL
+  end <- Sys.time()
+  message(" (", format(end - start, digits = 3),")")
   map
 }
 
@@ -45,13 +49,13 @@ trait_category <- function(traits, map) {
   tc
 }
 
-# fetch categories for link_trait(); NULL with a message if the download fails
+# fetch categories for link_trait(); NA with a message if download fails
 link_category <- function(traits) {
   map <- try(mem_trait_mappings(), silent = TRUE)
   if (inherits(map, "try-error")) {
     message("GWAS Catalog trait categories unavailable: ",
             trimws(attr(map, "condition")$message))
-    return(NULL)
+    return(NA)
   }
   trait_category(traits, map)
 }

@@ -350,7 +350,14 @@ zoom <- function(data, ens_db,
                               ))
                           }),
                           (if (show_ld) {
-                            uiOutput("ui_link_traits")
+                            fluidRow(
+                              column(12,
+                                     uiOutput("ui_link_traits"),
+                                     conditionalPanel("output.has_trait",
+                                                      checkboxInput("trait_collapse", "collapse duplicate associations",
+                                                                    value = TRUE)
+                                     )
+                              ))
                           }),
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
@@ -833,9 +840,11 @@ zoom <- function(data, ens_db,
     
     output$ui_link_traits <- renderUI({
       req(link_eqtl$traits)
+      cat_ok <- !(is.null(link_eqtl$categories) || 
+          (length(link_eqtl$categories) == 1 && is.na(link_eqtl$categories)))
       fluidRow(
         column(12,
-               (if (!is.null(link_eqtl$categories)) {
+               (if (cat_ok) {
                  shinyWidgets::pickerInput(
                    "trait_category_filter", h5("Select trait categories"),
                    choices = link_eqtl$categories,
@@ -854,12 +863,14 @@ zoom <- function(data, ens_db,
                                            actionsBox = TRUE,
                                            selectedTextFormat = 'count > 1',
                                            dropdownAlignRight = 'auto',
-                                           liveSearch = TRUE)),
-               checkboxInput("trait_collapse", "collapse duplicate associations",
-                             value = !isFALSE(isolate(input$trait_collapse)))
+                                           liveSearch = TRUE))
         ))
     })
-                    
+    
+    # conditionalPanel for trait_collapse checkbox
+    output$has_trait <- reactive({!is.null(link_eqtl$traits)})
+    outputOptions(output, "has_trait", suspendWhenHidden = FALSE)
+    
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
     trait_filter <- reactiveVal(NULL)
@@ -872,6 +883,7 @@ zoom <- function(data, ens_db,
       debounce(500)
     
     # prevents ui update double trigger output$locus
+    # NULL special meaning = all categories ticked
     observeEvent(deb_gene_filter(), {
       i <- deb_gene_filter()
       geneset <- link_eqtl$genes
@@ -902,13 +914,11 @@ zoom <- function(data, ens_db,
     observeEvent(deb_category_filter(), {
       i <- deb_category_filter()
       cset <- link_eqtl$categories
-      req(cset)
-      if (is.null(i)) {
-        trait_category_filter(character(0))
-      } else if (!identical(i, cset)) {
+      req(i, cset)
+      if (!identical(i, cset)) {
         trait_category_filter(i)
       } else trait_category_filter(NULL)
-    }, ignoreNULL = FALSE)
+    })
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
