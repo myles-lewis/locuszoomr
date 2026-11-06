@@ -753,23 +753,24 @@ zoom <- function(data, ens_db,
             paste0("eQTL request failed for ", pin2,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
-        }
-        LDX1 <- loc1$LDexp[loc1$LDexp$inData, ]
-        g <- unique(LDX1$Gene_Symbol[order(LDX1$P_value)])
-        tiss <- unique(LDX1$Tissue)
-        if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
-          loc2$index_snp <- pin2
-          loc2b <- try(link_eqtl(loc2, token = ld_token))
-          if (!inherits(loc2b, "try-error")) {
-            loc2 <- loc2b
-            LDX2 <- loc2$LDexp[loc2$LDexp$inData, ]
-            g <- union(g, LDX2$Gene_Symbol[order(LDX2$P_value)])
-            tiss <- union(tiss, LDX2$Tissue)
-            eqtl_scheme <- setNames(rainbow(length(g)), g)  # synchronise colours
+        } else {
+          LDX1 <- loc1$LDexp[loc1$LDexp$inData, ]
+          g <- unique(LDX1$Gene_Symbol[order(LDX1$P_value)])
+          tiss <- unique(LDX1$Tissue)
+          if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
+            loc2$index_snp <- pin2
+            loc2b <- try(link_eqtl(loc2, token = ld_token))
+            if (!inherits(loc2b, "try-error")) {
+              loc2 <- loc2b
+              LDX2 <- loc2$LDexp[loc2$LDexp$inData, ]
+              g <- union(g, LDX2$Gene_Symbol[order(LDX2$P_value)])
+              tiss <- union(tiss, LDX2$Tissue)
+              eqtl_scheme <- setNames(rainbow(length(g)), g)  # synchronise colours
+            }
           }
+          link_eqtl$genes <- sort(g)
+          link_eqtl$tissues <- sort(tiss)
         }
-        link_eqtl$genes <- sort(g)
-        link_eqtl$tissues <- sort(tiss)
       } else {
         link_eqtl$genes <- NULL
       }
@@ -1383,6 +1384,6 @@ zoom <- function(data, ens_db,
     
   }
   
-  runApp(list(ui = ui, server = server)) %>%
-    suppress_warnings("please add `event_register\\(p")
+  runApp(list(ui = ui, server = server)) # %>%
+    # suppress_warnings("please add `event_register\\(p")
 }
