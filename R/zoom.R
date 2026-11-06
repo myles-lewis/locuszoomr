@@ -379,12 +379,25 @@ zoom <- function(data, ens_db,
       ),
       tabPanel("Table",
                fluidRow(
-                 column(12, br(), DT::dataTableOutput("table"),
-                        ))),
+                 column(12, br(),
+                        conditionalPanel('output.coords_ok',
+                                         radioButtons("tab1_type", label = NULL,
+                                                      choices = c("local", "genome"),
+                                                      inline = TRUE)
+                        ),
+                        DT::dataTableOutput("table")
+                 ))
+               ),
       (if (man2) {
         tabPanel("Table 2",
                  fluidRow(
-                   column(12, br(), DT::dataTableOutput("table2"),
+                   column(12, br(),
+                          conditionalPanel('output.coords_ok',
+                                           radioButtons("tab2_type", label = NULL,
+                                                        choices = c("local", "genome"),
+                                                        inline = TRUE)
+                          ),
+                          DT::dataTableOutput("table2")
                    ))
                  )
       }),
@@ -633,9 +646,15 @@ zoom <- function(data, ens_db,
       
       # Table 2 tab
       output$table2 <- DT::renderDataTable({
-        cols <- colnames(data2)[sapply(data2, class) == "numeric"]
-        cols <- cols[!cols %in% c(chrom[2], pos[2])]
-        DT::datatable(data2, caption = traits[2]) %>% DT::formatSignif(cols, digits = 3)
+        dat <- data2
+        if (input$tab2_type == "local" && !is.null(coords$chr)) {
+          dat <- locv2$i$data
+          validate(need(!is.null(dat), "No data at locus"))
+        }
+        fcols <- colnames(dat)[sapply(dat, class) == "numeric"]
+        fcols <- fcols[!fcols %in% c(chrom[2], pos[2])]
+        DT::datatable(dat, caption = traits[2], rownames = FALSE) %>%
+          DT::formatSignif(fcols, digits = 3)
       })
       
     }  # end of 2nd manhattan section
@@ -1042,9 +1061,15 @@ zoom <- function(data, ens_db,
     
     # Table tab
     output$table <- DT::renderDataTable({
-      cols <- colnames(data)[sapply(data, class) == "numeric"]
-      cols <- cols[!cols %in% c(chrom[1], pos[1])]
-      DT::datatable(data, caption = traits[1]) %>% DT::formatSignif(cols, digits = 3)
+      dat <- data
+      if (input$tab1_type == "local" && !is.null(coords$chr)) {
+        dat <- loc$i$data
+        validate(need(!is.null(dat), "No data at locus"))
+      }
+      fcols <- colnames(dat)[sapply(dat, class) == "numeric"]
+      fcols <- fcols[!fcols %in% c(chrom[1], pos[1])]
+      DT::datatable(dat, caption = traits[1], rownames = FALSE) %>%
+        DT::formatSignif(fcols, digits = 3)
     })
     
     # Extra table tab
