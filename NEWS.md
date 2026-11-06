@@ -7,7 +7,7 @@ News
 via LDlink and display it as an extra track.
 * Improved tables in `zoom()` to show local/genome data and LDlink eQTL/ GWAS 
 Catalog trait data
-* Added `link_trait()` to pull GWAS Catalogue trait data and add it to a `locus` 
+* Added `link_trait()` to pull GWAS Catalog trait data and add it to a `locus` 
 object.
 * Added `trait_plotly()` to display GWAS trait SNPs as an extra track.
 
