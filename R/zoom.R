@@ -647,8 +647,9 @@ zoom <- function(data, ens_db,
       # Table 2 tab
       output$table2 <- DT::renderDataTable({
         dat <- data2
-        if (input$tab2_type == "local" && !is.null(locv2$i$data)) {
+        if (input$tab2_type == "local" && !is.null(coords$chr)) {
           dat <- locv2$i$data
+          validate(need(!is.null(dat), "No data at locus"))
         }
         fcols <- colnames(dat)[sapply(dat, class) == "numeric"]
         fcols <- fcols[!fcols %in% c(chrom[2], pos[2])]
@@ -1061,8 +1062,9 @@ zoom <- function(data, ens_db,
     # Table tab
     output$table <- DT::renderDataTable({
       dat <- data
-      if (input$tab1_type == "local" && !is.null(loc$i$data)) {
+      if (input$tab1_type == "local" && !is.null(coords$chr)) {
         dat <- loc$i$data
+        validate(need(!is.null(dat), "No data at locus"))
       }
       fcols <- colnames(dat)[sapply(dat, class) == "numeric"]
       fcols <- fcols[!fcols %in% c(chrom[1], pos[1])]
