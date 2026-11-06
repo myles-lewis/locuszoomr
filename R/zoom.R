@@ -379,8 +379,15 @@ zoom <- function(data, ens_db,
       ),
       tabPanel("Table",
                fluidRow(
-                 column(12, br(), DT::dataTableOutput("table"),
-                        ))),
+                 column(12, br(),
+                        conditionalPanel('output.coords_ok',
+                                         radioButtons("tab1_type", label = NULL,
+                                                      choices = c("local", "genome"),
+                                                      inline = TRUE)
+                        ),
+                        DT::dataTableOutput("table")
+                 ))
+               ),
       (if (man2) {
         tabPanel("Table 2",
                  fluidRow(
@@ -1042,9 +1049,13 @@ zoom <- function(data, ens_db,
     
     # Table tab
     output$table <- DT::renderDataTable({
-      cols <- colnames(data)[sapply(data, class) == "numeric"]
-      cols <- cols[!cols %in% c(chrom[1], pos[1])]
-      DT::datatable(data, caption = traits[1]) %>% DT::formatSignif(cols, digits = 3)
+      dat <- data
+      if (input$tab1_type == "local" && !is.null(loc$i$data)) {
+        dat <- loc$i$data
+      }
+      fcols <- colnames(dat)[sapply(dat, class) == "numeric"]
+      fcols <- fcols[!fcols %in% c(chrom[1], pos[1])]
+      DT::datatable(dat, caption = traits[1]) %>% DT::formatSignif(fcols, digits = 3)
     })
     
     # Extra table tab
