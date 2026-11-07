@@ -670,13 +670,11 @@ zoom <- function(data, ens_db,
     ld_snp <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
     eqtl_snp <- reactiveVal(NULL)
-    cur_eqtl <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
                                 categories = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
                                 LDexp = NULL)
     trait_snp <- reactiveVal(NULL)
-    cur_trait <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -736,7 +734,6 @@ zoom <- function(data, ens_db,
       }
       
       # retrieve eQTL
-      isolate(cur_eqtl(loc1$index_snp))
       pin2 <- eqtl_snp()
       ld_msg <- NULL
       eqtl_scheme <- NULL
@@ -793,7 +790,6 @@ zoom <- function(data, ens_db,
       } else locscheme <- c('grey', 'dodgerblue', 'red')
       
       # retrieve trait
-      isolate(cur_trait(loc1$index_snp))
       pin <- trait_snp()
       ld_msg <- NULL
       if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
@@ -1321,7 +1317,7 @@ zoom <- function(data, ens_db,
     
     # retrieve eQTL
     observeEvent(input$eqtl_get, {
-      snp <- cur_eqtl()
+      snp <- cur_index()
       if (is.null(snp) || is.na(snp)) {
         showNotification("No index SNP in view", type = "warning")
         return()
@@ -1335,7 +1331,7 @@ zoom <- function(data, ens_db,
     
     # retrieve trait
     observeEvent(input$trait_get, {
-      snp <- cur_trait()
+      snp <- cur_index()
       if (is.null(snp) || is.na(snp)) {
         showNotification("No index SNP in view", type = "warning")
         return()
