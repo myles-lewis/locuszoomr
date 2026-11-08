@@ -59,6 +59,8 @@
 #'   to filter results. See [trait_plotly()].
 #' @param trait_collapse Logical whether to collapse duplicate GWAS trait
 #'   associations. See [trait_plotly()].
+#' @param trait_r2_min Optional minimum r^2 for GWAS trait associations. See
+#'   [trait_plotly()].
 #' @param qtl_type_filter Character vector of Open Targets QTL types to show when
 #'   `loc` has QTL data from `link_ot()`.
 #' @param qtl_gene_filter Character vector of Open Targets QTL genes to show.
@@ -101,6 +103,7 @@ locus_plotly <- function(loc,
                          trait_filter = NULL,
                          trait_category_filter = NULL,
                          trait_collapse = TRUE,
+                         trait_r2_min = NULL,
                          qtl_type_filter = NULL,
                          qtl_gene_filter = NULL,
                          ...) {
@@ -149,7 +152,7 @@ locus_plotly <- function(loc,
   } else if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
-                        collapse = trait_collapse)
+                        collapse = trait_collapse, r2_min = trait_r2_min)
   }
   if (!is.null(ptr)) {
     n <- length(heights)

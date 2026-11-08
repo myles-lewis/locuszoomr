@@ -10,6 +10,8 @@
 #'   filter results. See [link_trait()].
 #' @param collapse Logical whether to collapse duplicate associations of the same
 #'   SNP and trait, keeping the smallest P value.
+#' @param r2_min Optional minimum r^2 with the index SNP: associations below it
+#'   or without r^2 are shown in grey.
 #' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_trait()] [locus_plotly()]
@@ -19,6 +21,7 @@ trait_plotly <- function(loc,
                          trait_filter = NULL,
                          category_filter = NULL,
                          collapse = TRUE,
+                         r2_min = NULL,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
@@ -33,6 +36,7 @@ trait_plotly <- function(loc,
     tc <- loc$trait_category
     LDT <- LDT[LDT$GWAS_Trait %in% tc$trait[tc$category %in% category_filter], ]
   }
+  r2_cut <- !is.null(r2_min) && r2_min > 0
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
   
@@ -75,6 +79,12 @@ trait_plotly <- function(loc,
   } else {
     LDT$colour <- "red"
   }
+  outline <- "black"
+  if (r2_cut) {
+    grey <- is.na(LDT$R2) | LDT$R2 < r2_min
+    LDT$colour[grey] <- "#CCCCCC"
+    outline <- ifelse(grey, "#999999", "black")
+  }
   
   # 27/10/26
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`
@@ -97,7 +107,7 @@ trait_plotly <- function(loc,
                marker = list(opacity = 0.8,
                              size = 6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2),
                              color = I(LDT$colour),
-                             line = list(width = 1, color = "black")),
+                             line = list(width = 1, color = outline)),
                text = hovertext, hoverinfo = 'text',
                key = LDT$RS_Number,
                showlegend = FALSE,

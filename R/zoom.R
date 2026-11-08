@@ -388,7 +388,11 @@ zoom <- function(data, ens_db,
                                      conditionalPanel("output.has_trait",
                                                       checkboxInput("trait_collapse", "collapse duplicate associations",
                                                                     value = TRUE)
-                                     )
+                                     ),
+                                     (if (!is.null(gwas_catalog)) {
+                                       shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
+                                                          min = 0, max = 1, value = 0, step = 0.05)
+                                     })
                               )))
                           }),
                           (if (show_ld) {
@@ -916,6 +920,7 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
+                   trait_r2_min = trait_r2_min(),
                    trait_collapse = !isFALSE(input$trait_collapse),
                    qtl_type_filter = qtl_type_filter(),
                    qtl_gene_filter = qtl_gene_filter())
@@ -1039,6 +1044,7 @@ zoom <- function(data, ens_db,
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
+    trait_r2_min <- reactive({input$trait_r2_min}) %>% debounce(500)
     deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
     deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
     
@@ -1434,6 +1440,25 @@ zoom <- function(data, ens_db,
         return()
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
+                       id = "ld_busy", duration = NULL)
+      link_snp(snp)
+      link_type("LD")
+    })
+    
+    # Clear drops LD, so reset the r2 cut-off rather than grey every hit
+    observeEvent(input$ld_clear, {
+      shiny::updateSliderInput(session, "trait_r2_min", value = 0)
+    })
+    
+    # moving the r2 slider without LD fetches it, as Get LD would
+    observeEvent(trait_r2_min(), {
+      req(trait_r2_min() > 0, !identical(link_type(), "LD"))
+      snp <- cur_index()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification(paste0("Fetching LD for ", snp, " for the r\u00b2 cut-off"),
                        id = "ld_busy", duration = NULL)
       link_snp(snp)
       link_type("LD")
