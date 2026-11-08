@@ -56,8 +56,9 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
-#' @param gwas_catalog Optional local GWAS Catalog, from [prep_gwas_catalog()]
-#'   or the path of an RDS file of it, shown as an extra track at every locus.
+#' @param gwas_catalog Optional local GWAS Catalog, shown as an extra track at
+#'   every locus: `TRUE` to load the copy saved by [download_gwas_catalog()],
+#'   or an object from [prep_gwas_catalog()] or the path of an RDS file of it.
 #' @param ld_token Personal access token for the LDlink API, available from
 #'   <https://ldlink.nih.gov/?tab=apiaccess>. See `LDlinkR` package
 #'   documentation and [link_LD()]. When empty the LD controls are hidden. LD
@@ -118,7 +119,7 @@ zoom <- function(data, ens_db,
   if (!requireNamespace("DT", quietly = TRUE))
     stop("Need DT package", call. = FALSE)
   
-  if (is.character(gwas_catalog)) gwas_catalog <- readRDS(gwas_catalog)
+  gwas_catalog <- as_gwas_catalog(gwas_catalog)
   dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings

@@ -89,8 +89,9 @@ plotly hover text for scatter points. Not available for \code{data2}.}
 
 \item{recomb}{Optional \code{GRanges} class object of recombination data.}
 
-\item{gwas_catalog}{Optional local GWAS Catalog, from \code{\link[=prep_gwas_catalog]{prep_gwas_catalog()}}
-or the path of an RDS file of it, shown as an extra track at every locus.}
+\item{gwas_catalog}{Optional local GWAS Catalog, shown as an extra track at
+every locus: \code{TRUE} to load the copy saved by \code{\link[=download_gwas_catalog]{download_gwas_catalog()}},
+or an object from \code{\link[=prep_gwas_catalog]{prep_gwas_catalog()}} or the path of an RDS file of it.}
 
 \item{ld_token}{Personal access token for the LDlink API, available from
 \url{https://ldlink.nih.gov/?tab=apiaccess}. See \code{LDlinkR} package

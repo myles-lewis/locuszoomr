@@ -38,7 +38,9 @@ Imports:
     Rcpp,
     rlang,
     rtracklayer,
-    shiny
+    shiny,
+    tools,
+    utils
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
