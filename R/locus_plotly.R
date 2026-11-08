@@ -142,13 +142,14 @@ locus_plotly <- function(loc,
     }
   }
   
+  # Open Targets first: a local GWAS Catalog fills LDtrait at every locus
   ptr <- NULL
-  if (!is.null(loc$LDtrait)) {
+  if (!is.null(loc$OTqtl)) {
+    ptr <- qtl_plotly(loc, qtl_type_filter, qtl_gene_filter)
+  } else if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
                         collapse = trait_collapse)
-  } else if (!is.null(loc$OTqtl)) {
-    ptr <- qtl_plotly(loc, qtl_type_filter, qtl_gene_filter)
   }
   if (!is.null(ptr)) {
     n <- length(heights)

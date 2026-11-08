@@ -47,6 +47,7 @@ Suggests:
     dplyr,
     DT,
     EnsDb.Hsapiens.v75,
+    data.table,
     ggrepel,
     httr,
     knitr,

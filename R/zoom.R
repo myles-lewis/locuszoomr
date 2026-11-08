@@ -56,6 +56,8 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
+#' @param gwas_catalog Optional local GWAS Catalog, from [prep_gwas_catalog()]
+#'   or the path of an RDS file of it, shown as an extra track at every locus.
 #' @param ld_token Personal access token for the LDlink API, available from
 #'   <https://ldlink.nih.gov/?tab=apiaccess>. See `LDlinkR` package
 #'   documentation and [link_LD()]. When empty the LD controls are hidden. LD
@@ -101,6 +103,7 @@ zoom <- function(data, ens_db,
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
+                 gwas_catalog = NULL,
                  ld_token = Sys.getenv("LDLINK_TOKEN"),
                  ld_pop = "EUR",
                  seq_filter = c(1:22, 'X', 'Y'),
@@ -115,6 +118,7 @@ zoom <- function(data, ens_db,
   if (!requireNamespace("DT", quietly = TRUE))
     stop("Need DT package", call. = FALSE)
   
+  if (is.character(gwas_catalog)) gwas_catalog <- readRDS(gwas_catalog)
   dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings
@@ -230,10 +234,16 @@ zoom <- function(data, ens_db,
         align-items: center;
       }")),
       tags$style(HTML("
-      #ld_get, #eqtl_get, #trait_get, #ot_get, #ld_clear { margin-bottom: 4px; }
+      #ld_get, #eqtl_get, #trait_get, #gcat_show, #ot_get, #ld_clear { margin-bottom: 4px; }
       #ot_get { background-color: #fff; border-color: #3489ca; color: #3489ca; }
       #ot_get:hover, #ot_get:focus { border-color: #18405e; color: #18405e; }
-      #ot_get img { height: 14px; margin-right: 4px; vertical-align: -2px; }"))
+      #ot_get img { height: 14px; margin-right: 4px; vertical-align: -2px; }")),
+      # with a local Catalog its pickers can show alongside eQTL/QTL pickers
+      (if (!is.null(gwas_catalog)) {
+        tags$style(HTML("
+      #ui_link_traits:not(:empty), #ui_link_qtl:not(:empty), #ui_link_genes:not(:empty) {
+        border-top: 1px solid #ddd; margin-top: 8px; padding-top: 4px; }"))
+      })
     ),
     shinyFeedback::useShinyFeedback(),
     tabsetPanel(id = "topTabs",
@@ -333,6 +343,9 @@ zoom <- function(data, ens_db,
                           (if (!is.null(recomb)) {
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
+                          (if (!is.null(gwas_catalog)) {
+                            checkboxInput("gwas_catalog", "show GWAS Catalog", value = TRUE)
+                          }),
                           checkboxInput("alltracks", "show all gene tracks"),
                           shinyWidgets::pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
@@ -349,8 +362,14 @@ zoom <- function(data, ens_db,
                                        actionButton("eqtl_get", "eQTL", icon = icon("compass"),
                                                     class = "btn-info btn-sm")
                                      }),
-                                     actionButton("trait_get", "GWAS trait",
-                                                  class = "btn-success btn-sm"),
+                                     (if (is.null(gwas_catalog)) {
+                                       actionButton("trait_get", "GWAS trait",
+                                                    class = "btn-success btn-sm")
+                                     } else {
+                                       # local Catalog is always shown; this just toggles its pickers
+                                       actionButton("gcat_show", "GWAS Catalog",
+                                                    class = "btn-success btn-sm")
+                                     }),
                                      actionButton("ot_get",
                                                   shiny::tagList(tags$img(
                                                     src = "https://platform.opentargets.org/favicon.png",
@@ -361,6 +380,8 @@ zoom <- function(data, ens_db,
                               ))
                           }),
                           (if (show_ld) {
+                            conditionalPanel(
+                              if (is.null(gwas_catalog)) "true" else "output.gcat_open",
                             fluidRow(
                               column(12,
                                      uiOutput("ui_link_traits"),
@@ -368,7 +389,7 @@ zoom <- function(data, ens_db,
                                                       checkboxInput("trait_collapse", "collapse duplicate associations",
                                                                     value = TRUE)
                                      )
-                              ))
+                              )))
                           }),
                           (if (show_ld) {
                             uiOutput("ui_link_qtl")
@@ -413,6 +434,10 @@ zoom <- function(data, ens_db,
                           DT::dataTableOutput("table2")
                    ))
                  )
+      }),
+      (if (!is.null(gwas_catalog)) {
+        tabPanel("GWAS Catalog",
+                 fluidRow(column(12, br(), DT::dataTableOutput("catalog_table"))))
       }),
       tabPanel(title = uiOutput("extra_tab_nm"), value = "linktab",
                fluidRow(
@@ -818,6 +843,24 @@ zoom <- function(data, ens_db,
         }
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
         link_eqtl$categories <- sort(unique(loc1$trait_category$category))
+      } else if (!is.null(gwas_catalog) && isTRUE(input$gwas_catalog)) {
+        # local GWAS Catalog, sized by r2 when LD is loaded
+        loc1b <- try(link_gwas_catalog(loc1, gwas_catalog))
+        if (inherits(loc1b, "try-error")) {
+          showNotification(attr(loc1b, "condition")$message,
+                           id = "gcat_error", type = "error", duration = 10)
+        } else {
+          loc1 <- loc1b
+          traits_new <- sort(unique(loc1$LDtrait$GWAS_Trait))
+          # the pickers re-render with every trait selected, so drop filters
+          # from the previous locus now rather than in a second render
+          if (!identical(traits_new, isolate(link_eqtl$traits))) {
+            trait_filter(NULL)
+            trait_category_filter(NULL)
+          }
+          link_eqtl$traits <- traits_new
+          link_eqtl$categories <- sort(unique(loc1$trait_category$category))
+        }
       } else {
         link_eqtl$traits <- NULL
         link_eqtl$categories <- NULL
@@ -965,6 +1008,23 @@ zoom <- function(data, ens_db,
                                       liveSearch = TRUE))
         })
       ))
+    })
+    
+    # local GWAS Catalog button: show/hide the trait pickers; if the Catalog
+    # track is switched off or replaced by Open Targets, bring it back
+    gcat_open <- reactiveVal(FALSE)
+    output$gcat_open <- reactive(gcat_open())
+    outputOptions(output, "gcat_open", suspendWhenHidden = FALSE)
+    observeEvent(input$gcat_show, {
+      ot <- identical(link_type(), "Open Targets")
+      if (!isTRUE(input$gwas_catalog) || ot) {
+        shiny::updateCheckboxInput(session, "gwas_catalog", value = TRUE)
+        if (ot) {
+          link_snp(NULL)
+          link_type(NULL)
+        }
+        gcat_open(TRUE)
+      } else gcat_open(!gcat_open())
     })
     
     eqtl_gene_filter <- reactiveVal(NULL)
@@ -1157,7 +1217,8 @@ zoom <- function(data, ens_db,
     
     # Extra table tab
     output$link_table <- DT::renderDataTable({
-      if (!is.null(link_data$LDtrait)) {
+      # a local GWAS Catalog has its own tab, so this one is for eQTL
+      if (!is.null(link_data$LDtrait) && is.null(gwas_catalog)) {
         tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
                            trait_category_filter(),
                            !isFALSE(input$trait_collapse))
@@ -1178,9 +1239,22 @@ zoom <- function(data, ens_db,
         DT::formatSignif(num, digits = 3)
     })
     
+    # local GWAS Catalog tab
+    output$catalog_table <- DT::renderDataTable({
+      validate(need(!is.null(link_data$LDtrait), "GWAS Catalog track is switched off"))
+      tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
+                         trait_category_filter(), !isFALSE(input$trait_collapse))
+      tab$PMID <- pubmed_links(tab$PMID)
+      DT::datatable(tab, rownames = FALSE,
+                    escape = setdiff(colnames(tab), "PMID"),
+                    caption = if (!is.null(gwas_catalog$date))
+                      paste("GWAS Catalog associations added up to", gwas_catalog$date)) %>%
+        DT::formatSignif(c("r2", "P"), digits = 3)
+    })
+    
     # control extra table tab title
     output$extra_tab_nm <- renderText({
-      if (!is.null(link_data$LDtrait)) return("GWAS Catalog associations")
+      if (!is.null(link_data$LDtrait) && is.null(gwas_catalog)) return("GWAS Catalog associations")
       if (!is.null(link_data$LDexp)) return("eQTL associations")
       if (!is.null(link_data$OTqtl)) return("QTL credible sets (Open Targets)")
       ""
@@ -1188,8 +1262,8 @@ zoom <- function(data, ens_db,
     
     # show/hide extra table tab
     observe({
-      if (!is.null(link_data$LDtrait) || !is.null(link_data$LDexp) ||
-          !is.null(link_data$OTqtl)) {
+      if ((!is.null(link_data$LDtrait) && is.null(gwas_catalog)) ||
+          !is.null(link_data$LDexp) || !is.null(link_data$OTqtl)) {
         showTab("topTabs", "linktab")
       } else {
         hideTab("topTabs", "linktab")
@@ -1382,6 +1456,9 @@ zoom <- function(data, ens_db,
       req(!is.null(cur))
       snp <- as.character(s$key)[1]
       req(!is.na(snp), nzchar(snp))
+      # trait-track points can be SNPs absent from the data, which LD can't use
+      req(snp %in% isolate(loc$i$data[, labs[1]]) ||
+            (man2 && snp %in% isolate(locv2$i$data[, labs[2]])))
       if (identical(snp, cur)) return()
       showNotification(paste0("Fetching ", ltype, " for ", snp),
                        id = "ld_busy", duration = NULL)
