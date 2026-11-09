@@ -391,8 +391,10 @@ zoom <- function(data, ens_db,
                                                                     value = TRUE)
                                      ),
                                      (if (!is.null(gwas_catalog)) {
-                                       shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
-                                                          min = 0, max = 1, value = 0, step = 0.05)
+                                       shiny::tagList(
+                                         shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
+                                                            min = 0, max = 1, value = 0, step = 0.05),
+                                         checkboxInput("trait_ld_colour", "colour by LD", value = FALSE))
                                      })
                               )))
                           }),
@@ -718,6 +720,7 @@ zoom <- function(data, ens_db,
                                 qtl_genes = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
                                 LDexp = NULL, OTqtl = NULL)
+    ld_colour <- reactiveVal(FALSE)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -922,6 +925,10 @@ zoom <- function(data, ens_db,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
                    trait_r2_min = trait_r2_min(),
+                   trait_ld_scheme = if (!is.null(gwas_catalog) && ld_colour() &&
+                                         "ld" %in% colnames(loc1$data))
+                     eval(formals(scatter_plotly)$LD_scheme),
+                   trait_size_by_r2 = is.null(gwas_catalog),
                    trait_collapse = !isFALSE(input$trait_collapse),
                    qtl_type_filter = qtl_type_filter(),
                    qtl_gene_filter = qtl_gene_filter())
@@ -1446,24 +1453,48 @@ zoom <- function(data, ens_db,
       link_type("LD")
     })
     
-    # Clear drops LD, so reset the r2 cut-off rather than grey every hit
-    observeEvent(input$ld_clear, {
+    # Clear, eQTL and Open Targets drop LD, so reset the LD-based Catalog options
+    observeEvent(list(input$ld_clear, input$eqtl_get, input$ot_get), {
       shiny::updateSliderInput(session, "trait_r2_min", value = 0)
-    })
+      shiny::updateCheckboxInput(session, "trait_ld_colour", value = FALSE)
+      ld_colour(FALSE)
+    }, ignoreInit = TRUE)
     
-    # moving the r2 slider without LD fetches it, as Get LD would
-    observeEvent(trait_r2_min(), {
-      req(trait_r2_min() > 0, !identical(link_type(), "LD"))
+    # fetch LD for the index SNP in view, as Get LD would
+    fetch_index_ld <- function(why) {
       snp <- cur_index()
       if (is.null(snp) || is.na(snp)) {
         showNotification("No index SNP in view", type = "warning")
         return()
       }
-      showNotification(paste0("Fetching LD for ", snp, " for the r\u00b2 cut-off"),
+      showNotification(paste0("Fetching LD for ", snp, " ", why),
                        id = "ld_busy", duration = NULL)
+      # re-setting the same SNP would not re-render, e.g. after a failed fetch
+      link_snp(NULL)
       link_snp(snp)
       link_type("LD")
-    })
+    }
+    
+    # the r2 cut-off and LD colouring need LD, so fetch it if missing; run
+    # before output$locus so it renders once, with LD
+    has_ld <- function() "ld" %in% colnames(isolate(loc$i$data))
+    observeEvent(trait_r2_min(), {
+      req(trait_r2_min() > 0, !has_ld())
+      ld_colour(TRUE)
+      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
+      fetch_index_ld("for the r\u00b2 cut-off")
+    }, priority = 1)
+    # with a local Catalog, Get LD also colours it by LD (in the same render)
+    observeEvent(input$ld_get, {
+      req(!is.null(gwas_catalog), !is.null(cur_index()), !is.na(cur_index()))
+      ld_colour(TRUE)
+      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
+    }, priority = 1)
+    observeEvent(input$trait_ld_colour, {
+      ld_colour(isTRUE(input$trait_ld_colour))
+      req(isTRUE(input$trait_ld_colour), !has_ld())
+      fetch_index_ld("to colour by LD")
+    }, priority = 1)
     
     observeEvent(input$ld_clear, {
       link_snp(NULL)

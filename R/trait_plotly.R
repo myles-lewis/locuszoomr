@@ -12,6 +12,12 @@
 #'   SNP and trait, keeping the smallest P value.
 #' @param r2_min Optional minimum r^2 with the index SNP: associations below it
 #'   or without r^2 are shown in grey.
+#' @param ld_scheme Optional vector of 7 colours to colour associations by r^2
+#'   with the index SNP instead of by trait, as `LD_scheme` in
+#'   [scatter_plotly()]; markers then have a fixed size rather than one
+#'   scaled by r^2.
+#' @param size_by_r2 Logical whether to scale marker size by r^2 with the index
+#'   SNP.
 #' @param ... Optional arguments passed to `plot_ly()`.
 #' @returns A `plotly` scatter plot.
 #' @seealso [link_trait()] [locus_plotly()]
@@ -22,6 +28,8 @@ trait_plotly <- function(loc,
                          category_filter = NULL,
                          collapse = TRUE,
                          r2_min = NULL,
+                         ld_scheme = NULL,
+                         size_by_r2 = TRUE,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   
@@ -79,6 +87,16 @@ trait_plotly <- function(loc,
   } else {
     LDT$colour <- "red"
   }
+  if (!is.null(ld_scheme)) {
+    # same bins as scatter_plotly(); strongest LD drawn on top
+    bin <- cut(LDT$R2, -1:6/5, labels = FALSE)
+    bin[LDT$R2 %in% 0] <- 2L
+    bin[is.na(bin)] <- 1L
+    bin[LDT$RS_Number %in% loc$index_snp] <- 7L
+    hex <- rgb(t(col2rgb(rep_len(ld_scheme, 7))), maxColorValue = 255)
+    LDT$colour <- hex[bin]
+    LDT <- LDT[order(bin), ]
+  }
   outline <- "black"
   if (r2_cut) {
     grey <- is.na(LDT$R2) | LDT$R2 < r2_min
@@ -105,7 +123,9 @@ trait_plotly <- function(loc,
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(opacity = 0.8,
-                             size = 6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2),
+                             size = if (size_by_r2 && is.null(ld_scheme)) {
+                               6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2)
+                             } else 7,
                              color = I(LDT$colour),
                              line = list(width = 1, color = outline)),
                text = hovertext, hoverinfo = 'text',

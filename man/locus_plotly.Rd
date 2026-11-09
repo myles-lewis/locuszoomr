@@ -32,6 +32,8 @@ locus_plotly(
   trait_category_filter = NULL,
   trait_collapse = TRUE,
   trait_r2_min = NULL,
+  trait_ld_scheme = NULL,
+  trait_size_by_r2 = TRUE,
   qtl_type_filter = NULL,
   qtl_gene_filter = NULL,
   ...
@@ -116,6 +118,12 @@ associations. See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{trait_r2_min}{Optional minimum r^2 for GWAS trait associations. See
 \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_ld_scheme}{Optional colours to colour GWAS trait associations by
+r^2 instead of by trait. See \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_size_by_r2}{Logical whether to scale GWAS trait marker size by
+r^2. See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{qtl_type_filter}{Character vector of Open Targets QTL types to show when
 \code{loc} has QTL data from \code{link_ot()}.}

@@ -10,6 +10,8 @@ trait_plotly(
   category_filter = NULL,
   collapse = TRUE,
   r2_min = NULL,
+  ld_scheme = NULL,
+  size_by_r2 = TRUE,
   ...
 )
 }
@@ -26,6 +28,14 @@ SNP and trait, keeping the smallest P value.}
 
 \item{r2_min}{Optional minimum r^2 with the index SNP: associations below it
 or without r^2 are shown in grey.}
+
+\item{ld_scheme}{Optional vector of 7 colours to colour associations by r^2
+with the index SNP instead of by trait, as \code{LD_scheme} in
+\code{\link[=scatter_plotly]{scatter_plotly()}}; markers then have a fixed size rather than one
+scaled by r^2.}
+
+\item{size_by_r2}{Logical whether to scale marker size by r^2 with the index
+SNP.}
 
 \item{...}{Optional arguments passed to \code{plot_ly()}.}
 }
