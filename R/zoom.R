@@ -667,14 +667,13 @@ zoom <- function(data, ens_db,
     locv2 <- reactiveValues(i = NULL)
     ntrace <- reactiveVal()
     genes <- reactiveValues(x = NULL)
-    ld_snp <- reactiveVal(NULL)
+    link_snp <- reactiveVal(NULL)
+    link_type <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
-    eqtl_snp <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
                                 categories = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
                                 LDexp = NULL)
-    trait_snp <- reactiveVal(NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -705,10 +704,10 @@ zoom <- function(data, ens_db,
       
       # retrieve LD
       isolate(cur_index(loc1$index_snp))
-      pin <- ld_snp()
+      pin <- link_snp()
       ld_msg <- NULL
-      if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
-          (man2 && pin %in% loc2$data[, labs[2]]))) {
+      if (link_type() == "LD" && !is.null(pin) &&
+          (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
         loc1$index_snp <- pin
         loc1b <- withCallingHandlers(
           try(link_LD(loc1, token = ld_token, pop = ld_pop)),
@@ -734,12 +733,11 @@ zoom <- function(data, ens_db,
       }
       
       # retrieve eQTL
-      pin2 <- eqtl_snp()
-      ld_msg <- NULL
       eqtl_scheme <- NULL
-      if (!is.null(pin2) && (pin2 %in% loc1$data[, labs[1]] ||
-                            (man2 && pin2 %in% loc2$data[, labs[2]]))) {
-        message("LDlink eQTL")
+      if (link_type() == "eQTL" && !is.null(pin) &&
+          (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
+        message("LDlink eQTL ", pin)
+        loc1$index_snp <- pin
         loc1b <- try(suppressMessages(link_eqtl(loc1, token = ld_token)))
         if (inherits(loc1b, "try-error")) {
           ld_msg <- attr(loc1b, "condition")$message
@@ -747,15 +745,15 @@ zoom <- function(data, ens_db,
         removeNotification("ld_busy")
         if (is.null(loc1$LDexp)) {
           showNotification(
-            paste0("eQTL request failed for ", pin2,
+            paste0("eQTL request failed for ", pin,
                    if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
             type = "error", duration = 10)
         } else {
           LDX1 <- loc1$LDexp[loc1$LDexp$inData, ]
           g <- unique(LDX1$Gene_Symbol[order(LDX1$P_value)])
           tiss <- unique(LDX1$Tissue)
-          if (man2 && !is.null(pin2) && !is.null(loc1$LDexp)) {
-            loc2$index_snp <- pin2
+          if (man2 && !is.null(pin) && !is.null(loc1$LDexp)) {
+            loc2$index_snp <- pin
             loc2b <- try(link_eqtl(loc2, token = ld_token))
             if (!inherits(loc2b, "try-error")) {
               loc2 <- loc2b
@@ -790,10 +788,9 @@ zoom <- function(data, ens_db,
       } else locscheme <- c('grey', 'dodgerblue', 'red')
       
       # retrieve trait
-      pin <- trait_snp()
-      ld_msg <- NULL
-      if (!is.null(pin) && (pin %in% loc1$data[, labs[1]] ||
-                            (man2 && pin %in% loc2$data[, labs[2]]))) {
+      if (link_type() == "GWAS trait" && !is.null(pin) &&
+          (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
+        loc1$index_snp <- pin
         loc1b <- try(link_trait(loc1, token = ld_token, category = TRUE))
         if (inherits(loc1b, "try-error")) {
           ld_msg <- attr(loc1b, "condition")$message
@@ -1269,48 +1266,43 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
-      ld_snp(snp)
-      eqtl_snp(NULL)
-      trait_snp(NULL)
+      link_snp(snp)
+      link_type("LD")
     })
     
     observeEvent(input$ld_clear, {
-      ld_snp(NULL)
-      eqtl_snp(NULL)
-      trait_snp(NULL)
+      link_snp(NULL)
+      link_type(NULL)
       link_eqtl$genes <- NULL
       link_eqtl$tissues <- NULL
       removeNotification("ld_busy")
     })
     
-    # LD rebase click on locus
+    # LDlink rebase click on locus
     observe({
       s <- event_data("plotly_click", source = "plotly_locus")
       req(s, !is.null(s$key))
-      cur <- isolate(ld_snp())
+      cur <- isolate(link_snp())
+      ltype <- isolate(link_type())
       req(!is.null(cur))
       snp <- as.character(s$key)[1]
       req(!is.na(snp), nzchar(snp))
       if (identical(snp, cur)) return()
-      showNotification(paste0("Fetching LD for ", snp),
+      showNotification(paste0("Fetching ", ltype, " for ", snp),
                        id = "ld_busy", duration = NULL)
-      ld_snp(snp)
+      link_snp(snp)
     })
     
     output$ld_status <- renderText({
-      if (!is.null(ld_snp())) {
-        if (man2) {
-          req(ld_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
-        } else {
-          req(ld_snp() %in% loc$i$data[, labs])
-        }
-        paste0("LD: ", ld_snp(), " (", ld_pop, ")")
+      req(link_snp())
+      if (man2) {
+        req(link_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
       } else {
-        if (man2) {
-          req(eqtl_snp() %in% c(loc$i$data[, labs[1]], locv2$i$data[, labs[2]]))
-        } else {
-          req(eqtl_snp() %in% loc$i$data[, labs])
-        }
+        req(link_snp() %in% loc$i$data[, labs])
+      }
+      if (link_type() == "LD") {
+        paste0("LD: ", link_snp(), " (", ld_pop, ")")
+      } else if (link_type() == "eQTL") {
         "eQTL overlay"
       }
     })
@@ -1324,9 +1316,8 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching eQTL data"),
                        id = "ld_busy", duration = NULL)
-      eqtl_snp(snp)
-      ld_snp(NULL)
-      trait_snp(NULL)
+      link_snp(snp)
+      link_type("eQTL")
     })
     
     # retrieve trait
@@ -1338,9 +1329,8 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching GWAS trait data"),
                        id = "ld_busy", duration = NULL)
-      trait_snp(snp)
-      ld_snp(NULL)
-      eqtl_snp(NULL)
+      link_snp(snp)
+      link_type("GWAS trait")
     })
     
     # inline conditional UI
