@@ -66,7 +66,7 @@ link_LD <- function(loc,
   }
   emsg <- NULL
   if (method == "proxy") {
-    message("LDproxy ", index_snp)
+    message("LDproxy ", index_snp, " ", appendLF = FALSE)
     ldp <- suppressMessages(
       mem_LDproxy(index_snp, pop = pop, r2d = r2d, token = token,
                   genome_build = genome_build, ...))
@@ -76,7 +76,7 @@ link_LD <- function(loc,
       emsg <- ld_response_error(ldp)
     }
   } else {
-    message("Obtaining LD on ", length(rslist), " SNPs. ", appendLF = FALSE)
+    message("Obtaining LD on ", length(rslist), " SNPs ", appendLF = FALSE)
     ldm <- mem_LDmatrix(rslist, pop = pop, r2d = r2d, token = token,
                         genome_build = genome_build, ...)
     if (index_snp %in% colnames(ldm)) {
@@ -88,9 +88,9 @@ link_LD <- function(loc,
   if (is.null(emsg)) {
     end <- Sys.time()
     m <- sum(!is.na(loc$data$ld))
-    message("Matched ", m, " SNPs (", format(end - start, digits = 3),")")
+    message("- matched ", m, " SNPs (", format(end - start, digits = 3),")")
   } else {
-    message(if (is.na(emsg)) "Unexpected LDproxy response" else emsg)
+    message("\n", if (is.na(emsg)) "Unexpected LDproxy response" else emsg)
   }
   
   loc

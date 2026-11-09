@@ -43,8 +43,12 @@ link_eqtl <- function(loc,
   index_snp <- loc$index_snp
   
   if (token == "") stop("token is missing")
-  LDexp <- mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
-                         token = token, genome_build = genome_build, ...)
+  start <- Sys.time()
+  message("LDlink eQTL ", index_snp, " ", appendLF = FALSE)
+  LDexp <- suppressMessages(
+    mem_LDexpress(snps = index_snp, pop = pop, r2d = r2d, 
+                  token = token, genome_build = genome_build, ...))
+  message("(", format(Sys.time() - start, digits = 3),")")
   for (i in c("R2", "D'", "Effect_Size", "P_value")) {
     LDexp[, i] <- as.numeric(LDexp[, i])
   }

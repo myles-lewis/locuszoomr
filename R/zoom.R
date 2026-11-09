@@ -736,11 +736,11 @@ zoom <- function(data, ens_db,
       eqtl_scheme <- NULL
       if (link_type() == "eQTL" && !is.null(pin) &&
           (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
-        message("LDlink eQTL ", pin)
         loc1$index_snp <- pin
-        loc1b <- try(suppressMessages(link_eqtl(loc1, token = ld_token)))
+        loc1b <- try(link_eqtl(loc1, token = ld_token), silent = TRUE)
         if (inherits(loc1b, "try-error")) {
-          ld_msg <- attr(loc1b, "condition")$message
+          ld_msg <- trimws(attr(loc1b, "condition")$message)
+          message("\n", ld_msg)
         } else loc1 <- loc1b
         removeNotification("ld_busy")
         if (is.null(loc1$LDexp)) {
@@ -754,7 +754,7 @@ zoom <- function(data, ens_db,
           tiss <- unique(LDX1$Tissue)
           if (man2 && !is.null(pin) && !is.null(loc1$LDexp)) {
             loc2$index_snp <- pin
-            loc2b <- try(link_eqtl(loc2, token = ld_token))
+            loc2b <- try(suppressMessages(link_eqtl(loc2, token = ld_token)))
             if (!inherits(loc2b, "try-error")) {
               loc2 <- loc2b
               LDX2 <- loc2$LDexp[loc2$LDexp$inData, ]
