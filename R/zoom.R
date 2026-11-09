@@ -179,6 +179,13 @@ zoom <- function(data, ens_db,
   
   show_ld <- nzchar(ld_token)
   show_eqtl <- show_ld & is.null(eqtl_gene)
+  # local Catalog button: always shows the Catalog, this just toggles its pickers
+  gcat_btn <- actionButton("gcat_show", "GWAS Catalog", class = "btn-success btn-sm")
+  ot_btn <- actionButton("ot_get",
+                         shiny::tagList(tags$img(
+                           src = "https://platform.opentargets.org/favicon.png",
+                           alt = ""), "Open Targets"),
+                         class = "btn-sm")
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -366,21 +373,22 @@ zoom <- function(data, ens_db,
                                      (if (is.null(gwas_catalog)) {
                                        actionButton("trait_get", "GWAS trait",
                                                     class = "btn-success btn-sm")
-                                     } else {
-                                       # local Catalog is always shown; this just toggles its pickers
-                                       actionButton("gcat_show", "GWAS Catalog",
-                                                    class = "btn-success btn-sm")
-                                     }),
-                                     actionButton("ot_get",
-                                                  shiny::tagList(tags$img(
-                                                    src = "https://platform.opentargets.org/favicon.png",
-                                                    alt = ""), "Open Targets"),
-                                                  class = "btn-sm"),
+                                     } else gcat_btn),
+                                     ot_btn,
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
                           }),
-                          (if (show_ld) {
+                          # the local Catalog and Open Targets need no LDlink token
+                          (if (!show_ld && !is.null(gwas_catalog)) {
+                            fluidRow(
+                              column(12,
+                                     h5("GWAS Catalog"),
+                                     gcat_btn, ot_btn,
+                                     actionButton("ld_clear", "Clear",
+                                                  class = "btn-default btn-sm")))
+                          }),
+                          (if (show_ld || !is.null(gwas_catalog)) {
                             conditionalPanel(
                               if (is.null(gwas_catalog)) "true" else "output.gcat_open",
                             fluidRow(
@@ -390,7 +398,7 @@ zoom <- function(data, ens_db,
                                                       checkboxInput("trait_collapse", "collapse duplicate associations",
                                                                     value = TRUE)
                                      ),
-                                     (if (!is.null(gwas_catalog)) {
+                                     (if (show_ld && !is.null(gwas_catalog)) {
                                        shiny::tagList(
                                          shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
                                                             min = 0, max = 1, value = 0, step = 0.05),
@@ -398,7 +406,7 @@ zoom <- function(data, ens_db,
                                      })
                               )))
                           }),
-                          (if (show_ld) {
+                          (if (show_ld || !is.null(gwas_catalog)) {
                             uiOutput("ui_link_qtl")
                           }),
                           (if (show_eqtl) {
@@ -852,7 +860,6 @@ zoom <- function(data, ens_db,
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
         link_eqtl$categories <- sort(unique(loc1$trait_category$category))
       } else if (!is.null(gwas_catalog) && isTRUE(input$gwas_catalog)) {
-        # local GWAS Catalog, sized by r2 when LD is loaded
         loc1b <- try(link_gwas_catalog(loc1, gwas_catalog))
         if (inherits(loc1b, "try-error")) {
           showNotification(attr(loc1b, "condition")$message,
@@ -924,7 +931,7 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_r2_min = trait_r2_min(),
+                   trait_r2_min = r2_min(),
                    trait_ld_scheme = if (!is.null(gwas_catalog) && ld_colour() &&
                                          "ld" %in% colnames(loc1$data))
                      eval(formals(scatter_plotly)$LD_scheme),
@@ -1053,6 +1060,9 @@ zoom <- function(data, ens_db,
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
     trait_r2_min <- reactive({input$trait_r2_min}) %>% debounce(500)
+    # held here so Clear etc. reset it in the same render, not after the
+    # slider's round trip
+    r2_min <- reactiveVal(0)
     deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
     deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
     
@@ -1457,6 +1467,7 @@ zoom <- function(data, ens_db,
     observeEvent(list(input$ld_clear, input$eqtl_get, input$ot_get), {
       shiny::updateSliderInput(session, "trait_r2_min", value = 0)
       shiny::updateCheckboxInput(session, "trait_ld_colour", value = FALSE)
+      r2_min(0)
       ld_colour(FALSE)
     }, ignoreInit = TRUE)
     
@@ -1479,6 +1490,7 @@ zoom <- function(data, ens_db,
     # before output$locus so it renders once, with LD
     has_ld <- function() "ld" %in% colnames(isolate(loc$i$data))
     observeEvent(trait_r2_min(), {
+      r2_min(as.numeric(trait_r2_min()))
       req(trait_r2_min() > 0, !has_ld())
       ld_colour(TRUE)
       shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
