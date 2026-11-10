@@ -28,6 +28,7 @@ export(sanity_check)
 export(scatter_plot)
 export(scatter_plotly)
 export(set_layers)
+export(trait_plot)
 export(trait_plotly)
 export(zoom)
 importFrom(AnnotationFilter,
