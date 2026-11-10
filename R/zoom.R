@@ -119,8 +119,15 @@ zoom <- function(data, ens_db,
   if (!requireNamespace("DT", quietly = TRUE))
     stop("Need DT package", call. = FALSE)
   
+  # how zoom() was called, for the R code button
+  data_sym <- arg_name(substitute(data))
+  data2_sym <- arg_name(substitute(data2))
+  recomb_sym <- arg_name(substitute(recomb))
+  ens_source <- ens_db_source(substitute(ens_db), ens_db)
+  gcat_source <- catalog_source(substitute(gwas_catalog), gwas_catalog)
   gwas_catalog <- as_gwas_catalog(gwas_catalog)
   dat_name <- deparse(substitute(data))
+  raw_names <- colnames(data)
   data <- data.frame(data)
   # autodetect headings
   dc <- detect_cols(data, chrom[1], pos[1], p[1], labs[1])
@@ -130,6 +137,7 @@ zoom <- function(data, ens_db,
   man2 <- FALSE
   if (!is.null(data2)) {
     dat2_name <- deparse(substitute(data2))
+    raw_names2 <- colnames(data2)
     data2 <- data.frame(data2)
     if (!is.null(chrom)) chrom <- rep_len(chrom, 2)
     if (!is.null(pos)) pos <- rep_len(pos, 2)
@@ -147,6 +155,7 @@ zoom <- function(data, ens_db,
   labs <- c(dc$labs, dc2$labs)
   
   message("Generating Manhattan plot", (if (man2) " 1"))
+  data_prep <- prep_changes(data, raw_names, chrom[1], pos[1], p[1], labs[1])
   data <- complete_data(data, chrom[1], pos[1], p[1])
   
   if (is.null(eqtl_gene)) {
@@ -201,6 +210,7 @@ zoom <- function(data, ens_db,
   
   if (man2) {
     message("Generating Manhattan plot 2")
+    data2_prep <- prep_changes(data2, raw_names2, chrom[2], pos[2], p[2], labs[2])
     data2 <- complete_data(data2, chrom[2], pos[2], p[2])
     data2[, labs[2]] <- unique_snps(data2, labs[2], chrom[2])
     data2[which(data2[, p[2]] < 5e-324), p[2]] <- 5e-324
@@ -332,7 +342,8 @@ zoom <- function(data, ens_db,
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
-                        uiOutput("save_ui", inline = T)
+                        uiOutput("save_ui", inline = T),
+                        uiOutput("fig_code_ui", inline = T)
                         ),
                  column(3,
                         textOutput("pos"),
@@ -1626,6 +1637,55 @@ zoom <- function(data, ens_db,
       } else {
         saveRDS(save_plotly$p, file)
       }
+    })
+    
+    # R code for a static figure of the current view
+    current_figure_state <- function() isolate({
+      pin <- link_snp()
+      in_view <- !is.null(pin) &&
+        (pin %in% loc$i$data[, labs[1]] || (man2 && pin %in% locv2$i$data[, labs[2]]))
+      bt <- input_biotype()
+      if (setequal(bt, biotypes)) bt <- NULL
+      figure_state(data = data_sym, data2 = if (man2) data2_sym, man2 = man2,
+                   data_prep = data_prep, data2_prep = if (man2) data2_prep,
+                   qtl_found = !is.null(link_data$OTqtl),
+                   ens_db = ens_source, recomb = recomb_sym,
+                   recomb_on = !is.null(recomb) && isTRUE(input$recomb),
+                   gwas_catalog = if (!is.null(gwas_catalog)) gcat_source,
+                   catalog_on = isTRUE(input$gwas_catalog),
+                   chrom = chrom, pos = pos, p = p, labs = labs,
+                   chr = coords$chr, xrange = coords$xrange,
+                   link_type = link_type(), link_snp = pin, link_snp_in_view = in_view,
+                   ld_pop = ld_pop, pcutoff = pcutoff, traits = if (man2) traits,
+                   eqtl_gene = eqtl_gene, beta = beta,
+                   select_gene = input$select_gene, biotype = bt,
+                   maxrows = if (isTRUE(input$alltracks)) NULL else 8,
+                   trait_filter = trait_filter(),
+                   category_filter = trait_category_filter(),
+                   collapse = !isFALSE(input$trait_collapse),
+                   r2_min = r2_min(), ld_colour = ld_colour(),
+                   eqtl_gene_filter = eqtl_gene_filter(),
+                   eqtl_tissue_filter = eqtl_tissue_filter(),
+                   qtl_type_filter = qtl_type_filter(),
+                   qtl_gene_filter = qtl_gene_filter())
+    })
+    
+    output$fig_code_ui <- renderUI({
+      req(coords$chr)
+      actionButton("fig_code", NULL, icon = icon("code"),
+                   title = "R code for this view")
+    })
+    
+    observeEvent(input$fig_code, {
+      code <- figure_code(current_figure_state())
+      shiny::showModal(shiny::modalDialog(
+        tags$pre(id = "fig_code_text", code),
+        title = "R code for this view", size = "l", easyClose = TRUE,
+        footer = shiny::tagList(
+          tags$button("Copy", class = "btn btn-primary",
+                      onclick = paste0("navigator.clipboard.writeText(",
+                                       "document.getElementById('fig_code_text').innerText)")),
+          shiny::modalButton("Close"))))
     })
     
   }

@@ -12,7 +12,9 @@ figure_state <- function(...) {
                 gwas_catalog = NULL, catalog_on = FALSE,
                 chrom = NULL, pos = NULL, p = NULL, labs = NULL,
                 chr = NULL, xrange = NULL,
+                data_prep = NULL, data2_prep = NULL,
                 link_type = NULL, link_snp = NULL, link_snp_in_view = FALSE,
+                qtl_found = TRUE,
                 ld_pop = "EUR", pcutoff = 5e-8,
                 traits = NULL, eqtl_gene = NULL, beta = NULL, select_gene = NULL,
                 biotype = NULL, maxrows = 8,
@@ -70,14 +72,35 @@ figure_code <- function(state, backend = "base") {
                  ens_db = ens_code,
                  chrom = code_value(s$chrom[i]), pos = code_value(s$pos[i]),
                  p = code_value(s$p[i]), labs = code_value(s$labs[i]))
-    if (linked) args$index_snp <- code_value(s$link_snp)
+    # as the app, loc2 only takes the link SNP for LD and eQTL
+    if (linked && (i == 1 || lt %in% c("LD", "eQTL"))) {
+      args$index_snp <- code_value(s$link_snp)
+    }
     if (i == 2) args$tx <- "FALSE"
     code_call("locus", args, assign)
   }
+  # repeat zoom()'s cleaning of the data where it changed anything
+  prep <- function(name, var, i, pr) {
+    if (!isTRUE(pr$df) && !isTRUE(pr$complete)) {
+      if (isTRUE(pr$dups)) add("# zoom() renamed duplicated SNP labels; here they keep their names")
+      return(name)
+    }
+    add(sprintf("%s <- data.frame(%s)", var, name))
+    if (isTRUE(pr$complete)) {
+      add(sprintf("%s <- %s[complete.cases(%s[, %s]), ]", var, var, var,
+                  gsub("\001", " ", code_value(c(s$chrom[i], s$pos[i], s$p[i])), fixed = TRUE)))
+    }
+    if (isTRUE(pr$dups)) add("# zoom() renamed duplicated SNP labels; here they keep their names")
+    var
+  }
   locs <- "loc"
-  add(locus_call(obj(s$data, "gwas_data", "the data passed to zoom()"), 1, "loc"))
+  d1 <- prep(obj(s$data, "gwas_data", "the data passed to zoom()"), "gwas_data", 1,
+             s$data_prep)
+  add(locus_call(d1, 1, "loc"))
   if (isTRUE(s$man2)) {
-    add(locus_call(obj(s$data2, "gwas_data2", "the data2 passed to zoom()"), 2, "loc2"))
+    d2 <- prep(obj(s$data2, "gwas_data2", "the data2 passed to zoom()"), "gwas_data2", 2,
+               s$data2_prep)
+    add(locus_call(d2, 2, "loc2"))
     locs <- c(locs, "loc2")
   }
   each <- function(fun, ...) {
@@ -91,7 +114,11 @@ figure_code <- function(state, backend = "base") {
   if (lt == "GWAS trait") {
     add(code_call("link_trait", list("loc", token = token, category = "TRUE"), "loc"))
   }
-  if (lt == "Open Targets") add(code_call("link_ot", list("loc"), "loc"))
+  qtl <- lt == "Open Targets" && !isFALSE(s$qtl_found)
+  if (qtl) add(code_call("link_ot", list("loc"), "loc"))
+  if (lt == "Open Targets" && !qtl) {
+    add("# no Open Targets credible sets were found for this SNP")
+  }
   gcat_on <- isTRUE(s$catalog_on) && !is.null(s$gwas_catalog) && lt != "GWAS trait"
   if (gcat_on) {
     g <- s$gwas_catalog
@@ -110,7 +137,7 @@ figure_code <- function(state, backend = "base") {
 
   # one extra track: Open Targets takes the GWAS Catalog's place
   track <- NULL
-  if (lt == "Open Targets") {
+  if (qtl) {
     track <- code_call("qtl_plot", c(list("loc"), code_args(
       type_filter = s$qtl_type_filter, gene_filter = s$qtl_gene_filter)))
   } else if (lt == "GWAS trait" || gcat_on) {
@@ -222,4 +249,31 @@ code_call <- function(fun, args, assign = NULL, width = 80L) {
   }
   lines[length(lines)] <- paste0(lines[length(lines)], ")")
   paste(lines, collapse = "\n")
+}
+
+# how zoom() was given its arguments, for the code it writes
+arg_name <- function(expr) {
+  if (!is.symbol(expr) || identical(expr, as.name("."))) return(NULL)
+  deparse(expr, backtick = TRUE)
+}
+
+catalog_source <- function(expr, value) {
+  if (is.null(value) || isFALSE(value)) return(NULL)
+  if (isTRUE(value)) return(list(how = "cache"))
+  if (is.character(value)) return(list(how = "path", value = value))
+  if (!is.null(arg_name(expr))) return(list(how = "object", value = arg_name(expr)))
+  list(how = "unknown")
+}
+
+ens_db_source <- function(expr, value) {
+  if (is.character(value)) return(list(name = value, package = TRUE))
+  if (!is.null(arg_name(expr))) return(list(name = arg_name(expr), package = FALSE))
+  NULL
+}
+
+# what zoom()'s data.frame(), complete_data() and unique_snps() change
+prep_changes <- function(data, raw_names, chrom, pos, p, labs) {
+  list(df = !identical(raw_names, colnames(data)),
+       complete = !all(stats::complete.cases(data[, c(chrom, pos, p)])),
+       dups = anyDuplicated(data[, labs]) > 0)
 }
