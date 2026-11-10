@@ -192,11 +192,11 @@ genetrack_ly <- function(locus,
                       "<br>Biotype: ", TX$gene_biotype,
                       "<br>Start: ", TX$start * 1e6,
                       "<br>End: ", TX$end * 1e6)
-  plot_ly(TX[ok, ], source = "plotly_locus", height = height) %>%
+  plot_ly(TX, source = "plotly_locus", height = height) %>%
     add_segments(x = ~start, y = ~-row,
                  xend = ~end, yend = ~-row,
                  color = I(gene_col),
-                 text = hovertext[ok], hoverinfo = 'text',
+                 text = hovertext, hoverinfo = 'text',
                  showlegend = FALSE) %>%
     add_text(x = xtex, y = ytex, text = ttext,
              textfont = list(size = 14 * cex.text, color = text_col),
