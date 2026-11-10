@@ -111,7 +111,6 @@ trait_plotly <- function(loc,
   
   sw <- strwrap(LDT$GWAS_Trait, 40, simplify = FALSE)
   wrap_traits <- vapply(sw, paste, collapse = "\n   ", character(1))
-  n_assoc <- if (collapse) paste0("<br>Associations: ", LDT$n_assoc) else ""
   
   hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
@@ -122,7 +121,11 @@ trait_plotly <- function(loc,
                       "<br>RAF = ", LDT$Risk_Allele,
                       "<br>OR/beta = ", LDT$Effect_Size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,
-                      "<br>Trait: ", wrap_traits, n_assoc)
+                      "<br>Trait: ", wrap_traits)
+  n_assoc <- if (collapse) {
+    w <- LDT$n_assoc > 1
+    hovertext[w] <- paste0(hovertext[w], "<br>Associations: ", LDT$n_assoc[w])
+  }
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(opacity = 0.8,
