@@ -15,7 +15,16 @@
 #' @return Returns an object of class 'locus' with an extra list element
 #'   'OTqtl', a dataframe with one row per credible set, or unchanged if no
 #'   credible sets contain the index SNP.
-#' @noRd
+#' @seealso [qtl_plot()]
+#' @examples
+#' \dontrun{
+#' data(SLE_gwas_sub)
+#' loc <- locus(SLE_gwas_sub, gene = "IRF5", flank = 1e5,
+#'              ens_db = "EnsDb.Hsapiens.v75")
+#' loc <- link_ot(loc)
+#' head(loc$OTqtl)
+#' }
+#' @export
 
 link_ot <- function(loc,
                     study_types = c("eqtl", "pqtl", "sqtl", "tuqtl", "sceqtl",
@@ -182,10 +191,7 @@ qtl_plotly <- function(loc, type_filter = NULL, gene_filter = NULL, ...) {
     return(cfg(p))
   }
 
-  scheme <- c(eQTL = "#1f77b4", sQTL = "#ff7f0e", tuQTL = "#2ca02c",
-              pQTL = "#d62728", `sc-eQTL` = "#9467bd", `sc-sQTL` = "#8c564b",
-              `sc-tuQTL` = "#e377c2", `sc-pQTL` = "#bcbd22")
-  col <- scheme[q$type]
+  col <- qtl_scheme[q$type]
   col[is.na(col)] <- "grey"
   ylim <- range(q$logP, na.rm = TRUE)
   ylim <- ylim + max(diff(ylim) * 0.05, 0.5) * c(-1, 1)
@@ -216,6 +222,11 @@ qtl_plotly <- function(loc, type_filter = NULL, gene_filter = NULL, ...) {
                    dragmode = "pan")
   cfg(p)
 }
+
+# QTL type colours, shared by qtl_plotly() and qtl_plot()
+qtl_scheme <- c(eQTL = "#1f77b4", sQTL = "#ff7f0e", tuQTL = "#2ca02c",
+                pQTL = "#d62728", `sc-eQTL` = "#9467bd", `sc-sQTL` = "#8c564b",
+                `sc-tuQTL` = "#e377c2", `sc-pQTL` = "#bcbd22")
 
 # shorten long Open Targets labels (study IDs reach ~95 characters) for hovers
 ellipsis <- function(x, n = 40) {
