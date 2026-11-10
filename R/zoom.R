@@ -931,7 +931,7 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_r2_min = r2_min(),
+                   trait_r2_min = if ("ld" %in% colnames(loc1$data)) r2_min(),
                    trait_ld_scheme = if (!is.null(gwas_catalog) && ld_colour() &&
                                          "ld" %in% colnames(loc1$data))
                      eval(formals(scatter_plotly)$LD_scheme),
@@ -1458,6 +1458,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("LD")
     })
@@ -1559,6 +1560,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching eQTL data"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("eQTL")
     })
@@ -1572,6 +1574,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching GWAS trait data"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("GWAS trait")
     })
@@ -1585,6 +1588,7 @@ zoom <- function(data, ens_db,
       }
       showNotification("Fetching Open Targets QTL data",
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("Open Targets")
     })
