@@ -119,7 +119,7 @@ locus_plotly <- function(loc,
   pheights <- NULL
   if (any(heights > 1)) {
     pheights <- heights
-    pheights[length(pheights)] <- sum(heights)
+    pheights[length(pheights)] <- sum(heights)  # controls total height
     heights <- heights / sum(heights)
   }
   
@@ -165,7 +165,7 @@ locus_plotly <- function(loc,
   if (!is.null(ptr)) {
     n <- length(heights)
     heights <- heights[c(1:(n-1), n-1, n)]
-    heights <- heights / sum(heights)
+    heights[1:n] <- heights[1:n] / sum(heights[1:n]) * (1-heights[n+1])
   }
   
   if (is.null(highlight)) highlight <- egenes
