@@ -48,6 +48,7 @@ Suggests:
     DT,
     EnsDb.Hsapiens.v75,
     ggrepel,
+    httr,
     knitr,
     org.Hs.eg.db,
     rmarkdown,

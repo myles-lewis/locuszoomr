@@ -59,6 +59,9 @@
 #'   to filter results. See [trait_plotly()].
 #' @param trait_collapse Logical whether to collapse duplicate GWAS trait
 #'   associations. See [trait_plotly()].
+#' @param qtl_type_filter Character vector of Open Targets QTL types to show when
+#'   `loc` has QTL data from `link_ot()`.
+#' @param qtl_gene_filter Character vector of Open Targets QTL genes to show.
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -98,6 +101,8 @@ locus_plotly <- function(loc,
                          trait_filter = NULL,
                          trait_category_filter = NULL,
                          trait_collapse = TRUE,
+                         qtl_type_filter = NULL,
+                         qtl_gene_filter = NULL,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -137,10 +142,15 @@ locus_plotly <- function(loc,
     }
   }
   
+  ptr <- NULL
   if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
                         collapse = trait_collapse)
+  } else if (!is.null(loc$OTqtl)) {
+    ptr <- qtl_plotly(loc, qtl_type_filter, qtl_gene_filter)
+  }
+  if (!is.null(ptr)) {
     n <- length(heights)
     heights <- heights[c(1:(n-1), n-1, n)]
     heights <- heights / sum(heights)
@@ -154,7 +164,7 @@ locus_plotly <- function(loc,
                     blanks, height = pheights[length(pheights)]) 
     
   if (!is.null(loc2)) {
-    if (is.null(loc$LDtrait)) {
+    if (is.null(ptr)) {
       pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                             titleY = TRUE, margin = c(0, 0, 0, 0.02))
     } else {
@@ -165,7 +175,7 @@ locus_plotly <- function(loc,
     return(remap_overlaying_yaxes(pp))
   }
   
-  if (is.null(loc$LDtrait)) {
+  if (is.null(ptr)) {
     pp <- plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                           titleY = TRUE, margin = 0)
   } else {

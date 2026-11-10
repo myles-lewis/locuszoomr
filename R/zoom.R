@@ -228,7 +228,12 @@ zoom <- function(data, ens_db,
       .shiny-output-error-validation {
         display: flex;
         align-items: center;
-      }"))
+      }")),
+      tags$style(HTML("
+      #ld_get, #eqtl_get, #trait_get, #ot_get, #ld_clear { margin-bottom: 4px; }
+      #ot_get { background-color: #fff; border-color: #3489ca; color: #3489ca; }
+      #ot_get:hover, #ot_get:focus { border-color: #18405e; color: #18405e; }
+      #ot_get img { height: 14px; margin-right: 4px; vertical-align: -2px; }"))
     ),
     shinyFeedback::useShinyFeedback(),
     tabsetPanel(id = "topTabs",
@@ -346,6 +351,11 @@ zoom <- function(data, ens_db,
                                      }),
                                      actionButton("trait_get", "GWAS trait",
                                                   class = "btn-success btn-sm"),
+                                     actionButton("ot_get",
+                                                  shiny::tagList(tags$img(
+                                                    src = "https://platform.opentargets.org/favicon.png",
+                                                    alt = ""), "Open Targets"),
+                                                  class = "btn-sm"),
                                      actionButton("ld_clear", "Clear",
                                                   class = "btn-default btn-sm")
                               ))
@@ -359,6 +369,9 @@ zoom <- function(data, ens_db,
                                                                     value = TRUE)
                                      )
                               ))
+                          }),
+                          (if (show_ld) {
+                            uiOutput("ui_link_qtl")
                           }),
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
@@ -671,9 +684,10 @@ zoom <- function(data, ens_db,
     link_type <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
-                                categories = NULL)
+                                categories = NULL, qtl_types = NULL,
+                                qtl_genes = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
-                                LDexp = NULL)
+                                LDexp = NULL, OTqtl = NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -808,9 +822,33 @@ zoom <- function(data, ens_db,
         link_eqtl$traits <- NULL
         link_eqtl$categories <- NULL
       }
+      
+      # retrieve Open Targets QTL credible sets
+      if (identical(link_type(), "Open Targets") && !is.null(pin) &&
+          (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
+        loc1$index_snp <- pin
+        ld_msg <- NULL
+        loc1b <- try(link_ot(loc1))
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
+        removeNotification("ld_busy")
+        if (is.null(loc1$OTqtl)) {
+          showNotification(
+            paste0("No Open Targets QTL data for ", pin,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "warning", duration = 10)
+        }
+        link_eqtl$qtl_types <- sort(unique(loc1$OTqtl$type))
+        link_eqtl$qtl_genes <- sort(unique(loc1$OTqtl$gene))
+      } else {
+        link_eqtl$qtl_types <- NULL
+        link_eqtl$qtl_genes <- NULL
+      }
       link_data$LDtrait <- loc1$LDtrait
       link_data$trait_category <- loc1$trait_category
       link_data$LDexp <- loc1$LDexp
+      link_data$OTqtl <- loc1$OTqtl
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
@@ -835,7 +873,9 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_collapse = !isFALSE(input$trait_collapse))
+                   trait_collapse = !isFALSE(input$trait_collapse),
+                   qtl_type_filter = qtl_type_filter(),
+                   qtl_gene_filter = qtl_gene_filter())
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
@@ -904,16 +944,43 @@ zoom <- function(data, ens_db,
     output$has_trait <- reactive({!is.null(link_eqtl$traits)})
     outputOptions(output, "has_trait", suspendWhenHidden = FALSE)
     
+    output$ui_link_qtl <- renderUI({
+      req(link_eqtl$qtl_types)
+      fluidRow(column(12,
+        shinyWidgets::pickerInput("qtl_type_filter", h5("Select QTL types"),
+                                  choices = link_eqtl$qtl_types,
+                                  selected = link_eqtl$qtl_types,
+                                  multiple = TRUE,
+                                  options = shinyWidgets::pickerOptions(
+                                    actionsBox = TRUE,
+                                    selectedTextFormat = 'count > 2')),
+        (if (length(link_eqtl$qtl_genes) > 1) {
+          shinyWidgets::pickerInput("qtl_gene_filter", h5("Select QTL genes"),
+                                    choices = link_eqtl$qtl_genes,
+                                    selected = link_eqtl$qtl_genes,
+                                    multiple = TRUE,
+                                    options = shinyWidgets::pickerOptions(
+                                      actionsBox = TRUE,
+                                      selectedTextFormat = 'count > 3',
+                                      liveSearch = TRUE))
+        })
+      ))
+    })
+    
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
     trait_filter <- reactiveVal(NULL)
     trait_category_filter <- reactiveVal(NULL)
+    qtl_type_filter <- reactiveVal(NULL)
+    qtl_gene_filter <- reactiveVal(NULL)
     
     deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
     deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
+    deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
+    deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
     
     # prevents ui update double trigger output$locus
     # NULL special meaning = all categories ticked
@@ -952,6 +1019,28 @@ zoom <- function(data, ens_db,
         trait_category_filter(i)
       } else trait_category_filter(NULL)
     })
+    
+    observeEvent(deb_qtl_filter(), {
+      i <- deb_qtl_filter()
+      tset <- link_eqtl$qtl_types
+      req(tset)
+      if (is.null(i)) {
+        qtl_type_filter(character(0))
+      } else if (!identical(i, tset)) {
+        qtl_type_filter(i)
+      } else qtl_type_filter(NULL)
+    }, ignoreNULL = FALSE)
+    
+    observeEvent(deb_qtl_gene_filter(), {
+      i <- deb_qtl_gene_filter()
+      gset <- link_eqtl$qtl_genes
+      req(length(gset) > 1)
+      if (is.null(i)) {
+        qtl_gene_filter(character(0))
+      } else if (!identical(i, gset)) {
+        qtl_gene_filter(i)
+      } else qtl_gene_filter(NULL)
+    }, ignoreNULL = FALSE)
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
@@ -1074,6 +1163,10 @@ zoom <- function(data, ens_db,
                            !isFALSE(input$trait_collapse))
         tab$PMID <- pubmed_links(tab$PMID)
         num <- c("r2", "P")
+      } else if (!is.null(link_data$OTqtl)) {
+        tab <- qtl_table(shiny::reactiveValuesToList(link_data),
+                         qtl_type_filter(), qtl_gene_filter())
+        num <- c("P", "Beta", "PIP")
       } else {
         tab <- eqtl_table(shiny::reactiveValuesToList(link_data), eqtl_gene_filter(),
                           eqtl_tissue_filter())
@@ -1089,12 +1182,14 @@ zoom <- function(data, ens_db,
     output$extra_tab_nm <- renderText({
       if (!is.null(link_data$LDtrait)) return("GWAS Catalog associations")
       if (!is.null(link_data$LDexp)) return("eQTL associations")
+      if (!is.null(link_data$OTqtl)) return("QTL credible sets (Open Targets)")
       ""
     })
     
     # show/hide extra table tab
     observe({
-      if (!is.null(link_data$LDtrait) || !is.null(link_data$LDexp)) {
+      if (!is.null(link_data$LDtrait) || !is.null(link_data$LDexp) ||
+          !is.null(link_data$OTqtl)) {
         showTab("topTabs", "linktab")
       } else {
         hideTab("topTabs", "linktab")
@@ -1331,6 +1426,19 @@ zoom <- function(data, ens_db,
                        id = "ld_busy", duration = NULL)
       link_snp(snp)
       link_type("GWAS trait")
+    })
+    
+    # retrieve Open Targets QTL credible sets
+    observeEvent(input$ot_get, {
+      snp <- cur_index()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification("Fetching Open Targets QTL data",
+                       id = "ld_busy", duration = NULL)
+      link_snp(snp)
+      link_type("Open Targets")
     })
     
     # inline conditional UI
