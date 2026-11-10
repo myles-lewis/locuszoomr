@@ -236,6 +236,42 @@ features which don't rely on shiny for updates are preserved, e.g. hover
 information. However shiny dependent features such as gene track reordering
 based on display width won't function.
 
+### R code for a figure
+
+The `r shiny::icon("code")` button next to the save icon shows R code which
+redraws the current view as a static base graphics figure, ready to copy into a
+script and adjust. The code repeats what the app did: the same window and data
+columns, the same LD, eQTL, GWAS Catalog or Open Targets data (fetched again
+when the code is run, with the LDlink token read from the `LDLINK_TOKEN`
+environment variable), and the same trait, category, QTL and gene filters. The
+extra tracks are drawn by `trait_plot()`, `qtl_plot()` and `overlay_scatter()`,
+which stack with `scatter_plot()` and `genetracks()` using `set_layers()`.
+For example, at IRF5 with LD and the local GWAS Catalog filtered to r^2^ >= 0.5:
+
+```{r eval=FALSE}
+library(locuszoomr)
+library(EnsDb.Hsapiens.v75)
+
+loc <- locus(SLE_gwas_sub, seqname = "7", xrange = c(128083877, 129083877),
+             ens_db = "EnsDb.Hsapiens.v75", chrom = "chrom", pos = "pos",
+             p = "p", labs = "rsid", index_snp = "rs35000415")
+loc <- link_LD(loc, token = Sys.getenv("LDLINK_TOKEN"), pop = "EUR")
+gcat <- load_gwas_catalog()
+loc <- link_gwas_catalog(loc, gcat)
+
+oldpar <- set_layers(2)
+scatter_plot(loc, xticks = FALSE)
+trait_plot(loc, r2_min = 0.5,
+           ld_scheme = eval(formals(scatter_plot)$LD_scheme),
+           size_by_r2 = FALSE)
+genetracks(loc, maxrows = 8)
+par(oldpar)
+```
+
+If an argument was passed to `zoom()` as an expression rather than an object
+name (e.g. `zoom(subset(gwas, chrom == 7), ...)`), the code starts with a line
+to fill in.
+
 ### Citation
 
 If you use this package please cite as:
