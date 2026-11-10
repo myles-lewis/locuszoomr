@@ -1024,8 +1024,7 @@ zoom <- function(data, ens_db,
                                     multiple = TRUE,
                                     options = shinyWidgets::pickerOptions(
                                       actionsBox = TRUE,
-                                      selectedTextFormat = 'count > 3',
-                                      liveSearch = TRUE))
+                                      selectedTextFormat = 'count > 3'))
         })
       ))
     })
@@ -1489,6 +1488,7 @@ zoom <- function(data, ens_db,
     # the r2 cut-off and LD colouring need LD, so fetch it if missing; run
     # before output$locus so it renders once, with LD
     has_ld <- function() "ld" %in% colnames(isolate(loc$i$data))
+    
     observeEvent(trait_r2_min(), {
       r2_min(as.numeric(trait_r2_min()))
       req(trait_r2_min() > 0, !has_ld())
@@ -1496,12 +1496,14 @@ zoom <- function(data, ens_db,
       shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
       fetch_index_ld("for the r\u00b2 cut-off")
     }, priority = 1)
+    
     # with a local Catalog, Get LD also colours it by LD (in the same render)
     observeEvent(input$ld_get, {
       req(!is.null(gwas_catalog), !is.null(cur_index()), !is.na(cur_index()))
       ld_colour(TRUE)
       shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
     }, priority = 1)
+    
     observeEvent(input$trait_ld_colour, {
       ld_colour(isTRUE(input$trait_ld_colour))
       req(isTRUE(input$trait_ld_colour), !has_ld())

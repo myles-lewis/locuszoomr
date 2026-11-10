@@ -47,6 +47,7 @@ trait_plotly <- function(loc,
   r2_cut <- !is.null(r2_min) && r2_min > 0
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
+  hasLD <- "ld" %in% colnames(loc$data)
   
   if (is.null(LDT) || nrow(LDT) == 0) {
     # blank plotly
@@ -115,7 +116,9 @@ trait_plotly <- function(loc,
   hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
-                      "<br>r<sup>2</sup> = ", signif(LDT$R2, 3),
+                      (if (hasLD) {
+                        paste0("<br>r<sup>2</sup> = ", signif(LDT$R2, 3))
+                      }),
                       "<br>RAF = ", LDT$Risk_Allele,
                       "<br>OR/beta = ", LDT$Effect_Size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,

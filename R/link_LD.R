@@ -86,6 +86,7 @@ link_LD <- function(loc,
   }
   
   if (is.null(emsg)) {
+    loc$data$ld[loc$data[, loc$labs] %in% index_snp] <- 1
     end <- Sys.time()
     m <- sum(!is.na(loc$data$ld))
     message("- matched ", m, " SNPs (", format(end - start, digits = 3),")")
