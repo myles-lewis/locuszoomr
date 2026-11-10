@@ -31,7 +31,7 @@ link_ot <- function(loc,
   }
   start <- Sys.time()
   message("Open Targets ", index_snp, appendLF = FALSE)
-  vid <- ot_variant_id(index_snp)
+  vid <- ot_variant_id(index_snp, loc$seqname)
   if (is.null(vid)) {
     message(" - not found in Open Targets")
     return(loc)
@@ -46,7 +46,13 @@ link_ot <- function(loc,
   ind <- match(q$lead_rsid, loc$data[, loc$labs])
   offset <- 0
   if (!grepl("38", loc$genome)) {
-    offset <- res$position - loc$data[match(index_snp, loc$data[, loc$labs]), loc$pos]
+    i <- match(index_snp, loc$data[, loc$labs])
+    offset <- if (!is.na(i)) {
+      res$position - loc$data[i, loc$pos]
+    } else {
+      # index SNP not in the data (e.g. only in zoom()'s second GWAS)
+      stats::median(q$pos38[!is.na(ind)] - loc$data[ind[!is.na(ind)], loc$pos])
+    }
   }
   q$pos <- ifelse(is.na(ind), q$pos38 - offset, loc$data[ind, loc$pos])
   loc$OTqtl <- q
@@ -68,13 +74,17 @@ ot_graphql <- function(query, variables = list()) {
 
 mem_ot_graphql <- memoise(ot_graphql)
 
-# rsID -> Open Targets variant ID (CHROM_POS_REF_ALT, GRCh38), or NULL
-ot_variant_id <- function(rsid) {
+# rsID -> Open Targets variant ID (CHROM_POS_REF_ALT, GRCh38), or NULL; the
+# search also returns prefix matches (rs1 -> rs10...), so check the rsID
+ot_variant_id <- function(rsid, chr = NULL) {
   d <- mem_ot_graphql(
-    'query q($s: String!) { search(queryString: $s, entityNames: ["variant"]) { hits { id entity } } }',
+    'query q($s: String!) { search(queryString: $s, entityNames: ["variant"]) { hits { id object { ... on Variant { rsIds chromosome } } } } }',
     list(s = rsid))
-  ids <- vapply(d$search$hits, function(h) h$id, character(1))
-  if (length(ids) == 0) NULL else ids[1]
+  ok <- vapply(d$search$hits, function(h) {
+    rsid %in% unlist(h$object$rsIds) &&
+      (is.null(chr) || identical(h$object$chromosome, sub("^chr", "", chr)))
+  }, logical(1))
+  if (!any(ok)) NULL else d$search$hits[[which(ok)[1]]]$id
 }
 
 ot_qtl_query <- 'query q($v: String!, $t: [StudyTypeEnum!], $i: Int!) {
@@ -120,12 +130,12 @@ ot_qtl_df <- function(rows) {
     study = get1(function(r) r$study$id),
     project = get1(function(r) r$study$projectId),
     lead_id = get1(function(r) r$variant$id),
-    lead_rsid = get1(function(r) r$variant$rsIds[[1]]),
+    lead_rsid = get1(function(r) unlist(r$variant$rsIds)[1]),
     pos38 = as.numeric(get1(function(r) r$variant$position)),
     p = as.numeric(get1(function(r) r$pValueMantissa)) *
       10^as.numeric(get1(function(r) r$pValueExponent)),
     beta = as.numeric(get1(function(r) r$beta)),
-    pip = as.numeric(get1(function(r) r$locus$rows[[1]]$posteriorProbability)),
+    pip = as.numeric(get1(function(r) unlist(lapply(r$locus$rows, `[[`, "posteriorProbability"))[1])),
     trans = get1(function(r) r$isTransQtl) %in% "TRUE"
   )
   q$logP <- -log10(q$p)
