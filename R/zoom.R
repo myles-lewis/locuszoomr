@@ -179,13 +179,6 @@ zoom <- function(data, ens_db,
   
   show_ld <- nzchar(ld_token)
   show_eqtl <- show_ld & is.null(eqtl_gene)
-  # local Catalog button: always shows the Catalog, this just toggles its pickers
-  gcat_btn <- actionButton("gcat_show", "GWAS Catalog", class = "btn-success btn-sm")
-  ot_btn <- actionButton("ot_get",
-                         shiny::tagList(tags$img(
-                           src = "https://platform.opentargets.org/favicon.png",
-                           alt = ""), "Open Targets"),
-                         class = "btn-sm")
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -241,12 +234,6 @@ zoom <- function(data, ens_db,
         display: flex;
         align-items: center;
       }")),
-      tags$style(HTML("
-      #ld_get, #eqtl_get, #trait_get, #gcat_show, #ot_get, #ld_clear { margin-bottom: 4px; }
-      #ot_get { background-color: #fff; border-color: #3489ca; color: #3489ca; }
-      #ot_get:hover, #ot_get:focus { border-color: #18405e; color: #18405e; }
-      #ot_get img { height: 14px; margin-right: 4px; vertical-align: -2px; }")),
-      # with a local Catalog its pickers can show alongside eQTL/QTL pickers
       (if (!is.null(gwas_catalog)) {
         tags$style(HTML("
       #ui_link_traits:not(:empty), #ui_link_qtl:not(:empty), #ui_link_genes:not(:empty) {
@@ -325,20 +312,28 @@ zoom <- function(data, ens_db,
                  )
                ),
                fluidRow(
-                 column(4,
-                        actionButton("left2", NULL, icon = icon("angles-left")),
+                 column(8,
+                        actionButton("left2", NULL, icon = icon("angles-left"),
+                                     style='margin-top:0px;'),
                         actionButton("left", NULL, icon = icon("angle-left")),
                         actionButton("right", NULL, icon = icon("angle-right")),
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
-                        uiOutput("save_ui", inline = T)
-                        ),
+                        uiOutput("save_ui", inline = T),
+                        (if (show_ld) {
+                          actionButton("ld_get", "LD")
+                        }),
+                        (if (show_eqtl) {
+                          actionButton("eqtl_get", "eQTL")
+                        }),
+                        (if (show_ld && is.null(gwas_catalog)) {
+                          actionButton("trait_get", "GWAS trait")
+                        }),
+                        actionButton("ot_get", "Open Targets"),
+                        actionButton("ld_clear", "Clear")
+                 ),
                  column(3,
-                        textOutput("pos"),
-                        textOutput("ld_status"),
-                        align = "centre", style='margin-top:7px;'),
-                 column(4,
                         splitLayout(
                           textInput("tex", NULL, placeholder = "chr:start-end, rs or gene",
                                     width = "100%"),
@@ -360,53 +355,18 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          (if (show_ld) {
-                            fluidRow(
-                              column(12,
-                                     h5("LDlink tools"),
-                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
-                                                  class = "btn-primary btn-sm"),
-                                     (if (show_eqtl) {
-                                       actionButton("eqtl_get", "eQTL", icon = icon("compass"),
-                                                    class = "btn-info btn-sm")
-                                     }),
-                                     (if (is.null(gwas_catalog)) {
-                                       actionButton("trait_get", "GWAS trait",
-                                                    class = "btn-success btn-sm")
-                                     } else gcat_btn),
-                                     ot_btn,
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")
-                              ))
-                          }),
-                          # the local Catalog and Open Targets need no LDlink token
-                          (if (!show_ld && !is.null(gwas_catalog)) {
-                            fluidRow(
-                              column(12,
-                                     h5("GWAS Catalog"),
-                                     gcat_btn, ot_btn,
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")))
-                          }),
+                          
                           (if (show_ld || !is.null(gwas_catalog)) {
-                            conditionalPanel(
-                              if (is.null(gwas_catalog)) "true" else "output.gcat_open",
                             fluidRow(
                               column(12,
                                      uiOutput("ui_link_traits"),
                                      conditionalPanel("output.has_trait",
                                                       checkboxInput("trait_collapse", "collapse duplicate associations",
                                                                     value = TRUE)
-                                     ),
-                                     (if (show_ld && !is.null(gwas_catalog)) {
-                                       shiny::tagList(
-                                         shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
-                                                            min = 0, max = 1, value = 0, step = 0.05),
-                                         checkboxInput("trait_ld_colour", "colour by LD", value = FALSE))
-                                     })
-                              )))
+                                     )
+                              ))
                           }),
-                          (if (show_ld || !is.null(gwas_catalog)) {
+                          (if (show_ld) {
                             uiOutput("ui_link_qtl")
                           }),
                           (if (show_eqtl) {
@@ -420,6 +380,12 @@ zoom <- function(data, ens_db,
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
+               fluidRow(
+                 column(3,
+                        textOutput("pos"),
+                        textOutput("ld_status"),
+                        align = "centre", style='margin-top:7px;', offset = 4)
+               ),
                  fluidRow(
                    column(12,
                           plotlyOutput("locus", width = "95vw", height = height[3])
@@ -728,7 +694,6 @@ zoom <- function(data, ens_db,
                                 qtl_genes = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
                                 LDexp = NULL, OTqtl = NULL)
-    ld_colour <- reactiveVal(FALSE)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -860,6 +825,7 @@ zoom <- function(data, ens_db,
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
         link_eqtl$categories <- sort(unique(loc1$trait_category$category))
       } else if (!is.null(gwas_catalog) && isTRUE(input$gwas_catalog)) {
+        # local GWAS catalog
         loc1b <- try(link_gwas_catalog(loc1, gwas_catalog))
         if (inherits(loc1b, "try-error")) {
           showNotification(attr(loc1b, "condition")$message,
@@ -931,10 +897,6 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_r2_min = if ("ld" %in% colnames(loc1$data)) r2_min(),
-                   trait_ld_scheme = if (!is.null(gwas_catalog) && ld_colour() &&
-                                         "ld" %in% colnames(loc1$data))
-                     eval(formals(scatter_plotly)$LD_scheme),
                    trait_size_by_r2 = is.null(gwas_catalog),
                    trait_collapse = !isFALSE(input$trait_collapse),
                    qtl_type_filter = qtl_type_filter(),
@@ -945,7 +907,6 @@ zoom <- function(data, ens_db,
     })
     
     output$ui_genes <- renderUI({
-      # req(length(genes$x) > 1)
       g <- c("all", genes$x)
       isolate(ig <- input$select_gene)
       if (length(ig) == 0 || !ig %in% genes$x) ig <- "all"
@@ -982,7 +943,7 @@ zoom <- function(data, ens_db,
         column(12,
                (if (cat_ok) {
                  shinyWidgets::pickerInput(
-                   "trait_category_filter", h5("Select trait categories"),
+                   "trait_category_filter", h5("Select GWAS trait categories"),
                    choices = link_eqtl$categories,
                    selected = link_eqtl$categories,
                    multiple = TRUE,
@@ -991,7 +952,7 @@ zoom <- function(data, ens_db,
                      selectedTextFormat = 'count > 1',
                      dropdownAlignRight = 'auto'))
                }),
-               shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
+               shinyWidgets::pickerInput("trait_filter", h5("Select GWAS traits"),
                                          choices = link_eqtl$traits,
                                          selected = link_eqtl$traits,
                                          multiple = TRUE,
@@ -1029,21 +990,15 @@ zoom <- function(data, ens_db,
       ))
     })
     
-    # local GWAS Catalog button: show/hide the trait pickers; if the Catalog
-    # track is switched off or replaced by Open Targets, bring it back
-    gcat_open <- reactiveVal(FALSE)
-    output$gcat_open <- reactive(gcat_open())
-    outputOptions(output, "gcat_open", suspendWhenHidden = FALSE)
-    observeEvent(input$gcat_show, {
-      ot <- identical(link_type(), "Open Targets")
-      if (!isTRUE(input$gwas_catalog) || ot) {
-        shiny::updateCheckboxInput(session, "gwas_catalog", value = TRUE)
-        if (ot) {
-          link_snp(NULL)
-          link_type(NULL)
-        }
-        gcat_open(TRUE)
-      } else gcat_open(!gcat_open())
+    # if local Catalog track is off and then toggled on, removes OT if present 
+    has_OT <- reactive({identical(link_type(), "Open Targets")}) 
+    
+    observeEvent(input$gwas_catalog, {
+      req(input$gwas_catalog)
+      if (input$gwas_catalog && has_OT()) {
+        link_snp(NULL)
+        link_type(NULL)
+      }
     })
     
     eqtl_gene_filter <- reactiveVal(NULL)
@@ -1058,10 +1013,6 @@ zoom <- function(data, ens_db,
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
-    trait_r2_min <- reactive({input$trait_r2_min}) %>% debounce(500)
-    # held here so Clear etc. reset it in the same render, not after the
-    # slider's round trip
-    r2_min <- reactiveVal(0)
     deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
     deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
     
@@ -1462,54 +1413,6 @@ zoom <- function(data, ens_db,
       link_snp(snp)
       link_type("LD")
     })
-    
-    # Clear, eQTL and Open Targets drop LD, so reset the LD-based Catalog options
-    observeEvent(list(input$ld_clear, input$eqtl_get, input$ot_get), {
-      shiny::updateSliderInput(session, "trait_r2_min", value = 0)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = FALSE)
-      r2_min(0)
-      ld_colour(FALSE)
-    }, ignoreInit = TRUE)
-    
-    # fetch LD for the index SNP in view, as Get LD would
-    fetch_index_ld <- function(why) {
-      snp <- cur_index()
-      if (is.null(snp) || is.na(snp)) {
-        showNotification("No index SNP in view", type = "warning")
-        return()
-      }
-      showNotification(paste0("Fetching LD for ", snp, " ", why),
-                       id = "ld_busy", duration = NULL)
-      # re-setting the same SNP would not re-render, e.g. after a failed fetch
-      link_snp(NULL)
-      link_snp(snp)
-      link_type("LD")
-    }
-    
-    # the r2 cut-off and LD colouring need LD, so fetch it if missing; run
-    # before output$locus so it renders once, with LD
-    has_ld <- function() "ld" %in% colnames(isolate(loc$i$data))
-    
-    observeEvent(trait_r2_min(), {
-      r2_min(as.numeric(trait_r2_min()))
-      req(trait_r2_min() > 0, !has_ld())
-      ld_colour(TRUE)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
-      fetch_index_ld("for the r\u00b2 cut-off")
-    }, priority = 1)
-    
-    # with a local Catalog, Get LD also colours it by LD (in the same render)
-    observeEvent(input$ld_get, {
-      req(!is.null(gwas_catalog), !is.null(cur_index()), !is.na(cur_index()))
-      ld_colour(TRUE)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
-    }, priority = 1)
-    
-    observeEvent(input$trait_ld_colour, {
-      ld_colour(isTRUE(input$trait_ld_colour))
-      req(isTRUE(input$trait_ld_colour), !has_ld())
-      fetch_index_ld("to colour by LD")
-    }, priority = 1)
     
     observeEvent(input$ld_clear, {
       link_snp(NULL)

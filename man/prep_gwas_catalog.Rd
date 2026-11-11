@@ -25,7 +25,7 @@ latest date an association was added to the Catalog).
 Reads the GWAS Catalog associations download, keeps single-SNP associations
 and the columns used by the GWAS Catalog track, and optionally lifts
 positions over to GRCh37 and adds trait categories. Save the result with
-\code{\link[=saveRDS]{saveRDS()}} and pass it, or the file path, to \code{\link[=zoom]{zoom()}} as \code{gwas_catalog}.
+\code{saveRDS()} and pass it, or the file path, to \code{\link[=zoom]{zoom()}} as \code{gwas_catalog}.
 }
 \details{
 The associations file ("All associations v1.0.2 - with added

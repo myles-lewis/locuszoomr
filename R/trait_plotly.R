@@ -16,6 +16,7 @@
 #'   with the index SNP instead of by trait, as `LD_scheme` in
 #'   [scatter_plotly()]; markers then have a fixed size rather than one
 #'   scaled by r^2.
+#' @param show_ld Whether to use LD for colour associations with the index SNP.
 #' @param size_by_r2 Logical whether to scale marker size by r^2 with the index
 #'   SNP.
 #' @param ... Optional arguments passed to `plot_ly()`.
@@ -29,6 +30,7 @@ trait_plotly <- function(loc,
                          collapse = TRUE,
                          r2_min = NULL,
                          ld_scheme = NULL,
+                         show_ld = "ld" %in% colnames(loc$data),
                          size_by_r2 = TRUE,
                          ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -44,10 +46,10 @@ trait_plotly <- function(loc,
     tc <- loc$trait_category
     LDT <- LDT[LDT$GWAS_Trait %in% tc$trait[tc$category %in% category_filter], ]
   }
-  r2_cut <- !is.null(r2_min) && r2_min > 0
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
-  hasLD <- "ld" %in% colnames(loc$data)
+  hasLD <- "R2" %in% colnames(LDT)
+  r2_cut <- hasLD && !is.null(r2_min) && r2_min > 0
   
   if (is.null(LDT) || nrow(LDT) == 0) {
     # blank plotly
@@ -88,7 +90,8 @@ trait_plotly <- function(loc,
   } else {
     LDT$colour <- "red"
   }
-  if (!is.null(ld_scheme)) {
+  if (hasLD && show_ld) {
+    if (is.null(ld_scheme)) ld_scheme <- eval(formals(scatter_plotly)$LD_scheme)
     # same bins as scatter_plotly(); strongest LD drawn on top
     bin <- cut(LDT$R2, -1:6/5, labels = FALSE)
     bin[LDT$R2 %in% 0] <- 2L
@@ -112,7 +115,7 @@ trait_plotly <- function(loc,
   sw <- strwrap(LDT$GWAS_Trait, 40, simplify = FALSE)
   wrap_traits <- vapply(sw, paste, collapse = "\n   ", character(1))
   
-  hovertext <- paste0("GWAS Catalogue: ", LDT$RS_Number,
+  hovertext <- paste0("GWAS Catalog: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
                       (if (hasLD) {

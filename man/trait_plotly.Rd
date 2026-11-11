@@ -11,6 +11,7 @@ trait_plotly(
   collapse = TRUE,
   r2_min = NULL,
   ld_scheme = NULL,
+  show_ld = "ld" \%in\% colnames(loc$data),
   size_by_r2 = TRUE,
   ...
 )
@@ -33,6 +34,8 @@ or without r^2 are shown in grey.}
 with the index SNP instead of by trait, as \code{LD_scheme} in
 \code{\link[=scatter_plotly]{scatter_plotly()}}; markers then have a fixed size rather than one
 scaled by r^2.}
+
+\item{show_ld}{Whether to use LD for colour associations with the index SNP.}
 
 \item{size_by_r2}{Logical whether to scale marker size by r^2 with the index
 SNP.}
