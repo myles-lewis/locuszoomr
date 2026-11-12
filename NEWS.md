@@ -1,12 +1,20 @@
 News
 =====
 
-# locuszoomr 1.3.1
-###### 6/11/2026
+# locuszoomr 1.3.2
+###### 12/11/2026
+
+## Major update
+* Improved UI in `zoom()`.
 * Added 'GWAS trait' button to `zoom()` to pull GWAS Catalog trait information 
 via LDlink and display it as an extra track.
+* Added `download_gwas_catalog()` function which downloads and caches a copy of 
+the GWAS Catalog so that this track can always be displayed in `zoom()` [Tom 
+Willis].
+* Added button to `zoom()` to pull credible QTL sets from Open Targets [Tom 
+Willis].
 * Improved tables in `zoom()` to show local/genome data and LDlink eQTL/ GWAS 
-Catalog trait data
+Catalog trait data.
 * Added `link_trait()` to pull GWAS Catalog trait data and add it to a `locus` 
 object.
 * Added `trait_plotly()` to display GWAS trait SNPs as an extra track.
