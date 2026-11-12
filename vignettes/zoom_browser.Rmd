@@ -152,11 +152,9 @@ filter the track by trait and trait category. The associations are listed in a
 GWAS Catalog tab, captioned with the date of the newest association in the
 downloaded copy.
 
-With an LDlink token, when LD is fetched with `Get LD`, the Catalog associations at SNPs in the GWAS
-data are coloured by their LD with the index SNP, using the same colours as the
-GWAS plot. Unticking `colour by LD` returns to trait colours. The `minimum r²`
-slider greys out associations below an LD cut-off. It fetches LD for the index
-SNP first if LD hasn't been fetched yet.
+With an LDlink token, when LD is fetched by pressing the `LD` button, the
+Catalog associations at SNPs in the GWAS data are coloured by their LD with the
+index SNP, using the same colours as the GWAS plot.
 
 The prepared Catalog can also be loaded and used outside the browser:
 
