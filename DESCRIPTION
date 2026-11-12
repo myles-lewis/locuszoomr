@@ -1,6 +1,6 @@
 Package: locuszoomr
 Title: Gene Locus Plot with Gene Annotations
-Version: 1.3.0
+Version: 1.3.2
 Authors@R:
     c(person(given = "Myles",family = "Lewis",
     role = c("aut", "cre"),
@@ -38,7 +38,9 @@ Imports:
     Rcpp,
     rlang,
     rtracklayer,
-    shiny
+    shiny,
+    tools,
+    utils
 LinkingTo: Rcpp
 Roxygen: list(markdown = TRUE)
 Suggests:
@@ -47,7 +49,9 @@ Suggests:
     dplyr,
     DT,
     EnsDb.Hsapiens.v75,
+    data.table,
     ggrepel,
+    httr,
     knitr,
     org.Hs.eg.db,
     rmarkdown,

@@ -170,6 +170,11 @@ scatter_plotly <- function(loc,
   hovertext <- paste0(data[, loc$labs], "<br>Chr ",
                       data[, loc$chrom], ": ", data[, loc$pos],
                       "<br>P = ", signif(data[, loc$p], 3))
+  if (hasLD) {
+    ok <- !is.na(data$ld)
+    hovertext[ok] <- paste0(hovertext[ok],
+                                 "<br>r<sup>2</sup> = ", signif(data$ld[ok], 3))
+  }
   add_hover <- c(beta, eqtl_gene, add_hover)
   if (!is.null(add_hover)) {
     for (i in add_hover) {

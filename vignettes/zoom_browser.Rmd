@@ -125,6 +125,58 @@ filtered using picker menus which become available in the Settings menu.
 knitr::include_graphics("zoom_eqtl.png")
 ```
 
+### Local copy of the GWAS Catalog
+
+Instead of querying LDlink for GWAS Catalog associations SNP by SNP, the whole
+[GWAS Catalog](https://www.ebi.ac.uk/gwas/) can be downloaded once and shown at
+every locus. `download_gwas_catalog()` downloads the Catalog associations
+(about 90 MB), the Catalog trait mappings (for trait categories) and the UCSC
+hg38ToHg19 liftOver chain (for GRCh37 positions). It then prepares them and
+saves a copy of about 25 MB in the locuszoomr cache directory (see
+`tools::R_user_dir()`). It asks before downloading and needs the `data.table`
+package. The Catalog is updated weekly; run `download_gwas_catalog()` again to
+update the cached copy.
+
+```{r eval=FALSE}
+download_gwas_catalog()
+zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19,
+     gwas_catalog = TRUE, ld_token = "my_token")
+```
+
+With `gwas_catalog = TRUE`, every Catalog association in the window is shown in
+the GWAS Catalog track below the GWAS plot, coloured by trait, at each locus as
+you browse. No API requests are made, so this also works without an LDlink
+token. A `show GWAS Catalog` checkbox in the `r shiny::icon("gear")` settings
+menu turns the track off. Picker menus can be used to filter the track by trait
+and trait category. A table of associations is also available in the GWAS
+Catalog table tab at the top of the page.
+
+With an LDlink token, when LD is fetched by pressing the `LD` button, the
+Catalog associations at SNPs in the GWAS data are coloured by their LD with the
+index SNP, using the same colours as the GWAS plot.
+
+The prepared Catalog can also be loaded and used outside the browser:
+
+```{r eval=FALSE}
+gcat <- load_gwas_catalog()
+loc <- locus(SLE_gwas, gene = "IRF5", flank = 5e5, ens_db = "EnsDb.Hsapiens.v75")
+loc <- link_gwas_catalog(loc, gcat)
+locus_plotly(loc)
+```
+
+A Catalog prepared with `prep_gwas_catalog()` from your own downloaded files
+can be passed to `zoom()` directly, either as the object or as the path of a
+saved .rds file.
+
+### Open Targets QTL credible sets
+
+The `Open Targets` button in the settings menu queries the
+[Open Targets Platform](https://platform.opentargets.org/) for fine-mapped
+molecular QTL credible sets (eQTL, pQTL, sQTL and others) containing the index
+SNP. They are shown in an extra track, with picker menus to filter by QTL type
+and gene and a table of the credible sets. The button appears alongside the
+LDlink tools, or with a local GWAS Catalog; Open Targets itself needs no token.
+
 ### Dual GWAS browsing
 
 Using the `data2` argument, users can browse 2 GWAS at the same time. Shown

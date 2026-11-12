@@ -31,6 +31,11 @@ locus_plotly(
   trait_filter = NULL,
   trait_category_filter = NULL,
   trait_collapse = TRUE,
+  trait_r2_min = NULL,
+  trait_ld_scheme = NULL,
+  trait_size_by_r2 = TRUE,
+  qtl_type_filter = NULL,
+  qtl_gene_filter = NULL,
   ...
 )
 }
@@ -110,6 +115,20 @@ to filter results. See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{trait_collapse}{Logical whether to collapse duplicate GWAS trait
 associations. See \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_r2_min}{Optional minimum r^2 for GWAS trait associations. See
+\code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_ld_scheme}{Optional colours to colour GWAS trait associations by
+r^2 instead of by trait. See \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{trait_size_by_r2}{Logical whether to scale GWAS trait marker size by
+r^2. See \code{\link[=trait_plotly]{trait_plotly()}}.}
+
+\item{qtl_type_filter}{Character vector of Open Targets QTL types to show when
+\code{loc} has QTL data from \code{link_ot()}.}
+
+\item{qtl_gene_filter}{Character vector of Open Targets QTL genes to show.}
 
 \item{...}{Optional arguments passed to \code{\link[=scatter_plotly]{scatter_plotly()}} to control the
 scatter plot.}

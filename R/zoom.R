@@ -56,6 +56,9 @@
 #' @param mh_points Number of points to display in manhattan plot. Default is
 #'   `1e5`.
 #' @param recomb Optional `GRanges` class object of recombination data.
+#' @param gwas_catalog Optional local GWAS Catalog, shown as an extra track at
+#'   every locus: `TRUE` to load the copy saved by [download_gwas_catalog()],
+#'   or an object from [prep_gwas_catalog()] or the path of an RDS file of it.
 #' @param ld_token Personal access token for the LDlink API, available from
 #'   <https://ldlink.nih.gov/?tab=apiaccess>. See `LDlinkR` package
 #'   documentation and [link_LD()]. When empty the LD controls are hidden. LD
@@ -101,6 +104,7 @@ zoom <- function(data, ens_db,
                  add_hover = NULL,
                  mh_points = 1e5,
                  recomb = NULL,
+                 gwas_catalog = NULL,
                  ld_token = Sys.getenv("LDLINK_TOKEN"),
                  ld_pop = "EUR",
                  seq_filter = c(1:22, 'X', 'Y'),
@@ -115,6 +119,7 @@ zoom <- function(data, ens_db,
   if (!requireNamespace("DT", quietly = TRUE))
     stop("Need DT package", call. = FALSE)
   
+  gwas_catalog <- as_gwas_catalog(gwas_catalog)
   dat_name <- deparse(substitute(data))
   data <- data.frame(data)
   # autodetect headings
@@ -228,7 +233,12 @@ zoom <- function(data, ens_db,
       .shiny-output-error-validation {
         display: flex;
         align-items: center;
-      }"))
+      }")),
+      (if (!is.null(gwas_catalog)) {
+        tags$style(HTML("
+      #ui_link_traits:not(:empty), #ui_link_qtl:not(:empty), #ui_link_genes:not(:empty) {
+        border-top: 1px solid #ddd; margin-top: 8px; padding-top: 4px; }"))
+      })
     ),
     shinyFeedback::useShinyFeedback(),
     tabsetPanel(id = "topTabs",
@@ -302,20 +312,28 @@ zoom <- function(data, ens_db,
                  )
                ),
                fluidRow(
-                 column(4,
-                        actionButton("left2", NULL, icon = icon("angles-left")),
+                 column(8,
+                        actionButton("left2", NULL, icon = icon("angles-left"),
+                                     style='margin-top:0px;'),
                         actionButton("left", NULL, icon = icon("angle-left")),
                         actionButton("right", NULL, icon = icon("angle-right")),
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
-                        uiOutput("save_ui", inline = T)
-                        ),
+                        uiOutput("save_ui", inline = T),
+                        (if (show_ld) {
+                          actionButton("ld_get", "LD")
+                        }),
+                        (if (show_eqtl) {
+                          actionButton("eqtl_get", "eQTL")
+                        }),
+                        (if (show_ld && is.null(gwas_catalog)) {
+                          actionButton("trait_get", "GWAS trait")
+                        }),
+                        actionButton("ot_get", "Open Targets"),
+                        actionButton("ld_clear", "Clear")
+                 ),
                  column(3,
-                        textOutput("pos"),
-                        textOutput("ld_status"),
-                        align = "centre", style='margin-top:7px;'),
-                 column(4,
                         splitLayout(
                           textInput("tex", NULL, placeholder = "chr:start-end, rs or gene",
                                     width = "100%"),
@@ -328,29 +346,17 @@ zoom <- function(data, ens_db,
                           (if (!is.null(recomb)) {
                             checkboxInput("recomb", "show recombination rate", value = TRUE)
                           } else NULL),
+                          (if (!is.null(gwas_catalog)) {
+                            checkboxInput("gwas_catalog", "show GWAS Catalog", value = TRUE)
+                          }),
                           checkboxInput("alltracks", "show all gene tracks"),
                           shinyWidgets::pickerInput("biotype", h5("Select gene biotypes"),
                                       choices = biotypes, selected = biotypes,
                                       multiple = TRUE,
                                       options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          (if (show_ld) {
-                            fluidRow(
-                              column(12,
-                                     h5("LDlink tools"),
-                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
-                                                  class = "btn-primary btn-sm"),
-                                     (if (show_eqtl) {
-                                       actionButton("eqtl_get", "eQTL", icon = icon("compass"),
-                                                    class = "btn-info btn-sm")
-                                     }),
-                                     actionButton("trait_get", "GWAS trait",
-                                                  class = "btn-success btn-sm"),
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")
-                              ))
-                          }),
-                          (if (show_ld) {
+                          
+                          (if (show_ld || !is.null(gwas_catalog)) {
                             fluidRow(
                               column(12,
                                      uiOutput("ui_link_traits"),
@@ -359,6 +365,9 @@ zoom <- function(data, ens_db,
                                                                     value = TRUE)
                                      )
                               ))
+                          }),
+                          (if (show_ld) {
+                            uiOutput("ui_link_qtl")
                           }),
                           (if (show_eqtl) {
                             uiOutput("ui_link_genes")
@@ -371,6 +380,12 @@ zoom <- function(data, ens_db,
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
+               fluidRow(
+                 column(3,
+                        textOutput("pos"),
+                        textOutput("ld_status"),
+                        align = "centre", style='margin-top:7px;', offset = 4)
+               ),
                  fluidRow(
                    column(12,
                           plotlyOutput("locus", width = "95vw", height = height[3])
@@ -400,6 +415,10 @@ zoom <- function(data, ens_db,
                           DT::dataTableOutput("table2")
                    ))
                  )
+      }),
+      (if (!is.null(gwas_catalog)) {
+        tabPanel("GWAS Catalog",
+                 fluidRow(column(12, br(), DT::dataTableOutput("catalog_table"))))
       }),
       tabPanel(title = uiOutput("extra_tab_nm"), value = "linktab",
                fluidRow(
@@ -671,9 +690,10 @@ zoom <- function(data, ens_db,
     link_type <- reactiveVal(NULL)
     cur_index <- reactiveVal(NULL)
     link_eqtl <- reactiveValues(genes = NULL, tissues = NULL, traits = NULL,
-                                categories = NULL)
+                                categories = NULL, qtl_types = NULL,
+                                qtl_genes = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
-                                LDexp = NULL)
+                                LDexp = NULL, OTqtl = NULL)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -804,13 +824,55 @@ zoom <- function(data, ens_db,
         }
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
         link_eqtl$categories <- sort(unique(loc1$trait_category$category))
+      } else if (!is.null(gwas_catalog) && isTRUE(input$gwas_catalog)) {
+        # local GWAS catalog
+        loc1b <- try(link_gwas_catalog(loc1, gwas_catalog))
+        if (inherits(loc1b, "try-error")) {
+          showNotification(attr(loc1b, "condition")$message,
+                           id = "gcat_error", type = "error", duration = 10)
+        } else {
+          loc1 <- loc1b
+          traits_new <- sort(unique(loc1$LDtrait$GWAS_Trait))
+          # the pickers re-render with every trait selected, so drop filters
+          # from the previous locus now rather than in a second render
+          if (!identical(traits_new, isolate(link_eqtl$traits))) {
+            trait_filter(NULL)
+            trait_category_filter(NULL)
+          }
+          link_eqtl$traits <- traits_new
+          link_eqtl$categories <- sort(unique(loc1$trait_category$category))
+        }
       } else {
         link_eqtl$traits <- NULL
         link_eqtl$categories <- NULL
       }
+      
+      # retrieve Open Targets QTL credible sets
+      if (identical(link_type(), "Open Targets") && !is.null(pin) &&
+          (pin %in% loc1$data[, labs[1]] || (man2 && pin %in% loc2$data[, labs[2]]))) {
+        loc1$index_snp <- pin
+        ld_msg <- NULL
+        loc1b <- try(link_ot(loc1))
+        if (inherits(loc1b, "try-error")) {
+          ld_msg <- attr(loc1b, "condition")$message
+        } else loc1 <- loc1b
+        removeNotification("ld_busy")
+        if (is.null(loc1$OTqtl)) {
+          showNotification(
+            paste0("No Open Targets QTL data for ", pin,
+                   if (is.null(ld_msg)) "" else paste0(" - ", ld_msg)),
+            type = "warning", duration = 10)
+        }
+        link_eqtl$qtl_types <- sort(unique(loc1$OTqtl$type))
+        link_eqtl$qtl_genes <- sort(unique(loc1$OTqtl$gene))
+      } else {
+        link_eqtl$qtl_types <- NULL
+        link_eqtl$qtl_genes <- NULL
+      }
       link_data$LDtrait <- loc1$LDtrait
       link_data$trait_category <- loc1$trait_category
       link_data$LDexp <- loc1$LDexp
+      link_data$OTqtl <- loc1$OTqtl
       
       isolate(width <- loc_width())
       isolate(biotype <- input_biotype())
@@ -835,14 +897,16 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_collapse = !isFALSE(input$trait_collapse))
+                   trait_size_by_r2 = is.null(gwas_catalog),
+                   trait_collapse = !isFALSE(input$trait_collapse),
+                   qtl_type_filter = qtl_type_filter(),
+                   qtl_gene_filter = qtl_gene_filter())
       ntrace(length(p$x$data) -2)
       save_plotly$p <- p
       p
     })
     
     output$ui_genes <- renderUI({
-      # req(length(genes$x) > 1)
       g <- c("all", genes$x)
       isolate(ig <- input$select_gene)
       if (length(ig) == 0 || !ig %in% genes$x) ig <- "all"
@@ -879,7 +943,7 @@ zoom <- function(data, ens_db,
         column(12,
                (if (cat_ok) {
                  shinyWidgets::pickerInput(
-                   "trait_category_filter", h5("Select trait categories"),
+                   "trait_category_filter", h5("Select GWAS trait categories"),
                    choices = link_eqtl$categories,
                    selected = link_eqtl$categories,
                    multiple = TRUE,
@@ -888,7 +952,7 @@ zoom <- function(data, ens_db,
                      selectedTextFormat = 'count > 1',
                      dropdownAlignRight = 'auto'))
                }),
-               shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
+               shinyWidgets::pickerInput("trait_filter", h5("Select GWAS traits"),
                                          choices = link_eqtl$traits,
                                          selected = link_eqtl$traits,
                                          multiple = TRUE,
@@ -904,16 +968,53 @@ zoom <- function(data, ens_db,
     output$has_trait <- reactive({!is.null(link_eqtl$traits)})
     outputOptions(output, "has_trait", suspendWhenHidden = FALSE)
     
+    output$ui_link_qtl <- renderUI({
+      req(link_eqtl$qtl_types)
+      fluidRow(column(12,
+        shinyWidgets::pickerInput("qtl_type_filter", h5("Select QTL types"),
+                                  choices = link_eqtl$qtl_types,
+                                  selected = link_eqtl$qtl_types,
+                                  multiple = TRUE,
+                                  options = shinyWidgets::pickerOptions(
+                                    actionsBox = TRUE,
+                                    selectedTextFormat = 'count > 2')),
+        (if (length(link_eqtl$qtl_genes) > 1) {
+          shinyWidgets::pickerInput("qtl_gene_filter", h5("Select QTL genes"),
+                                    choices = link_eqtl$qtl_genes,
+                                    selected = link_eqtl$qtl_genes,
+                                    multiple = TRUE,
+                                    options = shinyWidgets::pickerOptions(
+                                      actionsBox = TRUE,
+                                      selectedTextFormat = 'count > 3'))
+        })
+      ))
+    })
+    
+    # if local Catalog track is off and then toggled on, removes OT if present 
+    has_OT <- reactive({identical(link_type(), "Open Targets")}) 
+    
+    observeEvent(input$gwas_catalog, {
+      req(input$gwas_catalog)
+      if (input$gwas_catalog && has_OT()) {
+        link_snp(NULL)
+        link_type(NULL)
+      }
+    })
+    
     eqtl_gene_filter <- reactiveVal(NULL)
     eqtl_tissue_filter <- reactiveVal(NULL)
     trait_filter <- reactiveVal(NULL)
     trait_category_filter <- reactiveVal(NULL)
+    qtl_type_filter <- reactiveVal(NULL)
+    qtl_gene_filter <- reactiveVal(NULL)
     
     deb_gene_filter <- reactive({input$eqtl_gene_filter}) %>% debounce(500)
     deb_tissue_filter <- reactive({input$eqtl_tissue_filter}) %>% debounce(500)
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
+    deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
+    deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
     
     # prevents ui update double trigger output$locus
     # NULL special meaning = all categories ticked
@@ -952,6 +1053,28 @@ zoom <- function(data, ens_db,
         trait_category_filter(i)
       } else trait_category_filter(NULL)
     })
+    
+    observeEvent(deb_qtl_filter(), {
+      i <- deb_qtl_filter()
+      tset <- link_eqtl$qtl_types
+      req(tset)
+      if (is.null(i)) {
+        qtl_type_filter(character(0))
+      } else if (!identical(i, tset)) {
+        qtl_type_filter(i)
+      } else qtl_type_filter(NULL)
+    }, ignoreNULL = FALSE)
+    
+    observeEvent(deb_qtl_gene_filter(), {
+      i <- deb_qtl_gene_filter()
+      gset <- link_eqtl$qtl_genes
+      req(length(gset) > 1)
+      if (is.null(i)) {
+        qtl_gene_filter(character(0))
+      } else if (!identical(i, gset)) {
+        qtl_gene_filter(i)
+      } else qtl_gene_filter(NULL)
+    }, ignoreNULL = FALSE)
     
     observeEvent(input$left2, {
       dif <- diff(coords$xrange)
@@ -1068,12 +1191,17 @@ zoom <- function(data, ens_db,
     
     # Extra table tab
     output$link_table <- DT::renderDataTable({
-      if (!is.null(link_data$LDtrait)) {
+      # a local GWAS Catalog has its own tab, so this one is for eQTL
+      if (!is.null(link_data$LDtrait) && is.null(gwas_catalog)) {
         tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
                            trait_category_filter(),
                            !isFALSE(input$trait_collapse))
         tab$PMID <- pubmed_links(tab$PMID)
         num <- c("r2", "P")
+      } else if (!is.null(link_data$OTqtl)) {
+        tab <- qtl_table(shiny::reactiveValuesToList(link_data),
+                         qtl_type_filter(), qtl_gene_filter())
+        num <- c("P", "Beta", "PIP")
       } else {
         tab <- eqtl_table(shiny::reactiveValuesToList(link_data), eqtl_gene_filter(),
                           eqtl_tissue_filter())
@@ -1085,16 +1213,32 @@ zoom <- function(data, ens_db,
         DT::formatSignif(num, digits = 3)
     })
     
+    # local GWAS Catalog tab
+    output$catalog_table <- DT::renderDataTable({
+      validate(need(!is.null(link_data$LDtrait), "GWAS Catalog track is switched off"))
+      tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
+                         trait_category_filter(), !isFALSE(input$trait_collapse))
+      tab$PMID <- pubmed_links(tab$PMID)
+      fcols <- if ("r2" %in% colnames(tab)) c("r2", "P") else "P"
+      DT::datatable(tab, rownames = FALSE,
+                    escape = setdiff(colnames(tab), "PMID"),
+                    caption = if (!is.null(gwas_catalog$date))
+                      paste("GWAS Catalog associations added up to", gwas_catalog$date)) %>%
+        DT::formatSignif(fcols, digits = 3)
+    })
+    
     # control extra table tab title
     output$extra_tab_nm <- renderText({
-      if (!is.null(link_data$LDtrait)) return("GWAS Catalog associations")
+      if (!is.null(link_data$LDtrait) && is.null(gwas_catalog)) return("GWAS Catalog associations")
       if (!is.null(link_data$LDexp)) return("eQTL associations")
+      if (!is.null(link_data$OTqtl)) return("QTL credible sets (Open Targets)")
       ""
     })
     
     # show/hide extra table tab
     observe({
-      if (!is.null(link_data$LDtrait) || !is.null(link_data$LDexp)) {
+      if ((!is.null(link_data$LDtrait) && is.null(gwas_catalog)) ||
+          !is.null(link_data$LDexp) || !is.null(link_data$OTqtl)) {
         showTab("topTabs", "linktab")
       } else {
         hideTab("topTabs", "linktab")
@@ -1149,7 +1293,7 @@ zoom <- function(data, ens_db,
       lx <- seg2line(TX$start, TX$end)
       ly <- seg2line(-TX$row, -TX$row)
       hovertext <- paste0(TX$gene_name,
-                          TX$fullname,
+                          strwrap2(TX$fullname, 80),
                           "<br>Gene ID: ", TX$gene_id,
                           "<br>Biotype: ", TX$gene_biotype,
                           "<br>Start: ", TX$start * 1e6,
@@ -1266,6 +1410,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("LD")
     })
@@ -1287,6 +1432,9 @@ zoom <- function(data, ens_db,
       req(!is.null(cur))
       snp <- as.character(s$key)[1]
       req(!is.na(snp), nzchar(snp))
+      # trait-track points can be SNPs absent from the data, which LD can't use
+      req(snp %in% isolate(loc$i$data[, labs[1]]) ||
+            (man2 && snp %in% isolate(locv2$i$data[, labs[2]])))
       if (identical(snp, cur)) return()
       showNotification(paste0("Fetching ", ltype, " for ", snp),
                        id = "ld_busy", duration = NULL)
@@ -1316,6 +1464,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching eQTL data"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("eQTL")
     })
@@ -1329,8 +1478,23 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching GWAS trait data"),
                        id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("GWAS trait")
+    })
+    
+    # retrieve Open Targets QTL credible sets
+    observeEvent(input$ot_get, {
+      snp <- cur_index()
+      if (is.null(snp) || is.na(snp)) {
+        showNotification("No index SNP in view", type = "warning")
+        return()
+      }
+      showNotification("Fetching Open Targets QTL data",
+                       id = "ld_busy", duration = NULL)
+      link_snp(NULL)  # so a repeat press re-renders
+      link_snp(snp)
+      link_type("Open Targets")
     })
     
     # inline conditional UI

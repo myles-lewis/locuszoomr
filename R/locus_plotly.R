@@ -59,6 +59,15 @@
 #'   to filter results. See [trait_plotly()].
 #' @param trait_collapse Logical whether to collapse duplicate GWAS trait
 #'   associations. See [trait_plotly()].
+#' @param trait_r2_min Optional minimum r^2 for GWAS trait associations. See
+#'   [trait_plotly()].
+#' @param trait_ld_scheme Optional colours to colour GWAS trait associations by
+#'   r^2 instead of by trait. See [trait_plotly()].
+#' @param trait_size_by_r2 Logical whether to scale GWAS trait marker size by
+#'   r^2. See [trait_plotly()].
+#' @param qtl_type_filter Character vector of Open Targets QTL types to show when
+#'   `loc` has QTL data from `link_ot()`.
+#' @param qtl_gene_filter Character vector of Open Targets QTL genes to show.
 #' @param ... Optional arguments passed to [scatter_plotly()] to control the
 #'   scatter plot.
 #' @returns A 'plotly' plotting object showing a scatter plot above gene tracks.
@@ -98,6 +107,11 @@ locus_plotly <- function(loc,
                          trait_filter = NULL,
                          trait_category_filter = NULL,
                          trait_collapse = TRUE,
+                         trait_r2_min = NULL,
+                         trait_ld_scheme = NULL,
+                         trait_size_by_r2 = TRUE,
+                         qtl_type_filter = NULL,
+                         qtl_gene_filter = NULL,
                          ...) {
   if (!is.null(loc2) && length(heights) == 2) {
     heights <- c(0.375, 0.375, 0.25)
@@ -105,7 +119,7 @@ locus_plotly <- function(loc,
   pheights <- NULL
   if (any(heights > 1)) {
     pheights <- heights
-    pheights[length(pheights)] <- sum(heights)
+    pheights[length(pheights)] <- sum(heights)  # controls total height
     heights <- heights / sum(heights)
   }
   
@@ -137,13 +151,21 @@ locus_plotly <- function(loc,
     }
   }
   
-  if (!is.null(loc$LDtrait)) {
+  # Open Targets first: a local GWAS Catalog fills LDtrait at every locus
+  ptr <- NULL
+  if (!is.null(loc$OTqtl)) {
+    ptr <- qtl_plotly(loc, qtl_type_filter, qtl_gene_filter)
+  } else if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
-                        collapse = trait_collapse)
+                        collapse = trait_collapse, r2_min = trait_r2_min,
+                        ld_scheme = trait_ld_scheme,
+                        size_by_r2 = trait_size_by_r2)
+  }
+  if (!is.null(ptr)) {
     n <- length(heights)
     heights <- heights[c(1:(n-1), n-1, n)]
-    heights <- heights / sum(heights)
+    heights[1:n] <- heights[1:n] / sum(heights[1:n]) * (1-heights[n+1])
   }
   
   if (is.null(highlight)) highlight <- egenes
@@ -154,7 +176,7 @@ locus_plotly <- function(loc,
                     blanks, height = pheights[length(pheights)]) 
     
   if (!is.null(loc2)) {
-    if (is.null(loc$LDtrait)) {
+    if (is.null(ptr)) {
       pp <- plotly::subplot(p, p2, g, shareX = TRUE, nrows = 3, heights = heights,
                             titleY = TRUE, margin = c(0, 0, 0, 0.02))
     } else {
@@ -165,7 +187,7 @@ locus_plotly <- function(loc,
     return(remap_overlaying_yaxes(pp))
   }
   
-  if (is.null(loc$LDtrait)) {
+  if (is.null(ptr)) {
     pp <- plotly::subplot(p, g, shareX = TRUE, nrows = 2, heights = heights,
                           titleY = TRUE, margin = 0)
   } else {

@@ -29,8 +29,7 @@ trait_table <- function(loc, trait_filter = NULL, category_filter = NULL,
       pmid[paste(LDT$RS_Number, LDT$GWAS_Trait, sep = "\t")])
   }
   tab <- data.frame(SNP = LDT$RS_Number, Position = LDT$pos,
-                    r2 = LDT$R2, Trait = LDT$GWAS_Trait,
-                    check.names = FALSE)
+                    Trait = LDT$GWAS_Trait, check.names = FALSE)
   if (!is.null(tc)) {
     cats <- tapply(tc$category, tc$trait, paste, collapse = "; ")
     tab$Category <- as.character(cats[LDT$GWAS_Trait])
@@ -40,6 +39,7 @@ trait_table <- function(loc, trait_filter = NULL, category_filter = NULL,
   tab$`OR/beta` <- LDT$Effect_Size_95_CI
   tab$CI <- LDT$Beta_or_OR
   tab$RAF <- LDT$Risk_Allele
+  if ("R2" %in% colnames(LDT)) tab$r2 <- LDT$R2
   if (collapse) tab$Associations <- LDT$n_assoc
   tab$PMID <- LDT$PMID
   tab$`In data` <- LDT$indata
