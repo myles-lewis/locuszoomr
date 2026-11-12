@@ -1219,11 +1219,12 @@ zoom <- function(data, ens_db,
       tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
                          trait_category_filter(), !isFALSE(input$trait_collapse))
       tab$PMID <- pubmed_links(tab$PMID)
+      fcols <- if ("r2" %in% colnames(tab)) c("r2", "P") else "P"
       DT::datatable(tab, rownames = FALSE,
                     escape = setdiff(colnames(tab), "PMID"),
                     caption = if (!is.null(gwas_catalog$date))
                       paste("GWAS Catalog associations added up to", gwas_catalog$date)) %>%
-        DT::formatSignif(c("r2", "P"), digits = 3)
+        DT::formatSignif(fcols, digits = 3)
     })
     
     # control extra table tab title
