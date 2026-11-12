@@ -42,9 +42,12 @@ trait_plotly <- function(loc,
   if (!is.null(trait_filter)) {
     LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
   }
-  if (!is.null(category_filter) && !is.null(loc$trait_category)) {
-    tc <- loc$trait_category
-    LDT <- LDT[LDT$GWAS_Trait %in% tc$trait[tc$category %in% category_filter], ]
+  tc <- loc$trait_category
+  if (!is.null(tc)) {
+    LDT$category <- tc$category[match(LDT$GWAS_Trait, tc$trait)]
+    if (!is.null(category_filter)) {
+      LDT <- LDT[LDT$category %in% category_filter, ]
+    }
   }
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
@@ -82,14 +85,6 @@ trait_plotly <- function(loc,
   ylim <- range(LDT$logP, na.rm = TRUE)
   ylim <- ylim + diff(ylim) * c(-0.05, 0.05)
   
-  traits <- sort(unique(LDT$GWAS_Trait))
-  if (length(traits) > 1) {
-    trait_group <- similarGroups(traits)
-    scheme <- rainbow(length(unique(trait_group)))
-    LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
-  } else {
-    LDT$colour <- "red"
-  }
   if (hasLD && show_ld) {
     if (is.null(ld_scheme)) ld_scheme <- eval(formals(scatter_plotly)$LD_scheme)
     # same bins as scatter_plotly(); strongest LD drawn on top
@@ -100,7 +95,20 @@ trait_plotly <- function(loc,
     hex <- rgb(t(col2rgb(rep_len(ld_scheme, 7))), maxColorValue = 255)
     LDT$colour <- hex[bin]
     LDT <- LDT[order(bin), ]
+  } else if (!is.null(tc) && length(unique(LDT$category)) > 1) {
+    # colour by trait categories
+    scheme <- setNames(rainbow(16, s = 0.9), gcat_categories)
+    LDT$colour <- scheme[LDT$category]
+    LDT$colour[is.na(LDT$colour)] <- "#CCCCCC"
+  } else if (length(traits) > 1) {
+    # cluster based on text similarity
+    trait_group <- similarGroups(traits)
+    scheme <- rainbow(length(unique(trait_group)))
+    LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
+  } else {
+    LDT$colour <- "red"
   }
+  
   outline <- "black"
   if (r2_cut) {
     grey <- is.na(LDT$R2) | LDT$R2 < r2_min
@@ -112,9 +120,6 @@ trait_plotly <- function(loc,
   # LDtrait GWAS catalog API columns `Effect_size_95_CI` and `Beta_or_OR`
   # are the wrong way round!
   
-  sw <- strwrap(LDT$GWAS_Trait, 40, simplify = FALSE)
-  wrap_traits <- vapply(sw, paste, collapse = "\n   ", character(1))
-  
   hovertext <- paste0("GWAS Catalog: ", LDT$RS_Number,
                       "<br>Chr ", loc$seqname, ": ", LDT$pos,
                       "<br>P = ", signif(LDT$P_value, 3),
@@ -124,7 +129,10 @@ trait_plotly <- function(loc,
                       "<br>RAF = ", LDT$Risk_Allele,
                       "<br>OR/beta = ", LDT$Effect_Size_95_CI,
                       "<br>CI = ", LDT$Beta_or_OR,
-                      "<br>Trait: ", wrap_traits)
+                      "<br>Trait: ", strwrap2(LDT$GWAS_Trait))
+  if (!is.null(tc)) {
+    hovertext <- paste0(hovertext, "<br>Category: ", LDT$category)
+  }
   n_assoc <- if (collapse) {
     w <- LDT$n_assoc > 1
     hovertext[w] <- paste0(hovertext[w], "<br>Associations: ", LDT$n_assoc[w])
@@ -186,4 +194,10 @@ similarGroups <- function(x, thresh = 0.7, method = "jw"){
 removeWords <- function(words, x) {
   p <- paste0("(?:\\s+|^)\\S*(?<!\\w)(?:", paste(words, collapse = "|"), ")(?!\\w)\\S*")
   trimws(gsub(p, "", x, perl = TRUE))
+}
+
+
+strwrap2 <- function(x, w = 40) {
+  sw <- strwrap(x, w, simplify = FALSE)
+  vapply(sw, paste, collapse = "<br>   ", character(1))
 }
