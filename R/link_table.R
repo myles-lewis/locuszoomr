@@ -39,8 +39,8 @@ trait_table <- function(loc, trait_filter = NULL, category_filter = NULL,
   tab$`OR/beta` <- LDT$Effect_Size_95_CI
   tab$CI <- LDT$Beta_or_OR
   tab$RAF <- LDT$Risk_Allele
-  if (collapse) tab$Associations <- LDT$n_assoc
   if ("R2" %in% colnames(LDT)) tab$r2 <- LDT$R2
+  if (collapse) tab$Associations <- LDT$n_assoc
   tab$PMID <- LDT$PMID
   tab$`In data` <- LDT$indata
   tab <- tab[order(tab$P), ]
