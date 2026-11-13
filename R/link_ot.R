@@ -214,6 +214,7 @@ qtl_plotly <- function(loc, type_filter = NULL, gene_filter = NULL, ...) {
                                 ticks = "outside", fixedrange = TRUE,
                                 showline = TRUE, range = ylim),
                    dragmode = "pan")
+  attr(p, "eqtl_genes") <- unique(q$gene)
   cfg(p)
 }
 

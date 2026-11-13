@@ -155,6 +155,7 @@ locus_plotly <- function(loc,
   ptr <- NULL
   if (!is.null(loc$OTqtl)) {
     ptr <- qtl_plotly(loc, qtl_type_filter, qtl_gene_filter)
+    egenes <- attr(ptr, "eqtl_genes")
   } else if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
