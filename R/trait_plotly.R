@@ -10,8 +10,8 @@
 #'   filter results. See [link_trait()].
 #' @param collapse Logical whether to collapse duplicate associations of the same
 #'   SNP and trait, keeping the smallest P value.
-#' @param r2_min Optional minimum r^2 with the index SNP: associations below it
-#'   or without r^2 are shown in grey.
+#' @param r2_min Minimum r^2 with the index SNP: associations below it or
+#'   without r^2 are shown in pale grey.
 #' @param ld_scheme Optional vector of 7 colours to colour associations by r^2
 #'   with the index SNP instead of by trait, as `LD_scheme` in
 #'   [scatter_plotly()]; markers then have a fixed size rather than one
@@ -28,7 +28,7 @@ trait_plotly <- function(loc,
                          trait_filter = NULL,
                          category_filter = NULL,
                          collapse = TRUE,
-                         r2_min = NULL,
+                         r2_min = 0,
                          ld_scheme = NULL,
                          show_ld = "ld" %in% colnames(loc$data),
                          size_by_r2 = TRUE,
@@ -52,7 +52,6 @@ trait_plotly <- function(loc,
   if (collapse && !is.null(LDT)) LDT <- collapse_traits(LDT)
   traits <- sort(unique(LDT$GWAS_Trait))
   hasLD <- "R2" %in% colnames(LDT)
-  r2_cut <- hasLD && !is.null(r2_min) && r2_min > 0
   
   if (is.null(LDT) || nrow(LDT) == 0) {
     # blank plotly
@@ -110,12 +109,13 @@ trait_plotly <- function(loc,
   }
   
   outline <- "black"
-  if (r2_cut) {
+  if (hasLD && r2_min > 0) {
+    # r2 filter
     grey <- which(is.na(LDT$R2) | LDT$R2 < r2_min)
     if (length(grey) > 0) {
-      LDT$colour[grey] <- "#CCCCCC"
+      LDT$colour[grey] <- "#DDDDDD"
       outline <- rep_len("black", nrow(LDT))
-      outline[grey] <- "#999999"
+      outline[grey] <- "#BBBBBB"
     }
   }
   size <- 7

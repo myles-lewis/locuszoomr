@@ -28,10 +28,10 @@ locus_plotly(
   gene_filter = NULL,
   tissue_filter = NULL,
   eqtl_scheme = NULL,
+  r2_min = 0,
   trait_filter = NULL,
   trait_category_filter = NULL,
   trait_collapse = TRUE,
-  trait_r2_min = NULL,
   trait_ld_scheme = NULL,
   trait_size_by_r2 = TRUE,
   qtl_type_filter = NULL,
@@ -107,6 +107,9 @@ results. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
 
 \item{eqtl_scheme}{Vector of colours for eQTL genes. See \code{\link[=overlay_plotly]{overlay_plotly()}}.}
 
+\item{r2_min}{Filters points by minimum r^2 with index SNP (only if LD data
+is present).}
+
 \item{trait_filter}{Character vector of traits to filter results. See
 \code{\link[=trait_plotly]{trait_plotly()}}.}
 
@@ -115,9 +118,6 @@ to filter results. See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{trait_collapse}{Logical whether to collapse duplicate GWAS trait
 associations. See \code{\link[=trait_plotly]{trait_plotly()}}.}
-
-\item{trait_r2_min}{Optional minimum r^2 for GWAS trait associations. See
-\code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{trait_ld_scheme}{Optional colours to colour GWAS trait associations by
 r^2 instead of by trait. See \code{\link[=trait_plotly]{trait_plotly()}}.}

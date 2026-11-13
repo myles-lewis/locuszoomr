@@ -83,7 +83,7 @@
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
-#' @importFrom shiny showTab hideTab
+#' @importFrom shiny showTab hideTab sliderInput updateSliderInput
 #' @importFrom htmltools tags br
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
@@ -355,7 +355,10 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          
+                          conditionalPanel("output.has_ld",
+                                           sliderInput("r2_min", h5("Filter r\u00b2"),
+                                                       min = 0, max = 1, value = 0, step = 0.05)
+                          ),
                           (if (show_ld || !is.null(gwas_catalog)) {
                             fluidRow(
                               column(12,
@@ -897,6 +900,7 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
+                   r2_min = if ("ld" %in% colnames(loc1$data)) r2_min(),
                    trait_size_by_r2 = is.null(gwas_catalog),
                    trait_collapse = !isFALSE(input$trait_collapse),
                    qtl_type_filter = qtl_type_filter(),
@@ -1015,6 +1019,12 @@ zoom <- function(data, ens_db,
       debounce(500)
     deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
     deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
+    
+    r2_min <- reactive({input$r2_min}) %>% debounce(500)
+    
+    # conditionalPanel for r2 slider
+    output$has_ld <- reactive({"ld" %in% colnames(loc$i$data)})
+    outputOptions(output, "has_ld", suspendWhenHidden = FALSE)
     
     # prevents ui update double trigger output$locus
     # NULL special meaning = all categories ticked
@@ -1410,6 +1420,7 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
+      updateSliderInput(session, "r2_min", value = 0)
       link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("LD")

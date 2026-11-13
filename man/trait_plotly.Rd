@@ -9,7 +9,7 @@ trait_plotly(
   trait_filter = NULL,
   category_filter = NULL,
   collapse = TRUE,
-  r2_min = NULL,
+  r2_min = 0,
   ld_scheme = NULL,
   show_ld = "ld" \%in\% colnames(loc$data),
   size_by_r2 = TRUE,
@@ -27,8 +27,8 @@ filter results. See \code{\link[=link_trait]{link_trait()}}.}
 \item{collapse}{Logical whether to collapse duplicate associations of the same
 SNP and trait, keeping the smallest P value.}
 
-\item{r2_min}{Optional minimum r^2 with the index SNP: associations below it
-or without r^2 are shown in grey.}
+\item{r2_min}{Minimum r^2 with the index SNP: associations below it or
+without r^2 are shown in pale grey.}
 
 \item{ld_scheme}{Optional vector of 7 colours to colour associations by r^2
 with the index SNP instead of by trait, as \code{LD_scheme} in

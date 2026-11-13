@@ -53,14 +53,14 @@
 #' @param tissue_filter Character vector of tissues to filter LDlink eQTL
 #'   results. See [overlay_plotly()].
 #' @param eqtl_scheme Vector of colours for eQTL genes. See [overlay_plotly()].
+#' @param r2_min Filters points by minimum r^2 with index SNP (only if LD data
+#'   is present).
 #' @param trait_filter Character vector of traits to filter results. See
 #'   [trait_plotly()].
 #' @param trait_category_filter Character vector of GWAS Catalog trait categories
 #'   to filter results. See [trait_plotly()].
 #' @param trait_collapse Logical whether to collapse duplicate GWAS trait
 #'   associations. See [trait_plotly()].
-#' @param trait_r2_min Optional minimum r^2 for GWAS trait associations. See
-#'   [trait_plotly()].
 #' @param trait_ld_scheme Optional colours to colour GWAS trait associations by
 #'   r^2 instead of by trait. See [trait_plotly()].
 #' @param trait_size_by_r2 Logical whether to scale GWAS trait marker size by
@@ -104,10 +104,10 @@ locus_plotly <- function(loc,
                          gene_filter = NULL,
                          tissue_filter = NULL,
                          eqtl_scheme = NULL,
+                         r2_min = 0,
                          trait_filter = NULL,
                          trait_category_filter = NULL,
                          trait_collapse = TRUE,
-                         trait_r2_min = NULL,
                          trait_ld_scheme = NULL,
                          trait_size_by_r2 = TRUE,
                          qtl_type_filter = NULL,
@@ -126,7 +126,7 @@ locus_plotly <- function(loc,
   egenes <- NULL
   if (is.null(loc$LDexp)) {
     p <- scatter_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
-                        beta = beta[1], ...)
+                        beta = beta[1], r2_min = r2_min, ...)
   } else {
     # overlay LDlink eQTL
     p <- overlay_plotly(loc, xlab = xlab, ylab = ylab[1], height = pheights[1],
@@ -140,7 +140,7 @@ locus_plotly <- function(loc,
     if (is.null(loc2$LDexp)) {
       p2 <- scatter_plotly(loc2, xlab = xlab, ylab = ylab[2],
                            height = pheights[2], showlegend = FALSE,
-                           beta = beta[2])
+                           beta = beta[2], r2_min = r2_min)
     } else {
       # overlay LDlink eQTL
       p2 <- overlay_plotly(loc2, xlab = xlab, ylab = ylab[2],
@@ -158,7 +158,7 @@ locus_plotly <- function(loc,
   } else if (!is.null(loc$LDtrait)) {
     ptr <- trait_plotly(loc, trait_filter,
                         category_filter = trait_category_filter,
-                        collapse = trait_collapse, r2_min = trait_r2_min,
+                        collapse = trait_collapse, r2_min = r2_min,
                         ld_scheme = trait_ld_scheme,
                         size_by_r2 = trait_size_by_r2)
   }

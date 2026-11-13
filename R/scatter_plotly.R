@@ -30,6 +30,8 @@
 #'   (significant SNPs only).
 #' @param add_hover Optional vector of column names in `loc$data` to add to the
 #'   plotly hover text for scatter points.
+#' @param r2_min Minimum r^2 with the index SNP: associations below it or
+#'   without r^2 are shown in pale grey.
 #' @param showlegend Logical whether to show a legend for the scatter points.
 #' @param height Height in pixels (optional, defaults to automatic sizing).
 #' @param webGL Logical whether to use webGL or SVG for scatter plot.
@@ -55,6 +57,7 @@ scatter_plotly <- function(loc,
                            eqtl_gene = NULL,
                            beta = NULL,
                            add_hover = NULL,
+                           r2_min = 0,
                            showlegend = TRUE,
                            height = NULL,
                            webGL = TRUE) {
@@ -100,6 +103,7 @@ scatter_plotly <- function(loc,
   }
   hasLD <- "ld" %in% colnames(data)
   leg <- list()
+  
   if (!"bg" %in% colnames(data)) {
     if (showLD && hasLD) {
       data$bg <- cut(data$ld, -1:6/5, labels = FALSE)
@@ -113,6 +117,20 @@ scatter_plotly <- function(loc,
                                    "0.4 - 0.6", "0.6 - 0.8", "0.8 - 1.0",
                                    "index"))
       leg <- list(title = list(text = "Linkage r<sup>2</sup>"))
+      if (r2_min > 0) {
+        # r2 filter
+        grey <- which(is.na(data$ld) | data$ld < r2_min)
+        if (length(grey) > 0) {
+          data$bg[grey] <- "unknown"
+          levels(data$bg)[1] <- paste("<", signif(r2_min, 2))
+          marker_outline <- rep_len("black", nrow(data))
+          marker_outline[grey] <- "#BBBBBB"
+          o <- order(data$bg)
+          marker_outline <- marker_outline[o]  # patch plotly
+          data <- data[o, ]
+          scheme[1] <- "#DDDDDD"
+        }
+      }
     } else if (!is.null(eqtl_gene)) {
       bg <- data[, eqtl_gene]
       bg[data[, loc$p] > pcutoff] <- "ns"
