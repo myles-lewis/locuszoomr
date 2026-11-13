@@ -84,6 +84,7 @@ trait_plotly <- function(loc,
   ylim <- range(LDT$logP, na.rm = TRUE)
   ylim <- ylim + diff(ylim) * c(-0.05, 0.05)
   
+  outline <- "black"
   if (hasLD && show_ld) {
     if (is.null(ld_scheme)) ld_scheme <- eval(formals(scatter_plotly)$LD_scheme)
     # same bins as scatter_plotly(); strongest LD drawn on top
@@ -93,7 +94,21 @@ trait_plotly <- function(loc,
     bin[LDT$RS_Number %in% loc$index_snp] <- 7L
     hex <- rgb(t(col2rgb(rep_len(ld_scheme, 7))), maxColorValue = 255)
     LDT$colour <- hex[bin]
-    LDT <- LDT[order(bin), ]
+    if (r2_min > 0) {
+      # r2 filter
+      grey <- which(is.na(LDT$R2) | LDT$R2 < r2_min)
+      if (length(grey) > 0) {
+        LDT$colour[grey] <- "#DDDDDD"
+        outline <- rep_len("black", nrow(LDT))
+        outline[grey] <- "#BBBBBB"
+        bin[grey] <- 1L
+        o <- order(bin)
+        LDT <- LDT[o, ]
+        outline <- outline[o]
+      }
+    } else {
+      LDT <- LDT[order(bin), ]
+    }
   } else if (!is.null(tc) && length(unique(LDT$category)) > 1) {
     # colour by trait categories
     scheme <- setNames(rainbow(16, s = 0.9), gcat_categories)
@@ -108,16 +123,6 @@ trait_plotly <- function(loc,
     LDT$colour <- "red"
   }
   
-  outline <- "black"
-  if (hasLD && r2_min > 0) {
-    # r2 filter
-    grey <- which(is.na(LDT$R2) | LDT$R2 < r2_min)
-    if (length(grey) > 0) {
-      LDT$colour[grey] <- "#DDDDDD"
-      outline <- rep_len("black", nrow(LDT))
-      outline[grey] <- "#BBBBBB"
-    }
-  }
   size <- 7
   if (hasLD && size_by_r2) {
     size <- rep_len(6, nrow(LDT))
