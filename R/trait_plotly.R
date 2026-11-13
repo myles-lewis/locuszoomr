@@ -111,9 +111,18 @@ trait_plotly <- function(loc,
   
   outline <- "black"
   if (r2_cut) {
-    grey <- is.na(LDT$R2) | LDT$R2 < r2_min
-    LDT$colour[grey] <- "#CCCCCC"
-    outline <- ifelse(grey, "#999999", "black")
+    grey <- which(is.na(LDT$R2) | LDT$R2 < r2_min)
+    if (length(grey) > 0) {
+      LDT$colour[grey] <- "#CCCCCC"
+      outline <- rep_len("black", nrow(LDT))
+      outline[grey] <- "#999999"
+    }
+  }
+  size <- 7
+  if (hasLD && size_by_r2) {
+    size <- rep_len(6, nrow(LDT))
+    ok <- !is.na(LDT$R2)
+    size[ok] <- 6 + 8 * LDT$R2[ok]
   }
   
   # 27/10/26
@@ -140,9 +149,7 @@ trait_plotly <- function(loc,
   
   p <- plot_ly(x = LDT$pos / 1e6, y = LDT$logP,
                marker = list(opacity = 0.8,
-                             size = if (size_by_r2 && is.null(ld_scheme)) {
-                               6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2)
-                             } else 7,
+                             size = size,
                              color = I(LDT$colour),
                              line = list(width = 1, color = outline)),
                text = hovertext, hoverinfo = 'text',
