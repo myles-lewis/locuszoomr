@@ -23,6 +23,7 @@ scatter_plot(
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   recomb_col = "blue",
   recomb_offset = 0,
+  recomb_on_top = TRUE,
   legend_pos = "topleft",
   labels = NULL,
   label_x = 4,
@@ -82,6 +83,9 @@ recombination rate data.}
 
 \item{recomb_offset}{Offset from 0-1 which shifts the scatter plot up and
 recombination line plot down. Recommended value 0.1.}
+
+\item{recomb_on_top}{Whether recombination line goes on top or underneath
+points.}
 
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}

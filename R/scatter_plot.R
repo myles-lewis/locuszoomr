@@ -34,6 +34,8 @@
 #'   recombination rate data.
 #' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
 #'   recombination line plot down. Recommended value 0.1.
+#' @param recomb_on_top Whether recombination line goes on top or underneath
+#'   points.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
@@ -85,6 +87,7 @@ scatter_plot <- function(loc,
                                        'orange', 'red', 'purple'),
                          recomb_col = "blue",
                          recomb_offset = 0,
+                         recomb_on_top = TRUE,
                          legend_pos = 'topleft',
                          labels = NULL,
                          label_x = 4, label_y = 4,
@@ -168,7 +171,7 @@ scatter_plot <- function(loc,
   yd <- diff(ylim)
   if (recomb && recomb_offset != 0) ylim[1] <- ylim[1] - yd * recomb_offset
   
-  panel.first <- quote({
+  panel <- quote({
     if (loc$yvar == "logP" & !is.null(pcutoff)) {
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
     }
@@ -220,8 +223,10 @@ scatter_plot <- function(loc,
                bty = bty,
                xaxt = 'n',
                tcl = -0.3, 
-               mgp = c(1.7, 0.5, 0),
-               panel.first = panel.first)
+               mgp = c(1.7, 0.5, 0))
+  if (recomb_on_top) {
+    plot.args$panel.last <- panel
+  } else plot.args$panel.first <- panel
   if (recomb && recomb_offset != 0) {
     plot.args$ylab <- ""
     plot.args <- c(plot.args, yaxt = 'n')
