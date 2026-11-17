@@ -14,7 +14,7 @@ figure_state <- function(...) {
                 chr = NULL, xrange = NULL,
                 data_prep = NULL, data2_prep = NULL,
                 link_type = NULL, link_snp = NULL, link_snp_in_view = FALSE,
-                qtl_found = TRUE,
+                qtl_found = TRUE, ld_token = Sys.getenv("LDLINK_TOKEN"),
                 ld_pop = "EUR", pcutoff = 5e-8,
                 traits = NULL, eqtl_gene = NULL, beta = NULL, select_gene = NULL,
                 biotype = NULL, maxrows = 8,
@@ -60,8 +60,8 @@ figure_code <- function(state, backend = "base") {
   linked <- !is.null(s$link_type) && !is.null(s$link_snp) &&
     isTRUE(s$link_snp_in_view)
   lt <- if (linked) s$link_type else ""
-  token <- 'Sys.getenv("LDLINK_TOKEN")'
-
+  token <- paste0('"', s$ld_token, '"')
+  
   # data
   out <- character(0)
   add <- function(...) out <<- c(out, ...)
@@ -76,7 +76,6 @@ figure_code <- function(state, backend = "base") {
     if (linked && (i == 1 || lt %in% c("LD", "eQTL"))) {
       args$index_snp <- code_value(s$link_snp)
     }
-    if (i == 2) args$tx <- "FALSE"
     code_call("locus", args, assign)
   }
   # repeat zoom()'s cleaning of the data where it changed anything
