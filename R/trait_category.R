@@ -45,6 +45,7 @@ trait_category <- function(traits, map) {
   if (length(miss)) {
     tc <- rbind(tc, data.frame(trait = miss, category = "Unmapped"))
   }
+  tc$category[tc$category == "NR"] <- "Unmapped"
   rownames(tc) <- NULL
   tc
 }

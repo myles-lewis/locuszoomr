@@ -83,7 +83,8 @@
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
-#' @importFrom shiny showTab hideTab
+#' @importFrom shiny showTab hideTab sliderInput updateSliderInput showModal modalDialog
+#' @importFrom shiny tagList modalButton
 #' @importFrom htmltools tags br
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
@@ -188,13 +189,6 @@ zoom <- function(data, ens_db,
   
   show_ld <- nzchar(ld_token)
   show_eqtl <- show_ld & is.null(eqtl_gene)
-  # local Catalog button: always shows the Catalog, this just toggles its pickers
-  gcat_btn <- actionButton("gcat_show", "GWAS Catalog", class = "btn-success btn-sm")
-  ot_btn <- actionButton("ot_get",
-                         shiny::tagList(tags$img(
-                           src = "https://platform.opentargets.org/favicon.png",
-                           alt = ""), "Open Targets"),
-                         class = "btn-sm")
   
   # apply min_p_snp to data for manhat?
   # smallest floating point
@@ -251,12 +245,6 @@ zoom <- function(data, ens_db,
         display: flex;
         align-items: center;
       }")),
-      tags$style(HTML("
-      #ld_get, #eqtl_get, #trait_get, #gcat_show, #ot_get, #ld_clear { margin-bottom: 4px; }
-      #ot_get { background-color: #fff; border-color: #3489ca; color: #3489ca; }
-      #ot_get:hover, #ot_get:focus { border-color: #18405e; color: #18405e; }
-      #ot_get img { height: 14px; margin-right: 4px; vertical-align: -2px; }")),
-      # with a local Catalog its pickers can show alongside eQTL/QTL pickers
       (if (!is.null(gwas_catalog)) {
         tags$style(HTML("
       #ui_link_traits:not(:empty), #ui_link_qtl:not(:empty), #ui_link_genes:not(:empty) {
@@ -335,21 +323,30 @@ zoom <- function(data, ens_db,
                  )
                ),
                fluidRow(
-                 column(4,
-                        actionButton("left2", NULL, icon = icon("angles-left")),
+                 column(8,
+                        actionButton("left2", NULL, icon = icon("angles-left"),
+                                     style='margin-top:0px;'),
                         actionButton("left", NULL, icon = icon("angle-left")),
                         actionButton("right", NULL, icon = icon("angle-right")),
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
+                        actionButton("fig_code", NULL, icon = icon("file-code"),
+                                     title = "R code for this view"),
                         uiOutput("save_ui", inline = T),
-                        uiOutput("fig_code_ui", inline = T)
-                        ),
+                        (if (show_ld) {
+                          actionButton("ld_get", "LD")
+                        }),
+                        (if (show_eqtl) {
+                          actionButton("eqtl_get", "eQTL")
+                        }),
+                        (if (show_ld && is.null(gwas_catalog)) {
+                          actionButton("trait_get", "GWAS trait")
+                        }),
+                        actionButton("ot_get", "Open Targets"),
+                        actionButton("ld_clear", "Clear")
+                 ),
                  column(3,
-                        textOutput("pos"),
-                        textOutput("ld_status"),
-                        align = "centre", style='margin-top:7px;'),
-                 column(4,
                         splitLayout(
                           textInput("tex", NULL, placeholder = "chr:start-end, rs or gene",
                                     width = "100%"),
@@ -371,53 +368,21 @@ zoom <- function(data, ens_db,
                                       multiple = TRUE,
                                       options = shinyWidgets::pickerOptions(actionsBox = TRUE,
                                                               selectedTextFormat = 'count > 1')),
-                          (if (show_ld) {
-                            fluidRow(
-                              column(12,
-                                     h5("LDlink tools"),
-                                     actionButton("ld_get", "Get LD", icon = icon("circle-nodes"),
-                                                  class = "btn-primary btn-sm"),
-                                     (if (show_eqtl) {
-                                       actionButton("eqtl_get", "eQTL", icon = icon("compass"),
-                                                    class = "btn-info btn-sm")
-                                     }),
-                                     (if (is.null(gwas_catalog)) {
-                                       actionButton("trait_get", "GWAS trait",
-                                                    class = "btn-success btn-sm")
-                                     } else gcat_btn),
-                                     ot_btn,
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")
-                              ))
-                          }),
-                          # the local Catalog and Open Targets need no LDlink token
-                          (if (!show_ld && !is.null(gwas_catalog)) {
-                            fluidRow(
-                              column(12,
-                                     h5("GWAS Catalog"),
-                                     gcat_btn, ot_btn,
-                                     actionButton("ld_clear", "Clear",
-                                                  class = "btn-default btn-sm")))
-                          }),
+                          conditionalPanel("output.has_ld",
+                                           sliderInput("r2_min", h5("Filter r\u00b2"),
+                                                       min = 0, max = 1, value = 0, step = 0.05)
+                          ),
                           (if (show_ld || !is.null(gwas_catalog)) {
-                            conditionalPanel(
-                              if (is.null(gwas_catalog)) "true" else "output.gcat_open",
                             fluidRow(
                               column(12,
                                      uiOutput("ui_link_traits"),
                                      conditionalPanel("output.has_trait",
                                                       checkboxInput("trait_collapse", "collapse duplicate associations",
                                                                     value = TRUE)
-                                     ),
-                                     (if (show_ld && !is.null(gwas_catalog)) {
-                                       shiny::tagList(
-                                         shiny::sliderInput("trait_r2_min", "minimum r\u00b2 with the index SNP",
-                                                            min = 0, max = 1, value = 0, step = 0.05),
-                                         checkboxInput("trait_ld_colour", "colour by LD", value = FALSE))
-                                     })
-                              )))
+                                     )
+                              ))
                           }),
-                          (if (show_ld || !is.null(gwas_catalog)) {
+                          (if (show_ld) {
                             uiOutput("ui_link_qtl")
                           }),
                           (if (show_eqtl) {
@@ -431,6 +396,12 @@ zoom <- function(data, ens_db,
                           right = TRUE, icon = icon("gear")
                         ))
                  ),
+               fluidRow(
+                 column(3,
+                        textOutput("pos"),
+                        textOutput("ld_status"),
+                        align = "centre", style='margin-top:7px;', offset = 4)
+               ),
                  fluidRow(
                    column(12,
                           plotlyOutput("locus", width = "95vw", height = height[3])
@@ -739,7 +710,6 @@ zoom <- function(data, ens_db,
                                 qtl_genes = NULL)
     link_data <- reactiveValues(LDtrait = NULL, trait_category = NULL,
                                 LDexp = NULL, OTqtl = NULL)
-    ld_colour <- reactiveVal(FALSE)
     save_plotly <- reactiveValues(p = NULL)
     
     output$locus <- renderPlotly({
@@ -871,6 +841,7 @@ zoom <- function(data, ens_db,
         link_eqtl$traits <- sort(unique(loc1$LDtrait$GWAS_Trait))
         link_eqtl$categories <- sort(unique(loc1$trait_category$category))
       } else if (!is.null(gwas_catalog) && isTRUE(input$gwas_catalog)) {
+        # local GWAS catalog
         loc1b <- try(link_gwas_catalog(loc1, gwas_catalog))
         if (inherits(loc1b, "try-error")) {
           showNotification(attr(loc1b, "condition")$message,
@@ -942,10 +913,7 @@ zoom <- function(data, ens_db,
                    eqtl_scheme = eqtl_scheme,
                    trait_filter = trait_filter(),
                    trait_category_filter = trait_category_filter(),
-                   trait_r2_min = if ("ld" %in% colnames(loc1$data)) r2_min(),
-                   trait_ld_scheme = if (!is.null(gwas_catalog) && ld_colour() &&
-                                         "ld" %in% colnames(loc1$data))
-                     eval(formals(scatter_plotly)$LD_scheme),
+                   r2_min = if ("ld" %in% colnames(loc1$data)) r2_min(),
                    trait_size_by_r2 = is.null(gwas_catalog),
                    trait_collapse = !isFALSE(input$trait_collapse),
                    qtl_type_filter = qtl_type_filter(),
@@ -956,7 +924,6 @@ zoom <- function(data, ens_db,
     })
     
     output$ui_genes <- renderUI({
-      # req(length(genes$x) > 1)
       g <- c("all", genes$x)
       isolate(ig <- input$select_gene)
       if (length(ig) == 0 || !ig %in% genes$x) ig <- "all"
@@ -993,7 +960,7 @@ zoom <- function(data, ens_db,
         column(12,
                (if (cat_ok) {
                  shinyWidgets::pickerInput(
-                   "trait_category_filter", h5("Select trait categories"),
+                   "trait_category_filter", h5("Select GWAS trait categories"),
                    choices = link_eqtl$categories,
                    selected = link_eqtl$categories,
                    multiple = TRUE,
@@ -1002,7 +969,7 @@ zoom <- function(data, ens_db,
                      selectedTextFormat = 'count > 1',
                      dropdownAlignRight = 'auto'))
                }),
-               shinyWidgets::pickerInput("trait_filter", h5("Select traits"),
+               shinyWidgets::pickerInput("trait_filter", h5("Select GWAS traits"),
                                          choices = link_eqtl$traits,
                                          selected = link_eqtl$traits,
                                          multiple = TRUE,
@@ -1040,21 +1007,15 @@ zoom <- function(data, ens_db,
       ))
     })
     
-    # local GWAS Catalog button: show/hide the trait pickers; if the Catalog
-    # track is switched off or replaced by Open Targets, bring it back
-    gcat_open <- reactiveVal(FALSE)
-    output$gcat_open <- reactive(gcat_open())
-    outputOptions(output, "gcat_open", suspendWhenHidden = FALSE)
-    observeEvent(input$gcat_show, {
-      ot <- identical(link_type(), "Open Targets")
-      if (!isTRUE(input$gwas_catalog) || ot) {
-        shiny::updateCheckboxInput(session, "gwas_catalog", value = TRUE)
-        if (ot) {
-          link_snp(NULL)
-          link_type(NULL)
-        }
-        gcat_open(TRUE)
-      } else gcat_open(!gcat_open())
+    # if local Catalog track is off and then toggled on, removes OT if present 
+    has_OT <- reactive({identical(link_type(), "Open Targets")}) 
+    
+    observeEvent(input$gwas_catalog, {
+      req(input$gwas_catalog)
+      if (input$gwas_catalog && has_OT()) {
+        link_snp(NULL)
+        link_type(NULL)
+      }
     })
     
     eqtl_gene_filter <- reactiveVal(NULL)
@@ -1069,12 +1030,14 @@ zoom <- function(data, ens_db,
     deb_trait_filter <- reactive({input$trait_filter}) %>% debounce(500)
     deb_category_filter <- reactive({input$trait_category_filter}) %>%
       debounce(500)
-    trait_r2_min <- reactive({input$trait_r2_min}) %>% debounce(500)
-    # held here so Clear etc. reset it in the same render, not after the
-    # slider's round trip
-    r2_min <- reactiveVal(0)
     deb_qtl_filter <- reactive({input$qtl_type_filter}) %>% debounce(500)
     deb_qtl_gene_filter <- reactive({input$qtl_gene_filter}) %>% debounce(500)
+    
+    r2_min <- reactive({input$r2_min}) %>% debounce(500)
+    
+    # conditionalPanel for r2 slider
+    output$has_ld <- reactive({"ld" %in% colnames(loc$i$data)})
+    outputOptions(output, "has_ld", suspendWhenHidden = FALSE)
     
     # prevents ui update double trigger output$locus
     # NULL special meaning = all categories ticked
@@ -1168,6 +1131,7 @@ zoom <- function(data, ens_db,
     
     # temporary fix for R/plotly layout.xaxis.minallowed not working
     observeEvent(coords$xrange, {
+      req(coords$xrange)
       if (coords$xrange[1] < 0) {
         coords$xrange <- signif(coords$xrange - coords$xrange[1], 3)
       }
@@ -1279,11 +1243,12 @@ zoom <- function(data, ens_db,
       tab <- trait_table(shiny::reactiveValuesToList(link_data), trait_filter(),
                          trait_category_filter(), !isFALSE(input$trait_collapse))
       tab$PMID <- pubmed_links(tab$PMID)
+      fcols <- if ("r2" %in% colnames(tab)) c("r2", "P") else "P"
       DT::datatable(tab, rownames = FALSE,
                     escape = setdiff(colnames(tab), "PMID"),
                     caption = if (!is.null(gwas_catalog$date))
                       paste("GWAS Catalog associations added up to", gwas_catalog$date)) %>%
-        DT::formatSignif(c("r2", "P"), digits = 3)
+        DT::formatSignif(fcols, digits = 3)
     })
     
     # control extra table tab title
@@ -1352,7 +1317,7 @@ zoom <- function(data, ens_db,
       lx <- seg2line(TX$start, TX$end)
       ly <- seg2line(-TX$row, -TX$row)
       hovertext <- paste0(TX$gene_name,
-                          TX$fullname,
+                          strwrap2(TX$fullname, 80),
                           "<br>Gene ID: ", TX$gene_id,
                           "<br>Biotype: ", TX$gene_biotype,
                           "<br>Start: ", TX$start * 1e6,
@@ -1469,58 +1434,11 @@ zoom <- function(data, ens_db,
       }
       showNotification(paste0("Fetching LD for ", snp, " - click a point to re-base"),
                        id = "ld_busy", duration = NULL)
+      updateSliderInput(session, "r2_min", value = 0)
       link_snp(NULL)  # so a repeat press re-renders
       link_snp(snp)
       link_type("LD")
     })
-    
-    # Clear, eQTL and Open Targets drop LD, so reset the LD-based Catalog options
-    observeEvent(list(input$ld_clear, input$eqtl_get, input$ot_get), {
-      shiny::updateSliderInput(session, "trait_r2_min", value = 0)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = FALSE)
-      r2_min(0)
-      ld_colour(FALSE)
-    }, ignoreInit = TRUE)
-    
-    # fetch LD for the index SNP in view, as Get LD would
-    fetch_index_ld <- function(why) {
-      snp <- cur_index()
-      if (is.null(snp) || is.na(snp)) {
-        showNotification("No index SNP in view", type = "warning")
-        return()
-      }
-      showNotification(paste0("Fetching LD for ", snp, " ", why),
-                       id = "ld_busy", duration = NULL)
-      # re-setting the same SNP would not re-render, e.g. after a failed fetch
-      link_snp(NULL)
-      link_snp(snp)
-      link_type("LD")
-    }
-    
-    # the r2 cut-off and LD colouring need LD, so fetch it if missing; run
-    # before output$locus so it renders once, with LD
-    has_ld <- function() "ld" %in% colnames(isolate(loc$i$data))
-    
-    observeEvent(trait_r2_min(), {
-      r2_min(as.numeric(trait_r2_min()))
-      req(trait_r2_min() > 0, !has_ld())
-      ld_colour(TRUE)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
-      fetch_index_ld("for the r\u00b2 cut-off")
-    }, priority = 1)
-    
-    # with a local Catalog, Get LD also colours it by LD (in the same render)
-    observeEvent(input$ld_get, {
-      req(!is.null(gwas_catalog), !is.null(cur_index()), !is.na(cur_index()))
-      ld_colour(TRUE)
-      shiny::updateCheckboxInput(session, "trait_ld_colour", value = TRUE)
-    }, priority = 1)
-    
-    observeEvent(input$trait_ld_colour, {
-      ld_colour(isTRUE(input$trait_ld_colour))
-      req(isTRUE(input$trait_ld_colour), !has_ld())
-      fetch_index_ld("to colour by LD")
-    }, priority = 1)
     
     observeEvent(input$ld_clear, {
       link_snp(NULL)
@@ -1663,29 +1581,24 @@ zoom <- function(data, ens_db,
                    trait_filter = trait_filter(),
                    category_filter = trait_category_filter(),
                    collapse = !isFALSE(input$trait_collapse),
-                   r2_min = r2_min(), ld_colour = ld_colour(),
+                   r2_min = r2_min(),
                    eqtl_gene_filter = eqtl_gene_filter(),
                    eqtl_tissue_filter = eqtl_tissue_filter(),
                    qtl_type_filter = qtl_type_filter(),
                    qtl_gene_filter = qtl_gene_filter())
     })
     
-    output$fig_code_ui <- renderUI({
-      req(coords$chr)
-      actionButton("fig_code", NULL, icon = icon("code"),
-                   title = "R code for this view")
-    })
-    
     observeEvent(input$fig_code, {
+      req(coords$chr)
       code <- figure_code(current_figure_state())
-      shiny::showModal(shiny::modalDialog(
+      showModal(modalDialog(
         tags$pre(id = "fig_code_text", code),
         title = "R code for this view", size = "l", easyClose = TRUE,
-        footer = shiny::tagList(
+        footer = tagList(
           tags$button("Copy", class = "btn btn-primary",
                       onclick = paste0("navigator.clipboard.writeText(",
                                        "document.getElementById('fig_code_text').innerText)")),
-          shiny::modalButton("Close"))))
+          modalButton("Close"))))
     })
     
   }

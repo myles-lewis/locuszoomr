@@ -4,7 +4,7 @@
 #' Reads the GWAS Catalog associations download, keeps single-SNP associations
 #' and the columns used by the GWAS Catalog track, and optionally lifts
 #' positions over to GRCh37 and adds trait categories. Save the result with
-#' [saveRDS()] and pass it, or the file path, to [zoom()] as `gwas_catalog`.
+#' `saveRDS()` and pass it, or the file path, to [zoom()] as `gwas_catalog`.
 #'
 #' @details The associations file ("All associations v1.0.2 - with added
 #'   ontology annotations", unzipped) and the trait mappings file are at
@@ -126,7 +126,7 @@ link_gwas_catalog <- function(loc, gcat) {
   LDT <- LDT[order(LDT$pos, -a$logP[w]), ]
   ind <- match(LDT$RS_Number, loc$data[, loc$labs])
   LDT$indata <- !is.na(ind)
-  LDT$R2 <- if ("ld" %in% colnames(loc$data)) loc$data$ld[ind] else rep(NA_real_, nrow(LDT))
+  if ("ld" %in% colnames(loc$data)) LDT$R2 <- loc$data$ld[ind]
   rownames(LDT) <- NULL
   loc$LDtrait <- LDT
   if (!is.null(gcat$category)) {

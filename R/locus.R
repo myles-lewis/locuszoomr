@@ -130,7 +130,7 @@ locus <- function(data = NULL,
       xrange <- c(start(locus) - flank[1], end(locus) + flank[2])
     } else {
       m <- mean(c(start(locus), end(locus)))
-      xrange <- as.integer(c(m - fix_window/2, m + fix_window/2))
+      xrange <- c(m - fix_window/2, m + fix_window/2)
     }
     xrange[xrange < 0] <- 0
   }
@@ -156,13 +156,14 @@ locus <- function(data = NULL,
       xrange <- if (is.null(fix_window)) {
         c(snp_pos - flank[1], snp_pos + flank[2])
       } else {
-        as.integer(c(snp_pos - fix_window/2, snp_pos + fix_window/2))
+        c(snp_pos - fix_window/2, snp_pos + fix_window/2)
       }
       xrange[xrange < 0] <- 0
     }
   }
   
   if (is.null(xrange) | is.null(seqname)) stop('No locus specified')
+  xrange <- as.integer(xrange)
   msg <- paste0("chr ", seqname, ": ", xrange[1], " - ",
                 xrange[2])
   if (!is.null(gene)) msg <- paste(gene, msg, sep = ", ")

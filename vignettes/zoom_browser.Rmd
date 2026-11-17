@@ -143,20 +143,17 @@ zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19,
      gwas_catalog = TRUE, ld_token = "my_token")
 ```
 
-With `gwas_catalog = TRUE`, every Catalog association in the window is shown
-in the GWAS Catalog track below the GWAS plot, coloured by trait, at each locus
-as you browse. No API requests are made, so this also works without an LDlink
+With `gwas_catalog = TRUE`, every Catalog association in the window is shown in
+the GWAS Catalog track below the GWAS plot, coloured by trait, at each locus as
+you browse. No API requests are made, so this also works without an LDlink
 token. A `show GWAS Catalog` checkbox in the `r shiny::icon("gear")` settings
-menu turns the track off. The `GWAS Catalog` button there opens picker menus to
-filter the track by trait and trait category. The associations are listed in a
-GWAS Catalog tab, captioned with the date of the newest association in the
-downloaded copy.
+menu turns the track off. Picker menus can be used to filter the track by trait
+and trait category. A table of associations is also available in the GWAS
+Catalog table tab at the top of the page.
 
-With an LDlink token, when LD is fetched with `Get LD`, the Catalog associations at SNPs in the GWAS
-data are coloured by their LD with the index SNP, using the same colours as the
-GWAS plot. Unticking `colour by LD` returns to trait colours. The `minimum r²`
-slider greys out associations below an LD cut-off. It fetches LD for the index
-SNP first if LD hasn't been fetched yet.
+With an LDlink token, when LD is fetched by pressing the `LD` button, the
+Catalog associations at SNPs in the GWAS data are coloured by their LD with the
+index SNP, using the same colours as the GWAS plot.
 
 The prepared Catalog can also be loaded and used outside the browser:
 

@@ -20,6 +20,7 @@ scatter_plotly(
   eqtl_gene = NULL,
   beta = NULL,
   add_hover = NULL,
+  r2_min = 0,
   showlegend = TRUE,
   height = NULL,
   webGL = TRUE
@@ -67,6 +68,9 @@ triangles for positive beta and downward triangles for negative beta
 
 \item{add_hover}{Optional vector of column names in \code{loc$data} to add to the
 plotly hover text for scatter points.}
+
+\item{r2_min}{Minimum r^2 with the index SNP: associations below it or
+without r^2 are shown in pale grey.}
 
 \item{showlegend}{Logical whether to show a legend for the scatter points.}
 

@@ -139,3 +139,22 @@ gunzip_file <- function(src, dest) {
   }
   dest
 }
+
+gcat_categories <- c(
+  "Biological process",
+  "Body measurement",
+  "Cancer",
+  "Cardiovascular disease",
+  "Cardiovascular measurement",
+  "Digestive system disorder",
+  "Hematological measurement",
+  "Immune system disorder",
+  "Inflammatory measurement",
+  "Lipid or lipoprotein measurement",
+  "Metabolic disorder",
+  "Neurological disorder",
+  "Other disease",
+  "Other measurement",
+  "Other trait",
+  "Unmapped"
+)
