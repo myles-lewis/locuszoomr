@@ -331,8 +331,7 @@ zoom <- function(data, ens_db,
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
-                        actionButton("fig_code", NULL, icon = icon("code"),
-                                     title = "R code for this view"),
+                        actionButton("fig_code", NULL, icon = icon("code")),
                         uiOutput("save_ui", inline = T),
                         (if (show_ld) {
                           actionButton("ld_get", "LD")

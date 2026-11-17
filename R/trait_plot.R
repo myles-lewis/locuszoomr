@@ -7,8 +7,8 @@
 #' and sized as in [trait_plotly()].
 #'
 #' @param loc Object of class 'locus' with element `LDtrait`.
-#' @param trait_filter,category_filter,collapse,r2_min,ld_scheme,size_by_r2 See
-#'   [trait_plotly()].
+#' @param trait_filter,category_filter,collapse,r2_min,ld_scheme,show_ld,size_by_r2 
+#' See [trait_plotly()].
 #' @param xticks Logical whether x axis numbers and title are plotted.
 #' @param border Logical whether a bounding box is plotted.
 #' @param showRecomb Logical whether to leave room for a recombination axis on
@@ -41,8 +41,9 @@ trait_plot <- function(loc,
                        trait_filter = NULL,
                        category_filter = NULL,
                        collapse = TRUE,
-                       r2_min = NULL,
+                       r2_min = 0,
                        ld_scheme = NULL,
+                       show_ld = "ld" %in% colnames(loc$data),
                        size_by_r2 = TRUE,
                        xticks = FALSE,
                        border = FALSE,
@@ -55,7 +56,7 @@ trait_plot <- function(loc,
                        align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
   LDT <- trait_colours(loc, trait_filter, category_filter, collapse, r2_min,
-                       ld_scheme, size_by_r2)
+                       show_ld, ld_scheme, size_by_r2)
   if (is.null(ylab)) ylab <- expression("GWAS trait -log"[10] ~ "P")
   track_panel(loc, LDT$pos, LDT$logP, bg = LDT$colour, col = LDT$outline,
               cex = LDT$size / 7 * cex, blank = "No trait data",
@@ -68,7 +69,7 @@ trait_plot <- function(loc,
 # GWAS Catalog associations as trait_plotly() draws them: filtered, collapsed,
 # in drawing order, with marker colour, outline and size (plotly px)
 trait_colours <- function(loc, trait_filter = NULL, category_filter = NULL,
-                          collapse = TRUE, r2_min = NULL, ld_scheme = NULL,
+                          collapse = TRUE, r2_min = NULL, show_ld, ld_scheme = NULL,
                           size_by_r2 = TRUE) {
   LDT <- loc$LDtrait
   if (is.null(LDT)) {
@@ -76,8 +77,8 @@ trait_colours <- function(loc, trait_filter = NULL, category_filter = NULL,
                       outline = character(0), size = numeric(0)))
   }
   if (!is.null(trait_filter)) LDT <- LDT[LDT$GWAS_Trait %in% trait_filter, ]
-  if (!is.null(category_filter) && !is.null(loc$trait_category)) {
-    tc <- loc$trait_category
+  tc <- loc$trait_category
+  if (!is.null(category_filter) && !is.null(tc)) {
     LDT <- LDT[LDT$GWAS_Trait %in% tc$trait[tc$category %in% category_filter], ]
   }
   if (collapse) LDT <- collapse_traits(LDT)
@@ -86,29 +87,41 @@ trait_colours <- function(loc, trait_filter = NULL, category_filter = NULL,
                  size = numeric(0)))
   }
   traits <- sort(unique(LDT$GWAS_Trait))
-  if (length(traits) > 1) {
-    trait_group <- similarGroups(traits)
-    scheme <- rainbow(length(unique(trait_group)))
-    LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
-  } else {
-    LDT$colour <- "red"
-  }
-  if (!is.null(ld_scheme)) {
+  hasLD <- "R2" %in% colnames(LDT)
+  LDT$outline <- "black"
+  if (hasLD && show_ld) {
+    if (is.null(ld_scheme)) ld_scheme <- eval(formals(scatter_plotly)$LD_scheme)
+    # same bins as scatter_plotly(); strongest LD drawn on top
     bin <- cut(LDT$R2, -1:6/5, labels = FALSE)
     bin[LDT$R2 %in% 0] <- 2L
     bin[is.na(bin)] <- 1L
     bin[LDT$RS_Number %in% loc$index_snp] <- 7L
     hex <- rgb(t(col2rgb(rep_len(ld_scheme, 7))), maxColorValue = 255)
     LDT$colour <- hex[bin]
+    if (r2_min > 0) {
+      # r2 filter
+      grey <- which(is.na(LDT$R2) | LDT$R2 < r2_min)
+      if (length(grey) > 0) {
+        LDT$colour[grey] <- "#DDDDDD"
+        LDT$outline[grey] <- "#BBBBBB"
+        bin[grey] <- 1L
+      }
+    }
     LDT <- LDT[order(bin), ]
+  } else if (!is.null(tc) && length(unique(LDT$category)) > 1) {
+    # colour by trait categories
+    scheme <- setNames(rainbow(16, s = 0.9), gcat_categories)
+    LDT$colour <- scheme[LDT$category]
+    LDT$colour[is.na(LDT$colour)] <- "#CCCCCC"
+  } else if (length(traits) > 1) {
+    # cluster based on text similarity
+    trait_group <- similarGroups(traits)
+    scheme <- rainbow(length(unique(trait_group)))
+    LDT$colour <- scheme[trait_group[LDT$GWAS_Trait]]
+  } else {
+    LDT$colour <- "red"
   }
-  LDT$outline <- "black"
-  if (!is.null(r2_min) && r2_min > 0) {
-    grey <- is.na(LDT$R2) | LDT$R2 < r2_min
-    LDT$colour[grey] <- "#CCCCCC"
-    LDT$outline[grey] <- "#999999"
-  }
-  LDT$size <- if (size_by_r2 && is.null(ld_scheme)) {
+  LDT$size <- if (hasLD && size_by_r2) {
     6 + 8 * ifelse(is.na(LDT$R2), 0, LDT$R2)
   } else 7
   LDT
@@ -116,7 +129,7 @@ trait_colours <- function(loc, trait_filter = NULL, category_filter = NULL,
 
 # panel margins lining up with scatter_plot() and genetracks()
 track_mar <- function(xticks, recomb) {
-  c(ifelse(xticks, 3, 0.1), 3.5, 0.25, ifelse(recomb, 3.5, 1.5))
+  c(ifelse(xticks, 3, 0.1), 3.5, 2, ifelse(recomb, 3.5, 1.5))
 }
 
 # scatter panel for the static tracks, styled as scatter_plot()

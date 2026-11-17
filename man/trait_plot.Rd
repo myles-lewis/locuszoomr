@@ -9,8 +9,9 @@ trait_plot(
   trait_filter = NULL,
   category_filter = NULL,
   collapse = TRUE,
-  r2_min = NULL,
+  r2_min = 0,
   ld_scheme = NULL,
+  show_ld = "ld" \%in\% colnames(loc$data),
   size_by_r2 = TRUE,
   xticks = FALSE,
   border = FALSE,
@@ -27,8 +28,7 @@ trait_plot(
 \arguments{
 \item{loc}{Object of class 'locus' with element \code{LDtrait}.}
 
-\item{trait_filter, category_filter, collapse, r2_min, ld_scheme, size_by_r2}{See
-\code{\link[=trait_plotly]{trait_plotly()}}.}
+\item{trait_filter, category_filter, collapse, r2_min, ld_scheme, show_ld, size_by_r2}{See \code{\link[=trait_plotly]{trait_plotly()}}.}
 
 \item{xticks}{Logical whether x axis numbers and title are plotted.}
 
