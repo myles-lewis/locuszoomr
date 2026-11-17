@@ -29,6 +29,7 @@ scatter_plot(
   label_y = 4,
   eqtl_gene = NULL,
   beta = NULL,
+  r2_min = 0,
   add = FALSE,
   align = TRUE,
   ...
@@ -100,6 +101,9 @@ scale.}
 \item{beta}{Optional column name for beta coefficient to display upward
 triangles for positive beta and downward triangles for negative beta
 (significant SNPs only).}
+
+\item{r2_min}{Minimum r^2 with the index SNP: associations below it or
+without r^2 are shown in pale grey.}
 
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}

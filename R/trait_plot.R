@@ -69,7 +69,7 @@ trait_plot <- function(loc,
 # GWAS Catalog associations as trait_plotly() draws them: filtered, collapsed,
 # in drawing order, with marker colour, outline and size (plotly px)
 trait_colours <- function(loc, trait_filter = NULL, category_filter = NULL,
-                          collapse = TRUE, r2_min = NULL, show_ld, ld_scheme = NULL,
+                          collapse = TRUE, r2_min = 0, show_ld, ld_scheme = NULL,
                           size_by_r2 = TRUE) {
   LDT <- loc$LDtrait
   if (is.null(LDT)) {

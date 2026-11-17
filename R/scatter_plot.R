@@ -47,6 +47,8 @@
 #' @param beta Optional column name for beta coefficient to display upward
 #'   triangles for positive beta and downward triangles for negative beta
 #'   (significant SNPs only).
+#' @param r2_min Minimum r^2 with the index SNP: associations below it or
+#'   without r^2 are shown in pale grey.
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -88,6 +90,7 @@ scatter_plot <- function(loc,
                          label_x = 4, label_y = 4,
                          eqtl_gene = NULL,
                          beta = NULL,
+                         r2_min = 0,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -123,9 +126,19 @@ scatter_plot <- function(loc,
       data$bg[data$ld == 0] <- 2L
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] %in% index_snp] <- 7L
-      data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
+      if (r2_min > 0) {
+        # r2 filter
+        grey <- which(is.na(data$ld) | data$ld < r2_min)
+        if (length(grey) > 0) {
+          data$bg[grey] <- "#DDDDDD"
+          # levels(data$bg)[1] <- paste("<", signif(r2_min, 2))
+          data$col <- "black"
+          data$col[grey] <- "#BBBBBB"
+        }
+      }
+      data <- data[order(data$bg), ]
     } else if (!is.null(eqtl_gene)) {
       # eqtl gene colours
       bg <- data[, eqtl_gene]
