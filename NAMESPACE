@@ -13,6 +13,7 @@ export(line_plot)
 export(link_LD)
 export(link_eqtl)
 export(link_gwas_catalog)
+export(link_ot)
 export(link_recomb)
 export(link_trait)
 export(load_gwas_catalog)
@@ -22,12 +23,15 @@ export(locus_plot)
 export(locus_plotly)
 export(multi_layout)
 export(overlay_plot)
+export(overlay_scatter)
 export(prep_gwas_catalog)
+export(qtl_plot)
 export(quick_peak)
 export(sanity_check)
 export(scatter_plot)
 export(scatter_plotly)
 export(set_layers)
+export(trait_plot)
 export(trait_plotly)
 export(zoom)
 importFrom(AnnotationFilter,
@@ -170,6 +174,8 @@ importFrom(shiny,
   hideTab,
   icon,
   isolate,
+  modalButton,
+  modalDialog,
   need,
   observe,
   observeEvent,
@@ -183,12 +189,14 @@ importFrom(shiny,
   renderUI,
   req,
   runApp,
+  showModal,
   showNotification,
   showTab,
   sliderInput,
   splitLayout,
   tabPanel,
   tabsetPanel,
+  tagList,
   textInput,
   textOutput,
   uiOutput,

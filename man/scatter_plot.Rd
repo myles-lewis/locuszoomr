@@ -23,12 +23,14 @@ scatter_plot(
   LD_scheme = c("grey", "royalblue", "cyan2", "green3", "orange", "red", "purple"),
   recomb_col = "blue",
   recomb_offset = 0,
+  recomb_on_top = TRUE,
   legend_pos = "topleft",
   labels = NULL,
   label_x = 4,
   label_y = 4,
   eqtl_gene = NULL,
   beta = NULL,
+  r2_min = 0,
   add = FALSE,
   align = TRUE,
   ...
@@ -82,6 +84,9 @@ recombination rate data.}
 \item{recomb_offset}{Offset from 0-1 which shifts the scatter plot up and
 recombination line plot down. Recommended value 0.1.}
 
+\item{recomb_on_top}{Whether recombination line goes on top or underneath
+points.}
+
 \item{legend_pos}{Position of legend. See \code{\link[=legend]{legend()}}. Set to \code{NULL} to hide
 legend.}
 
@@ -100,6 +105,9 @@ scale.}
 \item{beta}{Optional column name for beta coefficient to display upward
 triangles for positive beta and downward triangles for negative beta
 (significant SNPs only).}
+
+\item{r2_min}{Minimum r^2 with the index SNP: associations below it or
+without r^2 are shown in pale grey.}
 
 \item{add}{Logical whether to add points to an existing plot or generate a
 new plot.}
