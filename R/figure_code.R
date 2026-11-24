@@ -206,7 +206,7 @@ code_call <- function(fun, args, assign = NULL, width = 80L) {
 
 # how zoom() was given its arguments, for the code it writes
 arg_name <- function(expr) {
-  if (!is.symbol(expr) || identical(expr, as.name("."))) return(NULL)
+  # if (!is.symbol(expr) || identical(expr, as.name("."))) return(NULL)
   deparse(expr, backtick = TRUE)
 }
 
