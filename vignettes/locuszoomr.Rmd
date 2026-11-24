@@ -26,7 +26,7 @@ ensdb_eval <- requireNamespace("EnsDb.Hsapiens.v75", quietly = TRUE)
 
 The `locuszoomr` package allows users to produce publication ready gene locus 
 plots very similar to those produced by the web interface 'locuszoom' 
-(http://locuszoom.org), but running purely locally in R. Plots can easily be 
+(https://my.locuszoom.org), but running purely locally in R. Plots can easily be 
 customised, labelled and stacked.
 
 These gene annotation plots are produced via R base graphics or 'ggplot2'. A
