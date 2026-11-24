@@ -83,7 +83,8 @@
 #' @importFrom shiny renderUI reactiveValues reactive observe observeEvent radioButtons
 #' @importFrom shiny reactiveVal validate need renderText updateTextInput outputOptions
 #' @importFrom shiny showNotification removeNotification HTML downloadButton downloadHandler
-#' @importFrom shiny showTab hideTab sliderInput updateSliderInput
+#' @importFrom shiny showTab hideTab sliderInput updateSliderInput showModal modalDialog
+#' @importFrom shiny tagList modalButton
 #' @importFrom htmltools tags br
 #' @importFrom gtools mixedsort
 #' @importFrom stats as.formula setNames
@@ -119,8 +120,11 @@ zoom <- function(data, ens_db,
   if (!requireNamespace("DT", quietly = TRUE))
     stop("Need DT package", call. = FALSE)
   
+  gcat_source <- catalog_source(substitute(gwas_catalog), gwas_catalog)
   gwas_catalog <- as_gwas_catalog(gwas_catalog)
   dat_name <- deparse(substitute(data))
+  call. <- match.call()
+  
   data <- data.frame(data)
   # autodetect headings
   dc <- detect_cols(data, chrom[1], pos[1], p[1], labs[1])
@@ -221,8 +225,6 @@ zoom <- function(data, ens_db,
           }
         });'
   
-  # https://shiny.posit.co/r/articles/build/packaging-javascript/
-  
   ui <- fluidPage(
     tags$script(js),
     # 3 plotly scattergl figures gives error "too many active WebGL contexts"
@@ -320,6 +322,7 @@ zoom <- function(data, ens_db,
                         actionButton("right2", NULL, icon = icon("angles-right")),
                         actionButton("zoomin", NULL, icon = icon("magnifying-glass-plus")),
                         actionButton("zoomout", NULL, icon = icon("magnifying-glass-minus")),
+                        actionButton("fig_code", NULL, icon = icon("code")),
                         uiOutput("save_ui", inline = T),
                         (if (show_ld) {
                           actionButton("ld_get", "LD")
@@ -1118,6 +1121,7 @@ zoom <- function(data, ens_db,
     
     # temporary fix for R/plotly layout.xaxis.minallowed not working
     observeEvent(coords$xrange, {
+      req(coords$xrange)
       if (coords$xrange[1] < 0) {
         coords$xrange <- signif(coords$xrange - coords$xrange[1], 3)
       }
@@ -1541,6 +1545,51 @@ zoom <- function(data, ens_db,
       } else {
         saveRDS(save_plotly$p, file)
       }
+    })
+    
+    # R code for a static figure of the current view
+    current_figure_state <- function() isolate({
+      pin <- link_snp()
+      in_view <- !is.null(pin) &&
+        (pin %in% loc$i$data[, labs[1]] || (man2 && pin %in% locv2$i$data[, labs[2]]))
+      bt <- input_biotype()
+      if (setequal(bt, biotypes)) bt <- NULL
+      list(call. = call.,
+           man2 = man2,
+           qtl_found = !is.null(link_data$OTqtl),
+           ens_db = ens_db,
+           recomb_on = !is.null(recomb) && isTRUE(input$recomb),
+           gwas_catalog = if (!is.null(gwas_catalog)) gcat_source,
+           catalog_on = isTRUE(input$gwas_catalog),
+           chrom = chrom, pos = pos, p = p, labs = labs,
+           chr = coords$chr, xrange = coords$xrange,
+           link_type = link_type(), link_snp = pin, link_snp_in_view = in_view,
+           ld_token = ld_token, ld_pop = ld_pop,
+           pcutoff = pcutoff, traits = if (man2) traits,
+           eqtl_gene = eqtl_gene, beta = beta,
+           select_gene = input$select_gene, biotype = bt,
+           maxrows = if (isTRUE(input$alltracks)) NULL else 8,
+           trait_filter = trait_filter(),
+           category_filter = trait_category_filter(),
+           collapse = !isFALSE(input$trait_collapse),
+           r2_min = r2_min(),
+           eqtl_gene_filter = eqtl_gene_filter(),
+           eqtl_tissue_filter = eqtl_tissue_filter(),
+           qtl_type_filter = qtl_type_filter(),
+           qtl_gene_filter = qtl_gene_filter())
+    })
+    
+    observeEvent(input$fig_code, {
+      req(coords$chr)
+      code <- figure_code(current_figure_state())
+      showModal(modalDialog(
+        tags$pre(id = "fig_code_text", code),
+        title = "R code for this view", size = "l", easyClose = TRUE,
+        footer = tagList(
+          tags$button("Copy", class = "btn btn-primary",
+                      onclick = paste0("navigator.clipboard.writeText(",
+                                       "document.getElementById('fig_code_text').innerText)")),
+          modalButton("Close"))))
     })
     
   }

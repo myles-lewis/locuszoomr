@@ -34,6 +34,8 @@
 #'   recombination rate data.
 #' @param recomb_offset Offset from 0-1 which shifts the scatter plot up and
 #'   recombination line plot down. Recommended value 0.1.
+#' @param recomb_on_top Whether recombination line goes on top or underneath
+#'   points.
 #' @param legend_pos Position of legend. See [legend()]. Set to `NULL` to hide
 #'   legend.
 #' @param labels Character vector of SNP or genomic feature IDs to label. The
@@ -47,6 +49,8 @@
 #' @param beta Optional column name for beta coefficient to display upward
 #'   triangles for positive beta and downward triangles for negative beta
 #'   (significant SNPs only).
+#' @param r2_min Minimum r^2 with the index SNP: associations below it or
+#'   without r^2 are shown in pale grey.
 #' @param add Logical whether to add points to an existing plot or generate a
 #'   new plot.
 #' @param align Logical whether to set [par()] to align the plot.
@@ -83,11 +87,13 @@ scatter_plot <- function(loc,
                                        'orange', 'red', 'purple'),
                          recomb_col = "blue",
                          recomb_offset = 0,
+                         recomb_on_top = TRUE,
                          legend_pos = 'topleft',
                          labels = NULL,
                          label_x = 4, label_y = 4,
                          eqtl_gene = NULL,
                          beta = NULL,
+                         r2_min = 0,
                          add = FALSE,
                          align = TRUE, ...) {
   if (!inherits(loc, "locus")) stop("Object of class 'locus' required")
@@ -123,9 +129,19 @@ scatter_plot <- function(loc,
       data$bg[data$ld == 0] <- 2L
       data$bg[is.na(data$bg)] <- 1L
       data$bg[data[, loc$labs] %in% index_snp] <- 7L
-      data <- data[order(data$bg), ]
       LD_scheme <- rep_len(LD_scheme, 7)
       data$bg <- LD_scheme[data$bg]
+      if (r2_min > 0) {
+        # r2 filter
+        grey <- which(is.na(data$ld) | data$ld < r2_min)
+        if (length(grey) > 0) {
+          data$bg[grey] <- "#DDDDDD"
+          # levels(data$bg)[1] <- paste("<", signif(r2_min, 2))
+          data$col <- "black"
+          data$col[grey] <- "#BBBBBB"
+        }
+      }
+      data <- data[order(data$bg), ]
     } else if (!is.null(eqtl_gene)) {
       # eqtl gene colours
       bg <- data[, eqtl_gene]
@@ -155,7 +171,7 @@ scatter_plot <- function(loc,
   yd <- diff(ylim)
   if (recomb && recomb_offset != 0) ylim[1] <- ylim[1] - yd * recomb_offset
   
-  panel.first <- quote({
+  panel <- quote({
     if (loc$yvar == "logP" & !is.null(pcutoff)) {
       abline(h = -log10(pcutoff), col = 'darkgrey', lty = 2)
     }
@@ -207,8 +223,10 @@ scatter_plot <- function(loc,
                bty = bty,
                xaxt = 'n',
                tcl = -0.3, 
-               mgp = c(1.7, 0.5, 0),
-               panel.first = panel.first)
+               mgp = c(1.7, 0.5, 0))
+  if (recomb_on_top) {
+    plot.args$panel.last <- panel
+  } else plot.args$panel.first <- panel
   if (recomb && recomb_offset != 0) {
     plot.args$ylab <- ""
     plot.args <- c(plot.args, yaxt = 'n')
