@@ -99,11 +99,11 @@ via the `ld_token` argument when calling `zoom()`.
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19, ld_token = "my_token")
 ```
 
-This enables extra buttons for `Get LD` in the `r shiny::icon("gear")` settings
-dropdown menu. LD API requests are cached and retained during an R session, so
-subsequent requests for the same SNP are much faster. At each locus, the SNP
-with the lowest p-value is presumed to be the index SNP for LD requests. But
-clicking on other points can re-base the LD to alternative SNPs.
+This enables extra buttons for `LD`, `eQTL` and `GWAS Catalog` in the navigation
+bar. LD API requests are cached and retained during an R session, so subsequent
+requests for the same SNP are much faster. At each locus, the SNP with the
+lowest p-value is presumed to be the index SNP for LD requests. But clicking on
+other points can re-base the LD to alternative SNPs.
 
 ```{r, out.width='100%', echo=FALSE}
 knitr::include_graphics("zoom2.png")
@@ -112,9 +112,8 @@ knitr::include_graphics("zoom2.png")
 ### Overlay eQTL data via LDlink
 
 The LDlink API can also be queried for eQTL data which can be overlaid on the
-GWAS plots. Click on the `Get eQTL` button in the `r shiny::icon("gear")`
-settings dropdown menu. The plot below shows how the top GWAS SNPs in the *IRF5* 
-locus are linked to an *IRF5* eQTL.
+GWAS plots by clicking on the `eQTL` button. The plot below shows how the top
+GWAS SNPs in the *IRF5* locus are linked to an *IRF5* eQTL.
 
 Each SNP may have an eQTL which drives gene expression across multiple tissues
 and some SNPs have eQTL with multiple genes. So by default the overlay plots
@@ -170,7 +169,7 @@ saved .rds file.
 
 ### Open Targets QTL credible sets
 
-The `Open Targets` button in the settings menu queries the
+The `Open Targets` button in the navigation bar queries the
 [Open Targets Platform](https://platform.opentargets.org/) for fine-mapped
 molecular QTL credible sets (eQTL, pQTL, sQTL and others) containing the index
 SNP. They are shown in an extra track, with picker menus to filter by QTL type
@@ -257,9 +256,8 @@ gcat <- load_gwas_catalog()
 loc <- link_gwas_catalog(loc, gcat)
 
 oldpar <- set_layers(2)
-scatter_plot(loc, xticks = FALSE)
+scatter_plot(loc, xticks = FALSE, r2_min = 0.5)
 trait_plot(loc, r2_min = 0.5,
-           ld_scheme = eval(formals(scatter_plot)$LD_scheme),
            size_by_r2 = FALSE)
 genetracks(loc, maxrows = 8)
 par(oldpar)
