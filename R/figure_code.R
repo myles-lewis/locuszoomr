@@ -1,34 +1,4 @@
 
-#' Describe a zoom() view for figure_code()
-#'
-#' @param ... Fields to set; any other field keeps its default. `NULL` values
-#'   are kept (e.g. `maxrows = NULL` for all gene tracks).
-#' @return List with every field `figure_code()` reads.
-#' @noRd
-
-figure_state <- function(...) {
-  state <- list(data = NULL, data2 = NULL, man2 = FALSE,
-                ens_db = NULL, recomb = NULL, recomb_on = FALSE,
-                gwas_catalog = NULL, catalog_on = FALSE,
-                chrom = NULL, pos = NULL, p = NULL, labs = NULL,
-                chr = NULL, xrange = NULL,
-                data_prep = NULL, data2_prep = NULL,
-                link_type = NULL, link_snp = NULL, link_snp_in_view = FALSE,
-                qtl_found = TRUE, ld_token = Sys.getenv("LDLINK_TOKEN"),
-                ld_pop = "EUR", pcutoff = 5e-8,
-                traits = NULL, eqtl_gene = NULL, beta = NULL, select_gene = NULL,
-                biotype = NULL, maxrows = 8,
-                trait_filter = NULL, category_filter = NULL, collapse = TRUE,
-                r2_min = 0, ld_colour = FALSE,
-                eqtl_gene_filter = NULL, eqtl_tissue_filter = NULL,
-                qtl_type_filter = NULL, qtl_gene_filter = NULL)
-  args <- list(...)
-  bad <- setdiff(names(args), names(state))
-  if (length(bad)) stop("unknown figure state: ", paste(bad, collapse = ", "))
-  state[names(args)] <- args
-  state
-}
-
 #' R code for a static figure of a zoom() view
 #'
 #' Mirrors what `zoom()`'s locus plot draws (see `output$locus` in zoom.R):
@@ -42,25 +12,26 @@ figure_state <- function(...) {
 figure_code <- function(state, backend = "base") {
   backend <- match.arg(backend, "base")
   s <- state
+  ocall <- c("# Original call and objects needed",
+             code_call("zoom", lapply(s$call.[-1], deparse)))
   pre <- character(0)
-  # name of a user object, or a placeholder that stops with a message
-  obj <- function(name, var, what) {
-    if (!is.null(name)) return(name)
-    pre <<- c(pre, sprintf('%s <- stop("set %s to %s")', var, var, what))
-    var
+  # name of a user object that was originally loaded
+  obj <- function(name, what) {
+    pre <<- c(pre, sprintf('# `%s` = %s', name, what))
+    name
   }
   libs <- "library(locuszoomr)"
-  ens <- s$ens_db
-  ens_code <- if (is.null(ens)) {
-    obj(NULL, "ens_db", "the ens_db passed to zoom()")
-  } else if (isTRUE(ens$package)) {
+  ens <- ens_db_source(s$call.$ens_db, s$ens_db)
+  ens_code <- if (isTRUE(ens$package)) {
     libs <- c(libs, sprintf("library(%s)", ens$name))
     code_value(ens$name)
-  } else ens$name
+  } else {
+    obj(ens$name, "ensembl database")
+  }
   linked <- !is.null(s$link_type) && !is.null(s$link_snp) &&
     isTRUE(s$link_snp_in_view)
   lt <- if (linked) s$link_type else ""
-  token <- paste0('"', s$ld_token, '"')
+  token <- code_value(s$ld_token)
   
   # data
   out <- character(0)
@@ -78,35 +49,18 @@ figure_code <- function(state, backend = "base") {
     }
     code_call("locus", args, assign)
   }
-  # repeat zoom()'s cleaning of the data where it changed anything
-  prep <- function(name, var, i, pr) {
-    if (!isTRUE(pr$df) && !isTRUE(pr$complete)) {
-      if (isTRUE(pr$dups)) add("# zoom() renamed duplicated SNP labels; here they keep their names")
-      return(name)
-    }
-    add(sprintf("%s <- data.frame(%s)", var, name))
-    if (isTRUE(pr$complete)) {
-      add(sprintf("%s <- %s[complete.cases(%s[, %s]), ]", var, var, var,
-                  gsub("\001", " ", code_value(c(s$chrom[i], s$pos[i], s$p[i])), fixed = TRUE)))
-    }
-    if (isTRUE(pr$dups)) add("# zoom() renamed duplicated SNP labels; here they keep their names")
-    var
-  }
   locs <- "loc"
-  d1 <- prep(obj(s$data, "gwas_data", "the data passed to zoom()"), "gwas_data", 1,
-             s$data_prep)
-  add(locus_call(d1, 1, "loc"))
+  add(locus_call(obj(arg_name(s$call.$data), "dataset 1"), 1, "loc"))
   if (isTRUE(s$man2)) {
-    d2 <- prep(obj(s$data2, "gwas_data2", "the data2 passed to zoom()"), "gwas_data2", 2,
-               s$data2_prep)
-    add(locus_call(d2, 2, "loc2"))
+    add(locus_call(obj(arg_name(s$call.$data2), "dataset 2"), 2, "loc2"))
     locs <- c(locs, "loc2")
   }
   each <- function(fun, ...) {
     for (l in locs) add(code_call(fun, c(list(l), list(...)), l))
   }
   if (isTRUE(s$recomb_on)) {
-    each("link_recomb", recomb = obj(s$recomb, "recomb", "the recomb passed to zoom()"))
+    each("link_recomb",
+         recomb = obj(arg_name(s$call.$recomb), "recombination rate object"))
   }
   if (lt == "LD") each("link_LD", token = token, pop = code_value(s$ld_pop))
   if (lt == "eQTL") each("link_eqtl", token = token)
@@ -124,8 +78,7 @@ figure_code <- function(state, backend = "base") {
     gname <- switch(g$how,
                     cache = {add("gcat <- load_gwas_catalog()"); "gcat"},
                     path = {add(sprintf("gcat <- readRDS(%s)", code_value(g$value))); "gcat"},
-                    object = g$value,
-                    obj(NULL, "gcat", "the gwas_catalog passed to zoom()"))
+                    object = obj(g$value, "gwas_catalog object"))
     add(sprintf("loc <- link_gwas_catalog(loc, %s)", gname))
   }
   if (!is.null(s$eqtl_gene) && !is.null(s$select_gene) && s$select_gene != "all") {
@@ -175,7 +128,8 @@ figure_code <- function(state, backend = "base") {
         padd(code_call("scatter_plot", c(list(locs[i]), code_args(
           xticks = FALSE, pcutoff = pcut,
           eqtl_gene = if (i == 1) s$eqtl_gene,
-          beta = if (length(s$beta) >= i) s$beta[i]), ylab)))
+          beta = if (length(s$beta) >= i) s$beta[i]),
+          r2_min = if (s$r2_min > 0) s$r2_min, ylab)))
       }
     }
     if (!is.null(track)) padd(track)
@@ -189,8 +143,8 @@ figure_code <- function(state, backend = "base") {
   if (overlay && isTRUE(s$man2)) {
     notes <- c(notes, "# eQTL gene colours are not matched between the two panels as in the app")
   }
-  paste(c("# R code for the current zoom() view", libs, "",
-          if (length(pre)) c(pre, ""), out, "", notes, plot_out), collapse = "\n")
+  paste(c(ocall, pre, "", "# R code for the current zoom() view", libs, "",
+          out, "", notes, plot_out), collapse = "\n")
 }
 
 # a value as R code; vector elements are joined with a soft break ("\001")
@@ -268,11 +222,4 @@ ens_db_source <- function(expr, value) {
   if (is.character(value)) return(list(name = value, package = TRUE))
   if (!is.null(arg_name(expr))) return(list(name = arg_name(expr), package = FALSE))
   NULL
-}
-
-# what zoom()'s data.frame(), complete_data() and unique_snps() change
-prep_changes <- function(data, raw_names, chrom, pos, p, labs) {
-  list(df = !identical(raw_names, colnames(data)),
-       complete = !all(stats::complete.cases(data[, c(chrom, pos, p)])),
-       dups = anyDuplicated(data[, labs]) > 0)
 }
