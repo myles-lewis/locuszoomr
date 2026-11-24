@@ -1,6 +1,13 @@
 News
 =====
 
+# locuszoomr 1.4.0
+###### 24/11/2026
+* Added code button to `zoom()` to open a window showing code needed to 
+reproduce the set of plots currently visible in the zoom browser [TW & ML].
+* Added `r2_min` argument to `scatter_plot()` etc to grey out points below an LD 
+r^2 threshold. 
+
 # locuszoomr 1.3.2
 ###### 12/11/2026
 
