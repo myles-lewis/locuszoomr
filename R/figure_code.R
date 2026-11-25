@@ -31,7 +31,9 @@ figure_code <- function(state, backend = "base") {
   linked <- !is.null(s$link_type) && !is.null(s$link_snp) &&
     isTRUE(s$link_snp_in_view)
   lt <- if (linked) s$link_type else ""
-  token <- code_value(s$ld_token)
+  # write the token as the user passed it to zoom(), never its value
+  token <- if (is.null(s$call.$ld_token)) 'Sys.getenv("LDLINK_TOKEN")' else
+    paste(deparse(s$call.$ld_token, backtick = TRUE), collapse = " ")
   
   # data
   out <- character(0)
