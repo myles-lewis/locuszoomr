@@ -1586,9 +1586,20 @@ zoom <- function(data, ens_db,
         tags$pre(id = "fig_code_text", code),
         title = "R code for this view", size = "l", easyClose = TRUE,
         footer = tagList(
-          tags$button("Copy", class = "btn btn-primary",
-                      onclick = paste0("navigator.clipboard.writeText(",
-                                       "document.getElementById('fig_code_text').innerText)")),
+          # the Clipboard API is missing outside secure contexts and blocked in
+          # some viewers (e.g. RStudio), so fall back to selecting the text
+          tags$button("Copy", class = "btn btn-primary", onclick = paste0(
+            "var b = this, el = document.getElementById('fig_code_text');",
+            "var done = function(ok) {b.textContent = ok ? 'Copied' : 'Press Ctrl/Cmd+C';};",
+            "var fallback = function() {",
+            "  var r = document.createRange(); r.selectNodeContents(el);",
+            "  var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);",
+            "  var ok = false; try {ok = document.execCommand('copy');} catch (e) {}",
+            "  if (ok) s.removeAllRanges(); done(ok);};",
+            "if (navigator.clipboard && window.isSecureContext) {",
+            "  navigator.clipboard.writeText(el.innerText).then(",
+            "    function() {done(true);}, fallback);",
+            "} else fallback();")),
           modalButton("Close"))))
     })
     
