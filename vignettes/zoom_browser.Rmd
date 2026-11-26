@@ -238,7 +238,7 @@ based on display width won't function.
 
 ### R code for a figure
 
-The `r shiny::icon("code")` button next to the save icon shows R code which
+The `r shiny::icon("code")` button next to the save icon produces R code which
 redraws the current view as a static base graphics figure, ready to copy into a
 script and adjust. The code repeats what the app did: the same window and data
 columns, the same LD, eQTL, GWAS Catalog or Open Targets data (fetched again
@@ -252,7 +252,7 @@ For example, at IRF5 with LD and the local GWAS Catalog filtered to r^2^ >= 0.5:
 library(locuszoomr)
 library(EnsDb.Hsapiens.v75)
 
-loc <- locus(SLE_gwas_sub, seqname = "7", xrange = c(128083877, 129083877),
+loc <- locus(SLE_gwas, seqname = "7", xrange = c(128083877, 129083877),
              ens_db = "EnsDb.Hsapiens.v75", chrom = "chrom", pos = "pos",
              p = "p", labs = "rsid", index_snp = "rs35000415")
 loc <- link_LD(loc, token = Sys.getenv("LDLINK_TOKEN"), pop = "EUR")
