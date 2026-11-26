@@ -267,10 +267,6 @@ genetracks(loc, maxrows = 8)
 par(oldpar)
 ```
 
-If an argument was passed to `zoom()` as an expression rather than an object
-name (e.g. `zoom(subset(gwas, chrom == 7), ...)`), the code starts with a line
-to fill in.
-
 ### Citation
 
 If you use this package please cite as:
