@@ -106,7 +106,7 @@ lowest p-value is presumed to be the index SNP for LD requests. But clicking on
 other points can re-base the LD to alternative SNPs.
 
 ```{r, out.width='100%', echo=FALSE}
-knitr::include_graphics("zoom2.png")
+knitr::include_graphics("zoom_ld.png")
 ```
 
 ### Overlay eQTL data via LDlink
@@ -140,6 +140,10 @@ update the cached copy.
 download_gwas_catalog()
 zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75", recomb = recomb.hg19,
      gwas_catalog = TRUE, ld_token = "my_token")
+```
+
+```{r, out.width='100%', echo=FALSE}
+knitr::include_graphics("zoom_gcat.png")
 ```
 
 With `gwas_catalog = TRUE`, every Catalog association in the window is shown in
