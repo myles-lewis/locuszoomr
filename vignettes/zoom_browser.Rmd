@@ -45,7 +45,8 @@ zoom(SLE_gwas, ens_db = "EnsDb.Hsapiens.v75")
 ```
 
 ```{r, out.width='100%', echo=FALSE}
-knitr::include_graphics("zoom1.png")
+knitr::include_graphics("zoom1a.png")
+knitr::include_graphics("zoom1b.png")
 ```
 
 ### Navigation
